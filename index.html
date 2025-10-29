@@ -5,11 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dietfy - Aplicación de Dietas Personalizadas</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <!-- Librería para generar PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
     <div class="container">
+        <div id="userInfo" class="user-info">
+            <!-- Se llenará dinámicamente con auth.js -->
+        </div>
+        
+        <!-- Botón flotante para crear cliente (solo cuando estés logueado) -->
+        <div id="botonCrearClienteFlotante" class="boton-flotante oculto">
+            <button class="btn-flotante" title="Nuevo Cliente">
+                ➕
+            </button>
+        </div>
+        
         <h1>Dietfy - Calculadora de Dietas Personalizadas</h1>
         
         <div class="form-container">
@@ -108,7 +123,9 @@
                     <label for="duracion">Duración del plan:</label>
                     <select id="duracion" name="duracion" required>
                         <option value="semana">1 Semana</option>
-                        <option value="mes">1 Mes</option>
+                        <option value="2semanas">2 Semanas</option>
+                        <option value="3semanas">3 Semanas</option>
+                        <option value="mes">1 Mes (4 Semanas)</option>
                     </select>
                 </div>
 
@@ -119,6 +136,12 @@
         <div id="resultados" class="resultados oculto">
             <div class="print-header">
                 <div class="btn-container">
+                    <button type="button" id="btnGuardar" class="btn-save">
+                        💾 Guardar Dieta
+                    </button>
+                    <button type="button" id="btnEditarDieta" class="btn-edit">
+                        ✏️ Editar Dieta
+                    </button>
                     <button type="button" id="btnDescargar" class="btn-download">
                         📥 Descargar Plan en PDF
                     </button>
@@ -270,6 +293,17 @@
         </div>
     </div>
 
+    <!-- Scripts en orden de dependencia -->
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="dietaService.js"></script>
+    <script src="clienteService.js"></script>
+    <script src="base-datos-alimentos.js"></script>
+    <script src="generador-dietas.js"></script>
+    <script src="editor-dietas.js"></script>
+    <script src="verificar-firestore.js"></script>
+    <script src="cliente-manager.js"></script>
+    <script src="ui-manager.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

@@ -856,10 +856,18 @@ const alimentosPorObjetivo = {
 
 // Variables globales
 let datosUsuario = {};
+window.datosUsuario = datosUsuario; // Exportar para uso en otros módulos
 
 // Event listener para el formulario
-document.getElementById('dietForm').addEventListener('submit', function(e) {
+document.getElementById('dietForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    
+    // Validar que el usuario esté autenticado
+    if (!window.authManager || !window.authManager.isAuthenticated()) {
+        window.uiManager?.openModal();
+        mostrarNotificacion('⚠️ Debes iniciar sesión para generar dietas', 'error');
+        return;
+    }
     
     datosUsuario = {
         nombre: document.getElementById('nombre').value,
@@ -875,6 +883,7 @@ document.getElementById('dietForm').addEventListener('submit', function(e) {
     };
     
     calcularMacronutrientes();
+    window.datosUsuario = datosUsuario; // Actualizar referencia global
     mostrarResultados();
 });
 
@@ -928,13 +937,16 @@ function calcularMacronutrientes() {
     datosUsuario.carbohidratos = carbohidratos;
     datosUsuario.imc = (peso / Math.pow(altura / 100, 2)).toFixed(1);
     
+    window.datosUsuario = datosUsuario; // Actualizar referencia global
+    
     document.getElementById('calorias').value = calorias;
     document.getElementById('proteinas').value = proteinas;
     document.getElementById('grasas').value = grasas;
     document.getElementById('carbohidratos').value = carbohidratos;
 }
 
-function mostrarResultados() {
+// Hacer función global para uso desde otros módulos
+window.mostrarResultados = function() {
     const resultadosDiv = document.getElementById('resultados');
     
     const fechaHoy = new Date().toLocaleDateString('es-ES', {
@@ -963,7 +975,10 @@ function mostrarResultados() {
     }, 200);
     
     mostrarNotificacion('✅ Plan de alimentación generado correctamente', 'success');
-}
+};
+
+// Alias para compatibilidad
+const mostrarResultados = window.mostrarResultados;
 
 function mostrarTablaMacros() {
     const tbody = document.getElementById('tabla-macros-body');
@@ -1027,26 +1042,77 @@ function mostrarPlanAlimentacion() {
     const planDiv = document.getElementById('plan-alimentacion');
     const { objetivo, duracion } = datosUsuario;
     
-    const planSemana = alimentosPorObjetivo[objetivo].semana;
+    // Verificar si hay base de datos ampliada disponible
+    let planSemana;
+    if (window.generarPlanVariado && window.baseDatosAlimentos) {
+        // Usar generador variado con base de datos ampliada
+        planSemana = window.generarPlanVariado(objetivo, duracion);
+    } else {
+        // Usar plan estático original y extender según duración
+        const semanaBase = alimentosPorObjetivo[objetivo].semana;
+        planSemana = [];
+        
+        // Determinar cuántas semanas necesitamos
+        let semanas;
+        if (duracion === 'semana') {
+            semanas = 1;
+        } else if (duracion === '2semanas') {
+            semanas = 2;
+        } else if (duracion === '3semanas') {
+            semanas = 3;
+        } else if (duracion === 'mes') {
+            semanas = 4;
+        } else {
+            semanas = 1;
+        }
+        
+        // Duplicar la semana base según necesidad
+        for (let s = 0; s < semanas; s++) {
+            // Crear copias con variaciones menores
+            semanaBase.forEach((diaOriginal, diaIndex) => {
+                const diaCopia = JSON.parse(JSON.stringify(diaOriginal));
+                planSemana.push(diaCopia);
+            });
+        }
+    }
+    
     let htmlPlan = '';
     
-    const semanas = duracion === 'mes' ? 4 : 1;
+    // Determinar número de semanas según duración
+    let semanas;
+    if (duracion === 'semana') {
+        semanas = 1;
+    } else if (duracion === '2semanas') {
+        semanas = 2;
+    } else if (duracion === '3semanas') {
+        semanas = 3;
+    } else if (duracion === 'mes') {
+        semanas = 4;
+    } else {
+        semanas = 1; // Por defecto
+    }
     
     for (let semana = 1; semana <= semanas; semana++) {
-        if (duracion === 'mes') {
+        if (semanas > 1) {
             htmlPlan += `<h2 style="color: #764ba2; margin-top: 40px; text-align: center;">Semana ${semana}</h2>`;
         }
         
-        planSemana.forEach(dia => {
-            htmlPlan += generarDiaHTML(dia);
+        const inicioSemana = (semana - 1) * 7;
+        const finSemana = semana * 7;
+        const semanaActual = planSemana.slice(inicioSemana, finSemana);
+        
+        semanaActual.forEach(dia => {
+            htmlPlan += generarDiaHTML(dia, false);
         });
     }
     
     planDiv.innerHTML = htmlPlan;
 }
 
-function generarDiaHTML(dia) {
+function generarDiaHTML(dia, editable = false) {
     const comidas = dia.comidas;
+    const editableAttr = editable ? 'contenteditable="true"' : '';
+    const editarClass = editable ? ' editable-alimento' : '';
     
     return `
         <div class="dia-plan">
@@ -1066,57 +1132,84 @@ function generarDiaHTML(dia) {
                     <tr>
                         <td>
                             <div class="comida-header">🍳 Desayuno</div>
-                            <ul class="lista-alimentos">
-                                ${comidas.desayuno.alimentos.map(alimento => `<li>${alimento}</li>`).join('')}
+                            <ul class="lista-alimentos${editarClass}">
+                                ${comidas.desayuno.alimentos.map(alimento => 
+                                    `<li class="alimento-item" ${editableAttr}>${alimento}</li>`
+                                ).join('')}
                             </ul>
                             <div class="macros-comida">
-                                Calorías: ${comidas.desayuno.calorias} kcal<br>
-                                Prot: ${comidas.desayuno.proteinas}g | Carb: ${comidas.desayuno.carbohidratos}g | Grasas: ${comidas.desayuno.grasas}g
+                                Calorías: <span class="macro-calorias">${comidas.desayuno.calorias}</span> kcal<br>
+                                Prot: <span class="macro-proteinas">${comidas.desayuno.proteinas}</span>g | 
+                                Carb: <span class="macro-carbohidratos">${comidas.desayuno.carbohidratos}</span>g | 
+                                Grasas: <span class="macro-grasas">${comidas.desayuno.grasas}</span>g
                             </div>
                         </td>
                         <td>
                             <div class="comida-header">🥤 Mediodía</div>
-                            <ul class="lista-alimentos">
-                                ${comidas.medioDia.alimentos.map(alimento => `<li>${alimento}</li>`).join('')}
+                            <ul class="lista-alimentos${editarClass}">
+                                ${comidas.medioDia.alimentos.map(alimento => 
+                                    `<li class="alimento-item" ${editableAttr}>${alimento}</li>`
+                                ).join('')}
                             </ul>
                             <div class="macros-comida">
-                                Calorías: ${comidas.medioDia.calorias} kcal<br>
-                                Prot: ${comidas.medioDia.proteinas}g | Carb: ${comidas.medioDia.carbohidratos}g | Grasas: ${comidas.medioDia.grasas}g
+                                Calorías: <span class="macro-calorias">${comidas.medioDia.calorias}</span> kcal<br>
+                                Prot: <span class="macro-proteinas">${comidas.medioDia.proteinas}</span>g | 
+                                Carb: <span class="macro-carbohidratos">${comidas.medioDia.carbohidratos}</span>g | 
+                                Grasas: <span class="macro-grasas">${comidas.medioDia.grasas}</span>g
                             </div>
                         </td>
                         <td>
                             <div class="comida-header">🍽️ Comida</div>
-                            <ul class="lista-alimentos">
-                                ${comidas.almuerzo.alimentos.map(alimento => `<li>${alimento}</li>`).join('')}
+                            <ul class="lista-alimentos${editarClass}">
+                                ${comidas.almuerzo.alimentos.map(alimento => 
+                                    `<li class="alimento-item" ${editableAttr}>${alimento}</li>`
+                                ).join('')}
                             </ul>
                             <div class="macros-comida">
-                                Calorías: ${comidas.almuerzo.calorias} kcal<br>
-                                Prot: ${comidas.almuerzo.proteinas}g | Carb: ${comidas.almuerzo.carbohidratos}g | Grasas: ${comidas.almuerzo.grasas}g
+                                Calorías: <span class="macro-calorias">${comidas.almuerzo.calorias}</span> kcal<br>
+                                Prot: <span class="macro-proteinas">${comidas.almuerzo.proteinas}</span>g | 
+                                Carb: <span class="macro-carbohidratos">${comidas.almuerzo.carbohidratos}</span>g | 
+                                Grasas: <span class="macro-grasas">${comidas.almuerzo.grasas}</span>g
                             </div>
                         </td>
                         <td>
                             <div class="comida-header">🥙 Merienda</div>
-                            <ul class="lista-alimentos">
-                                ${comidas.merienda.alimentos.map(alimento => `<li>${alimento}</li>`).join('')}
+                            <ul class="lista-alimentos${editarClass}">
+                                ${comidas.merienda.alimentos.map(alimento => 
+                                    `<li class="alimento-item" ${editableAttr}>${alimento}</li>`
+                                ).join('')}
                             </ul>
                             <div class="macros-comida">
-                                Calorías: ${comidas.merienda.calorias} kcal<br>
-                                Prot: ${comidas.merienda.proteinas}g | Carb: ${comidas.merienda.carbohidratos}g | Grasas: ${comidas.merienda.grasas}g
+                                Calorías: <span class="macro-calorias">${comidas.merienda.calorias}</span> kcal<br>
+                                Prot: <span class="macro-proteinas">${comidas.merienda.proteinas}</span>g | 
+                                Carb: <span class="macro-carbohidratos">${comidas.merienda.carbohidratos}</span>g | 
+                                Grasas: <span class="macro-grasas">${comidas.merienda.grasas}</span>g
                             </div>
                         </td>
                         <td>
                             <div class="comida-header">🌙 Cena</div>
-                            <ul class="lista-alimentos">
-                                ${comidas.cena.alimentos.map(alimento => `<li>${alimento}</li>`).join('')}
+                            <ul class="lista-alimentos${editarClass}">
+                                ${comidas.cena.alimentos.map(alimento => 
+                                    `<li class="alimento-item" ${editableAttr}>${alimento}</li>`
+                                ).join('')}
                             </ul>
                             <div class="macros-comida">
-                                Calorías: ${comidas.cena.calorias} kcal<br>
-                                Prot: ${comidas.cena.proteinas}g | Carb: ${comidas.cena.carbohidratos}g | Grasas: ${comidas.cena.grasas}g
+                                Calorías: <span class="macro-calorias">${comidas.cena.calorias}</span> kcal<br>
+                                Prot: <span class="macro-proteinas">${comidas.cena.proteinas}</span>g | 
+                                Carb: <span class="macro-carbohidratos">${comidas.cena.carbohidratos}</span>g | 
+                                Grasas: <span class="macro-grasas">${comidas.cena.grasas}</span>g
                             </div>
                         </td>
                     </tr>
                 </tbody>
             </table>
+            
+            ${editable ? `
+                <div class="edicion-comida">
+                    <button class="btn-agregar-alimento" onclick="agregarAlimento(this)">➕ Agregar Alimento</button>
+                    <button class="btn-eliminar-alimento" onclick="eliminarAlimentoSeleccionado(this)">➖ Eliminar Seleccionado</button>
+                </div>
+            ` : ''}
             
             <div class="menu-section">
                 <h4>📋 MENÚ PERSONALIZADO</h4>
@@ -1182,6 +1275,70 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function inicializarBotones() {
+    // Botón guardar dieta
+    const btnGuardar = document.getElementById('btnGuardar');
+    if (btnGuardar) {
+        btnGuardar.replaceWith(btnGuardar.cloneNode(true));
+        const nuevoBtnGuardar = document.getElementById('btnGuardar');
+        
+        nuevoBtnGuardar.addEventListener('click', async function() {
+            const boton = this;
+            const textoOriginal = boton.innerHTML;
+            
+            if (!window.authManager || !window.authManager.isAuthenticated()) {
+                window.uiManager?.openModal();
+                mostrarNotificacion('⚠️ Debes iniciar sesión para guardar dietas', 'error');
+                return;
+            }
+            
+            boton.innerHTML = '⏳ Guardando...';
+            boton.disabled = true;
+            
+            try {
+                // Si hay un cliente asociado, guardar en su historial
+                if (window.clienteIdDieta && window.clienteService) {
+                    await window.clienteService.agregarDieta(window.clienteIdDieta, datosUsuario);
+                }
+                
+                const resultado = await window.dietaService.guardarDieta(datosUsuario);
+                
+                if (resultado.success) {
+                    mostrarNotificacion('✅ Dieta guardada correctamente', 'success');
+                    boton.innerHTML = '✅ Guardado';
+                    setTimeout(() => {
+                        boton.innerHTML = textoOriginal;
+                        boton.disabled = false;
+                    }, 2000);
+                } else {
+                    mostrarNotificacion('❌ Error al guardar: ' + resultado.error, 'error');
+                    boton.innerHTML = textoOriginal;
+                    boton.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('❌ Error al guardar dieta', 'error');
+                boton.innerHTML = textoOriginal;
+                boton.disabled = false;
+            }
+        });
+    }
+    
+    // Botón editar dieta
+    const btnEditarDieta = document.getElementById('btnEditarDieta');
+    if (btnEditarDieta) {
+        btnEditarDieta.replaceWith(btnEditarDieta.cloneNode(true));
+        const nuevoBtnEditar = document.getElementById('btnEditarDieta');
+        
+        nuevoBtnEditar.addEventListener('click', function() {
+            if (window.habilitarEdicionDieta) {
+                window.habilitarEdicionDieta();
+            } else {
+                mostrarNotificacion('⚠️ Sistema de edición no disponible', 'error');
+            }
+        });
+    }
+    
+    // Botón descargar PDF
     const btnDescargar = document.getElementById('btnDescargar');
     if (btnDescargar) {
         btnDescargar.replaceWith(btnDescargar.cloneNode(true));
@@ -1273,7 +1430,8 @@ function inicializarBotones() {
     }
 }
 
-function mostrarNotificacion(mensaje, tipo = 'info') {
+// Hacer función global
+window.mostrarNotificacion = function(mensaje, tipo = 'info') {
     const notificacion = document.createElement('div');
     notificacion.className = `notificacion notificacion-${tipo}`;
     notificacion.textContent = mensaje;
@@ -1301,7 +1459,7 @@ function mostrarNotificacion(mensaje, tipo = 'info') {
             document.body.removeChild(notificacion);
         }, 300);
     }, 3000);
-}
+};
 
 const style = document.createElement('style');
 style.textContent = `
