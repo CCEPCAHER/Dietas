@@ -1,0 +1,31 @@
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (si en el futuro agregas npm)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Archivos temporales
+*.tmp
+*.log
+*.temp
+
+# Archivos de backup
+*.bak
+*.backup
+*.pdf
+
+# Archivos específicos del proyecto
+# Nota: firebase-config.js se incluye porque las credenciales de Firebase
+# son públicas por diseño (no son un riesgo de seguridad)
+

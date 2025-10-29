@@ -994,7 +994,25 @@ function mostrarTablaMacros() {
 
 function mostrarInfoUsuario() {
     const tbody = document.getElementById('tabla-info-body');
-    const { nombre, fechaRegistro, sexo, edad, peso, altura, tipoPersona, imc } = datosUsuario;
+    const { nombre, fechaRegistro, sexo, edad, peso, altura, tipoPersona, imc, sexo: sexoUsuario } = datosUsuario;
+    
+    // Calcular TMB (Tasa Metabólica Basal) con fórmula de Mifflin-St Jeor
+    let tmb;
+    if (sexoUsuario === 'masculino') {
+        tmb = 10 * peso + 6.25 * altura - 5 * edad + 5;
+    } else {
+        tmb = 10 * peso + 6.25 * altura - 5 * edad - 161;
+    }
+    tmb = Math.round(tmb);
+    
+    // Factores de actividad
+    const factoresActividad = {
+        sedentario: { factor: 1.2, desc: "Poco o ningún ejercicio" },
+        ligero: { factor: 1.375, desc: "Ejercicio ligero (1-3 días/semana)" },
+        moderado: { factor: 1.55, desc: "Ejercicio moderado (3-5 días/semana)" },
+        activo: { factor: 1.725, desc: "Ejercicio intenso (6-7 días/semana)" },
+        muyActivo: { factor: 1.9, desc: "Ejercicio muy intenso (2 veces/día)" }
+    };
     
     tbody.innerHTML = `
         <tr>
@@ -1008,6 +1026,44 @@ function mostrarInfoUsuario() {
             <td>${imc}</td>
         </tr>
     `;
+    
+    // Agregar calculadora TMB visual después de la tabla
+    const tmbContainer = document.getElementById('tmb-calculator');
+    if (tmbContainer) {
+        let tmbHTML = `
+            <div class="tmb-section">
+                <h3>📊 Calculadora de Metabolismo Basal (TMB)</h3>
+                <div class="tmb-result">
+                    <div class="tmb-value">
+                        <span class="tmb-label">Tu TMB es:</span>
+                        <span class="tmb-number">${tmb}</span>
+                        <span class="tmb-unit">kcal/día</span>
+                    </div>
+                    <p class="tmb-description">Esta es la cantidad mínima de calorías que tu cuerpo necesita en reposo para funciones vitales.</p>
+                </div>
+                <div class="gasto-calorico">
+                    <h4>Gasto Calórico Total Estimado (TDEE)</h4>
+                    <div class="actividad-grid">`;
+        
+        Object.keys(factoresActividad).forEach(key => {
+            const { factor, desc } = factoresActividad[key];
+            const tdee = Math.round(tmb * factor);
+            tmbHTML += `
+                <div class="actividad-card">
+                    <div class="actividad-nivel">${key.charAt(0).toUpperCase() + key.slice(1)}</div>
+                    <div class="actividad-desc">${desc}</div>
+                    <div class="actividad-tdee">${tdee} kcal/día</div>
+                </div>`;
+        });
+        
+        tmbHTML += `
+                    </div>
+                    <p class="tmb-note">💡 Tu plan nutricional está ajustado según tu objetivo y nivel de actividad.</p>
+                </div>
+            </div>`;
+        
+        tmbContainer.innerHTML = tmbHTML;
+    }
 }
 
 function mostrarPlanAlimentacion() {
@@ -1078,12 +1134,58 @@ function mostrarPlanAlimentacion() {
         });
     }
     
+    // Agregar suplementación si está habilitada
+    if (datosUsuario.incluirSuplementacion) {
+        if (datosUsuario.suplementacionPersonalizada && datosUsuario.suplementacionPersonalizada.trim() !== '') {
+            // Suplementación personalizada
+            htmlPlan += `
+                <div class="suplementacion-section" style="margin: 12px 0; padding: 12px; background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); border-radius: 8px; border-left: 4px solid #ff9800;">
+                    <h3 style="color: #e65100; margin-bottom: 10px; font-size: 13pt; text-align: center;">💊 SUPLEMENTACIÓN PERSONALIZADA</h3>
+                    <div style="background: white; padding: 10px; border-radius: 6px;">
+                        <p style="margin: 0; color: #5d4037; font-size: 9pt; white-space: pre-wrap; line-height: 1.4;">${datosUsuario.suplementacionPersonalizada}</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Suplementación automática
+            htmlPlan += generarSuplementacion(datosUsuario.objetivo);
+        }
+    }
+    
+    // Calcular hidratación recomendada
+    const hidratacionRecomendada = Math.round((datosUsuario.peso * 0.033 + 0.5) * 10) / 10;
+    htmlPlan += `
+        <div class="hidratacion-section" style="margin-top: 12px; padding: 12px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 8px; border-left: 4px solid #2196f3;">
+            <h3 style="color: #0d47a1; margin-bottom: 6px; font-size: 13pt; font-weight: bold;">
+                💧 HIDRATACIÓN DIARIA
+            </h3>
+            <p style="margin: 3px 0; color: #1565c0; font-size: 9.5pt; font-weight: 600;">
+                Recomendación personalizada: <strong>${hidratacionRecomendada}L - ${hidratacionRecomendada + 0.5}L de agua al día</strong>
+            </p>
+            <p style="margin: 3px 0; color: #1976d2; font-size: 8.5pt; line-height: 1.3;">
+                • Bebe agua antes, durante y después del ejercicio • Ajusta según sudoración y clima • La orina debe ser de color amarillo claro
+            </p>
+        </div>
+    `;
+    
+    // Agregar nota personalizada al final
+    htmlPlan += `
+        <div class="nota-personalizada" style="margin-top: 15px; padding: 15px; background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); border-radius: 8px; border-left: 4px solid #17a2b8;">
+            <h3 style="color: #0c5460; margin-bottom: 8px; font-size: 14pt; font-weight: bold; text-align: center;">
+                📋 MENÚ PERSONALIZADO
+            </h3>
+            <p style="margin: 0; color: #0c5460; font-size: 10pt; font-weight: 600; text-align: center; line-height: 1.4;">
+                Este plan está diseñado específicamente para tu objetivo de ${datosUsuario.objetivo === 'aumentar' ? 'aumentar masa muscular' : datosUsuario.objetivo === 'adelgazar' ? 'perder peso' : 'mantener peso'}.
+            </p>
+        </div>
+    `;
+    
     planDiv.innerHTML = htmlPlan;
 }
 
 function generarDiaHTML(dia, editable = false) {
     const comidas = dia.comidas;
-    const editableAttr = editable ? 'contenteditable="true"' : '';
+    const editableAttr = editable ? 'data-editable="true"' : '';
     const editarClass = editable ? ' editable-alimento' : '';
     
     return `
@@ -1102,11 +1204,17 @@ function generarDiaHTML(dia, editable = false) {
                 </thead>
                 <tbody>
                     <tr>
-                        <td>
+                        <td data-comida="desayuno">
                             <div class="comida-header">🍳 Desayuno</div>
                             <ul class="lista-alimentos${editarClass}">
-                                ${comidas.desayuno.alimentos.map(alimento => 
-                                    `<li class="alimento-item" ${editableAttr}>${alimento}</li>`
+                                ${comidas.desayuno.alimentos.map((alimento, idx) => 
+                                    editable ? 
+                                    `<li class="alimento-item" data-alimento-index="${idx}" data-tipo-comida="desayuno" ${editableAttr}>
+                                        <span class="alimento-nombre">${alimento}</span>
+                                        <button class="btn-editar-item" onclick="editarAlimento(this)">✏️</button>
+                                        <button class="btn-eliminar-item" onclick="eliminarAlimento(this)">🗑️</button>
+                                    </li>` :
+                                    `<li class="alimento-item">${alimento}</li>`
                                 ).join('')}
                             </ul>
                             <div class="macros-comida">
@@ -1116,11 +1224,17 @@ function generarDiaHTML(dia, editable = false) {
                                 Grasas: <span class="macro-grasas">${comidas.desayuno.grasas}</span>g
                             </div>
                         </td>
-                        <td>
+                        <td data-comida="medioDia">
                             <div class="comida-header">🥤 Mediodía</div>
                             <ul class="lista-alimentos${editarClass}">
-                                ${comidas.medioDia.alimentos.map(alimento => 
-                                    `<li class="alimento-item" ${editableAttr}>${alimento}</li>`
+                                ${comidas.medioDia.alimentos.map((alimento, idx) => 
+                                    editable ? 
+                                    `<li class="alimento-item" data-alimento-index="${idx}" data-tipo-comida="medioDia" ${editableAttr}>
+                                        <span class="alimento-nombre">${alimento}</span>
+                                        <button class="btn-editar-item" onclick="editarAlimento(this)">✏️</button>
+                                        <button class="btn-eliminar-item" onclick="eliminarAlimento(this)">🗑️</button>
+                                    </li>` :
+                                    `<li class="alimento-item">${alimento}</li>`
                                 ).join('')}
                             </ul>
                             <div class="macros-comida">
@@ -1130,11 +1244,17 @@ function generarDiaHTML(dia, editable = false) {
                                 Grasas: <span class="macro-grasas">${comidas.medioDia.grasas}</span>g
                             </div>
                         </td>
-                        <td>
+                        <td data-comida="almuerzo">
                             <div class="comida-header">🍽️ Comida</div>
                             <ul class="lista-alimentos${editarClass}">
-                                ${comidas.almuerzo.alimentos.map(alimento => 
-                                    `<li class="alimento-item" ${editableAttr}>${alimento}</li>`
+                                ${comidas.almuerzo.alimentos.map((alimento, idx) => 
+                                    editable ? 
+                                    `<li class="alimento-item" data-alimento-index="${idx}" data-tipo-comida="almuerzo" ${editableAttr}>
+                                        <span class="alimento-nombre">${alimento}</span>
+                                        <button class="btn-editar-item" onclick="editarAlimento(this)">✏️</button>
+                                        <button class="btn-eliminar-item" onclick="eliminarAlimento(this)">🗑️</button>
+                                    </li>` :
+                                    `<li class="alimento-item">${alimento}</li>`
                                 ).join('')}
                             </ul>
                             <div class="macros-comida">
@@ -1144,11 +1264,17 @@ function generarDiaHTML(dia, editable = false) {
                                 Grasas: <span class="macro-grasas">${comidas.almuerzo.grasas}</span>g
                             </div>
                         </td>
-                        <td>
+                        <td data-comida="merienda">
                             <div class="comida-header">🥙 Merienda</div>
                             <ul class="lista-alimentos${editarClass}">
-                                ${comidas.merienda.alimentos.map(alimento => 
-                                    `<li class="alimento-item" ${editableAttr}>${alimento}</li>`
+                                ${comidas.merienda.alimentos.map((alimento, idx) => 
+                                    editable ? 
+                                    `<li class="alimento-item" data-alimento-index="${idx}" data-tipo-comida="merienda" ${editableAttr}>
+                                        <span class="alimento-nombre">${alimento}</span>
+                                        <button class="btn-editar-item" onclick="editarAlimento(this)">✏️</button>
+                                        <button class="btn-eliminar-item" onclick="eliminarAlimento(this)">🗑️</button>
+                                    </li>` :
+                                    `<li class="alimento-item">${alimento}</li>`
                                 ).join('')}
                             </ul>
                             <div class="macros-comida">
@@ -1158,11 +1284,17 @@ function generarDiaHTML(dia, editable = false) {
                                 Grasas: <span class="macro-grasas">${comidas.merienda.grasas}</span>g
                             </div>
                         </td>
-                        <td>
+                        <td data-comida="cena">
                             <div class="comida-header">🌙 Cena</div>
                             <ul class="lista-alimentos${editarClass}">
-                                ${comidas.cena.alimentos.map(alimento => 
-                                    `<li class="alimento-item" ${editableAttr}>${alimento}</li>`
+                                ${comidas.cena.alimentos.map((alimento, idx) => 
+                                    editable ? 
+                                    `<li class="alimento-item" data-alimento-index="${idx}" data-tipo-comida="cena" ${editableAttr}>
+                                        <span class="alimento-nombre">${alimento}</span>
+                                        <button class="btn-editar-item" onclick="editarAlimento(this)">✏️</button>
+                                        <button class="btn-eliminar-item" onclick="eliminarAlimento(this)">🗑️</button>
+                                    </li>` :
+                                    `<li class="alimento-item">${alimento}</li>`
                                 ).join('')}
                             </ul>
                             <div class="macros-comida">
@@ -1178,15 +1310,9 @@ function generarDiaHTML(dia, editable = false) {
             
             ${editable ? `
                 <div class="edicion-comida">
-                    <button class="btn-agregar-alimento" onclick="agregarAlimento(this)">➕ Agregar Alimento</button>
-                    <button class="btn-eliminar-alimento" onclick="eliminarAlimentoSeleccionado(this)">➖ Eliminar Seleccionado</button>
+                    <p style="margin-bottom: 10px; font-weight: 600;">Para agregar un alimento, haz clic en el botón ✏️ junto a un alimento existente o escribe uno nuevo</p>
                 </div>
             ` : ''}
-            
-            <div class="menu-section">
-                <h4>📋 MENÚ PERSONALIZADO</h4>
-                <p>Este plan está diseñado específicamente para tu objetivo de ${datosUsuario.objetivo === 'aumentar' ? 'aumentar masa muscular' : datosUsuario.objetivo === 'adelgazar' ? 'perder peso' : 'mantener peso'}.</p>
-            </div>
         </div>
     `;
 }
@@ -1217,13 +1343,151 @@ function mostrarProhibiciones() {
     }
 }
 
+// Función para generar recomendaciones de suplementación
+function generarSuplementacion(objetivo) {
+    const suplementos = {
+        aumentar: {
+            titulo: "💊 SUPLEMENTACIÓN RECOMENDADA PARA GANAR MASA MUSCULAR",
+            basicos: [
+                "• Proteína Whey (25-30g post-entreno) - Recuperación muscular",
+                "• Creatina Monohidrato (5g/día) - Fuerza y volumen",
+                "• BCAA's (5-10g durante/post-entreno) - Recuperación"
+            ],
+            opcionales: [
+                "• Glutamina (5g post-entreno)",
+                "• Beta-Alanina (3-5g pre-entreno)",
+                "• Omega-3 (2-3g EPA/DHA con comidas)",
+                "• Multivitamínico",
+                "• Vitamina D3 (2000-4000 UI)"
+            ],
+            nota: "⚠️ Consulta con un profesional antes de iniciar cualquier suplementación."
+        },
+        adelgazar: {
+            titulo: "💊 SUPLEMENTACIÓN RECOMENDADA PARA PÉRDIDA DE PESO",
+            basicos: [
+                "• Proteína (20-25g entre comidas) - Saciedad",
+                "• Fibra / Psyllium (5-10g antes de comidas)",
+                "• Omega-3 (2-3g EPA/DHA) - Control de apetito"
+            ],
+            opcionales: [
+                "• Cafeína (200-400mg pre-entreno)",
+                "• Té Verde EGCG (400-500mg)",
+                "• L-Carnitina (1-2g pre-entreno)",
+                "• Multivitamínico en déficit calórico"
+            ],
+            nota: "⚠️ La suplementación es complementaria. El déficit calórico y ejercicio son fundamentales."
+        },
+        mantener: {
+            titulo: "💊 SUPLEMENTACIÓN RECOMENDADA PARA MANTENIMIENTO",
+            basicos: [
+                "• Omega-3 (2g EPA/DHA) - Salud cardiovascular",
+                "• Multivitamínico - Cobertura nutricional",
+                "• Vitamina D3 (2000 UI) - Salud ósea"
+            ],
+            opcionales: [
+                "• Proteína en polvo (conveniencia)",
+                "• Magnesio (300-400mg noche)",
+                "• Probióticos - Salud digestiva",
+                "• Colágeno (10g) - Articulaciones"
+            ],
+            nota: "⚠️ Alimentación equilibrada es la base. Suplementación cubre carencias específicas."
+        }
+    };
+    
+    const sup = suplementos[objetivo] || suplementos.mantener;
+    let html = `<div class="suplementacion-section" style="margin: 12px 0; padding: 12px; background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); border-radius: 8px; border-left: 4px solid #ff9800;">`;
+    html += `<h3 style="color: #e65100; margin-bottom: 10px; font-size: 13pt; text-align: center;">${sup.titulo}</h3>`;
+    html += `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">`;
+    html += `<div style="background: white; padding: 8px; border-radius: 6px;">`;
+    html += `<h4 style="color: #f57c00; margin-bottom: 6px; font-size: 10pt;">Esenciales</h4><ul style="list-style: none; padding: 0; margin: 0;">`;
+    sup.basicos.forEach(item => html += `<li style="padding: 4px 0; border-bottom: 1px solid #ffe0b2; color: #5d4037; font-size: 8.5pt;">${item}</li>`);
+    html += `</ul></div>`;
+    html += `<div style="background: white; padding: 8px; border-radius: 6px;">`;
+    html += `<h4 style="color: #f57c00; margin-bottom: 6px; font-size: 10pt;">Opcionales</h4><ul style="list-style: none; padding: 0; margin: 0;">`;
+    sup.opcionales.forEach(item => html += `<li style="padding: 4px 0; border-bottom: 1px solid #ffe0b2; color: #5d4037; font-size: 8.5pt;">${item}</li>`);
+    html += `</ul></div>`;
+    html += `</div>`;
+    html += `<p style="margin-top: 8px; padding: 8px; background: #fff8e1; border-radius: 4px; color: #f57c00; font-weight: 600; text-align: center; font-size: 8.5pt;">${sup.nota}</p>`;
+    html += `</div>`;
+    
+    return html;
+}
+
+function generarTextoPlanEjercicio(plan) {
+    let texto = `${plan.nombre}\n\n`;
+    texto += `${plan.descripcion}\n`;
+    texto += `Frecuencia: ${plan.frecuencia}\n\n`;
+    
+    plan.semanas.forEach((semana, idx) => {
+        if (plan.semanas.length > 1) {
+            texto += `--- SEMANA ${semana.numero} ---\n\n`;
+        }
+        
+        semana.dias.forEach(dia => {
+            texto += `${dia.dia} - ${dia.grupoMuscular}\n`;
+            texto += `Duración: ${dia.duracion}\n`;
+            if (dia.cardio) {
+                texto += `Cardio: ${dia.cardio}\n`;
+            }
+            texto += `\nEjercicios:\n`;
+            
+            dia.ejercicios.forEach(ej => {
+                texto += `• ${ej.nombre}: ${ej.series}x${ej.repeticiones}`;
+                if (ej.descanso && ej.descanso !== '-') {
+                    texto += ` (descanso: ${ej.descanso})`;
+                }
+                if (ej.notas && ej.notas.trim() !== '') {
+                    texto += ` - ${ej.notas}`;
+                }
+                texto += '\n';
+            });
+            texto += '\n';
+        });
+    });
+    
+    return texto;
+}
+
 function mostrarPlanEjercicio() {
     const planEjercicioDiv = document.getElementById('plan-ejercicio-content');
     const planEjercicioContainer = document.getElementById('plan-ejercicio-container');
     
     if (planEjercicioDiv && planEjercicioContainer) {
         if (datosUsuario.planEjercicio && datosUsuario.planEjercicio.trim() !== '') {
-            planEjercicioDiv.textContent = datosUsuario.planEjercicio;
+            // Formatear el texto con HTML adecuado
+            const texto = datosUsuario.planEjercicio;
+            
+            // Reemplazar saltos de línea con <br> para asegurar que se muestren en PDF
+            let html = texto.split('\n').map(line => {
+                line = line.replace(/\s+/g, ' ').trim();
+                if (!line) return '';
+                
+                // Títulos de semana
+                if (line.includes('SEMANA')) {
+                    return `<h3 style="color: #667eea; margin: 20px 0 10px; font-weight: bold; font-size: 18pt;">${line}</h3>`;
+                }
+                
+                // Días
+                if (line.includes('LUNES') || line.includes('MARTES') || line.includes('MIÉRCOLES') || 
+                    line.includes('JUEVES') || line.includes('VIERNES') || line.includes('SÁBADO') || line.includes('DOMINGO')) {
+                    return `<h4 style="color: #764ba2; margin: 15px 0 8px; font-weight: bold; font-size: 15pt;">${line}</h4>`;
+                }
+                
+                // Ejercicios con bullet
+                if (line.startsWith('•') || line.match(/^[A-Z].*:\s*\d+x\d+/)) {
+                    return `<div style="margin: 8px 0; padding-left: 15px; font-size: 11pt; line-height: 1.6;">${line.replace(/^•\s*/, '')}</div>`;
+                }
+                
+                // Texto normal
+                if (line.match(/^[A-Z].+/)) {
+                    return `<div style="margin: 5px 0; font-size: 11pt; font-weight: 600; color: #495057;">${line}</div>`;
+                }
+                
+                // Cualquier otra línea
+                return `<div style="margin: 3px 0; font-size: 11pt; color: #6c757d;">${line}</div>`;
+            }).filter(html => html !== '').join('');
+            
+            planEjercicioDiv.innerHTML = html;
             planEjercicioContainer.style.display = 'block';
         } else {
             planEjercicioContainer.style.display = 'none';
@@ -1245,6 +1509,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
+            // Recopilar intolerancias seleccionadas
+            const checkboxesIntolerancias = document.querySelectorAll('input[name="intolerancia"]:checked');
+            const intolerancias = Array.from(checkboxesIntolerancias).map(cb => cb.value);
+            
+            // Combinar intolerancias y prohibiciones adicionales
+            const prohibicionesAdicionales = document.getElementById('prohibiciones').value;
+            const todasLasProhibiciones = [...intolerancias, prohibicionesAdicionales].filter(p => p.trim() !== '').join(', ');
+            
+            // Generar plan de ejercicio automático si está seleccionado
+            const tipoPlan = document.getElementById('tipoPlanEjercicio').value;
+            const nivelEjercicio = document.getElementById('nivelEjercicio').value;
+            let planEjercicioTexto = '';
+            
+            if (tipoPlan === 'automatico' && window.generarPlanEjercicio) {
+                const planEjercicio = window.generarPlanEjercicio(
+                    document.getElementById('objetivo').value,
+                    nivelEjercicio,
+                    document.getElementById('duracion').value
+                );
+                if (planEjercicio) {
+                    planEjercicioTexto = generarTextoPlanEjercicio(planEjercicio);
+                }
+            } else {
+                planEjercicioTexto = document.getElementById('planEjercicio').value;
+            }
+            
             datosUsuario = {
                 nombre: document.getElementById('nombre').value,
                 fechaRegistro: document.getElementById('fechaRegistro').value,
@@ -1254,14 +1544,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 peso: parseFloat(document.getElementById('peso').value),
                 tipoPersona: document.getElementById('tipoPersona').value,
                 objetivo: document.getElementById('objetivo').value,
-                prohibiciones: document.getElementById('prohibiciones').value,
+                prohibiciones: todasLasProhibiciones,
+                intolerancias: intolerancias,
                 duracion: document.getElementById('duracion').value,
-                planEjercicio: document.getElementById('planEjercicio').value
+                planEjercicio: planEjercicioTexto,
+                nivelEjercicio: nivelEjercicio,
+                incluirSuplementacion: document.getElementById('incluirSuplementacion').checked,
+                suplementacionPersonalizada: document.getElementById('suplementacionPersonalizada').value
             };
             
             calcularMacronutrientes();
             window.datosUsuario = datosUsuario; // Actualizar referencia global
             mostrarResultados();
+        });
+    }
+    
+    // Listener para tipo de plan de ejercicio
+    const tipoPlanEjercicio = document.getElementById('tipoPlanEjercicio');
+    const planEjercicioPersonalizado = document.getElementById('planEjercicioPersonalizado');
+    
+    if (tipoPlanEjercicio && planEjercicioPersonalizado) {
+        tipoPlanEjercicio.addEventListener('change', function() {
+            if (this.value === 'personalizado') {
+                planEjercicioPersonalizado.style.display = 'block';
+            } else {
+                planEjercicioPersonalizado.style.display = 'none';
+            }
+        });
+    }
+    
+    // Listener para checkbox de suplementación
+    const incluirSuplementacion = document.getElementById('incluirSuplementacion');
+    const suplementacionPersonalizada = document.getElementById('suplementacion-personalizada');
+    
+    if (incluirSuplementacion && suplementacionPersonalizada) {
+        incluirSuplementacion.addEventListener('change', function() {
+            if (this.checked) {
+                suplementacionPersonalizada.style.display = 'block';
+            } else {
+                suplementacionPersonalizada.style.display = 'none';
+            }
         });
     }
     
@@ -1404,11 +1726,11 @@ function inicializarBotones() {
             // Aplicar estilos inline para el PDF con colores mejorados
             const pdfHeader = clone.querySelector('.pdf-header');
             if (pdfHeader) {
-                pdfHeader.style.cssText = 'text-align: center; padding: 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);';
+                pdfHeader.style.cssText = 'text-align: center; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; margin-bottom: 12px;';
                 const h1 = pdfHeader.querySelector('h1');
-                if (h1) h1.style.cssText = 'color: white; margin: 0; font-size: 32pt; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);';
+                if (h1) h1.style.cssText = 'color: white; margin: 0; font-size: 24pt; font-weight: bold;';
                 const subtitle = pdfHeader.querySelector('.subtitle');
-                if (subtitle) subtitle.style.cssText = 'font-size: 18pt; margin-top: 10px; opacity: 0.95; font-weight: 600;';
+                if (subtitle) subtitle.style.cssText = 'font-size: 11pt; margin-top: 5px; opacity: 0.95; font-weight: 600;';
             }
             
             // Estilizar tablas con mejor diseño
@@ -1429,75 +1751,91 @@ function inicializarBotones() {
             
             // Estilizar h2 también
             clone.querySelectorAll('h2').forEach(h2 => {
-                h2.style.cssText = 'font-size: 26pt; margin-bottom: 22px; color: #764ba2; font-weight: bold; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); letter-spacing: 1px;';
+                h2.style.cssText = 'font-size: 24pt; margin-top: 0; margin-bottom: 12px; color: #764ba2; font-weight: bold; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); letter-spacing: 1px;';
             });
             
             // Estilizar días del plan con colores mejorados
             clone.querySelectorAll('.dia-plan').forEach(dia => {
-                dia.style.cssText = 'background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%); padding: 25px; margin-bottom: 25px; border-radius: 12px; page-break-inside: avoid; break-inside: avoid; box-shadow: 0 3px 12px rgba(118, 75, 162, 0.15); border-left: 5px solid #764ba2;';
+                dia.style.cssText = 'background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%); padding: 6px; margin-top: 0; margin-bottom: 4px; border-radius: 8px; page-break-inside: avoid !important; break-inside: avoid !important; -webkit-page-break-inside: avoid; box-shadow: 0 2px 8px rgba(118, 75, 162, 0.15); border-left: 4px solid #764ba2;';
                 const diaH3 = dia.querySelector('h3');
-                if (diaH3) diaH3.style.cssText = 'color: #764ba2; font-size: 24pt; margin-bottom: 20px; font-weight: bold; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(118, 75, 162, 0.2); letter-spacing: 1px;';
+                if (diaH3) diaH3.style.cssText = 'color: #764ba2; font-size: 16pt; margin-top: 0; margin-bottom: 4px; font-weight: bold; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(118, 75, 162, 0.2); letter-spacing: 0.5px;';
                 
                 const tablaComidas = dia.querySelector('.tabla-comidas');
                 if (tablaComidas) {
-                    tablaComidas.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 11pt; margin: 15px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
+                    tablaComidas.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 9pt; margin: 4px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); page-break-inside: avoid !important;';
                     tablaComidas.querySelectorAll('th').forEach(th => {
-                        th.style.cssText = 'padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 2px solid #667eea; font-size: 11pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;';
+                        th.style.cssText = 'padding: 5px 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 2px solid #667eea; font-size: 9pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.3px;';
                     });
                     tablaComidas.querySelectorAll('td').forEach(td => {
-                        td.style.cssText = 'padding: 12px; border: 2px solid #e9ecef; vertical-align: top; font-size: 11pt; background: #ffffff; font-weight: 600; line-height: 1.6;';
+                        td.style.cssText = 'padding: 5px 4px; border: 2px solid #e9ecef; vertical-align: top; font-size: 9pt; background: #ffffff; font-weight: 600; line-height: 1.4;';
                     });
                 }
                 
                 // Estilizar headers de comida
                 dia.querySelectorAll('.comida-header').forEach(header => {
-                    header.style.cssText = 'font-weight: bold; margin-bottom: 10px; font-size: 12pt; color: #667eea; font-weight: 700;';
+                    header.style.cssText = 'font-weight: bold; margin-bottom: 3px; font-size: 9pt; color: #667eea; font-weight: 700;';
                 });
                 
-                // Estilizar listas de alimentos
+                // Estilizar listas de alimentos y limpiar botones
                 dia.querySelectorAll('.lista-alimentos li').forEach(li => {
-                    li.style.cssText = 'font-size: 10pt; margin-bottom: 6px; font-weight: 600; line-height: 1.7; color: #2c3e50;';
+                    li.style.cssText = 'font-size: 8.5pt; margin-bottom: 2px; font-weight: 600; line-height: 1.35; color: #2c3e50; list-style-type: none; padding-left: 0;';
+                    // Si tiene span con clase alimento-nombre, mantener solo ese contenido
+                    const span = li.querySelector('.alimento-nombre');
+                    if (span) {
+                        li.innerHTML = span.textContent;
+                    }
+                    // Eliminar cualquier botón
+                    li.querySelectorAll('button').forEach(btn => btn.remove());
                 });
                 
                 // Estilizar macros
                 dia.querySelectorAll('.macros-comida').forEach(macros => {
-                    macros.style.cssText = 'font-size: 10pt; color: #495057; margin-top: 10px; font-weight: 700; background: #e7f3ff; padding: 8px; border-radius: 6px;';
+                    macros.style.cssText = 'font-size: 8.5pt; color: #495057; margin-top: 3px; font-weight: 700; background: #e7f3ff; padding: 3px; border-radius: 5px;';
                 });
                 
                 // Ocultar controles de edición
                 dia.querySelectorAll('.edicion-comida').forEach(edicion => {
                     edicion.style.display = 'none';
                 });
+                
+                // Ocultar botones de edición en alimentos
+                dia.querySelectorAll('.btn-editar-item, .btn-eliminar-item, .btn-agregar-rapido').forEach(btn => {
+                    btn.style.display = 'none';
+                });
             });
             
             // Estilizar footer con mejor diseño
             const footer = clone.querySelector('.pdf-footer');
             if (footer) {
-                footer.style.cssText = 'margin-top: 40px; padding: 20px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 12px; text-align: center; font-size: 10pt; color: #495057; border-top: 4px solid #667eea; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
+                footer.style.cssText = 'margin-top: 15px; padding: 12px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 8px; text-align: center; font-size: 8.5pt; color: #495057; border-top: 3px solid #667eea;';
                 footer.querySelectorAll('p').forEach(p => {
-                    p.style.cssText = 'margin: 5px 0; font-weight: 600; color: #495057;';
+                    p.style.cssText = 'margin: 3px 0; font-weight: 600; color: #495057;';
                 });
             }
             
             // Estilizar otros elementos
             clone.querySelectorAll('.plan-ejercicio-container').forEach(container => {
-                container.style.cssText = 'margin-top: 30px; padding: 20px; background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%); border-radius: 12px; border: 3px solid #667eea; box-shadow: 0 3px 12px rgba(102, 126, 234, 0.2);';
+                container.style.cssText = 'margin-top: 12px; padding: 12px; background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%); border-radius: 8px; border: 2px solid #667eea;';
             });
             
             clone.querySelectorAll('.notas-agua-section').forEach(section => {
-                section.style.cssText = 'margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); border-radius: 12px; border-left: 5px solid #17a2b8; box-shadow: 0 2px 8px rgba(23, 162, 184, 0.2);';
+                section.style.cssText = 'margin-top: 12px; padding: 12px; background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); border-radius: 8px; border-left: 4px solid #17a2b8;';
                 const h4 = section.querySelector('h4');
-                if (h4) h4.style.cssText = 'color: #0c5460; margin-bottom: 10px; font-size: 14pt; font-weight: bold;';
+                if (h4) h4.style.cssText = 'color: #0c5460; margin-bottom: 6px; font-size: 11pt; font-weight: bold;';
                 const p = section.querySelector('p');
-                if (p) p.style.cssText = 'margin: 0; color: #0c5460; font-size: 11pt; font-weight: 600;';
+                if (p) p.style.cssText = 'margin: 0; color: #0c5460; font-size: 9pt; font-weight: 600;';
             });
             
-            // Crear wrapper para el PDF con padding
+            // Crear wrapper para el PDF con padding reducido
             const pdfWrapper = document.createElement('div');
-            pdfWrapper.style.cssText = 'padding: 20px; background: white; font-family: Arial, sans-serif; width: 210mm; box-sizing: border-box;';
+            pdfWrapper.style.cssText = 'padding: 8px; background: white; font-family: Arial, sans-serif; width: 100%; max-width: 100%; box-sizing: border-box;';
             
             // Estilizar el contenedor principal
             clone.style.cssText = 'margin: 0; padding: 0; background: white; font-family: Arial, sans-serif; overflow: visible;';
+            
+            // Estilizar el primer elemento para eliminar espacio extra
+            const firstElement = pdfWrapper.querySelector('h2, .dia-plan');
+            if (firstElement) firstElement.style.marginTop = '0';
             
             // Mover contenido a wrapper
             while (clone.firstChild) {
@@ -1518,11 +1856,11 @@ function inicializarBotones() {
             // Generar PDF
             setTimeout(() => {
                 const opciones = {
-                    margin: [0, 0, 0, 0],
+                    margin: [8, 8, 8, 8],
                     filename: `Dieta_${datosUsuario.nombre.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { 
-                        scale: 2.5,
+                        scale: 2,
                         useCORS: true,
                         allowTaint: true,
                         letterRendering: true,
@@ -1530,13 +1868,16 @@ function inicializarBotones() {
                         backgroundColor: '#ffffff',
                         scrollX: 0,
                         scrollY: 0,
-                        dpi: 300
+                        dpi: 300,
+                        windowWidth: 794,
+                        windowHeight: 1123
                     },
                     jsPDF: { 
                         unit: 'mm', 
                         format: 'a4', 
                         orientation: 'portrait',
-                        compress: true
+                        compress: true,
+                        putOnlyUsedFonts: true
                     }
                 };
                 

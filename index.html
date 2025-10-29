@@ -103,7 +103,10 @@
                 <h2>Objetivo</h2>
 
                 <div class="form-group">
-                    <label for="objetivo">Selecciona tu objetivo:</label>
+                    <label for="objetivo">
+                        Selecciona tu objetivo:
+                        <span class="tooltip-icon" data-tooltip="El objetivo determina la distribución de calorías y macronutrientes. Aumentar: superávit calórico, Perder: déficit calórico, Mantener: equilibrio energético.">ℹ️</span>
+                    </label>
                     <select id="objetivo" name="objetivo" title="Selecciona el objetivo de la dieta" required>
                         <option value="">Selecciona...</option>
                         <option value="aumentar">Aumentar masa muscular</option>
@@ -115,8 +118,88 @@
                 <h2>Prohibiciones y Alergias</h2>
 
                 <div class="form-group">
-                    <label for="prohibiciones">Indica alimentos prohibidos o alergias (opcional):</label>
-                    <textarea id="prohibiciones" name="prohibiciones" rows="3" title="Lista de alimentos prohibidos o alergias" placeholder="Ej: Lactosa, frutos secos, gluten..."></textarea>
+                    <label>Selecciona intolerancias comunes (opcional):</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="intolerancia" value="lactosa" id="intol-lactosa">
+                            <span>Lactosa</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="intolerancia" value="gluten" id="intol-gluten">
+                            <span>Gluten</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="intolerancia" value="frutos-secos" id="intol-frutos-secos">
+                            <span>Frutos Secos</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="intolerancia" value="huevo" id="intol-huevo">
+                            <span>Huevo</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="intolerancia" value="pescado" id="intol-pescado">
+                            <span>Pescado</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="intolerancia" value="mariscos" id="intol-mariscos">
+                            <span>Mariscos</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="intolerancia" value="soja" id="intol-soja">
+                            <span>Soja</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="intolerancia" value="cacahuetes" id="intol-cacahuetes">
+                            <span>Cacahuetes</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="intolerancia" value="carne-roja" id="intol-carne-roja">
+                            <span>Carne Roja</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="intolerancia" value="cerdo" id="intol-cerdo">
+                            <span>Cerdo</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="intolerancia" value="azufre" id="intol-azufre">
+                            <span>Sulfitos</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="intolerancia" value="levadura" id="intol-levadura">
+                            <span>Levadura</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Preferencias dietéticas (opcional):</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="preferencia" value="vegetariano" id="pref-vegetariano">
+                            <span>Vegetariano</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="preferencia" value="vegano" id="pref-vegano">
+                            <span>Vegano</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="preferencia" value="pescetariano" id="pref-pescetariano">
+                            <span>Pescetariano</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="preferencia" value="bajo-carbohidratos" id="pref-bajo-carbs">
+                            <span>Bajo en Carbohidratos</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="preferencia" value="cetogenica" id="pref-keto">
+                            <span>Cetogénica</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="prohibiciones">Indica otros alimentos prohibidos o alergias (opcional):</label>
+                    <textarea id="prohibiciones" name="prohibiciones" rows="3" title="Lista adicional de alimentos prohibidos o alergias" placeholder="Ej: Cebolla, cilantro, champiñones..."></textarea>
                 </div>
 
                 <div class="form-group">
@@ -129,11 +212,53 @@
                     </select>
                 </div>
 
-                <h2>Plan de Ejercicio</h2>
+                <h2>Hidratación</h2>
 
                 <div class="form-group">
-                    <label for="planEjercicio">Indica el plan de ejercicio (opcional):</label>
-                    <textarea id="planEjercicio" name="planEjercicio" rows="6" title="Plan de ejercicio semanal" placeholder="Ej: Lunes - Piernas: Sentadillas 4x10, Prensa 3x12, Extensión de cuádriceps 3x15&#10;Martes - Espalda: Dominadas 4x8, Remo con barra 4x10, Jalones 3x12&#10;Miércoles - Pecho: Press banca 4x8, Aperturas 3x12, Fondos 3x10..."></textarea>
+                    <label for="hidratacion">Consumo actual de agua (litros/día):</label>
+                    <input type="number" id="hidratacion" name="hidratacion" min="0" max="10" step="0.5" value="2" title="Indica cuántos litros de agua bebes al día">
+                    <small class="form-help">Recomendación general: 2-3 litros/día. Se calculará una recomendación personalizada según tu peso y actividad.</small>
+                </div>
+
+                <h2>Suplementación</h2>
+
+                <div class="form-group">
+                    <label class="checkbox-label" style="display: inline-flex; align-items: center; margin-bottom: 15px;">
+                        <input type="checkbox" id="incluirSuplementacion" name="incluirSuplementacion" checked>
+                        <span>Incluir recomendaciones de suplementación en el plan</span>
+                    </label>
+                </div>
+
+                <div id="suplementacion-personalizada" style="display: none;">
+                    <div class="form-group">
+                        <label for="suplementacionPersonalizada">Suplementación personalizada (opcional):</label>
+                        <textarea id="suplementacionPersonalizada" name="suplementacionPersonalizada" rows="4" placeholder="Describe aquí suplementos específicos o notas personalizadas sobre suplementación..."></textarea>
+                    </div>
+                </div>
+
+                <h2>Plan de Ejercicio</h2>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nivelEjercicio">Nivel de ejercicio:</label>
+                        <select id="nivelEjercicio" name="nivelEjercicio" title="Selecciona tu nivel de experiencia">
+                            <option value="principiante">Principiante</option>
+                            <option value="intermedio">Intermedio</option>
+                            <option value="avanzado">Avanzado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipoPlanEjercicio">Tipo de plan:</label>
+                        <select id="tipoPlanEjercicio" name="tipoPlanEjercicio" title="Selecciona el tipo de plan">
+                            <option value="automatico">Automático (Recomendado)</option>
+                            <option value="personalizado">Personalizado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" id="planEjercicioPersonalizado" style="display: none;">
+                    <label for="planEjercicio">Indica tu plan de ejercicio personalizado (opcional):</label>
+                    <textarea id="planEjercicio" name="planEjercicio" rows="6" title="Plan de ejercicio semanal personalizado" placeholder="Ej: Lunes - Piernas: Sentadillas 4x10, Prensa 3x12, Extensión de cuádriceps 3x15&#10;Martes - Espalda: Dominadas 4x8, Remo con barra 4x10, Jalones 3x12&#10;Miércoles - Pecho: Press banca 4x8, Aperturas 3x12, Fondos 3x10..."></textarea>
                 </div>
 
                 <button type="submit" class="btn-submit">✨ Generar Plan de Alimentación</button>
@@ -192,6 +317,9 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Calculadora TMB -->
+                    <div id="tmb-calculator"></div>
 
                     <!-- Información del Usuario -->
                     <div class="info-usuario-table">
@@ -321,6 +449,7 @@
     <script src="clienteService.js"></script>
     <script src="base-datos-alimentos.js"></script>
     <script src="generador-dietas.js"></script>
+    <script src="planes-ejercicio.js"></script>
     <script src="editor-dietas.js"></script>
     <script src="verificar-firestore.js"></script>
     <script src="cliente-manager.js"></script>

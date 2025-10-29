@@ -105,7 +105,7 @@ function generarComida(objetivo, tipoComida, variacion) {
     });
     
     return {
-        alimentos: alimentos.map(a => `${a.nombre}${a.cantidad !== 100 ? ` (${a.cantidad}g)` : ''}`),
+        alimentos: alimentos.map(a => formatearAlimento(a)),
         calorias: Math.round(calorias),
         proteinas: Math.round(proteinas),
         carbohidratos: Math.round(carbohidratos),
@@ -195,10 +195,10 @@ function seleccionarMedioDia(objetivo, distribucion, variacion, restricciones = 
     
     if (objetivo === 'aumentar') {
         const opciones = [
-            [{ nombre: 'Batido de proteína', cantidad: 30 }, { nombre: 'Plátano', cantidad: 100 }],
+            [{ nombre: 'Barrita proteica', cantidad: 1 }, { nombre: 'Plátano', cantidad: 100 }],
             [{ nombre: 'Yogur griego', cantidad: 200 }, { nombre: 'Nueces', cantidad: 30 }],
             [{ nombre: 'Manzana', cantidad: 150 }, { nombre: 'Mantequilla de almendras', cantidad: 30 }],
-            [{ nombre: 'Batido proteico', cantidad: 1 }, { nombre: 'Fresas', cantidad: 100 }],
+            [{ nombre: 'Requesón', cantidad: 150 }, { nombre: 'Fresas', cantidad: 100 }],
             [{ nombre: 'Barrita proteica', cantidad: 1 }, { nombre: 'Naranja', cantidad: 150 }]
         ];
         return opciones[variacion % opciones.length];
@@ -260,11 +260,11 @@ function seleccionarMerienda(objetivo, distribucion, variacion, restricciones = 
     
     if (objetivo === 'aumentar') {
         const opciones = [
-            [{ nombre: 'Batido de proteína', cantidad: 30 }, { nombre: 'Plátano', cantidad: 120 }, { nombre: 'Mantequilla de cacahuete', cantidad: 30 }, { nombre: 'Avena', cantidad: 40 }],
-            [{ nombre: 'Yogur griego', cantidad: 200 }, { nombre: 'Granola', cantidad: 50 }, { nombre: 'Fresas', cantidad: 100 }, { nombre: 'Nueces', cantidad: 30 }],
+            [{ nombre: 'Barrita proteica', cantidad: 1 }, { nombre: 'Plátano', cantidad: 120 }, { nombre: 'Mantequilla de cacahuete', cantidad: 30 }, { nombre: 'Avena', cantidad: 40 }],
+            [{ nombre: 'Yogur griego', cantidad: 200 }, { nombre: 'Avena', cantidad: 50 }, { nombre: 'Fresas', cantidad: 100 }, { nombre: 'Nueces', cantidad: 30 }],
             [{ nombre: 'Barrita proteica', cantidad: 1 }, { nombre: 'Plátano', cantidad: 100 }, { nombre: 'Almendras', cantidad: 25 }],
-            [{ nombre: 'Sándwich integral', cantidad: 2 }, { nombre: 'Pavo', cantidad: 80 }, { nombre: 'Aguacate', cantidad: 40 }],
-            [{ nombre: 'Batido proteico', cantidad: 1 }, { nombre: 'Avena', cantidad: 50 }, { nombre: 'Miel', cantidad: 20 }]
+            [{ nombre: 'Pan integral', cantidad: 100 }, { nombre: 'Pavo', cantidad: 80 }, { nombre: 'Aguacate', cantidad: 40 }],
+            [{ nombre: 'Requesón', cantidad: 200 }, { nombre: 'Avena', cantidad: 50 }, { nombre: 'Miel', cantidad: 20 }]
         ];
         return opciones[variacion % opciones.length];
     } else if (objetivo === 'adelgazar') {
@@ -278,11 +278,11 @@ function seleccionarMerienda(objetivo, distribucion, variacion, restricciones = 
         return opciones[variacion % opciones.length];
     } else {
         const opciones = [
-            [{ nombre: 'Yogur natural', cantidad: 150 }, { nombre: 'Fruta', cantidad: 100 }, { nombre: 'Nueces', cantidad: 15 }],
-            [{ nombre: 'Batido', cantidad: 250 }, { nombre: 'Almendras', cantidad: 10 }],
+            [{ nombre: 'Yogur griego', cantidad: 150 }, { nombre: 'Plátano', cantidad: 100 }, { nombre: 'Nueces', cantidad: 15 }],
+            [{ nombre: 'Yogur desnatado', cantidad: 180 }, { nombre: 'Almendras', cantidad: 10 }, { nombre: 'Fresas', cantidad: 100 }],
             [{ nombre: 'Manzana', cantidad: 150 }, { nombre: 'Queso fresco', cantidad: 50 }, { nombre: 'Nueces', cantidad: 15 }],
-            [{ nombre: 'Sándwich', cantidad: 1 }, { nombre: 'Pavo', cantidad: 60 }, { nombre: 'Fruta', cantidad: 100 }],
-            [{ nombre: 'Yogur con frutas', cantidad: 150 }, { nombre: 'Avena', cantidad: 20 }, { nombre: 'Almendras', cantidad: 15 }]
+            [{ nombre: 'Requesón', cantidad: 100 }, { nombre: 'Pavo', cantidad: 60 }, { nombre: 'Naranja', cantidad: 150 }],
+            [{ nombre: 'Yogur griego', cantidad: 150 }, { nombre: 'Avena', cantidad: 20 }, { nombre: 'Almendras', cantidad: 15 }, { nombre: 'Miel', cantidad: 15 }]
         ];
         return opciones[variacion % opciones.length];
     }
@@ -325,6 +325,68 @@ function seleccionarCena(objetivo, distribucion, variacion, restricciones = '') 
     }
     
     return alimentos;
+}
+
+// Función para formatear alimento correctamente según su tipo
+function formatearAlimento(alimento) {
+    const nombre = alimento.nombre;
+    const cantidad = alimento.cantidad;
+    
+    // Huevos - siempre por unidades
+    if (nombre.toLowerCase().includes('huevo')) {
+        const numUnidades = Math.max(1, Math.round(cantidad / 50)); // Aproximar huevos
+        return `${nombre} (${numUnidades} ${numUnidades === 1 ? 'unidad' : 'unidades'})`;
+    }
+    
+    // Barritas - por unidades
+    if (nombre.toLowerCase().includes('barrita')) {
+        return `${nombre} (${cantidad} ${cantidad === 1 ? 'unidad' : 'unidades'})`;
+    }
+    
+    // Tortillas - por unidades
+    if (nombre.toLowerCase().includes('tortilla')) {
+        return `${nombre} (${cantidad} ${cantidad === 1 ? 'unidad' : 'unidades'})`;
+    }
+    
+    // Pan/Sándwiches - por rebanadas
+    if (nombre.toLowerCase().includes('sándwich')) {
+        return `${nombre} (${cantidad} ${cantidad === 1 ? 'unidad' : 'unidades'})`;
+    }
+    
+    if (nombre.toLowerCase().includes('pan') && !nombre.toLowerCase().includes('pan integral') && cantidad <= 10) {
+        return `${nombre} (${cantidad} ${cantidad === 1 ? 'rebanada' : 'rebanadas'})`;
+    }
+    
+    // Frutas individuales - por gramos siempre (cantidad en gramos)
+    const frutasIndividuales = ['Plátano', 'Manzana', 'Naranja', 'Pera', 'Kiwi', 'Melocotón', 'Albaricoque', 'Ciruela', 'Aguacate', 'Pepino', 'Tomate', 'Limón', 'Lima'];
+    if (frutasIndividuales.some(f => nombre.toLowerCase().includes(f.toLowerCase()))) {
+        // Las frutas siempre se miden en gramos (peso)
+        return `${nombre} (${cantidad}g)`;
+    }
+    
+    // Frutas pequeñas por porciones
+    const frutasPequenas = ['Fresas', 'Arándanos', 'Moras', 'Frambuesas', 'Cerezas', 'Uvas'];
+    if (frutasPequenas.some(f => nombre.toLowerCase().includes(f.toLowerCase())) && cantidad <= 30) {
+        // Puede ser por unidades si la cantidad es muy pequeña
+        return `${nombre} (${cantidad}g)`;
+    }
+    
+    // Bebidas en ml
+    const bebidas = ['Leche', 'Yogur', 'Batido', 'Té', 'Café', 'Infusión', 'Agua', 'Zumo', 'Kombucha'];
+    if (bebidas.some(b => nombre.toLowerCase().includes(b.toLowerCase()))) {
+        if (cantidad >= 1000) {
+            return `${nombre} (${cantidad/1000}L)`;
+        } else {
+            return `${nombre} (${cantidad}ml)`;
+        }
+    }
+    
+    // Por defecto en gramos
+    if (cantidad === 100) {
+        return nombre;
+    } else {
+        return `${nombre} (${cantidad}g)`;
+    }
 }
 
 // Funciones auxiliares para selección inteligente
@@ -498,4 +560,5 @@ window.verificarRestricciones = verificarRestricciones;
 window.calcularCantidadOptima = calcularCantidadOptima;
 window.balancearMacrosComida = balancearMacrosComida;
 window.obtenerAlimentosPorMacro = obtenerAlimentosPorMacro;
+window.formatearAlimento = formatearAlimento;
 

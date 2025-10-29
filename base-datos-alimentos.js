@@ -240,10 +240,14 @@ const baseDatosAlimentos = {
             "Mantequilla de almendras": { calorias: 614, proteinas: 21, carbohidratos: 19, grasas: 56 },
             "Mantequilla de cacahuete": { calorias: 588, proteinas: 25, carbohidratos: 20, grasas: 50 },
             "Crema de avellanas": { calorias: 628, proteinas: 15, carbohidratos: 17, grasas: 61 },
-            "Tahini": { calorias: 595, proteinas: 17, carbohidratos: 21, grasas: 54 },
+            "Tahini": { calorias: 595, proteinas: 17, carbohidratos: 21, grasas: 54 },
             // --- NUEVOS AÑADIDOS ---
-            "Castañas (asadas)": { calorias: 245, proteinas: 3.2, carbohidratos: 53, grasas: 2.2 },
-            "Semillas de amapola": { calorias: 525, proteinas: 18, carbohidratos: 28, grasas: 42 }
+            "Nueces de nogal": { calorias: 654, proteinas: 15, carbohidratos: 14, grasas: 65 },
+            "Almendras tostadas": { calorias: 597, proteinas: 21, carbohidratos: 19, grasas: 52 },
+            "Pipas de girasol peladas": { calorias: 584, proteinas: 21, carbohidratos: 20, grasas: 51 },
+            "Semillas de amapola": { calorias: 525, proteinas: 18, carbohidratos: 28, grasas: 42 },
+            "Semillas de amaranto": { calorias: 371, proteinas: 14, carbohidratos: 65, grasas: 7 },
+            "Castañas (asadas)": { calorias: 245, proteinas: 3.2, carbohidratos: 53, grasas: 2.2 }
         },
     
         // LÁCTEOS Y DERIVADOS
@@ -301,13 +305,17 @@ const baseDatosAlimentos = {
             "Jalea real": { calorias: 310, proteinas: 13, carbohidratos: 49, grasas: 4 },
             "Maca": { calorias: 325, proteinas: 10, carbohidratos: 59, grasas: 2 },
             "Cacao en polvo": { calorias: 228, proteinas: 20, carbohidratos: 58, grasas: 14 },
-            "Miel": { calorias: 304, proteinas: 0.3, carbohidratos: 82, grasas: 0 },
-            "Sirope de arce": { calorias: 260, proteinas: 0, carbohidratos: 67, grasas: 0 },
-            "Stevia": { calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0 },
-            "Azúcar de coco": { calorias: 380, proteinas: 0, carbohidratos: 98, grasas: 0 },
-            // --- NUEVOS AÑADIDOS ---
-            "Jengibre (raíz)": { calorias: 80, proteinas: 1.8, carbohidratos: 18, grasas: 0.8 },
+            "Miel": { calorias: 304, proteinas: 0.3, carbohidratos: 82, grasas: 0 },
+            "Sirope de arce": { calorias: 260, proteinas: 0, carbohidratos: 67, grasas: 0 },
+            "Açai (polvo)": { calorias: 533, proteinas: 8, carbohidratos: 44, grasas: 48 },
+            "Bayas de goji": { calorias: 349, proteinas: 14, carbohidratos: 77, grasas: 0.4 },
+            "Matcha": { calorias: 324, proteinas: 30, carbohidratos: 39, grasas: 5 },
             "Cúrcuma (polvo)": { calorias: 354, proteinas: 8, carbohidratos: 65, grasas: 10 },
+            "Jengibre (fresco)": { calorias: 80, proteinas: 1.8, carbohidratos: 18, grasas: 0.8 },
+            "Moringa (polvo)": { calorias: 205, proteinas: 27, carbohidratos: 38, grasas: 2 },
+            "Acerola (polvo)": { calorias: 32, proteinas: 0.4, carbohidratos: 8, grasas: 0.3 },
+            "Stevia": { calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0 },
+            "Azúcar de coco": { calorias: 380, proteinas: 0, carbohidratos: 98, grasas: 0 },
             "Miso (pasta)": { calorias: 198, proteinas: 12, carbohidratos: 28, grasas: 6 },
             "Bayas de Goji (secas)": { calorias: 349, proteinas: 14.3, carbohidratos: 77, grasas: 0.4 }
         },
