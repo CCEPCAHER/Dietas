@@ -861,7 +861,6 @@ let datosUsuario = {};
 document.getElementById('dietForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
-    // Recoger datos del formulario
     datosUsuario = {
         nombre: document.getElementById('nombre').value,
         fechaRegistro: document.getElementById('fechaRegistro').value,
@@ -875,17 +874,13 @@ document.getElementById('dietForm').addEventListener('submit', function(e) {
         duracion: document.getElementById('duracion').value
     };
     
-    // Calcular macronutrientes
     calcularMacronutrientes();
-    
-    // Mostrar resultados
     mostrarResultados();
 });
 
 function calcularMacronutrientes() {
     const { edad, sexo, altura, peso, objetivo, tipoPersona } = datosUsuario;
     
-    // Calcular TMB (Tasa Metabólica Basal) usando la fórmula de Harris-Benedict
     let tmb;
     if (sexo === 'Hombre') {
         tmb = 88.362 + (13.397 * peso) + (4.799 * altura) - (5.677 * edad);
@@ -893,23 +888,14 @@ function calcularMacronutrientes() {
         tmb = 447.593 + (9.247 * peso) + (3.098 * altura) - (4.330 * edad);
     }
     
-    // Factor de actividad
     let factorActividad;
     switch(tipoPersona) {
-        case 'sedentaria':
-            factorActividad = 1.2;
-            break;
-        case 'activa':
-            factorActividad = 1.55;
-            break;
-        case 'muy-activa':
-            factorActividad = 1.725;
-            break;
-        default:
-            factorActividad = 1.2;
+        case 'sedentaria': factorActividad = 1.2; break;
+        case 'activa': factorActividad = 1.55; break;
+        case 'muy-activa': factorActividad = 1.725; break;
+        default: factorActividad = 1.2;
     }
     
-    // Calorías según objetivo
     let calorias = tmb * factorActividad;
     
     if (objetivo === 'aumentar') {
@@ -920,34 +906,28 @@ function calcularMacronutrientes() {
     
     calorias = Math.round(calorias);
     
-    // Calcular macronutrientes según objetivo
     let proteinas, grasas, carbohidratos;
     
     if (objetivo === 'aumentar') {
-        // Aumentar masa: 2g proteína/kg, 25% grasas, resto carbohidratos
         proteinas = Math.round(peso * 2);
         grasas = Math.round((calorias * 0.25) / 9);
         carbohidratos = Math.round((calorias - (proteinas * 4) - (grasas * 9)) / 4);
     } else if (objetivo === 'adelgazar') {
-        // Perder peso: 2.2g proteína/kg, 25% grasas, resto carbohidratos
         proteinas = Math.round(peso * 2.2);
         grasas = Math.round((calorias * 0.25) / 9);
         carbohidratos = Math.round((calorias - (proteinas * 4) - (grasas * 9)) / 4);
     } else {
-        // Mantener: 1.8g proteína/kg, 30% grasas, resto carbohidratos
         proteinas = Math.round(peso * 1.8);
         grasas = Math.round((calorias * 0.30) / 9);
         carbohidratos = Math.round((calorias - (proteinas * 4) - (grasas * 9)) / 4);
     }
     
-    // Guardar en datos del usuario
     datosUsuario.calorias = calorias;
     datosUsuario.proteinas = proteinas;
     datosUsuario.grasas = grasas;
     datosUsuario.carbohidratos = carbohidratos;
     datosUsuario.imc = (peso / Math.pow(altura / 100, 2)).toFixed(1);
     
-    // Actualizar campos en el formulario
     document.getElementById('calorias').value = calorias;
     document.getElementById('proteinas').value = proteinas;
     document.getElementById('grasas').value = grasas;
@@ -957,35 +937,31 @@ function calcularMacronutrientes() {
 function mostrarResultados() {
     const resultadosDiv = document.getElementById('resultados');
     
-    // Establecer fecha de generación
     const fechaHoy = new Date().toLocaleDateString('es-ES', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
     });
-    document.getElementById('fecha-generacion').textContent = fechaHoy;
+    const fechaGenElem = document.getElementById('fecha-generacion');
+    if (fechaGenElem) {
+        fechaGenElem.textContent = fechaHoy;
+    }
     
-    // Mostrar tabla de macronutrientes
     mostrarTablaMacros();
-    
-    // Mostrar información del usuario
     mostrarInfoUsuario();
-    
-    // Mostrar plan de alimentación
     mostrarPlanAlimentacion();
-    
-    // Mostrar prohibiciones
     mostrarProhibiciones();
     
-    // Mostrar resultados
     resultadosDiv.classList.remove('oculto');
     
-    // Scroll suave hacia los resultados
     setTimeout(() => {
-        resultadosDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        inicializarBotones();
     }, 100);
     
-    // Mostrar notificación de éxito
+    setTimeout(() => {
+        resultadosDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 200);
+    
     mostrarNotificacion('✅ Plan de alimentación generado correctamente', 'success');
 }
 
@@ -993,7 +969,6 @@ function mostrarTablaMacros() {
     const tbody = document.getElementById('tabla-macros-body');
     const { calorias, proteinas, grasas, carbohidratos } = datosUsuario;
     
-    // Calcular porcentajes
     const proteinasPercent = Math.round((proteinas * 4 / calorias) * 100);
     const grasasPercent = Math.round((grasas * 9 / calorias) * 100);
     const carbohidratosPercent = Math.round((carbohidratos * 4 / calorias) * 100);
@@ -1182,7 +1157,6 @@ function mostrarProhibiciones() {
     }
 }
 
-// Event listeners para las pestañas
 document.addEventListener('DOMContentLoaded', function() {
     const tabs = document.querySelectorAll('.tab');
     
@@ -1190,104 +1164,120 @@ document.addEventListener('DOMContentLoaded', function() {
         tab.addEventListener('click', function() {
             const tabName = this.getAttribute('data-tab');
             
-            // Remover clase active de todas las pestañas
             tabs.forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
             
-            // Activar pestaña y contenido seleccionado
             this.classList.add('active');
             document.getElementById(`tab-${tabName}`).classList.add('active');
         });
     });
     
-    // Establecer fecha actual
     const hoy = new Date();
-    document.getElementById('fechaRegistro').valueAsDate = hoy;
-});
-
-// Botón de descarga en PDF
-document.getElementById('btnDescargar').addEventListener('click', function() {
-    const boton = this;
-    const textoOriginal = boton.textContent;
-    
-    // Cambiar texto del botón
-    boton.textContent = '⏳ Generando PDF...';
-    boton.disabled = true;
-    
-    // Elemento a convertir en PDF
-    const elemento = document.getElementById('pdf-content');
-    
-    // Configuración del PDF
-    const opciones = {
-        margin: [10, 10, 10, 10],
-        filename: `Dieta_${datosUsuario.nombre.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2,
-            useCORS: true,
-            letterRendering: true
-        },
-        jsPDF: { 
-            unit: 'mm', 
-            format: 'a4', 
-            orientation: 'portrait'
-        },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-    };
-    
-    // Generar PDF
-    html2pdf()
-        .set(opciones)
-        .from(elemento)
-        .save()
-        .then(function() {
-            // Restaurar botón
-            boton.textContent = textoOriginal;
-            boton.disabled = false;
-            
-            // Mostrar mensaje de éxito
-            mostrarNotificacion('✅ PDF descargado correctamente', 'success');
-        })
-        .catch(function(error) {
-            console.error('Error al generar PDF:', error);
-            boton.textContent = textoOriginal;
-            boton.disabled = false;
-            mostrarNotificacion('❌ Error al generar el PDF', 'error');
-        });
-});
-
-// Botón para crear nueva dieta
-document.getElementById('btnNuevo').addEventListener('click', function() {
-    if (confirm('¿Estás seguro de que quieres crear una nueva dieta? Se perderá la información actual.')) {
-        // Ocultar resultados
-        document.getElementById('resultados').classList.add('oculto');
-        
-        // Resetear formulario
-        document.getElementById('dietForm').reset();
-        
-        // Limpiar campos auto-calculados
-        document.getElementById('calorias').value = '';
-        document.getElementById('proteinas').value = '';
-        document.getElementById('grasas').value = '';
-        document.getElementById('carbohidratos').value = '';
-        
-        // Scroll al inicio
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        
-        mostrarNotificacion('✨ Listo para crear una nueva dieta', 'info');
+    const fechaInput = document.getElementById('fechaRegistro');
+    if (fechaInput) {
+        fechaInput.valueAsDate = hoy;
     }
 });
 
-// Función para mostrar notificaciones
+function inicializarBotones() {
+    const btnDescargar = document.getElementById('btnDescargar');
+    if (btnDescargar) {
+        btnDescargar.replaceWith(btnDescargar.cloneNode(true));
+        const nuevoBtn = document.getElementById('btnDescargar');
+        
+        nuevoBtn.addEventListener('click', function() {
+            const boton = this;
+            const textoOriginal = boton.innerHTML;
+            
+            boton.innerHTML = '⏳ Generando PDF...';
+            boton.disabled = true;
+            
+            if (typeof html2pdf === 'undefined') {
+                alert('Error: La librería html2pdf no está cargada. Por favor, recarga la página.');
+                boton.innerHTML = textoOriginal;
+                boton.disabled = false;
+                return;
+            }
+            
+            const elemento = document.getElementById('pdf-content');
+            
+            if (!elemento) {
+                alert('Error: No se encontró el contenido para generar el PDF.');
+                boton.innerHTML = textoOriginal;
+                boton.disabled = false;
+                return;
+            }
+            
+            const opciones = {
+                margin: [10, 10, 10, 10],
+                filename: `Dieta_${datosUsuario.nombre.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true,
+                    logging: false
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait'
+                },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+            
+            html2pdf()
+                .set(opciones)
+                .from(elemento)
+                .save()
+                .then(function() {
+                    boton.innerHTML = textoOriginal;
+                    boton.disabled = false;
+                    mostrarNotificacion('✅ PDF descargado correctamente', 'success');
+                })
+                .catch(function(error) {
+                    console.error('Error al generar PDF:', error);
+                    boton.innerHTML = textoOriginal;
+                    boton.disabled = false;
+                    mostrarNotificacion('❌ Error al generar el PDF. Por favor, inténtalo de nuevo.', 'error');
+                });
+        });
+    }
+    
+    const btnNuevo = document.getElementById('btnNuevo');
+    if (btnNuevo) {
+        btnNuevo.replaceWith(btnNuevo.cloneNode(true));
+        const nuevoBtn2 = document.getElementById('btnNuevo');
+        
+        nuevoBtn2.addEventListener('click', function() {
+            if (confirm('¿Estás seguro de que quieres crear una nueva dieta? Se perderá la información actual.')) {
+                document.getElementById('resultados').classList.add('oculto');
+                document.getElementById('dietForm').reset();
+                document.getElementById('calorias').value = '';
+                document.getElementById('proteinas').value = '';
+                document.getElementById('grasas').value = '';
+                document.getElementById('carbohidratos').value = '';
+                
+                const hoy = new Date();
+                const fechaInput = document.getElementById('fechaRegistro');
+                if (fechaInput) {
+                    fechaInput.valueAsDate = hoy;
+                }
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                mostrarNotificacion('✨ Listo para crear una nueva dieta', 'info');
+            }
+        });
+    }
+}
+
 function mostrarNotificacion(mensaje, tipo = 'info') {
-    // Crear elemento de notificación
     const notificacion = document.createElement('div');
     notificacion.className = `notificacion notificacion-${tipo}`;
     notificacion.textContent = mensaje;
     
-    // Estilos inline
     notificacion.style.cssText = `
         position: fixed;
         top: 20px;
@@ -1303,10 +1293,8 @@ function mostrarNotificacion(mensaje, tipo = 'info') {
         max-width: 300px;
     `;
     
-    // Añadir al body
     document.body.appendChild(notificacion);
     
-    // Remover después de 3 segundos
     setTimeout(() => {
         notificacion.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => {
@@ -1315,7 +1303,6 @@ function mostrarNotificacion(mensaje, tipo = 'info') {
     }, 3000);
 }
 
-// Añadir animaciones CSS para notificaciones
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
