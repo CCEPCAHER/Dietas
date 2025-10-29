@@ -129,6 +129,13 @@
                     </select>
                 </div>
 
+                <h2>Plan de Ejercicio</h2>
+
+                <div class="form-group">
+                    <label for="planEjercicio">Indica el plan de ejercicio (opcional):</label>
+                    <textarea id="planEjercicio" name="planEjercicio" rows="6" placeholder="Ej: Lunes - Piernas: Sentadillas 4x10, Prensa 3x12, Extensión de cuádriceps 3x15&#10;Martes - Espalda: Dominadas 4x8, Remo con barra 4x10, Jalones 3x12&#10;Miércoles - Pecho: Press banca 4x8, Aperturas 3x12, Fondos 3x10..."></textarea>
+                </div>
+
                 <button type="submit" class="btn-submit">✨ Generar Plan de Alimentación</button>
             </form>
         </div>
@@ -211,6 +218,20 @@
                     <!-- Plan de Alimentación Semanal -->
                     <div id="plan-alimentacion" class="plan-alimentacion">
                         <!-- Se llenará con JS -->
+                    </div>
+
+                    <!-- Nota sobre agua (solo una vez) -->
+                    <div id="nota-agua" class="notas-agua-section" style="margin-top: 30px; padding: 15px; background: #d1ecf1; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                        <h4 style="color: #0c5460; margin-bottom: 10px;">📝 NOTA IMPORTANTE</h4>
+                        <p style="margin: 0; color: #0c5460;">Recuerda beber al menos 2-3 litros de agua al día. Ajusta las porciones según tu nivel de saciedad y energía.</p>
+                    </div>
+
+                    <!-- Plan de Ejercicio -->
+                    <div id="plan-ejercicio-container" class="plan-ejercicio-container" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 2px solid #667eea;">
+                        <h3 style="color: #667eea; margin-bottom: 15px; font-size: 1.5em;">🏋️ Plan de Ejercicio</h3>
+                        <div id="plan-ejercicio-content" style="white-space: pre-line; line-height: 1.8; font-size: 1.1em; color: #333;">
+                            <!-- Se llenará con JS -->
+                        </div>
                     </div>
                 </div>
 

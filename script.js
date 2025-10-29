@@ -858,35 +858,6 @@ const alimentosPorObjetivo = {
 let datosUsuario = {};
 window.datosUsuario = datosUsuario; // Exportar para uso en otros módulos
 
-// Event listener para el formulario
-document.getElementById('dietForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    // Validar que el usuario esté autenticado
-    if (!window.authManager || !window.authManager.isAuthenticated()) {
-        window.uiManager?.openModal();
-        mostrarNotificacion('⚠️ Debes iniciar sesión para generar dietas', 'error');
-        return;
-    }
-    
-    datosUsuario = {
-        nombre: document.getElementById('nombre').value,
-        fechaRegistro: document.getElementById('fechaRegistro').value,
-        sexo: document.getElementById('sexo').value,
-        edad: parseInt(document.getElementById('edad').value),
-        altura: parseInt(document.getElementById('altura').value),
-        peso: parseFloat(document.getElementById('peso').value),
-        tipoPersona: document.getElementById('tipoPersona').value,
-        objetivo: document.getElementById('objetivo').value,
-        prohibiciones: document.getElementById('prohibiciones').value,
-        duracion: document.getElementById('duracion').value
-    };
-    
-    calcularMacronutrientes();
-    window.datosUsuario = datosUsuario; // Actualizar referencia global
-    mostrarResultados();
-});
-
 function calcularMacronutrientes() {
     const { edad, sexo, altura, peso, objetivo, tipoPersona } = datosUsuario;
     
@@ -963,6 +934,7 @@ window.mostrarResultados = function() {
     mostrarInfoUsuario();
     mostrarPlanAlimentacion();
     mostrarProhibiciones();
+    mostrarPlanEjercicio();
     
     resultadosDiv.classList.remove('oculto');
     
@@ -1215,11 +1187,6 @@ function generarDiaHTML(dia, editable = false) {
                 <h4>📋 MENÚ PERSONALIZADO</h4>
                 <p>Este plan está diseñado específicamente para tu objetivo de ${datosUsuario.objetivo === 'aumentar' ? 'aumentar masa muscular' : datosUsuario.objetivo === 'adelgazar' ? 'perder peso' : 'mantener peso'}.</p>
             </div>
-            
-            <div class="notas-section">
-                <h4>📝 NOTAS</h4>
-                <p>Recuerda beber al menos 2-3 litros de agua al día. Ajusta las porciones según tu nivel de saciedad y energía.</p>
-            </div>
         </div>
     `;
 }
@@ -1250,7 +1217,54 @@ function mostrarProhibiciones() {
     }
 }
 
+function mostrarPlanEjercicio() {
+    const planEjercicioDiv = document.getElementById('plan-ejercicio-content');
+    const planEjercicioContainer = document.getElementById('plan-ejercicio-container');
+    
+    if (planEjercicioDiv && planEjercicioContainer) {
+        if (datosUsuario.planEjercicio && datosUsuario.planEjercicio.trim() !== '') {
+            planEjercicioDiv.textContent = datosUsuario.planEjercicio;
+            planEjercicioContainer.style.display = 'block';
+        } else {
+            planEjercicioContainer.style.display = 'none';
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Event listener para el formulario
+    const dietForm = document.getElementById('dietForm');
+    if (dietForm) {
+        dietForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validar que el usuario esté autenticado
+            if (!window.authManager || !window.authManager.isAuthenticated()) {
+                window.uiManager?.openModal();
+                mostrarNotificacion('⚠️ Debes iniciar sesión para generar dietas', 'error');
+                return;
+            }
+            
+            datosUsuario = {
+                nombre: document.getElementById('nombre').value,
+                fechaRegistro: document.getElementById('fechaRegistro').value,
+                sexo: document.getElementById('sexo').value,
+                edad: parseInt(document.getElementById('edad').value),
+                altura: parseInt(document.getElementById('altura').value),
+                peso: parseFloat(document.getElementById('peso').value),
+                tipoPersona: document.getElementById('tipoPersona').value,
+                objetivo: document.getElementById('objetivo').value,
+                prohibiciones: document.getElementById('prohibiciones').value,
+                duracion: document.getElementById('duracion').value,
+                planEjercicio: document.getElementById('planEjercicio').value
+            };
+            
+            calcularMacronutrientes();
+            window.datosUsuario = datosUsuario; // Actualizar referencia global
+            mostrarResultados();
+        });
+    }
+    
     const tabs = document.querySelectorAll('.tab');
     
     tabs.forEach(tab => {
@@ -1358,48 +1372,246 @@ function inicializarBotones() {
                 return;
             }
             
-            const elemento = document.getElementById('pdf-content');
+            // Crear contenedor temporal solo con contenido necesario para PDF
+            const elementoOriginal = document.getElementById('pdf-content');
             
-            if (!elemento) {
+            if (!elementoOriginal) {
                 alert('Error: No se encontró el contenido para generar el PDF.');
                 boton.innerHTML = textoOriginal;
                 boton.disabled = false;
                 return;
             }
             
-            const opciones = {
-                margin: [10, 10, 10, 10],
-                filename: `Dieta_${datosUsuario.nombre.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2,
-                    useCORS: true,
-                    letterRendering: true,
-                    logging: false
-                },
-                jsPDF: { 
-                    unit: 'mm', 
-                    format: 'a4', 
-                    orientation: 'portrait'
-                },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
+            // Crear contenedor temporal con solo el contenido necesario
+            const contenedorPDF = document.createElement('div');
+            contenedorPDF.id = 'pdf-temp-content';
+            contenedorPDF.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 210mm;
+                padding: 10mm;
+                font-size: 12pt;
+                line-height: 1.6;
+                color: #333;
+                background: white;
+                z-index: -1;
+                visibility: visible;
+                opacity: 1;
+            `;
             
-            html2pdf()
-                .set(opciones)
-                .from(elemento)
-                .save()
-                .then(function() {
-                    boton.innerHTML = textoOriginal;
-                    boton.disabled = false;
-                    mostrarNotificacion('✅ PDF descargado correctamente', 'success');
-                })
-                .catch(function(error) {
-                    console.error('Error al generar PDF:', error);
-                    boton.innerHTML = textoOriginal;
-                    boton.disabled = false;
-                    mostrarNotificacion('❌ Error al generar el PDF. Por favor, inténtalo de nuevo.', 'error');
+            // Copiar header
+            const header = elementoOriginal.querySelector('.pdf-header');
+            if (header) {
+                const headerClone = header.cloneNode(true);
+                headerClone.style.cssText = `
+                    text-align: center;
+                    padding: 15px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border-radius: 10px;
+                    margin-bottom: 20px;
+                `;
+                headerClone.querySelector('h1').style.cssText = 'color: white; margin: 0; font-size: 24pt;';
+                headerClone.querySelector('.subtitle').style.cssText = 'font-size: 14pt; margin-top: 5px; opacity: 0.9;';
+                contenedorPDF.appendChild(headerClone);
+            }
+            
+            // Copiar tabla de macronutrientes
+            const macroTable = elementoOriginal.querySelector('.macro-table');
+            if (macroTable) {
+                const macroClone = macroTable.cloneNode(true);
+                macroClone.style.cssText = 'margin-bottom: 20px;';
+                macroClone.querySelector('h3').style.cssText = 'font-size: 16pt; margin-bottom: 10px; color: #333;';
+                const tabla = macroClone.querySelector('table');
+                if (tabla) {
+                    tabla.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 11pt;';
+                    tabla.querySelectorAll('th, td').forEach(celda => {
+                        celda.style.cssText = 'padding: 8px; border: 1px solid #ddd; text-align: center; font-size: 11pt;';
+                    });
+                }
+                contenedorPDF.appendChild(macroClone);
+            }
+            
+            // Copiar información del usuario
+            const infoUsuario = elementoOriginal.querySelector('.info-usuario-table');
+            if (infoUsuario) {
+                const infoClone = infoUsuario.cloneNode(true);
+                infoClone.style.cssText = 'margin-bottom: 20px;';
+                infoClone.querySelector('h3').style.cssText = 'font-size: 16pt; margin-bottom: 10px; color: #333;';
+                const tabla = infoClone.querySelector('table');
+                if (tabla) {
+                    tabla.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 11pt;';
+                    tabla.querySelectorAll('th, td').forEach(celda => {
+                        celda.style.cssText = 'padding: 8px; border: 1px solid #ddd; text-align: center; font-size: 11pt;';
+                    });
+                }
+                contenedorPDF.appendChild(infoClone);
+            }
+            
+            // Copiar plan de alimentación completo
+            const planAlimentacion = elementoOriginal.querySelector('#plan-alimentacion');
+            if (planAlimentacion) {
+                const planClone = planAlimentacion.cloneNode(true);
+                planClone.style.cssText = 'margin-top: 20px;';
+                
+                // Mejorar estilos de cada día
+                planClone.querySelectorAll('.dia-plan').forEach(dia => {
+                    dia.style.cssText = `
+                        background: #f8f9fa;
+                        padding: 15px;
+                        margin-bottom: 20px;
+                        border-radius: 8px;
+                        page-break-inside: avoid;
+                        break-inside: avoid;
+                    `;
+                    dia.querySelector('h3').style.cssText = 'font-size: 14pt; color: #764ba2; margin-bottom: 10px; font-weight: bold;';
+                    
+                    // Mejorar tabla de comidas
+                    const tablaComidas = dia.querySelector('.tabla-comidas');
+                    if (tablaComidas) {
+                        tablaComidas.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 10pt; margin: 10px 0;';
+                        tablaComidas.querySelectorAll('th').forEach(th => {
+                            th.style.cssText = 'padding: 6px; background: #667eea; color: white; border: 1px solid #ddd; font-size: 9pt; font-weight: bold;';
+                        });
+                        tablaComidas.querySelectorAll('td').forEach(td => {
+                            td.style.cssText = 'padding: 6px; border: 1px solid #ddd; vertical-align: top; font-size: 9pt;';
+                        });
+                        tablaComidas.querySelectorAll('.comida-header').forEach(header => {
+                            header.style.cssText = 'font-weight: bold; margin-bottom: 5px; font-size: 9pt;';
+                        });
+                        tablaComidas.querySelectorAll('.lista-alimentos').forEach(lista => {
+                            lista.style.cssText = 'margin: 5px 0; padding-left: 15px; font-size: 8pt;';
+                        });
+                        tablaComidas.querySelectorAll('.macros-comida').forEach(macros => {
+                            macros.style.cssText = 'font-size: 7pt; color: #666; margin-top: 5px;';
+                        });
+                    }
+                    
+                    // Ocultar secciones no necesarias
+                    dia.querySelectorAll('.menu-section, .notas-section, .edicion-comida').forEach(seccion => {
+                        seccion.style.display = 'none';
+                    });
                 });
+                
+                contenedorPDF.appendChild(planClone);
+            }
+            
+            // Copiar nota de agua
+            const notaAgua = elementoOriginal.querySelector('#nota-agua');
+            if (notaAgua) {
+                const notaAguaClone = notaAgua.cloneNode(true);
+                notaAguaClone.style.cssText = `
+                    margin-top: 20px;
+                    padding: 15px;
+                    background: #d1ecf1;
+                    border-radius: 8px;
+                    border-left: 4px solid #17a2b8;
+                `;
+                notaAguaClone.querySelector('h4').style.cssText = 'color: #0c5460; margin-bottom: 10px; font-size: 12pt;';
+                notaAguaClone.querySelector('p').style.cssText = 'margin: 0; color: #0c5460; font-size: 10pt;';
+                contenedorPDF.appendChild(notaAguaClone);
+            }
+            
+            // Copiar plan de ejercicio
+            const planEjercicioContainer = elementoOriginal.querySelector('#plan-ejercicio-container');
+            if (planEjercicioContainer && planEjercicioContainer.style.display !== 'none') {
+                const planEjercicioClone = planEjercicioContainer.cloneNode(true);
+                planEjercicioClone.style.cssText = `
+                    margin-top: 20px;
+                    padding: 15px;
+                    background: #f8f9fa;
+                    border-radius: 10px;
+                    border: 2px solid #667eea;
+                `;
+                planEjercicioClone.querySelector('h3').style.cssText = 'color: #667eea; margin-bottom: 15px; font-size: 14pt; font-weight: bold;';
+                const contenidoEjercicio = planEjercicioClone.querySelector('#plan-ejercicio-content');
+                if (contenidoEjercicio) {
+                    contenidoEjercicio.style.cssText = 'white-space: pre-line; line-height: 1.8; font-size: 10pt; color: #333;';
+                }
+                contenedorPDF.appendChild(planEjercicioClone);
+            }
+            
+            // Copiar footer
+            const footer = elementoOriginal.querySelector('.pdf-footer');
+            if (footer) {
+                const footerClone = footer.cloneNode(true);
+                footerClone.style.cssText = `
+                    margin-top: 30px;
+                    padding: 15px;
+                    background: #f8f9fa;
+                    border-radius: 10px;
+                    text-align: center;
+                    font-size: 9pt;
+                    color: #666;
+                    border-top: 3px solid #667eea;
+                `;
+                footerClone.querySelectorAll('p').forEach(p => {
+                    p.style.cssText = 'margin: 3px 0; font-size: 9pt;';
+                });
+                contenedorPDF.appendChild(footerClone);
+            }
+            
+            // Agregar al body temporalmente
+            document.body.appendChild(contenedorPDF);
+            
+            // Forzar reflow para asegurar que el contenido se renderice
+            void contenedorPDF.offsetHeight;
+            
+            // Esperar un momento para que los estilos se apliquen y el contenido se renderice
+            setTimeout(() => {
+                const opciones = {
+                    margin: [8, 8, 8, 8],
+                    filename: `Dieta_${datosUsuario.nombre.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 2,
+                        useCORS: true,
+                        letterRendering: true,
+                        logging: false,
+                        windowWidth: contenedorPDF.scrollWidth,
+                        windowHeight: contenedorPDF.scrollHeight,
+                        scrollX: 0,
+                        scrollY: 0,
+                        backgroundColor: '#ffffff',
+                        allowTaint: true
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true
+                    },
+                    pagebreak: { 
+                        mode: ['css'],
+                        avoid: ['.dia-plan']
+                    }
+                };
+                
+                html2pdf()
+                    .set(opciones)
+                    .from(contenedorPDF)
+                    .save()
+                    .then(function() {
+                        // Eliminar contenedor temporal
+                        if (document.body.contains(contenedorPDF)) {
+                            document.body.removeChild(contenedorPDF);
+                        }
+                        boton.innerHTML = textoOriginal;
+                        boton.disabled = false;
+                        mostrarNotificacion('✅ PDF descargado correctamente', 'success');
+                    })
+                    .catch(function(error) {
+                        console.error('Error al generar PDF:', error);
+                        // Eliminar contenedor temporal en caso de error
+                        if (document.body.contains(contenedorPDF)) {
+                            document.body.removeChild(contenedorPDF);
+                        }
+                        boton.innerHTML = textoOriginal;
+                        boton.disabled = false;
+                        mostrarNotificacion('❌ Error al generar el PDF. Por favor, inténtalo de nuevo.', 'error');
+                    });
+            }, 100);
         });
     }
     

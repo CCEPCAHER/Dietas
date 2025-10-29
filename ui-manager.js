@@ -22,11 +22,6 @@ class UIManager {
             <div id="authModal" class="modal">
                 <div class="modal-content">
                     <span class="close-modal">&times;</span>
-                    <div id="authTabs" class="auth-tabs">
-                        <button class="auth-tab active" data-auth="login">Iniciar Sesión</button>
-                        <button class="auth-tab" data-auth="register">Registrarse</button>
-                    </div>
-                    
                     <div id="loginForm" class="auth-form active">
                         <h2>Iniciar Sesión</h2>
                         <form id="loginFormElement">
@@ -42,30 +37,6 @@ class UIManager {
                         </form>
                         <div id="loginError" class="error-message"></div>
                     </div>
-                    
-                    <div id="registerForm" class="auth-form">
-                        <h2>Crear Cuenta</h2>
-                        <form id="registerFormElement">
-                            <div class="form-group">
-                                <label>Nombre completo:</label>
-                                <input type="text" id="registerName" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Email:</label>
-                                <input type="email" id="registerEmail" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Contraseña:</label>
-                                <input type="password" id="registerPassword" required minlength="6">
-                            </div>
-                            <div class="form-group">
-                                <label>Confirmar contraseña:</label>
-                                <input type="password" id="registerPasswordConfirm" required>
-                            </div>
-                            <button type="submit" class="btn-auth">Registrarse</button>
-                        </form>
-                        <div id="registerError" class="error-message"></div>
-                    </div>
                 </div>
             </div>
         `;
@@ -77,30 +48,22 @@ class UIManager {
     }
 
     setupEventListeners() {
-        // Tabs de autenticación
-        document.querySelectorAll('.auth-tab').forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                const authType = e.target.getAttribute('data-auth');
-                this.switchAuthTab(authType);
-            });
-        });
-
         // Cerrar modal
-        document.querySelector('.close-modal').addEventListener('click', () => {
-            this.closeModal();
-        });
+        const closeBtn = document.querySelector('.close-modal');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                this.closeModal();
+            });
+        }
 
         // Login form
-        document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await this.handleLogin();
-        });
-
-        // Register form
-        document.getElementById('registerFormElement').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await this.handleRegister();
-        });
+        const loginForm = document.getElementById('loginFormElement');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.handleLogin();
+            });
+        }
 
         // Eventos de autenticación
         window.addEventListener('userLoggedIn', () => {
@@ -110,14 +73,6 @@ class UIManager {
         window.addEventListener('userLoggedOut', () => {
             this.updateUIForLoggedOutUser();
         });
-    }
-
-    switchAuthTab(authType) {
-        document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
-        
-        document.querySelector(`[data-auth="${authType}"]`).classList.add('active');
-        document.getElementById(`${authType}Form`).classList.add('active');
     }
 
     async handleLogin() {
@@ -138,37 +93,6 @@ class UIManager {
         }
     }
 
-    async handleRegister() {
-        const nombre = document.getElementById('registerName').value;
-        const email = document.getElementById('registerEmail').value;
-        const password = document.getElementById('registerPassword').value;
-        const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
-        const errorDiv = document.getElementById('registerError');
-
-        errorDiv.textContent = '';
-
-        // Validaciones
-        if (password !== passwordConfirm) {
-            errorDiv.textContent = 'Las contraseñas no coinciden';
-            return;
-        }
-
-        if (password.length < 6) {
-            errorDiv.textContent = 'La contraseña debe tener al menos 6 caracteres';
-            return;
-        }
-
-        const result = await window.authManager.register(email, password, nombre);
-        
-        if (result.success) {
-            this.closeModal();
-            this.showNotification('✅ Cuenta creada correctamente', 'success');
-        } else {
-            errorDiv.textContent = result.error;
-            this.showNotification('❌ ' + result.error, 'error');
-        }
-    }
-
     openModal() {
         if (this.modal) {
             this.modal.style.display = 'block';
@@ -179,10 +103,10 @@ class UIManager {
         if (this.modal) {
             this.modal.style.display = 'none';
             // Limpiar formularios
-            document.getElementById('loginFormElement').reset();
-            document.getElementById('registerFormElement').reset();
-            document.getElementById('loginError').textContent = '';
-            document.getElementById('registerError').textContent = '';
+            const loginForm = document.getElementById('loginFormElement');
+            const loginError = document.getElementById('loginError');
+            if (loginForm) loginForm.reset();
+            if (loginError) loginError.textContent = '';
         }
     }
 
@@ -248,7 +172,7 @@ class UIManager {
         const userInfoDiv = document.getElementById('userInfo');
         if (userInfoDiv) {
             userInfoDiv.innerHTML = `
-                <button id="loginBtn" class="btn-login">Iniciar Sesión / Registrarse</button>
+                <button id="loginBtn" class="btn-login">Iniciar Sesión</button>
             `;
             document.getElementById('loginBtn').addEventListener('click', () => this.openModal());
         }
@@ -376,6 +300,10 @@ class UIManager {
         document.getElementById('objetivo').value = dieta.objetivo || '';
         document.getElementById('prohibiciones').value = dieta.prohibiciones || '';
         document.getElementById('duracion').value = dieta.duracion || 'semana';
+        const planEjercicioInput = document.getElementById('planEjercicio');
+        if (planEjercicioInput) {
+            planEjercicioInput.value = dieta.planEjercicio || '';
+        }
 
         // Actualizar macros si existen
         if (dieta.calorias) {
