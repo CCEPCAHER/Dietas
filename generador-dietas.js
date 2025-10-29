@@ -1,7 +1,15 @@
 // Generador de planes de dieta usando la base de datos ampliada
 // Este archivo genera planes variados usando la base de datos de alimentos
 
+// Variables globales para tracking de diversidad
+let alimentosUsadosSemana = [];
+let alimentosUsadosHistorial = [];
+
 function generarPlanVariado(objetivo, duracion) {
+    // Limpiar historial de alimentos usados para el nuevo plan
+    alimentosUsadosHistorial = [];
+    alimentosUsadosSemana = [];
+    
     // Determinar número de semanas según duración
     let semanas;
     if (duracion === 'semana') {
@@ -21,6 +29,8 @@ function generarPlanVariado(objetivo, duracion) {
     for (let semana = 0; semana < semanas; semana++) {
         const semanaPlan = generarSemanaVariada(objetivo, semana);
         planCompleto.push(...semanaPlan);
+        // Limpiar alimentos de la semana para la siguiente
+        alimentosUsadosSemana = [];
     }
     
     return planCompleto;
@@ -56,7 +66,7 @@ function generarComida(objetivo, tipoComida, variacion) {
     
     // Obtener datos del usuario desde la variable global
     const datosUsuario = window.datosUsuario || {};
-    const { calorias: calObj, proteinas: protObj, carbohidratos: carbObj, grasas: grasObj } = datosUsuario;
+    const { calorias: calObj, proteinas: protObj, carbohidratos: carbObj, grasas: grasObj, prohibiciones } = datosUsuario;
     
     // Distribución objetivo según tipo de comida
     const distribucion = obtenerDistribucionComida(objetivo, tipoComida, calObj, protObj, carbObj, grasObj);
@@ -64,21 +74,24 @@ function generarComida(objetivo, tipoComida, variacion) {
     // Seleccionar alimentos según el tipo de comida
     switch(tipoComida) {
         case 'desayuno':
-            alimentos = seleccionarDesayuno(objetivo, distribucion, variacion);
+            alimentos = seleccionarDesayuno(objetivo, distribucion, variacion, prohibiciones);
             break;
         case 'medioDia':
-            alimentos = seleccionarMedioDia(objetivo, distribucion, variacion);
+            alimentos = seleccionarMedioDia(objetivo, distribucion, variacion, prohibiciones);
             break;
         case 'almuerzo':
-            alimentos = seleccionarAlmuerzo(objetivo, distribucion, variacion);
+            alimentos = seleccionarAlmuerzo(objetivo, distribucion, variacion, prohibiciones);
             break;
         case 'merienda':
-            alimentos = seleccionarMerienda(objetivo, distribucion, variacion);
+            alimentos = seleccionarMerienda(objetivo, distribucion, variacion, prohibiciones);
             break;
         case 'cena':
-            alimentos = seleccionarCena(objetivo, distribucion, variacion);
+            alimentos = seleccionarCena(objetivo, distribucion, variacion, prohibiciones);
             break;
     }
+    
+    // Balancear macros si es necesario
+    alimentos = balancearMacrosComida(alimentos, distribucion, objetivo);
     
     // Calcular macros totales
     alimentos.forEach(alimento => {
@@ -136,7 +149,7 @@ function obtenerDistribucionComida(objetivo, tipoComida, calTotales, protTotales
     };
 }
 
-function seleccionarDesayuno(objetivo, distribucion, variacion) {
+function seleccionarDesayuno(objetivo, distribucion, variacion, restricciones = '') {
     const alimentos = [];
     
     // Base de carbohidratos
@@ -177,7 +190,7 @@ function seleccionarDesayuno(objetivo, distribucion, variacion) {
     return alimentos;
 }
 
-function seleccionarMedioDia(objetivo, distribucion, variacion) {
+function seleccionarMedioDia(objetivo, distribucion, variacion, restricciones = '') {
     const alimentos = [];
     
     if (objetivo === 'aumentar') {
@@ -201,7 +214,7 @@ function seleccionarMedioDia(objetivo, distribucion, variacion) {
     }
 }
 
-function seleccionarAlmuerzo(objetivo, distribucion, variacion) {
+function seleccionarAlmuerzo(objetivo, distribucion, variacion, restricciones = '') {
     const alimentos = [];
     
     // Proteína principal
@@ -242,7 +255,7 @@ function seleccionarAlmuerzo(objetivo, distribucion, variacion) {
     return alimentos;
 }
 
-function seleccionarMerienda(objetivo, distribucion, variacion) {
+function seleccionarMerienda(objetivo, distribucion, variacion, restricciones = '') {
     const alimentos = [];
     
     if (objetivo === 'aumentar') {
@@ -275,7 +288,7 @@ function seleccionarMerienda(objetivo, distribucion, variacion) {
     }
 }
 
-function seleccionarCena(objetivo, distribucion, variacion) {
+function seleccionarCena(objetivo, distribucion, variacion, restricciones = '') {
     const alimentos = [];
     
     // Proteína principal
@@ -314,7 +327,175 @@ function seleccionarCena(objetivo, distribucion, variacion) {
     return alimentos;
 }
 
+// Funciones auxiliares para selección inteligente
+
+// Función para seleccionar alimento evitando repeticiones
+function seleccionarAlimentoDiverso(arrayAlimentos, indicesUsados, variacion = 0) {
+    const disponibles = arrayAlimentos.filter((_, index) => !indicesUsados.includes(index));
+    if (disponibles.length === 0) {
+        // Si ya usamos todos, limpiamos y empezamos de nuevo
+        indicesUsados.length = 0;
+        return arrayAlimentos[variacion % arrayAlimentos.length];
+    }
+    
+    const seleccionado = disponibles[variacion % disponibles.length];
+    const indice = arrayAlimentos.indexOf(seleccionado);
+    indicesUsados.push(indice);
+    
+    return seleccionado;
+}
+
+// Función para verificar restricciones alimentarias
+function verificarRestricciones(alimento, restricciones) {
+    if (!restricciones || restricciones.trim() === '') return true;
+    
+    const alimentoLower = alimento.toLowerCase();
+    const restriccionesLower = restricciones.toLowerCase();
+    
+    // Lista de palabras prohibidas comunes
+    const palabrasProhibidas = restriccionesLower.split(/[,\s]+/).filter(p => p.trim() !== '');
+    
+    // Verificar si el alimento contiene alguna palabra prohibida
+    for (let palabra of palabrasProhibidas) {
+        if (alimentoLower.includes(palabra.toLowerCase())) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+// Función para calcular cantidad óptima de un alimento según distribución objetivo
+function calcularCantidadOptima(alimento, distribucion, tipoAlimento) {
+    const info = obtenerInfoNutricional(alimento, 100);
+    if (!info) return 100;
+    
+    // Calcular cuántos gramos necesitamos para alcanzar la distribución objetivo
+    const factor = 1.0; // Factor de ajuste
+    
+    switch(tipoAlimento) {
+        case 'proteina':
+            if (info.proteinas > 0) {
+                return Math.round((distribucion.proteinas / info.proteinas) * 100 * factor);
+            }
+            break;
+        case 'carbohidrato':
+            if (info.carbohidratos > 0) {
+                return Math.round((distribucion.carbohidratos / info.carbohidratos) * 100 * factor);
+            }
+            break;
+        case 'grasa':
+            if (info.grasas > 0) {
+                return Math.round((distribucion.grasas / info.grasas) * 100 * factor);
+            }
+            break;
+    }
+    
+    return 100;
+}
+
+// Función para balancear macros de una comida
+function balancearMacrosComida(alimentos, distribucionObjetivo, objetivo) {
+    const totalMacros = {
+        calorias: 0,
+        proteinas: 0,
+        carbohidratos: 0,
+        grasas: 0
+    };
+    
+    // Calcular macros actuales
+    alimentos.forEach(alimento => {
+        const info = obtenerInfoNutricional(alimento.nombre, alimento.cantidad);
+        if (info) {
+            totalMacros.calorias += info.calorias;
+            totalMacros.proteinas += info.proteinas;
+            totalMacros.carbohidratos += info.carbohidratos;
+            totalMacros.grasas += info.grasas;
+        }
+    });
+    
+    // Tolerancia para ajustes (10% de diferencia)
+    const tolerancia = 0.15;
+    
+    // Si estamos dentro de la tolerancia, devolver tal cual
+    const diffProt = Math.abs(totalMacros.proteinas - distribucionObjetivo.proteinas) / distribucionObjetivo.proteinas;
+    const diffCarb = Math.abs(totalMacros.carbohidratos - distribucionObjetivo.carbohidratos) / distribucionObjetivo.carbohidratos;
+    const diffGras = Math.abs(totalMacros.grasas - distribucionObjetivo.grasas) / distribucionObjetivo.grasas;
+    
+    if (diffProt <= tolerancia && diffCarb <= tolerancia && diffGras <= tolerancia) {
+        return alimentos;
+    }
+    
+    // Ajustar cantidades
+    const alimentosAjustados = alimentos.map(alimento => {
+        const info = obtenerInfoNutricional(alimento.nombre, alimento.cantidad);
+        if (!info) return alimento;
+        
+        let cantidad = alimento.cantidad;
+        
+        // Ajustar según necesidad
+        if (totalMacros.proteinas < distribucionObjetivo.proteinas && info.proteinas > 0) {
+            cantidad = Math.round(cantidad * 1.1);
+        } else if (totalMacros.proteinas > distribucionObjetivo.proteinas && info.proteinas > 0) {
+            cantidad = Math.round(cantidad * 0.95);
+        }
+        
+        return { ...alimento, cantidad };
+    });
+    
+    return alimentosAjustados;
+}
+
+// Función para obtener alimentos según macronutriente
+function obtenerAlimentosPorMacro(macroTipo, objetivo) {
+    const baseDatos = window.baseDatosAlimentos;
+    if (!baseDatos) return [];
+    
+    let alimentos = [];
+    
+    switch(macroTipo) {
+        case 'proteina':
+            alimentos = [
+                ...Object.keys(baseDatos.proteinas || {}),
+                ...Object.keys(baseDatos.proteinasVegetales || {})
+            ];
+            break;
+        case 'carbohidrato':
+            alimentos = [
+                ...Object.keys(baseDatos.carbohidratos || {}),
+                ...Object.keys(baseDatos.tuberculos || {})
+            ];
+            break;
+        case 'grasa':
+            alimentos = Object.keys(baseDatos.grasas || {});
+            break;
+        case 'verdura':
+            alimentos = Object.keys(baseDatos.verduras || {});
+            break;
+        case 'fruta':
+            alimentos = Object.keys(baseDatos.frutas || {});
+            break;
+    }
+    
+    // Filtrar según objetivo
+    if (objetivo === 'adelgazar') {
+        if (macroTipo === 'carbohidrato') {
+            alimentos = alimentos.filter(a => 
+                !a.toLowerCase().includes('pasta') && 
+                !a.toLowerCase().includes('pan blanco')
+            );
+        }
+    }
+    
+    return alimentos;
+}
+
 // Exportar funciones
 window.generarPlanVariado = generarPlanVariado;
 window.generarSemanaVariada = generarSemanaVariada;
+window.seleccionarAlimentoDiverso = seleccionarAlimentoDiverso;
+window.verificarRestricciones = verificarRestricciones;
+window.calcularCantidadOptima = calcularCantidadOptima;
+window.balancearMacrosComida = balancearMacrosComida;
+window.obtenerAlimentosPorMacro = obtenerAlimentosPorMacro;
 

@@ -1372,9 +1372,15 @@ function inicializarBotones() {
                 return;
             }
             
-            // Crear contenedor temporal solo con contenido necesario para PDF
-            const elementoOriginal = document.getElementById('pdf-content');
+            if (!datosUsuario || !datosUsuario.nombre) {
+                alert('Error: No hay datos de dieta para generar el PDF.');
+                boton.innerHTML = textoOriginal;
+                boton.disabled = false;
+                return;
+            }
             
+            // Clonar el contenido completo sin los tabs
+            const elementoOriginal = document.getElementById('pdf-content');
             if (!elementoOriginal) {
                 alert('Error: No se encontró el contenido para generar el PDF.');
                 boton.innerHTML = textoOriginal;
@@ -1382,236 +1388,185 @@ function inicializarBotones() {
                 return;
             }
             
-            // Crear contenedor temporal con solo el contenido necesario
-            const contenedorPDF = document.createElement('div');
-            contenedorPDF.id = 'pdf-temp-content';
-            contenedorPDF.style.cssText = `
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 210mm;
-                padding: 10mm;
-                font-size: 12pt;
-                line-height: 1.6;
-                color: #333;
-                background: white;
-                z-index: -1;
-                visibility: visible;
-                opacity: 1;
-            `;
+            const clone = elementoOriginal.cloneNode(true);
             
-            // Copiar header
-            const header = elementoOriginal.querySelector('.pdf-header');
-            if (header) {
-                const headerClone = header.cloneNode(true);
-                headerClone.style.cssText = `
-                    text-align: center;
-                    padding: 15px;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    border-radius: 10px;
-                    margin-bottom: 20px;
-                `;
-                headerClone.querySelector('h1').style.cssText = 'color: white; margin: 0; font-size: 24pt;';
-                headerClone.querySelector('.subtitle').style.cssText = 'font-size: 14pt; margin-top: 5px; opacity: 0.9;';
-                contenedorPDF.appendChild(headerClone);
-            }
+            // Remover tabs
+            const tabs = clone.querySelector('.tabs');
+            if (tabs) tabs.remove();
             
-            // Copiar tabla de macronutrientes
-            const macroTable = elementoOriginal.querySelector('.macro-table');
-            if (macroTable) {
-                const macroClone = macroTable.cloneNode(true);
-                macroClone.style.cssText = 'margin-bottom: 20px;';
-                macroClone.querySelector('h3').style.cssText = 'font-size: 16pt; margin-bottom: 10px; color: #333;';
-                const tabla = macroClone.querySelector('table');
-                if (tabla) {
-                    tabla.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 11pt;';
-                    tabla.querySelectorAll('th, td').forEach(celda => {
-                        celda.style.cssText = 'padding: 8px; border: 1px solid #ddd; text-align: center; font-size: 11pt;';
-                    });
+            // Remover tabs content no activos
+            clone.querySelectorAll('.tab-content').forEach(tab => {
+                if (!tab.classList.contains('active')) {
+                    tab.remove();
                 }
-                contenedorPDF.appendChild(macroClone);
+            });
+            
+            // Aplicar estilos inline para el PDF con colores mejorados
+            const pdfHeader = clone.querySelector('.pdf-header');
+            if (pdfHeader) {
+                pdfHeader.style.cssText = 'text-align: center; padding: 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);';
+                const h1 = pdfHeader.querySelector('h1');
+                if (h1) h1.style.cssText = 'color: white; margin: 0; font-size: 32pt; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);';
+                const subtitle = pdfHeader.querySelector('.subtitle');
+                if (subtitle) subtitle.style.cssText = 'font-size: 18pt; margin-top: 10px; opacity: 0.95; font-weight: 600;';
             }
             
-            // Copiar información del usuario
-            const infoUsuario = elementoOriginal.querySelector('.info-usuario-table');
-            if (infoUsuario) {
-                const infoClone = infoUsuario.cloneNode(true);
-                infoClone.style.cssText = 'margin-bottom: 20px;';
-                infoClone.querySelector('h3').style.cssText = 'font-size: 16pt; margin-bottom: 10px; color: #333;';
-                const tabla = infoClone.querySelector('table');
-                if (tabla) {
-                    tabla.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 11pt;';
-                    tabla.querySelectorAll('th, td').forEach(celda => {
-                        celda.style.cssText = 'padding: 8px; border: 1px solid #ddd; text-align: center; font-size: 11pt;';
-                    });
-                }
-                contenedorPDF.appendChild(infoClone);
-            }
+            // Estilizar tablas con mejor diseño
+            clone.querySelectorAll('table').forEach(tabla => {
+                tabla.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 13pt; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
+                tabla.querySelectorAll('th').forEach(th => {
+                    th.style.cssText = 'padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 2px solid #667eea; text-align: center; font-weight: bold; font-size: 13pt; letter-spacing: 0.5px;';
+                });
+                tabla.querySelectorAll('td').forEach(td => {
+                    td.style.cssText = 'padding: 12px; border: 2px solid #e9ecef; text-align: center; background: #ffffff; font-weight: 600; font-size: 12pt;';
+                });
+            });
             
-            // Copiar plan de alimentación completo
-            const planAlimentacion = elementoOriginal.querySelector('#plan-alimentacion');
-            if (planAlimentacion) {
-                const planClone = planAlimentacion.cloneNode(true);
-                planClone.style.cssText = 'margin-top: 20px;';
+            // Estilizar títulos con negrita
+            clone.querySelectorAll('h3').forEach(h3 => {
+                h3.style.cssText = 'font-size: 22pt; margin-bottom: 18px; color: #667eea; border-bottom: 3px solid #764ba2; padding-bottom: 10px; font-weight: bold; letter-spacing: 0.5px;';
+            });
+            
+            // Estilizar h2 también
+            clone.querySelectorAll('h2').forEach(h2 => {
+                h2.style.cssText = 'font-size: 26pt; margin-bottom: 22px; color: #764ba2; font-weight: bold; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); letter-spacing: 1px;';
+            });
+            
+            // Estilizar días del plan con colores mejorados
+            clone.querySelectorAll('.dia-plan').forEach(dia => {
+                dia.style.cssText = 'background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%); padding: 25px; margin-bottom: 25px; border-radius: 12px; page-break-inside: avoid; break-inside: avoid; box-shadow: 0 3px 12px rgba(118, 75, 162, 0.15); border-left: 5px solid #764ba2;';
+                const diaH3 = dia.querySelector('h3');
+                if (diaH3) diaH3.style.cssText = 'color: #764ba2; font-size: 24pt; margin-bottom: 20px; font-weight: bold; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(118, 75, 162, 0.2); letter-spacing: 1px;';
                 
-                // Mejorar estilos de cada día
-                planClone.querySelectorAll('.dia-plan').forEach(dia => {
-                    dia.style.cssText = `
-                        background: #f8f9fa;
-                        padding: 15px;
-                        margin-bottom: 20px;
-                        border-radius: 8px;
-                        page-break-inside: avoid;
-                        break-inside: avoid;
-                    `;
-                    dia.querySelector('h3').style.cssText = 'font-size: 14pt; color: #764ba2; margin-bottom: 10px; font-weight: bold;';
-                    
-                    // Mejorar tabla de comidas
-                    const tablaComidas = dia.querySelector('.tabla-comidas');
-                    if (tablaComidas) {
-                        tablaComidas.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 10pt; margin: 10px 0;';
-                        tablaComidas.querySelectorAll('th').forEach(th => {
-                            th.style.cssText = 'padding: 6px; background: #667eea; color: white; border: 1px solid #ddd; font-size: 9pt; font-weight: bold;';
-                        });
-                        tablaComidas.querySelectorAll('td').forEach(td => {
-                            td.style.cssText = 'padding: 6px; border: 1px solid #ddd; vertical-align: top; font-size: 9pt;';
-                        });
-                        tablaComidas.querySelectorAll('.comida-header').forEach(header => {
-                            header.style.cssText = 'font-weight: bold; margin-bottom: 5px; font-size: 9pt;';
-                        });
-                        tablaComidas.querySelectorAll('.lista-alimentos').forEach(lista => {
-                            lista.style.cssText = 'margin: 5px 0; padding-left: 15px; font-size: 8pt;';
-                        });
-                        tablaComidas.querySelectorAll('.macros-comida').forEach(macros => {
-                            macros.style.cssText = 'font-size: 7pt; color: #666; margin-top: 5px;';
-                        });
-                    }
-                    
-                    // Ocultar secciones no necesarias
-                    dia.querySelectorAll('.menu-section, .notas-section, .edicion-comida').forEach(seccion => {
-                        seccion.style.display = 'none';
+                const tablaComidas = dia.querySelector('.tabla-comidas');
+                if (tablaComidas) {
+                    tablaComidas.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 11pt; margin: 15px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
+                    tablaComidas.querySelectorAll('th').forEach(th => {
+                        th.style.cssText = 'padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 2px solid #667eea; font-size: 11pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;';
                     });
+                    tablaComidas.querySelectorAll('td').forEach(td => {
+                        td.style.cssText = 'padding: 12px; border: 2px solid #e9ecef; vertical-align: top; font-size: 11pt; background: #ffffff; font-weight: 600; line-height: 1.6;';
+                    });
+                }
+                
+                // Estilizar headers de comida
+                dia.querySelectorAll('.comida-header').forEach(header => {
+                    header.style.cssText = 'font-weight: bold; margin-bottom: 10px; font-size: 12pt; color: #667eea; font-weight: 700;';
                 });
                 
-                contenedorPDF.appendChild(planClone);
-            }
+                // Estilizar listas de alimentos
+                dia.querySelectorAll('.lista-alimentos li').forEach(li => {
+                    li.style.cssText = 'font-size: 10pt; margin-bottom: 6px; font-weight: 600; line-height: 1.7; color: #2c3e50;';
+                });
+                
+                // Estilizar macros
+                dia.querySelectorAll('.macros-comida').forEach(macros => {
+                    macros.style.cssText = 'font-size: 10pt; color: #495057; margin-top: 10px; font-weight: 700; background: #e7f3ff; padding: 8px; border-radius: 6px;';
+                });
+                
+                // Ocultar controles de edición
+                dia.querySelectorAll('.edicion-comida').forEach(edicion => {
+                    edicion.style.display = 'none';
+                });
+            });
             
-            // Copiar nota de agua
-            const notaAgua = elementoOriginal.querySelector('#nota-agua');
-            if (notaAgua) {
-                const notaAguaClone = notaAgua.cloneNode(true);
-                notaAguaClone.style.cssText = `
-                    margin-top: 20px;
-                    padding: 15px;
-                    background: #d1ecf1;
-                    border-radius: 8px;
-                    border-left: 4px solid #17a2b8;
-                `;
-                notaAguaClone.querySelector('h4').style.cssText = 'color: #0c5460; margin-bottom: 10px; font-size: 12pt;';
-                notaAguaClone.querySelector('p').style.cssText = 'margin: 0; color: #0c5460; font-size: 10pt;';
-                contenedorPDF.appendChild(notaAguaClone);
-            }
-            
-            // Copiar plan de ejercicio
-            const planEjercicioContainer = elementoOriginal.querySelector('#plan-ejercicio-container');
-            if (planEjercicioContainer && planEjercicioContainer.style.display !== 'none') {
-                const planEjercicioClone = planEjercicioContainer.cloneNode(true);
-                planEjercicioClone.style.cssText = `
-                    margin-top: 20px;
-                    padding: 15px;
-                    background: #f8f9fa;
-                    border-radius: 10px;
-                    border: 2px solid #667eea;
-                `;
-                planEjercicioClone.querySelector('h3').style.cssText = 'color: #667eea; margin-bottom: 15px; font-size: 14pt; font-weight: bold;';
-                const contenidoEjercicio = planEjercicioClone.querySelector('#plan-ejercicio-content');
-                if (contenidoEjercicio) {
-                    contenidoEjercicio.style.cssText = 'white-space: pre-line; line-height: 1.8; font-size: 10pt; color: #333;';
-                }
-                contenedorPDF.appendChild(planEjercicioClone);
-            }
-            
-            // Copiar footer
-            const footer = elementoOriginal.querySelector('.pdf-footer');
+            // Estilizar footer con mejor diseño
+            const footer = clone.querySelector('.pdf-footer');
             if (footer) {
-                const footerClone = footer.cloneNode(true);
-                footerClone.style.cssText = `
-                    margin-top: 30px;
-                    padding: 15px;
-                    background: #f8f9fa;
-                    border-radius: 10px;
-                    text-align: center;
-                    font-size: 9pt;
-                    color: #666;
-                    border-top: 3px solid #667eea;
-                `;
-                footerClone.querySelectorAll('p').forEach(p => {
-                    p.style.cssText = 'margin: 3px 0; font-size: 9pt;';
+                footer.style.cssText = 'margin-top: 40px; padding: 20px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 12px; text-align: center; font-size: 10pt; color: #495057; border-top: 4px solid #667eea; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
+                footer.querySelectorAll('p').forEach(p => {
+                    p.style.cssText = 'margin: 5px 0; font-weight: 600; color: #495057;';
                 });
-                contenedorPDF.appendChild(footerClone);
             }
             
-            // Agregar al body temporalmente
-            document.body.appendChild(contenedorPDF);
+            // Estilizar otros elementos
+            clone.querySelectorAll('.plan-ejercicio-container').forEach(container => {
+                container.style.cssText = 'margin-top: 30px; padding: 20px; background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%); border-radius: 12px; border: 3px solid #667eea; box-shadow: 0 3px 12px rgba(102, 126, 234, 0.2);';
+            });
             
-            // Forzar reflow para asegurar que el contenido se renderice
-            void contenedorPDF.offsetHeight;
+            clone.querySelectorAll('.notas-agua-section').forEach(section => {
+                section.style.cssText = 'margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); border-radius: 12px; border-left: 5px solid #17a2b8; box-shadow: 0 2px 8px rgba(23, 162, 184, 0.2);';
+                const h4 = section.querySelector('h4');
+                if (h4) h4.style.cssText = 'color: #0c5460; margin-bottom: 10px; font-size: 14pt; font-weight: bold;';
+                const p = section.querySelector('p');
+                if (p) p.style.cssText = 'margin: 0; color: #0c5460; font-size: 11pt; font-weight: 600;';
+            });
             
-            // Esperar un momento para que los estilos se apliquen y el contenido se renderice
+            // Crear wrapper para el PDF con padding
+            const pdfWrapper = document.createElement('div');
+            pdfWrapper.style.cssText = 'padding: 20px; background: white; font-family: Arial, sans-serif; width: 210mm; box-sizing: border-box;';
+            
+            // Estilizar el contenedor principal
+            clone.style.cssText = 'margin: 0; padding: 0; background: white; font-family: Arial, sans-serif; overflow: visible;';
+            
+            // Mover contenido a wrapper
+            while (clone.firstChild) {
+                pdfWrapper.appendChild(clone.firstChild);
+            }
+            
+            // Limpiar clone y añadir wrapper
+            clone.innerHTML = '';
+            clone.appendChild(pdfWrapper);
+            
+            // Agregar el clone al body temporalmente
+            document.body.appendChild(clone);
+            
+            // Forzar un repaint
+            void clone.offsetHeight;
+            void pdfWrapper.offsetHeight;
+            
+            // Generar PDF
             setTimeout(() => {
                 const opciones = {
-                    margin: [8, 8, 8, 8],
+                    margin: [0, 0, 0, 0],
                     filename: `Dieta_${datosUsuario.nombre.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { 
-                        scale: 2,
+                        scale: 2.5,
                         useCORS: true,
+                        allowTaint: true,
                         letterRendering: true,
                         logging: false,
-                        windowWidth: contenedorPDF.scrollWidth,
-                        windowHeight: contenedorPDF.scrollHeight,
+                        backgroundColor: '#ffffff',
                         scrollX: 0,
                         scrollY: 0,
-                        backgroundColor: '#ffffff',
-                        allowTaint: true
+                        dpi: 300
                     },
                     jsPDF: { 
                         unit: 'mm', 
                         format: 'a4', 
                         orientation: 'portrait',
                         compress: true
-                    },
-                    pagebreak: { 
-                        mode: ['css'],
-                        avoid: ['.dia-plan']
                     }
                 };
                 
+                console.log('Iniciando generación de PDF...');
+                console.log('Elemento wrapper:', pdfWrapper);
+                console.log('Dimensiones wrapper:', pdfWrapper.scrollWidth, 'x', pdfWrapper.scrollHeight);
+                
                 html2pdf()
                     .set(opciones)
-                    .from(contenedorPDF)
+                    .from(clone)
                     .save()
                     .then(function() {
-                        // Eliminar contenedor temporal
-                        if (document.body.contains(contenedorPDF)) {
-                            document.body.removeChild(contenedorPDF);
-                        }
+                        console.log('PDF generado exitosamente');
+                        // Limpiar
+                        document.body.removeChild(clone);
                         boton.innerHTML = textoOriginal;
                         boton.disabled = false;
                         mostrarNotificacion('✅ PDF descargado correctamente', 'success');
                     })
                     .catch(function(error) {
                         console.error('Error al generar PDF:', error);
-                        // Eliminar contenedor temporal en caso de error
-                        if (document.body.contains(contenedorPDF)) {
-                            document.body.removeChild(contenedorPDF);
+                        console.error('Detalles:', error.stack);
+                        if (document.body.contains(clone)) {
+                            document.body.removeChild(clone);
                         }
                         boton.innerHTML = textoOriginal;
                         boton.disabled = false;
-                        mostrarNotificacion('❌ Error al generar el PDF. Por favor, inténtalo de nuevo.', 'error');
+                        mostrarNotificacion('❌ Error al generar el PDF: ' + error.message, 'error');
                     });
-            }, 100);
+            }, 500);
         });
     }
     

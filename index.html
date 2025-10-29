@@ -33,18 +33,18 @@
                 
                 <div class="form-group">
                     <label for="nombre">Nombre completo:</label>
-                    <input type="text" id="nombre" name="nombre" required>
+                    <input type="text" id="nombre" name="nombre" title="Ingresa el nombre completo del cliente" placeholder="Ej: Juan Pérez" required>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="fechaRegistro">Fecha de registro:</label>
-                        <input type="date" id="fechaRegistro" name="fechaRegistro" required>
+                        <input type="date" id="fechaRegistro" name="fechaRegistro" title="Fecha de registro del cliente" required>
                     </div>
 
                     <div class="form-group">
                         <label for="sexo">Sexo:</label>
-                        <select id="sexo" name="sexo" required>
+                        <select id="sexo" name="sexo" title="Sexo del cliente" required>
                             <option value="">Selecciona...</option>
                             <option value="Mujer">Mujer</option>
                             <option value="Hombre">Hombre</option>
@@ -55,23 +55,23 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="edad">Edad:</label>
-                        <input type="number" id="edad" name="edad" required min="18" max="100">
+                        <input type="number" id="edad" name="edad" title="Edad del cliente en años" placeholder="18-100" required min="18" max="100">
                     </div>
 
                     <div class="form-group">
                         <label for="altura">Altura (cm):</label>
-                        <input type="number" id="altura" name="altura" required min="140" max="220">
+                        <input type="number" id="altura" name="altura" title="Altura en centímetros" placeholder="140-220" required min="140" max="220">
                     </div>
 
                     <div class="form-group">
                         <label for="peso">Peso (kg):</label>
-                        <input type="number" id="peso" name="peso" required min="40" max="200" step="0.1">
+                        <input type="number" id="peso" name="peso" title="Peso en kilogramos" placeholder="40.0-200.0" required min="40" max="200" step="0.1">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="tipoPersona">Tipo de persona:</label>
-                    <select id="tipoPersona" name="tipoPersona" required>
+                    <select id="tipoPersona" name="tipoPersona" title="Selecciona el nivel de actividad física" required>
                         <option value="">Selecciona...</option>
                         <option value="sedentaria">Sedentaria</option>
                         <option value="activa">Activa</option>
@@ -83,20 +83,20 @@
 
                 <div class="macro-info">
                     <div class="macro-item">
-                        <label>Calorías diarias:</label>
-                        <input type="number" id="calorias" placeholder="Auto-calculado" readonly>
+                        <label for="calorias">Calorías diarias:</label>
+                        <input type="number" id="calorias" name="calorias" title="Calorías diarias calculadas automáticamente" placeholder="Auto-calculado" readonly>
                     </div>
                     <div class="macro-item">
-                        <label>Proteínas (g):</label>
-                        <input type="number" id="proteinas" placeholder="Auto-calculado" readonly>
+                        <label for="proteinas">Proteínas (g):</label>
+                        <input type="number" id="proteinas" name="proteinas" title="Gramos de proteínas calculados automáticamente" placeholder="Auto-calculado" readonly>
                     </div>
                     <div class="macro-item">
-                        <label>Grasas (g):</label>
-                        <input type="number" id="grasas" placeholder="Auto-calculado" readonly>
+                        <label for="grasas">Grasas (g):</label>
+                        <input type="number" id="grasas" name="grasas" title="Gramos de grasas calculados automáticamente" placeholder="Auto-calculado" readonly>
                     </div>
                     <div class="macro-item">
-                        <label>Carbohidratos (g):</label>
-                        <input type="number" id="carbohidratos" placeholder="Auto-calculado" readonly>
+                        <label for="carbohidratos">Carbohidratos (g):</label>
+                        <input type="number" id="carbohidratos" name="carbohidratos" title="Gramos de carbohidratos calculados automáticamente" placeholder="Auto-calculado" readonly>
                     </div>
                 </div>
 
@@ -104,7 +104,7 @@
 
                 <div class="form-group">
                     <label for="objetivo">Selecciona tu objetivo:</label>
-                    <select id="objetivo" name="objetivo" required>
+                    <select id="objetivo" name="objetivo" title="Selecciona el objetivo de la dieta" required>
                         <option value="">Selecciona...</option>
                         <option value="aumentar">Aumentar masa muscular</option>
                         <option value="adelgazar">Perder peso</option>
@@ -116,12 +116,12 @@
 
                 <div class="form-group">
                     <label for="prohibiciones">Indica alimentos prohibidos o alergias (opcional):</label>
-                    <textarea id="prohibiciones" name="prohibiciones" rows="3" placeholder="Ej: Lactosa, frutos secos, gluten..."></textarea>
+                    <textarea id="prohibiciones" name="prohibiciones" rows="3" title="Lista de alimentos prohibidos o alergias" placeholder="Ej: Lactosa, frutos secos, gluten..."></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="duracion">Duración del plan:</label>
-                    <select id="duracion" name="duracion" required>
+                    <select id="duracion" name="duracion" title="Selecciona la duración del plan de alimentación" required>
                         <option value="semana">1 Semana</option>
                         <option value="2semanas">2 Semanas</option>
                         <option value="3semanas">3 Semanas</option>
@@ -133,7 +133,7 @@
 
                 <div class="form-group">
                     <label for="planEjercicio">Indica el plan de ejercicio (opcional):</label>
-                    <textarea id="planEjercicio" name="planEjercicio" rows="6" placeholder="Ej: Lunes - Piernas: Sentadillas 4x10, Prensa 3x12, Extensión de cuádriceps 3x15&#10;Martes - Espalda: Dominadas 4x8, Remo con barra 4x10, Jalones 3x12&#10;Miércoles - Pecho: Press banca 4x8, Aperturas 3x12, Fondos 3x10..."></textarea>
+                    <textarea id="planEjercicio" name="planEjercicio" rows="6" title="Plan de ejercicio semanal" placeholder="Ej: Lunes - Piernas: Sentadillas 4x10, Prensa 3x12, Extensión de cuádriceps 3x15&#10;Martes - Espalda: Dominadas 4x8, Remo con barra 4x10, Jalones 3x12&#10;Miércoles - Pecho: Press banca 4x8, Aperturas 3x12, Fondos 3x10..."></textarea>
                 </div>
 
                 <button type="submit" class="btn-submit">✨ Generar Plan de Alimentación</button>
