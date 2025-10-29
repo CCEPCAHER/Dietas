@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dietfy - Aplicación de Dietas Personalizadas</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Librería para generar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Dietfy - Calculadora de Dietas Personalizadas</h1>
+        
+        <div class="form-container">
+            <form id="dietForm">
+                <h2>Datos Personales</h2>
+                
+                <div class="form-group">
+                    <label for="nombre">Nombre completo:</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fechaRegistro">Fecha de registro:</label>
+                        <input type="date" id="fechaRegistro" name="fechaRegistro" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sexo">Sexo:</label>
+                        <select id="sexo" name="sexo" required>
+                            <option value="">Selecciona...</option>
+                            <option value="Mujer">Mujer</option>
+                            <option value="Hombre">Hombre</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edad">Edad:</label>
+                        <input type="number" id="edad" name="edad" required min="18" max="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="altura">Altura (cm):</label>
+                        <input type="number" id="altura" name="altura" required min="140" max="220">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="peso">Peso (kg):</label>
+                        <input type="number" id="peso" name="peso" required min="40" max="200" step="0.1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tipoPersona">Tipo de persona:</label>
+                    <select id="tipoPersona" name="tipoPersona" required>
+                        <option value="">Selecciona...</option>
+                        <option value="sedentaria">Sedentaria</option>
+                        <option value="activa">Activa</option>
+                        <option value="muy-activa">Muy activa</option>
+                    </select>
+                </div>
+
+                <h2>Macronutrientes (Auto-calculados)</h2>
+
+                <div class="macro-info">
+                    <div class="macro-item">
+                        <label>Calorías diarias:</label>
+                        <input type="number" id="calorias" placeholder="Auto-calculado" readonly>
+                    </div>
+                    <div class="macro-item">
+                        <label>Proteínas (g):</label>
+                        <input type="number" id="proteinas" placeholder="Auto-calculado" readonly>
+                    </div>
+                    <div class="macro-item">
+                        <label>Grasas (g):</label>
+                        <input type="number" id="grasas" placeholder="Auto-calculado" readonly>
+                    </div>
+                    <div class="macro-item">
+                        <label>Carbohidratos (g):</label>
+                        <input type="number" id="carbohidratos" placeholder="Auto-calculado" readonly>
+                    </div>
+                </div>
+
+                <h2>Objetivo</h2>
+
+                <div class="form-group">
+                    <label for="objetivo">Selecciona tu objetivo:</label>
+                    <select id="objetivo" name="objetivo" required>
+                        <option value="">Selecciona...</option>
+                        <option value="aumentar">Aumentar masa muscular</option>
+                        <option value="adelgazar">Perder peso</option>
+                        <option value="mantener">Mantener peso</option>
+                    </select>
+                </div>
+
+                <h2>Prohibiciones y Alergias</h2>
+
+                <div class="form-group">
+                    <label for="prohibiciones">Indica alimentos prohibidos o alergias (opcional):</label>
+                    <textarea id="prohibiciones" name="prohibiciones" rows="3" placeholder="Ej: Lactosa, frutos secos, gluten..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="duracion">Duración del plan:</label>
+                    <select id="duracion" name="duracion" required>
+                        <option value="semana">1 Semana</option>
+                        <option value="mes">1 Mes</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-submit">✨ Generar Plan de Alimentación</button>
+            </form>
+        </div>
+
+        <div id="resultados" class="resultados oculto">
+            <div class="print-header">
+                <div class="btn-container">
+                    <button type="button" id="btnDescargar" class="btn-download">
+                        📥 Descargar Plan en PDF
+                    </button>
+                    <button type="button" id="btnNuevo" class="btn-new">
+                        🔄 Nueva Dieta
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenido que se exportará a PDF -->
+            <div id="pdf-content">
+                <div class="pdf-header">
+                    <h1>Javier Prieto - Dietfy</h1>
+                    <p class="subtitle">Plan de Alimentación Personalizado</p>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab active" data-tab="dieta">DIETA</button>
+                    <button class="tab" data-tab="alimentos">ALIMENTOS</button>
+                    <button class="tab" data-tab="revisiones">REVISIONES</button>
+                    <button class="tab" data-tab="calendario">CALENDARIO</button>
+                    <button class="tab" data-tab="prohibiciones">PROHIBICIONES LEGALES</button>
+                </div>
+
+                <div id="tab-dieta" class="tab-content active">
+                    <!-- Tabla de Macronutrientes -->
+                    <div class="macro-table">
+                        <h3>Macronutrientes</h3>
+                        <table class="tabla-macros">
+                            <thead>
+                                <tr>
+                                    <th>NUTRIENTE</th>
+                                    <th>AUTOMÁTICO</th>
+                                    <th>AJUSTE MANUAL</th>
+                                    <th>SELECCIONADO</th>
+                                    <th>% CALORÍAS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-macros-body">
+                                <!-- Se llenará con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Información del Usuario -->
+                    <div class="info-usuario-table">
+                        <h3>Información del Usuario</h3>
+                        <table class="tabla-info">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Fecha registro</th>
+                                    <th>Sexo</th>
+                                    <th>Edad</th>
+                                    <th>Peso (kg)</th>
+                                    <th>Altura (cm)</th>
+                                    <th>Tipo persona</th>
+                                    <th>IMC</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-info-body">
+                                <!-- Se llenará con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Plan de Alimentación Semanal -->
+                    <div id="plan-alimentacion" class="plan-alimentacion">
+                        <!-- Se llenará con JS -->
+                    </div>
+                </div>
+
+                <div id="tab-alimentos" class="tab-content">
+                    <h2>Lista de Alimentos Recomendados</h2>
+                    <div class="alimentos-info">
+                        <h3>Proteínas</h3>
+                        <p>Pollo, pavo, pescado, huevos, carne magra, tofu, legumbres, lácteos bajos en grasa.</p>
+                        
+                        <h3>Carbohidratos</h3>
+                        <p>Arroz integral, avena, quinoa, batata, patatas, pasta integral, pan integral, frutas.</p>
+                        
+                        <h3>Grasas Saludables</h3>
+                        <p>Aceite de oliva, aguacate, frutos secos, semillas, pescado azul, mantequilla de cacahuete.</p>
+                        
+                        <h3>Verduras y Hortalizas</h3>
+                        <p>Brócoli, espinacas, lechuga, tomate, pepino, zanahoria, calabacín, pimientos, espárragos.</p>
+                    </div>
+                </div>
+
+                <div id="tab-revisiones" class="tab-content">
+                    <h2>Revisiones y Seguimiento</h2>
+                    <div class="revisiones-info">
+                        <h3>Recomendaciones de seguimiento</h3>
+                        <ul>
+                            <li>Pesarse una vez por semana, siempre a la misma hora</li>
+                            <li>Tomar medidas corporales cada 2 semanas</li>
+                            <li>Hacer fotos de progreso mensualmente</li>
+                            <li>Revisar sensaciones de energía y saciedad diariamente</li>
+                            <li>Ajustar calorías según resultados cada 3-4 semanas</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="tab-calendario" class="tab-content">
+                    <h2>Calendario de Comidas</h2>
+                    <div class="calendario-info">
+                        <h3>Horarios recomendados</h3>
+                        <table class="tabla-horarios">
+                            <tr>
+                                <th>Comida</th>
+                                <th>Horario sugerido</th>
+                            </tr>
+                            <tr>
+                                <td>🍳 Desayuno</td>
+                                <td>7:00 - 9:00</td>
+                            </tr>
+                            <tr>
+                                <td>🥤 Mediodía</td>
+                                <td>10:30 - 11:30</td>
+                            </tr>
+                            <tr>
+                                <td>🍽️ Comida</td>
+                                <td>13:00 - 15:00</td>
+                            </tr>
+                            <tr>
+                                <td>🥙 Merienda</td>
+                                <td>17:00 - 18:00</td>
+                            </tr>
+                            <tr>
+                                <td>🌙 Cena</td>
+                                <td>20:00 - 22:00</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="tab-prohibiciones" class="tab-content">
+                    <h2>Prohibiciones y Alergias</h2>
+                    <div id="prohibiciones-info" class="prohibiciones-info">
+                        <!-- Se llenará con JS -->
+                    </div>
+                </div>
+
+                <div class="pdf-footer">
+                    <p>© 2025 Dietfy - Javier Prieto | Plan generado el <span id="fecha-generacion"></span></p>
+                    <p>Este plan es orientativo. Consulta con un profesional de la salud antes de realizar cambios significativos en tu dieta.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
