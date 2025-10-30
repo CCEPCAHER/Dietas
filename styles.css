@@ -602,6 +602,26 @@ table tbody tr:hover {
     background: #d4f1f9;
 }
 
+/* Centrar contenedores de tablas */
+.macro-table,
+.info-usuario-table {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 30px auto;
+}
+
+.macro-table table,
+.info-usuario-table table {
+    margin: 0 auto;
+}
+
+.macro-table h3,
+.info-usuario-table h3 {
+    text-align: center;
+    width: 100%;
+}
+
 .tabla-horarios {
     max-width: 600px;
     margin: 20px auto;

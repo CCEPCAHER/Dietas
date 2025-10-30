@@ -1188,6 +1188,81 @@ function generarDiaHTML(dia, editable = false) {
     const editableAttr = editable ? 'data-editable="true"' : '';
     const editarClass = editable ? ' editable-alimento' : '';
     
+    // Calcular el máximo de alimentos para saber cuántas columnas de productos necesitamos
+    const maxAlimentos = Math.max(
+        comidas.desayuno.alimentos.length,
+        comidas.medioDia.alimentos.length,
+        comidas.almuerzo.alimentos.length,
+        comidas.merienda.alimentos.length,
+        comidas.cena.alimentos.length
+    );
+    
+    // Generar encabezado con las columnas de productos
+    let theadThs = '<th>COMIDA</th>';
+    for (let i = 0; i < maxAlimentos; i++) {
+        theadThs += `<th>Producto ${i + 1}</th>`;
+    }
+    theadThs += '<th>MACROS</th>';
+    
+    // Generar filas para cada tipo de comida
+    const filasComidas = `
+        <tr>
+            <td class="nombre-comida">🍳 DESAYUNO</td>
+            ${comidas.desayuno.alimentos.map(alimento => `<td>${alimento}</td>`).join('')}
+            ${Array(maxAlimentos - comidas.desayuno.alimentos.length).fill('<td></td>').join('')}
+            <td class="macros-celda">
+                <div class="macros-comida">
+                    ${comidas.desayuno.calorias} kcal<br>
+                    P:${comidas.desayuno.proteinas}g C:${comidas.desayuno.carbohidratos}g G:${comidas.desayuno.grasas}g
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="nombre-comida">🥤 MEDIODÍA</td>
+            ${comidas.medioDia.alimentos.map(alimento => `<td>${alimento}</td>`).join('')}
+            ${Array(maxAlimentos - comidas.medioDia.alimentos.length).fill('<td></td>').join('')}
+            <td class="macros-celda">
+                <div class="macros-comida">
+                    ${comidas.medioDia.calorias} kcal<br>
+                    P:${comidas.medioDia.proteinas}g C:${comidas.medioDia.carbohidratos}g G:${comidas.medioDia.grasas}g
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="nombre-comida">🍽️ COMIDA</td>
+            ${comidas.almuerzo.alimentos.map(alimento => `<td>${alimento}</td>`).join('')}
+            ${Array(maxAlimentos - comidas.almuerzo.alimentos.length).fill('<td></td>').join('')}
+            <td class="macros-celda">
+                <div class="macros-comida">
+                    ${comidas.almuerzo.calorias} kcal<br>
+                    P:${comidas.almuerzo.proteinas}g C:${comidas.almuerzo.carbohidratos}g G:${comidas.almuerzo.grasas}g
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="nombre-comida">🥙 MERIENDA</td>
+            ${comidas.merienda.alimentos.map(alimento => `<td>${alimento}</td>`).join('')}
+            ${Array(maxAlimentos - comidas.merienda.alimentos.length).fill('<td></td>').join('')}
+            <td class="macros-celda">
+                <div class="macros-comida">
+                    ${comidas.merienda.calorias} kcal<br>
+                    P:${comidas.merienda.proteinas}g C:${comidas.merienda.carbohidratos}g G:${comidas.merienda.grasas}g
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="nombre-comida">🌙 CENA</td>
+            ${comidas.cena.alimentos.map(alimento => `<td>${alimento}</td>`).join('')}
+            ${Array(maxAlimentos - comidas.cena.alimentos.length).fill('<td></td>').join('')}
+            <td class="macros-celda">
+                <div class="macros-comida">
+                    ${comidas.cena.calorias} kcal<br>
+                    P:${comidas.cena.proteinas}g C:${comidas.cena.carbohidratos}g G:${comidas.cena.grasas}g
+                </div>
+            </td>
+        </tr>
+    `;
+    
     return `
         <div class="dia-plan">
             <h3>${dia.dia}</h3>
@@ -1195,124 +1270,13 @@ function generarDiaHTML(dia, editable = false) {
             <table class="tabla-comidas">
                 <thead>
                     <tr>
-                        <th>DESAYUNO</th>
-                        <th>MEDIODÍA</th>
-                        <th>COMIDA</th>
-                        <th>MERIENDA</th>
-                        <th>CENA</th>
+                        ${theadThs}
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td data-comida="desayuno">
-                            <div class="comida-header">🍳 Desayuno</div>
-                            <ul class="lista-alimentos${editarClass}">
-                                ${comidas.desayuno.alimentos.map((alimento, idx) => 
-                                    editable ? 
-                                    `<li class="alimento-item" data-alimento-index="${idx}" data-tipo-comida="desayuno" ${editableAttr}>
-                                        <span class="alimento-nombre">${alimento}</span>
-                                        <button class="btn-editar-item" onclick="editarAlimento(this)">✏️</button>
-                                        <button class="btn-eliminar-item" onclick="eliminarAlimento(this)">🗑️</button>
-                                    </li>` :
-                                    `<li class="alimento-item">${alimento}</li>`
-                                ).join('')}
-                            </ul>
-                            <div class="macros-comida">
-                                Calorías: <span class="macro-calorias">${comidas.desayuno.calorias}</span> kcal<br>
-                                Prot: <span class="macro-proteinas">${comidas.desayuno.proteinas}</span>g | 
-                                Carb: <span class="macro-carbohidratos">${comidas.desayuno.carbohidratos}</span>g | 
-                                Grasas: <span class="macro-grasas">${comidas.desayuno.grasas}</span>g
-                            </div>
-                        </td>
-                        <td data-comida="medioDia">
-                            <div class="comida-header">🥤 Mediodía</div>
-                            <ul class="lista-alimentos${editarClass}">
-                                ${comidas.medioDia.alimentos.map((alimento, idx) => 
-                                    editable ? 
-                                    `<li class="alimento-item" data-alimento-index="${idx}" data-tipo-comida="medioDia" ${editableAttr}>
-                                        <span class="alimento-nombre">${alimento}</span>
-                                        <button class="btn-editar-item" onclick="editarAlimento(this)">✏️</button>
-                                        <button class="btn-eliminar-item" onclick="eliminarAlimento(this)">🗑️</button>
-                                    </li>` :
-                                    `<li class="alimento-item">${alimento}</li>`
-                                ).join('')}
-                            </ul>
-                            <div class="macros-comida">
-                                Calorías: <span class="macro-calorias">${comidas.medioDia.calorias}</span> kcal<br>
-                                Prot: <span class="macro-proteinas">${comidas.medioDia.proteinas}</span>g | 
-                                Carb: <span class="macro-carbohidratos">${comidas.medioDia.carbohidratos}</span>g | 
-                                Grasas: <span class="macro-grasas">${comidas.medioDia.grasas}</span>g
-                            </div>
-                        </td>
-                        <td data-comida="almuerzo">
-                            <div class="comida-header">🍽️ Comida</div>
-                            <ul class="lista-alimentos${editarClass}">
-                                ${comidas.almuerzo.alimentos.map((alimento, idx) => 
-                                    editable ? 
-                                    `<li class="alimento-item" data-alimento-index="${idx}" data-tipo-comida="almuerzo" ${editableAttr}>
-                                        <span class="alimento-nombre">${alimento}</span>
-                                        <button class="btn-editar-item" onclick="editarAlimento(this)">✏️</button>
-                                        <button class="btn-eliminar-item" onclick="eliminarAlimento(this)">🗑️</button>
-                                    </li>` :
-                                    `<li class="alimento-item">${alimento}</li>`
-                                ).join('')}
-                            </ul>
-                            <div class="macros-comida">
-                                Calorías: <span class="macro-calorias">${comidas.almuerzo.calorias}</span> kcal<br>
-                                Prot: <span class="macro-proteinas">${comidas.almuerzo.proteinas}</span>g | 
-                                Carb: <span class="macro-carbohidratos">${comidas.almuerzo.carbohidratos}</span>g | 
-                                Grasas: <span class="macro-grasas">${comidas.almuerzo.grasas}</span>g
-                            </div>
-                        </td>
-                        <td data-comida="merienda">
-                            <div class="comida-header">🥙 Merienda</div>
-                            <ul class="lista-alimentos${editarClass}">
-                                ${comidas.merienda.alimentos.map((alimento, idx) => 
-                                    editable ? 
-                                    `<li class="alimento-item" data-alimento-index="${idx}" data-tipo-comida="merienda" ${editableAttr}>
-                                        <span class="alimento-nombre">${alimento}</span>
-                                        <button class="btn-editar-item" onclick="editarAlimento(this)">✏️</button>
-                                        <button class="btn-eliminar-item" onclick="eliminarAlimento(this)">🗑️</button>
-                                    </li>` :
-                                    `<li class="alimento-item">${alimento}</li>`
-                                ).join('')}
-                            </ul>
-                            <div class="macros-comida">
-                                Calorías: <span class="macro-calorias">${comidas.merienda.calorias}</span> kcal<br>
-                                Prot: <span class="macro-proteinas">${comidas.merienda.proteinas}</span>g | 
-                                Carb: <span class="macro-carbohidratos">${comidas.merienda.carbohidratos}</span>g | 
-                                Grasas: <span class="macro-grasas">${comidas.merienda.grasas}</span>g
-                            </div>
-                        </td>
-                        <td data-comida="cena">
-                            <div class="comida-header">🌙 Cena</div>
-                            <ul class="lista-alimentos${editarClass}">
-                                ${comidas.cena.alimentos.map((alimento, idx) => 
-                                    editable ? 
-                                    `<li class="alimento-item" data-alimento-index="${idx}" data-tipo-comida="cena" ${editableAttr}>
-                                        <span class="alimento-nombre">${alimento}</span>
-                                        <button class="btn-editar-item" onclick="editarAlimento(this)">✏️</button>
-                                        <button class="btn-eliminar-item" onclick="eliminarAlimento(this)">🗑️</button>
-                                    </li>` :
-                                    `<li class="alimento-item">${alimento}</li>`
-                                ).join('')}
-                            </ul>
-                            <div class="macros-comida">
-                                Calorías: <span class="macro-calorias">${comidas.cena.calorias}</span> kcal<br>
-                                Prot: <span class="macro-proteinas">${comidas.cena.proteinas}</span>g | 
-                                Carb: <span class="macro-carbohidratos">${comidas.cena.carbohidratos}</span>g | 
-                                Grasas: <span class="macro-grasas">${comidas.cena.grasas}</span>g
-                            </div>
-                        </td>
-                    </tr>
+                    ${filasComidas}
                 </tbody>
             </table>
-            
-            ${editable ? `
-                <div class="edicion-comida">
-                    <p style="margin-bottom: 10px; font-weight: 600;">Para agregar un alimento, haz clic en el botón ✏️ junto a un alimento existente o escribe uno nuevo</p>
-                </div>
-            ` : ''}
         </div>
     `;
 }
@@ -1683,24 +1647,23 @@ function inicializarBotones() {
         nuevoBtn.addEventListener('click', function() {
             const boton = this;
             const textoOriginal = boton.innerHTML;
-            
             boton.innerHTML = '⏳ Generando PDF...';
             boton.disabled = true;
-            
+
             if (typeof html2pdf === 'undefined') {
                 alert('Error: La librería html2pdf no está cargada. Por favor, recarga la página.');
                 boton.innerHTML = textoOriginal;
                 boton.disabled = false;
                 return;
             }
-            
+
             if (!datosUsuario || !datosUsuario.nombre) {
                 alert('Error: No hay datos de dieta para generar el PDF.');
                 boton.innerHTML = textoOriginal;
                 boton.disabled = false;
                 return;
             }
-            
+
             // Clonar el contenido completo sin los tabs
             const elementoOriginal = document.getElementById('pdf-content');
             if (!elementoOriginal) {
@@ -1709,88 +1672,155 @@ function inicializarBotones() {
                 boton.disabled = false;
                 return;
             }
-            
+
             const clone = elementoOriginal.cloneNode(true);
-            
+
+            // Remover contenedores con max-width que limiten el ancho
+            clone.querySelectorAll('.container, .form-container').forEach(container => {
+                container.style.maxWidth = '100%';
+                container.style.width = '100%';
+                container.style.margin = '0';
+                container.style.padding = '0';
+            });
+
             // Remover tabs
             const tabs = clone.querySelector('.tabs');
             if (tabs) tabs.remove();
-            
+
             // Remover tabs content no activos
             clone.querySelectorAll('.tab-content').forEach(tab => {
                 if (!tab.classList.contains('active')) {
                     tab.remove();
                 }
             });
+
+            // Forzar todos los elementos principales a ocupar el 100% del ancho
+            clone.style.width = '100%';
+            clone.style.maxWidth = '100%';
+            clone.style.margin = '0';
+            clone.style.padding = '0';
+
+            // Eliminar márgenes y paddings de los hijos directos
+            Array.from(clone.children).forEach(child => {
+                if (child.style) {
+                    child.style.margin = '0';
+                    child.style.padding = '0';
+                    child.style.width = '100%';
+                    child.style.maxWidth = '100%';
+                    child.style.minHeight = 'unset';
+                    child.style.height = 'auto';
+                    child.style.boxSizing = 'border-box';
+                    // Eliminar saltos de página forzados
+                    child.style.pageBreakBefore = 'auto';
+                    child.style.pageBreakAfter = 'auto';
+                    child.style.breakBefore = 'auto';
+                    child.style.breakAfter = 'auto';
+                }
+            });
+
+            // Eliminar saltos de página forzados y márgenes/paddings en todos los descendientes
+            clone.querySelectorAll('*').forEach(el => {
+                if (el.style) {
+                    el.style.pageBreakBefore = 'auto';
+                    el.style.pageBreakAfter = 'auto';
+                    el.style.breakBefore = 'auto';
+                    el.style.breakAfter = 'auto';
+                    el.style.marginTop = '0';
+                    el.style.marginBottom = '0';
+                    el.style.paddingTop = '0';
+                    el.style.paddingBottom = '0';
+                    el.style.minHeight = 'unset';
+                    el.style.height = 'auto';
+                    el.style.boxSizing = 'border-box';
+                }
+            });
             
             // Aplicar estilos inline para el PDF con colores mejorados
             const pdfHeader = clone.querySelector('.pdf-header');
             if (pdfHeader) {
-                pdfHeader.style.cssText = 'text-align: center; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; margin-bottom: 12px;';
+                pdfHeader.style.cssText = 'text-align: center; padding: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; margin-bottom: 8px;';
                 const h1 = pdfHeader.querySelector('h1');
-                if (h1) h1.style.cssText = 'color: white; margin: 0; font-size: 24pt; font-weight: bold;';
+                if (h1) h1.style.cssText = 'color: white; margin: 0; font-size: 20pt; font-weight: bold;';
                 const subtitle = pdfHeader.querySelector('.subtitle');
-                if (subtitle) subtitle.style.cssText = 'font-size: 11pt; margin-top: 5px; opacity: 0.95; font-weight: 600;';
+                if (subtitle) subtitle.style.cssText = 'font-size: 10pt; margin-top: 4px; opacity: 0.95; font-weight: 600;';
             }
+            
+            // Centrar contenedores de tablas
+            clone.querySelectorAll('.macro-table, .info-usuario-table').forEach(container => {
+                container.style.cssText = 'display: flex; flex-direction: column; align-items: center; margin: 15px auto 10px auto; text-align: center;';
+                const h3 = container.querySelector('h3');
+                if (h3) h3.style.textAlign = 'center';
+            });
             
             // Estilizar tablas con mejor diseño
             clone.querySelectorAll('table').forEach(tabla => {
-                tabla.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 13pt; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
+                tabla.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 10pt; margin: 0 auto 15px auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
                 tabla.querySelectorAll('th').forEach(th => {
-                    th.style.cssText = 'padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 2px solid #667eea; text-align: center; font-weight: bold; font-size: 13pt; letter-spacing: 0.5px;';
+                    th.style.cssText = 'padding: 8px 6px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 1px solid #667eea; text-align: center; font-weight: bold; font-size: 9pt; letter-spacing: 0.3px;';
                 });
                 tabla.querySelectorAll('td').forEach(td => {
-                    td.style.cssText = 'padding: 12px; border: 2px solid #e9ecef; text-align: center; background: #ffffff; font-weight: 600; font-size: 12pt;';
+                    td.style.cssText = 'padding: 6px 4px; border: 1px solid #e9ecef; text-align: center; background: #ffffff; font-weight: 600; font-size: 8.5pt;';
                 });
             });
             
             // Estilizar títulos con negrita
             clone.querySelectorAll('h3').forEach(h3 => {
-                h3.style.cssText = 'font-size: 22pt; margin-bottom: 18px; color: #667eea; border-bottom: 3px solid #764ba2; padding-bottom: 10px; font-weight: bold; letter-spacing: 0.5px;';
+                h3.style.cssText = 'font-size: 16pt; margin-bottom: 10px; color: #667eea; border-bottom: 2px solid #764ba2; padding-bottom: 6px; font-weight: bold; letter-spacing: 0.3px;';
             });
             
             // Estilizar h2 también
             clone.querySelectorAll('h2').forEach(h2 => {
-                h2.style.cssText = 'font-size: 24pt; margin-top: 0; margin-bottom: 12px; color: #764ba2; font-weight: bold; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); letter-spacing: 1px;';
+                h2.style.cssText = 'font-size: 18pt; margin-top: 0; margin-bottom: 8px; color: #764ba2; font-weight: bold; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); letter-spacing: 0.8px;';
             });
             
             // Estilizar días del plan con colores mejorados
             clone.querySelectorAll('.dia-plan').forEach(dia => {
-                dia.style.cssText = 'background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%); padding: 6px; margin-top: 0; margin-bottom: 4px; border-radius: 8px; page-break-inside: avoid !important; break-inside: avoid !important; -webkit-page-break-inside: avoid; box-shadow: 0 2px 8px rgba(118, 75, 162, 0.15); border-left: 4px solid #764ba2;';
+                // Evitar forzar 'avoid' que genera grandes espacios cuando un bloque no cabe en la página
+                dia.style.cssText = 'background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%); padding: 4px; margin-top: 0; margin-bottom: 3px; border-radius: 6px; page-break-inside: auto; break-inside: auto; -webkit-page-break-inside: auto; box-shadow: 0 2px 8px rgba(118, 75, 162, 0.15); border-left: 4px solid #764ba2; width: 100%; box-sizing: border-box;';
                 const diaH3 = dia.querySelector('h3');
-                if (diaH3) diaH3.style.cssText = 'color: #764ba2; font-size: 16pt; margin-top: 0; margin-bottom: 4px; font-weight: bold; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(118, 75, 162, 0.2); letter-spacing: 0.5px;';
+                if (diaH3) diaH3.style.cssText = 'color: #764ba2; font-size: 14pt; margin-top: 0; margin-bottom: 3px; font-weight: bold; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(118, 75, 162, 0.2); letter-spacing: 0.5px; text-align: center;';
                 
                 const tablaComidas = dia.querySelector('.tabla-comidas');
                 if (tablaComidas) {
-                    tablaComidas.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 9pt; margin: 4px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); page-break-inside: avoid !important;';
-                    tablaComidas.querySelectorAll('th').forEach(th => {
-                        th.style.cssText = 'padding: 5px 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 2px solid #667eea; font-size: 9pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.3px;';
+                    tablaComidas.style.cssText = 'width: 100% !important; border-collapse: collapse; font-size: 7pt; margin: 3px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); page-break-inside: auto; table-layout: fixed; display: table !important; min-width: 100%;';
+                    // Estilizar encabezados
+                    tablaComidas.querySelectorAll('th').forEach((th, index) => {
+                        let width = 'auto';
+                        if (index === 0) {
+                            width = '12%'; // Primera columna (COMIDA)
+                        } else if (index === tablaComidas.querySelectorAll('th').length - 1) {
+                            width = '18%'; // Última columna (MACROS)
+                        } else {
+                            // Columnas de productos - distribuir el espacio restante
+                            width = 'auto';
+                        }
+                        th.style.cssText = `padding: 3px 2px !important; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 1px solid #667eea; font-size: 6.5pt !important; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1px; text-align: center; width: ${width} !important;`;
                     });
-                    tablaComidas.querySelectorAll('td').forEach(td => {
-                        td.style.cssText = 'padding: 5px 4px; border: 2px solid #e9ecef; vertical-align: top; font-size: 9pt; background: #ffffff; font-weight: 600; line-height: 1.4;';
+                    // Estilizar todas las celdas
+                    tablaComidas.querySelectorAll('td').forEach((td, index) => {
+                        let width = 'auto';
+                        if (td.classList.contains('nombre-comida')) {
+                            width = '12%';
+                        } else if (td.classList.contains('macros-celda')) {
+                            width = '18%';
+                        }
+                        td.style.cssText = `padding: 3px 2px !important; border: 1px solid #e9ecef; vertical-align: middle; font-size: 6.5pt !important; background: #ffffff; font-weight: 600; line-height: 1.3; overflow-wrap: break-word; word-wrap: break-word; hyphens: auto; text-align: center; width: ${width} !important;`;
                     });
                 }
                 
-                // Estilizar headers de comida
-                dia.querySelectorAll('.comida-header').forEach(header => {
-                    header.style.cssText = 'font-weight: bold; margin-bottom: 3px; font-size: 9pt; color: #667eea; font-weight: 700;';
+                // Estilizar celdas con nombres de comida
+                dia.querySelectorAll('.nombre-comida').forEach(td => {
+                    td.style.cssText = 'padding: 4px 3px !important; border: 1px solid #667eea !important; vertical-align: middle; font-size: 7pt !important; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important; width: 12% !important;';
                 });
                 
-                // Estilizar listas de alimentos y limpiar botones
-                dia.querySelectorAll('.lista-alimentos li').forEach(li => {
-                    li.style.cssText = 'font-size: 8.5pt; margin-bottom: 2px; font-weight: 600; line-height: 1.35; color: #2c3e50; list-style-type: none; padding-left: 0;';
-                    // Si tiene span con clase alimento-nombre, mantener solo ese contenido
-                    const span = li.querySelector('.alimento-nombre');
-                    if (span) {
-                        li.innerHTML = span.textContent;
-                    }
-                    // Eliminar cualquier botón
-                    li.querySelectorAll('button').forEach(btn => btn.remove());
+                // Estilizar celdas de macros
+                dia.querySelectorAll('.macros-celda').forEach(td => {
+                    td.style.cssText = 'padding: 4px 2px !important; border: 1px solid #e9ecef; background: #e7f3ff !important; font-weight: 700; line-height: 1.3; text-align: center; width: 18% !important;';
                 });
                 
                 // Estilizar macros
                 dia.querySelectorAll('.macros-comida').forEach(macros => {
-                    macros.style.cssText = 'font-size: 8.5pt; color: #495057; margin-top: 3px; font-weight: 700; background: #e7f3ff; padding: 3px; border-radius: 5px;';
+                    macros.style.cssText = 'font-size: 6pt !important; color: #495057; font-weight: 700; line-height: 1.2; text-align: center;';
                 });
                 
                 // Ocultar controles de edición
@@ -1813,6 +1843,11 @@ function inicializarBotones() {
                 });
             }
             
+            // Eliminar sección TMB/TDEE completamente del PDF (mantener minimalista)
+            clone.querySelectorAll('.tmb-section, .tmb-calculator, #tmb-calculator').forEach(section => {
+                section.remove();
+            });
+            
             // Estilizar otros elementos
             clone.querySelectorAll('.plan-ejercicio-container').forEach(container => {
                 container.style.cssText = 'margin-top: 12px; padding: 12px; background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%); border-radius: 8px; border: 2px solid #667eea;';
@@ -1826,22 +1861,36 @@ function inicializarBotones() {
                 if (p) p.style.cssText = 'margin: 0; color: #0c5460; font-size: 9pt; font-weight: 600;';
             });
             
-            // Crear wrapper para el PDF con padding reducido
+            // Estilizar el contenedor principal ANTES de crear el wrapper
+            clone.style.cssText = 'margin: 0; padding: 0; background: white; font-family: Arial, sans-serif; overflow: visible; width: 100%; display: block;';
+            
+            // Estilizar todos los elementos hijos para que usen el 100% del ancho
+            const aplicarEstilosAncho = (element) => {
+                if (element && element.style) {
+                    const display = window.getComputedStyle(element).display;
+                    if (display === 'block' || display === 'inline-block' || element.tagName === 'DIV' || element.tagName === 'SECTION') {
+                        element.style.width = '100%';
+                        element.style.maxWidth = '100%';
+                        element.style.boxSizing = 'border-box';
+                    }
+                }
+                Array.from(element.children || []).forEach(child => aplicarEstilosAncho(child));
+            };
+            aplicarEstilosAncho(clone);
+            
+            // Crear wrapper para el PDF con padding reducido y mejor control de ancho
             const pdfWrapper = document.createElement('div');
-            pdfWrapper.style.cssText = 'padding: 8px; background: white; font-family: Arial, sans-serif; width: 100%; max-width: 100%; box-sizing: border-box;';
-            
-            // Estilizar el contenedor principal
-            clone.style.cssText = 'margin: 0; padding: 0; background: white; font-family: Arial, sans-serif; overflow: visible;';
-            
+            pdfWrapper.style.cssText = 'padding: 15px; background: white; font-family: Arial, sans-serif; width: 216mm; min-width: 216mm; max-width: 216mm; box-sizing: border-box; margin: 0 auto; display: block;';
+
             // Estilizar el primer elemento para eliminar espacio extra
-            const firstElement = pdfWrapper.querySelector('h2, .dia-plan');
+            const firstElement = clone.querySelector('h2, .dia-plan, .pdf-header');
             if (firstElement) firstElement.style.marginTop = '0';
-            
+
             // Mover contenido a wrapper
             while (clone.firstChild) {
                 pdfWrapper.appendChild(clone.firstChild);
             }
-            
+
             // Limpiar clone y añadir wrapper
             clone.innerHTML = '';
             clone.appendChild(pdfWrapper);
@@ -1853,60 +1902,80 @@ function inicializarBotones() {
             void clone.offsetHeight;
             void pdfWrapper.offsetHeight;
             
-            // Generar PDF
+            // Generar PDF con método alternativo más robusto
             setTimeout(() => {
-                const opciones = {
-                    margin: [8, 8, 8, 8],
-                    filename: `Dieta_${datosUsuario.nombre.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { 
-                        scale: 2,
-                        useCORS: true,
-                        allowTaint: true,
-                        letterRendering: true,
-                        logging: false,
-                        backgroundColor: '#ffffff',
-                        scrollX: 0,
-                        scrollY: 0,
-                        dpi: 300,
-                        windowWidth: 794,
-                        windowHeight: 1123
-                    },
-                    jsPDF: { 
-                        unit: 'mm', 
-                        format: 'a4', 
-                        orientation: 'portrait',
-                        compress: true,
-                        putOnlyUsedFonts: true
-                    }
-                };
-                
                 console.log('Iniciando generación de PDF...');
                 console.log('Elemento wrapper:', pdfWrapper);
                 console.log('Dimensiones wrapper:', pdfWrapper.scrollWidth, 'x', pdfWrapper.scrollHeight);
                 
-                html2pdf()
-                    .set(opciones)
-                    .from(clone)
-                    .save()
-                    .then(function() {
+                try {
+                    // Convertir el contenido a imagen usando html2canvas
+                    html2canvas(pdfWrapper, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        logging: false,
+                        backgroundColor: '#ffffff',
+                        width: pdfWrapper.scrollWidth,
+                        height: pdfWrapper.scrollHeight
+                    }).then(function(canvas) {
+                        // Crear PDF desde la imagen
+                        const imgData = canvas.toDataURL('image/png');
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+                        
+                        const imgWidth = 210; // Ancho A4 en mm
+                        const pageHeight = 297; // Alto A4 en mm
+                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                        
+                        // Agregar primera página con imagen centrada
+                        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                        
+                        // Si la imagen es más alta que una página, agregar páginas adicionales
+                        if (imgHeight > pageHeight) {
+                            let heightLeft = imgHeight - pageHeight;
+                            let position = -pageHeight;
+                            
+                            while (heightLeft > 0) {
+                                pdf.addPage();
+                                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                                heightLeft -= pageHeight;
+                                position -= pageHeight;
+                            }
+                        }
+                        
+                        // Generar blob y mostrar preview
+                        const pdfBlob = pdf.output('blob');
+                        const pdfUrl = URL.createObjectURL(pdfBlob);
+                        const filename = `Dieta_${datosUsuario.nombre.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+                        
                         console.log('PDF generado exitosamente');
+                        
                         // Limpiar
-                        document.body.removeChild(clone);
-                        boton.innerHTML = textoOriginal;
-                        boton.disabled = false;
-                        mostrarNotificacion('✅ PDF descargado correctamente', 'success');
-                    })
-                    .catch(function(error) {
-                        console.error('Error al generar PDF:', error);
-                        console.error('Detalles:', error.stack);
                         if (document.body.contains(clone)) {
                             document.body.removeChild(clone);
                         }
                         boton.innerHTML = textoOriginal;
                         boton.disabled = false;
-                        mostrarNotificacion('❌ Error al generar el PDF: ' + error.message, 'error');
+                        
+                        // Mostrar modal de previsualización
+                        mostrarPreviewPDF(pdfUrl, pdfBlob, filename);
+                        
+                        mostrarNotificacion('✅ PDF generado. Vista previa lista', 'success');
+                    }).catch(function(error) {
+                        console.error('Error en html2canvas:', error);
+                        throw error;
                     });
+                } catch (error) {
+                    console.error('Error al generar PDF:', error);
+                    console.error('Detalles:', error.stack);
+                    if (document.body.contains(clone)) {
+                        document.body.removeChild(clone);
+                    }
+                    boton.innerHTML = textoOriginal;
+                    boton.disabled = false;
+                    mostrarNotificacion('❌ Error al generar el PDF: ' + error.message, 'error');
+                }
             }, 500);
         });
     }
@@ -1969,6 +2038,272 @@ window.mostrarNotificacion = function(mensaje, tipo = 'info') {
     }, 3000);
 };
 
+// Función para mostrar vista previa del PDF con opciones de descarga/compartir
+window.mostrarPreviewPDF = function(pdfUrl, pdfBlob, filename) {
+    // Crear modal de previsualización
+    const modal = document.createElement('div');
+    modal.id = 'pdfPreviewModal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        animation: fadeIn 0.3s ease;
+    `;
+    
+    // Contenedor del modal
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 1000px;
+        height: 90%;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        overflow: hidden;
+    `;
+    
+    // Header del modal
+    const header = document.createElement('div');
+    header.style.cssText = `
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 12px 12px 0 0;
+    `;
+    
+    const title = document.createElement('h3');
+    title.textContent = '📄 Vista Previa del PDF';
+    title.style.cssText = `
+        margin: 0;
+        font-size: 1.5em;
+        font-weight: 600;
+    `;
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '✕';
+    closeBtn.style.cssText = `
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        font-size: 24px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: bold;
+    `;
+    closeBtn.onmouseover = () => closeBtn.style.background = 'rgba(255, 255, 255, 0.3)';
+    closeBtn.onmouseout = () => closeBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+    closeBtn.onclick = () => {
+        URL.revokeObjectURL(pdfUrl);
+        document.body.removeChild(modal);
+    };
+    
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+    
+    // Visor de PDF
+    const pdfViewer = document.createElement('iframe');
+    pdfViewer.src = pdfUrl;
+    pdfViewer.style.cssText = `
+        flex: 1;
+        border: none;
+        width: 100%;
+        background: #f5f5f5;
+    `;
+    
+    // Footer con botones de acción
+    const footer = document.createElement('div');
+    footer.style.cssText = `
+        padding: 20px;
+        background: #f8f9fa;
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        border-radius: 0 0 12px 12px;
+        border-top: 2px solid #e9ecef;
+    `;
+    
+    // Botón Descargar
+    const btnDescargar = document.createElement('button');
+    btnDescargar.innerHTML = '💾 Descargar PDF';
+    btnDescargar.style.cssText = `
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    `;
+    btnDescargar.onmouseover = () => {
+        btnDescargar.style.transform = 'translateY(-2px)';
+        btnDescargar.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+    };
+    btnDescargar.onmouseout = () => {
+        btnDescargar.style.transform = 'translateY(0)';
+        btnDescargar.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+    };
+    btnDescargar.onclick = () => {
+        const a = document.createElement('a');
+        a.href = pdfUrl;
+        a.download = filename;
+        a.click();
+        mostrarNotificacion('✅ PDF descargado correctamente', 'success');
+    };
+    
+    // Botón Abrir en Nueva Ventana
+    const btnNuevaVentana = document.createElement('button');
+    btnNuevaVentana.innerHTML = '🔗 Abrir en Nueva Ventana';
+    btnNuevaVentana.style.cssText = `
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+    `;
+    btnNuevaVentana.onmouseover = () => {
+        btnNuevaVentana.style.transform = 'translateY(-2px)';
+        btnNuevaVentana.style.boxShadow = '0 6px 20px rgba(240, 147, 251, 0.5)';
+    };
+    btnNuevaVentana.onmouseout = () => {
+        btnNuevaVentana.style.transform = 'translateY(0)';
+        btnNuevaVentana.style.boxShadow = '0 4px 15px rgba(240, 147, 251, 0.4)';
+    };
+    btnNuevaVentana.onclick = () => {
+        window.open(pdfUrl, '_blank');
+        mostrarNotificacion('✅ PDF abierto en nueva ventana', 'info');
+    };
+    
+    // Botón WhatsApp
+    const btnWhatsApp = document.createElement('button');
+    btnWhatsApp.innerHTML = '📱 Compartir por WhatsApp';
+    btnWhatsApp.style.cssText = `
+        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+    `;
+    btnWhatsApp.onmouseover = () => {
+        btnWhatsApp.style.transform = 'translateY(-2px)';
+        btnWhatsApp.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.5)';
+    };
+    btnWhatsApp.onmouseout = () => {
+        btnWhatsApp.style.transform = 'translateY(0)';
+        btnWhatsApp.style.boxShadow = '0 4px 15px rgba(37, 211, 102, 0.4)';
+    };
+    btnWhatsApp.onclick = () => {
+        // Primero descargar el archivo
+        const a = document.createElement('a');
+        a.href = pdfUrl;
+        a.download = filename;
+        a.click();
+        
+        // Mostrar instrucciones
+        const mensaje = 'El PDF se ha descargado. Para compartirlo por WhatsApp:\n\n' +
+                       '1. Abre WhatsApp\n' +
+                       '2. Selecciona el contacto\n' +
+                       '3. Toca el ícono de adjuntar (📎)\n' +
+                       '4. Selecciona "Documento"\n' +
+                       '5. Busca y selecciona el PDF descargado';
+        
+        alert(mensaje);
+        mostrarNotificacion('💡 Sigue las instrucciones para compartir', 'info');
+    };
+    
+    // Botón Email
+    const btnEmail = document.createElement('button');
+    btnEmail.innerHTML = '📧 Enviar por Email';
+    btnEmail.style.cssText = `
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+    `;
+    btnEmail.onmouseover = () => {
+        btnEmail.style.transform = 'translateY(-2px)';
+        btnEmail.style.boxShadow = '0 6px 20px rgba(79, 172, 254, 0.5)';
+    };
+    btnEmail.onmouseout = () => {
+        btnEmail.style.transform = 'translateY(0)';
+        btnEmail.style.boxShadow = '0 4px 15px rgba(79, 172, 254, 0.4)';
+    };
+    btnEmail.onclick = () => {
+        // Primero descargar el archivo
+        const a = document.createElement('a');
+        a.href = pdfUrl;
+        a.download = filename;
+        a.click();
+        
+        // Abrir cliente de email
+        const subject = encodeURIComponent('Plan de Dieta Personalizado');
+        const body = encodeURIComponent('Adjunto encontrarás tu plan de dieta personalizado en formato PDF.');
+        window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        
+        mostrarNotificacion('📧 Adjunta el PDF descargado a tu email', 'info');
+    };
+    
+    // Agregar botones al footer
+    footer.appendChild(btnDescargar);
+    footer.appendChild(btnNuevaVentana);
+    footer.appendChild(btnWhatsApp);
+    footer.appendChild(btnEmail);
+    
+    // Ensamblar modal
+    modalContent.appendChild(header);
+    modalContent.appendChild(pdfViewer);
+    modalContent.appendChild(footer);
+    modal.appendChild(modalContent);
+    
+    // Agregar al body
+    document.body.appendChild(modal);
+    
+    // Cerrar con ESC
+    document.addEventListener('keydown', function cerrarConEsc(e) {
+        if (e.key === 'Escape' && document.getElementById('pdfPreviewModal')) {
+            URL.revokeObjectURL(pdfUrl);
+            document.body.removeChild(modal);
+            document.removeEventListener('keydown', cerrarConEsc);
+        }
+    });
+};
+
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
@@ -1990,6 +2325,15 @@ style.textContent = `
         to {
             transform: translateX(400px);
             opacity: 0;
+        }
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
         }
     }
 `;

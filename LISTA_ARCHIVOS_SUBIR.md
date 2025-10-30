@@ -187,3 +187,7 @@ Al subir estos archivos, tendrás:
 - ✅ Tooltips y mejoras UI/UX
 - ✅ Preferencias dietéticas ampliadas
 
+
+
+
+
