@@ -277,8 +277,9 @@ class ClienteManager {
                         <p><strong>Dietas:</strong> ${cliente.historialDietas?.length || 0}</p>
                     </div>
                     <div class="cliente-actions">
-                        <button class="btn-ver-ficha" data-id="${cliente.id}">📋 Ver Ficha</button>
-                        <button class="btn-generar-dieta" data-id="${cliente.id}">✨ Nueva Dieta</button>
+                        <button class="btn-ver-ficha" data-id="${cliente.id}" title="Ver información completa del cliente">📋 Ver Ficha</button>
+                        <button class="btn-generar-dieta" data-id="${cliente.id}" title="Generar una nueva dieta para este cliente">✨ Nueva Dieta</button>
+                        <button class="btn-eliminar-cliente" data-id="${cliente.id}" data-nombre="${cliente.nombre || 'Cliente'}" title="Eliminar cliente permanentemente">🗑️ Eliminar</button>
                     </div>
                 </div>
             `;
@@ -296,6 +297,15 @@ class ClienteManager {
             btn.addEventListener('click', (e) => {
                 const clienteId = e.target.getAttribute('data-id');
                 this.generarDietaParaCliente(clienteId);
+            });
+        });
+
+        // Event listeners para botones de eliminar
+        lista.querySelectorAll('.btn-eliminar-cliente').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const clienteId = e.target.getAttribute('data-id');
+                const clienteNombre = e.target.getAttribute('data-nombre');
+                this.eliminarCliente(clienteId, clienteNombre);
             });
         });
     }
@@ -336,8 +346,9 @@ class ClienteManager {
                         <p><strong>Fecha registro:</strong> ${fechaCreacion}</p>
                     </div>
                     <div class="cliente-actions">
-                        <button class="btn-ver-ficha" data-id="${cliente.id}">📋 Ver Ficha</button>
-                        <button class="btn-generar-dieta" data-id="${cliente.id}">✨ Nueva Dieta</button>
+                        <button class="btn-ver-ficha" data-id="${cliente.id}" title="Ver información completa del cliente">📋 Ver Ficha</button>
+                        <button class="btn-generar-dieta" data-id="${cliente.id}" title="Generar una nueva dieta para este cliente">✨ Nueva Dieta</button>
+                        <button class="btn-eliminar-cliente" data-id="${cliente.id}" data-nombre="${cliente.nombre || 'Cliente'}" title="Eliminar cliente permanentemente">🗑️ Eliminar</button>
                     </div>
                 </div>
             `;
@@ -355,6 +366,15 @@ class ClienteManager {
             btn.addEventListener('click', (e) => {
                 const clienteId = e.target.getAttribute('data-id');
                 this.generarDietaParaCliente(clienteId);
+            });
+        });
+
+        // Event listeners para botones de eliminar en búsqueda
+        lista.querySelectorAll('.btn-eliminar-cliente').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const clienteId = e.target.getAttribute('data-id');
+                const clienteNombre = e.target.getAttribute('data-nombre');
+                this.eliminarCliente(clienteId, clienteNombre);
             });
         });
     }
@@ -390,6 +410,7 @@ class ClienteManager {
                         <p><strong>DNI:</strong> ${cliente.dni || 'No especificado'}</p>
                         <p><strong>Fecha de nacimiento:</strong> ${cliente.fechaNacimiento || 'No especificado'}</p>
                         <p><strong>Sexo:</strong> ${cliente.sexo || 'No especificado'}</p>
+                        <p><strong>Tipo de persona:</strong> ${cliente.tipoPersona || 'No especificado'}</p>
                         <p><strong>Dirección:</strong> ${cliente.direccion || 'No especificado'}</p>
                         <p><strong>Fecha registro:</strong> ${fechaCreacion}</p>
                     </div>
@@ -522,6 +543,15 @@ class ClienteManager {
                     </select>
                 </div>
                 <div class="form-group">
+                    <label>Tipo de persona (nivel de actividad)</label>
+                    <select id="clienteTipoPersona">
+                        <option value="">Seleccionar...</option>
+                        <option value="sedentaria">Sedentaria</option>
+                        <option value="activa">Activa</option>
+                        <option value="muy-activa">Muy activa</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>Dirección</label>
                     <textarea id="clienteDireccion" rows="2"></textarea>
                 </div>
@@ -582,6 +612,7 @@ class ClienteManager {
             dni: document.getElementById('clienteDNI').value,
             fechaNacimiento: document.getElementById('clienteFechaNacimiento').value,
             sexo: document.getElementById('clienteSexo').value,
+            tipoPersona: document.getElementById('clienteTipoPersona').value,
             direccion: document.getElementById('clienteDireccion').value,
             altura: parseInt(document.getElementById('clienteAltura').value) || null,
             pesoInicial: parseFloat(document.getElementById('clientePesoInicial').value) || null,
@@ -620,11 +651,23 @@ class ClienteManager {
         // Cargar datos del cliente en el formulario
         document.getElementById('nombre').value = cliente.nombre || '';
         document.getElementById('fechaRegistro').value = new Date().toISOString().split('T')[0];
-        document.getElementById('sexo').value = cliente.sexo || '';
+        // Mapear valores de sexo a las opciones del formulario (Hombre/Mujer)
+        const mapSexo = (sx) => {
+            if (!sx) return '';
+            const s = String(sx).toLowerCase();
+            if (s === 'masculino' || s === 'hombre') return 'Hombre';
+            if (s === 'femenino' || s === 'mujer') return 'Mujer';
+            return '';
+        };
+        document.getElementById('sexo').value = mapSexo(cliente.sexo);
         document.getElementById('edad').value = cliente.fechaNacimiento ? 
             Math.floor((new Date() - new Date(cliente.fechaNacimiento)) / (365.25 * 24 * 60 * 60 * 1000)) : '';
         document.getElementById('altura').value = cliente.altura || '';
         document.getElementById('peso').value = cliente.pesoActual || cliente.pesoInicial || '';
+        // Establecer nivel de actividad en el selector tipoPersona
+        const tipoActividad = (cliente.tipoPersona || '').toLowerCase();
+        const tp = ['sedentaria','activa','muy-activa'].includes(tipoActividad) ? tipoActividad : '';
+        document.getElementById('tipoPersona').value = tp;
         document.getElementById('objetivo').value = cliente.objetivo || '';
         document.getElementById('prohibiciones').value = cliente.alergias || '';
 
@@ -653,8 +696,285 @@ class ClienteManager {
         alert('Función de agregar consulta en desarrollo');
     }
 
-    editarCliente(clienteId) {
-        alert('Función de editar cliente en desarrollo');
+    async editarCliente(clienteId) {
+        // Obtener datos actuales del cliente
+        const resultado = await window.clienteService.obtenerClientePorId(clienteId);
+        
+        if (!resultado.success) {
+            window.mostrarNotificacion('❌ Error al cargar cliente: ' + resultado.error, 'error');
+            return;
+        }
+
+        const cliente = resultado.cliente;
+
+        // Crear modal de edición
+        const modal = document.createElement('div');
+        modal.id = 'modalEditarCliente';
+        modal.className = 'modal';
+        modal.style.display = 'block';
+
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 700px;">
+                <div class="modal-header">
+                    <h2>✏️ Editar Cliente: ${cliente.nombre || 'Sin nombre'}</h2>
+                    <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                </div>
+                <form id="formEditarCliente" class="form-editar-cliente">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editNombre">Nombre Completo *</label>
+                            <input type="text" id="editNombre" name="nombre" value="${cliente.nombre || ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editEmail">Email *</label>
+                            <input type="email" id="editEmail" name="email" value="${cliente.email || ''}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editTelefono">Teléfono</label>
+                            <input type="tel" id="editTelefono" name="telefono" value="${cliente.telefono || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label for="editDNI">DNI</label>
+                            <input type="text" id="editDNI" name="dni" value="${cliente.dni || ''}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editFechaNacimiento">Fecha de Nacimiento</label>
+                            <input type="date" id="editFechaNacimiento" name="fechaNacimiento" value="${cliente.fechaNacimiento || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label for="editSexo">Sexo</label>
+                            <select id="editSexo" name="sexo">
+                                <option value="">Seleccionar</option>
+                                <option value="masculino" ${cliente.sexo === 'masculino' ? 'selected' : ''}>Masculino</option>
+                                <option value="femenino" ${cliente.sexo === 'femenino' ? 'selected' : ''}>Femenino</option>
+                                <option value="otro" ${cliente.sexo === 'otro' ? 'selected' : ''}>Otro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editTipoPersona">Tipo de Persona (actividad)</label>
+                            <select id="editTipoPersona" name="tipoPersona">
+                                <option value="">Seleccionar</option>
+                                <option value="sedentaria" ${cliente.tipoPersona === 'sedentaria' ? 'selected' : ''}>Sedentaria</option>
+                                <option value="activa" ${cliente.tipoPersona === 'activa' ? 'selected' : ''}>Activa</option>
+                                <option value="muy-activa" ${cliente.tipoPersona === 'muy-activa' ? 'selected' : ''}>Muy activa</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editDireccion">Dirección</label>
+                        <input type="text" id="editDireccion" name="direccion" value="${cliente.direccion || ''}">
+                    </div>
+
+                    <div class="form-section-header">Datos de Salud</div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editAltura">Altura (cm)</label>
+                            <input type="number" id="editAltura" name="altura" min="0" max="250" value="${cliente.altura || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label for="editPesoInicial">Peso Inicial (kg)</label>
+                            <input type="number" id="editPesoInicial" name="pesoInicial" min="0" step="0.1" value="${cliente.pesoInicial || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label for="editPesoActual">Peso Actual (kg)</label>
+                            <input type="number" id="editPesoActual" name="pesoActual" min="0" step="0.1" value="${cliente.pesoActual || ''}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editAlergias">Alergias</label>
+                        <textarea id="editAlergias" name="alergias" rows="2" placeholder="Ej: Lactosa, gluten...">${cliente.alergias || ''}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editPatologias">Patologías</label>
+                        <textarea id="editPatologias" name="patologias" rows="2" placeholder="Ej: Diabetes, hipertensión...">${cliente.patologias || ''}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editMedicacion">Medicación</label>
+                        <textarea id="editMedicacion" name="medicacion" rows="2" placeholder="Lista de medicamentos actuales">${cliente.medicacion || ''}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editObjetivo">Objetivo</label>
+                        <select id="editObjetivo" name="objetivo">
+                            <option value="">Seleccionar objetivo</option>
+                            <option value="perder-peso" ${cliente.objetivo === 'perder-peso' ? 'selected' : ''}>Perder Peso</option>
+                            <option value="ganar-peso" ${cliente.objetivo === 'ganar-peso' ? 'selected' : ''}>Ganar Peso</option>
+                            <option value="mantener-peso" ${cliente.objetivo === 'mantener-peso' ? 'selected' : ''}>Mantener Peso</option>
+                            <option value="ganar-musculo" ${cliente.objetivo === 'ganar-musculo' ? 'selected' : ''}>Ganar Músculo</option>
+                            <option value="mejorar-salud" ${cliente.objetivo === 'mejorar-salud' ? 'selected' : ''}>Mejorar Salud</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancelar" onclick="document.getElementById('modalEditarCliente').remove()">Cancelar</button>
+                        <button type="submit" class="btn-guardar">💾 Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Manejar envío del formulario
+        const form = document.getElementById('formEditarCliente');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btnGuardar = form.querySelector('.btn-guardar');
+            const textoOriginal = btnGuardar.textContent;
+            btnGuardar.disabled = true;
+            btnGuardar.textContent = '⏳ Guardando...';
+
+            try {
+                // Recopilar datos del formulario
+                const formData = new FormData(form);
+                const datosActualizados = {
+                    nombre: formData.get('nombre').trim(),
+                    email: formData.get('email').trim(),
+                    telefono: formData.get('telefono').trim() || null,
+                    dni: formData.get('dni').trim() || null,
+                    fechaNacimiento: formData.get('fechaNacimiento') || null,
+                    sexo: formData.get('sexo') || null,
+                    direccion: formData.get('direccion').trim() || null,
+                    tipoPersona: formData.get('tipoPersona') || null,
+                    altura: formData.get('altura') ? parseInt(formData.get('altura')) : null,
+                    pesoInicial: formData.get('pesoInicial') ? parseFloat(formData.get('pesoInicial')) : null,
+                    pesoActual: formData.get('pesoActual') ? parseFloat(formData.get('pesoActual')) : null,
+                    alergias: formData.get('alergias').trim() || null,
+                    patologias: formData.get('patologias').trim() || null,
+                    medicacion: formData.get('medicacion').trim() || null,
+                    objetivo: formData.get('objetivo') || null
+                };
+
+                // Calcular IMC si hay altura y peso actual
+                if (datosActualizados.altura && datosActualizados.pesoActual) {
+                    const alturaEnMetros = datosActualizados.altura / 100;
+                    datosActualizados.imc = (datosActualizados.pesoActual / (alturaEnMetros * alturaEnMetros)).toFixed(1);
+                }
+
+                // Actualizar cliente
+                const resultado = await window.clienteService.actualizarCliente(clienteId, datosActualizados);
+
+                if (resultado.success) {
+                    window.mostrarNotificacion('✅ Cliente actualizado correctamente', 'success');
+                    
+                    // Cerrar modal de edición
+                    modal.remove();
+                    
+                    // Recargar ficha del cliente
+                    await this.mostrarFichaCliente(clienteId);
+                    
+                    // Recargar lista de clientes
+                    await this.cargarClientes();
+                } else {
+                    throw new Error(resultado.error || 'Error al actualizar el cliente');
+                }
+            } catch (error) {
+                console.error('Error al editar cliente:', error);
+                window.mostrarNotificacion('❌ Error al actualizar cliente: ' + error.message, 'error');
+                btnGuardar.disabled = false;
+                btnGuardar.textContent = textoOriginal;
+            }
+        });
+
+        // Cerrar al hacer clic fuera del modal
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    }
+
+    async eliminarCliente(clienteId, clienteNombre) {
+        // Confirmación antes de eliminar
+        const confirmacion = confirm(
+            `¿Estás seguro de que deseas eliminar al cliente "${clienteNombre}"?\n\n` +
+            `Esta acción marcará al cliente como inactivo.\n` +
+            `¿Deseas continuar?`
+        );
+
+        if (!confirmacion) {
+            return;
+        }
+
+        // Confirmación adicional
+        const confirmacion2 = confirm(
+            `⚠️ ÚLTIMA CONFIRMACIÓN\n\n` +
+            `Estás a punto de eliminar a "${clienteNombre}".\n` +
+            `Esta acción no se puede deshacer.\n\n` +
+            `¿Confirmas la eliminación?`
+        );
+
+        if (!confirmacion2) {
+            return;
+        }
+
+        try {
+            // Mostrar indicador de carga
+            const btn = document.querySelector(`[data-id="${clienteId}"].btn-eliminar-cliente`);
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '⏳ Eliminando...';
+            }
+
+            const resultado = await window.clienteService.eliminarCliente(clienteId);
+
+            if (resultado.success) {
+                // Mostrar notificación de éxito
+                if (typeof window.mostrarNotificacion === 'function') {
+                    window.mostrarNotificacion(
+                        `✅ Cliente "${clienteNombre}" eliminado correctamente`,
+                        'success'
+                    );
+                } else {
+                    alert(`✅ Cliente "${clienteNombre}" eliminado correctamente`);
+                }
+
+                // Recargar la lista de clientes
+                await this.cargarClientes();
+
+                // Cerrar ficha si estaba abierta
+                const fichaModal = document.getElementById('clienteModal');
+                if (fichaModal && !fichaModal.classList.contains('oculto')) {
+                    const clienteFicha = fichaModal.querySelector('[data-id]');
+                    if (clienteFicha && clienteFicha.getAttribute('data-id') === clienteId) {
+                        fichaModal.classList.add('oculto');
+                    }
+                }
+            } else {
+                throw new Error(resultado.error || 'Error al eliminar el cliente');
+            }
+        } catch (error) {
+            console.error('Error al eliminar cliente:', error);
+            
+            // Mostrar error
+            if (typeof window.mostrarNotificacion === 'function') {
+                window.mostrarNotificacion(
+                    `❌ Error al eliminar cliente: ${error.message}`,
+                    'error'
+                );
+            } else {
+                alert(`❌ Error al eliminar cliente: ${error.message}`);
+            }
+
+            // Restaurar botón
+            const btn = document.querySelector(`[data-id="${clienteId}"].btn-eliminar-cliente`);
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '🗑️ Eliminar';
+            }
+        }
     }
 }
 

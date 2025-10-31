@@ -1,413 +1,3672 @@
-// Base de Datos Ampliada de Alimentos Saludables
-// Información nutricional aproximada por 100g (excepto donde se indique)
+/**
+ * Base de Datos de Alimentos - Sistema de Nutrición
+ * @version 3.0
+ * @description Sistema completo de gestión de alimentos con datos nutricionales
+ */
 
-const baseDatosAlimentos = {
-    // PROTEÍNAS ANIMALES
-    proteinas: {
-        "Pechuga de pollo": { calorias: 165, proteinas: 31, carbohidratos: 0, grasas: 3.6 },
-            "Pechuga de pavo": { calorias: 135, proteinas: 30, carbohidratos: 0, grasas: 1 },
-            "Muslo de pollo": { calorias: 209, proteinas: 26, carbohidratos: 0, grasas: 10 },
-            "Salmón": { calorias: 208, proteinas: 20, carbohidratos: 0, grasas: 13 },
-            "Atún fresco": { calorias: 144, proteinas: 30, carbohidratos: 0, grasas: 1 },
-            "Atún en lata": { calorias: 116, proteinas: 26, carbohidratos: 0, grasas: 0.8 },
-            "Merluza": { calorias: 76, proteinas: 17, carbohidratos: 0, grasas: 0.6 },
-            "Bacalao": { calorias: 82, proteinas: 18, carbohidratos: 0, grasas: 0.7 },
-            "Trucha": { calorias: 148, proteinas: 21, carbohidratos: 0, grasas: 6 },
-            "Sardinas": { calorias: 208, proteinas: 25, carbohidratos: 0, grasas: 11 },
-            "Salmón ahumado": { calorias: 117, proteinas: 18, carbohidratos: 0, grasas: 4 },
-            "Ternera magra": { calorias: 250, proteinas: 26, carbohidratos: 0, grasas: 15 },
-            "Cerdo magro": { calorias: 242, proteinas: 27, carbohidratos: 0, grasas: 14 },
-            "Cordero": { calorias: 294, proteinas: 25, carbohidratos: 0, grasas: 21 },
-            "Huevos enteros": { calorias: 155, proteinas: 13, carbohidratos: 1.1, grasas: 11 },
-            "Claras de huevo": { calorias: 52, proteinas: 11, carbohidratos: 0.7, grasas: 0.2 },
-            "Sepia": { calorias: 79, proteinas: 16, carbohidratos: 0.8, grasas: 0.7 },
-            "Gambas": { calorias: 85, proteinas: 18, carbohidratos: 0.5, grasas: 0.5 },
-            "Langostinos": { calorias: 71, proteinas: 14, carbohidratos: 0.2, grasas: 0.4 },
-            "Mejillones": { calorias: 86, proteinas: 12, carbohidratos: 4.5, grasas: 2 },
-            "Almejas": { calorias: 74, proteinas: 12, carbohidratos: 2.6, grasas: 0.8 },
-            "Pulpo": { calorias: 82, proteinas: 15, carbohidratos: 2.2, grasas: 1 },
-            "Jamón serrano": { calorias: 319, proteinas: 30, carbohidratos: 1.5, grasas: 20 },
-            "Jamón de pavo": { calorias: 84, proteinas: 16, carbohidratos: 2, grasas: 1 },
-            "Queso fresco": { calorias: 98, proteinas: 17, carbohidratos: 3, grasas: 2 },
-            "Queso cottage": { calorias: 98, proteinas: 11, carbohidratos: 3.4, grasas: 4.3 },
-            "Queso parmesano": { calorias: 431, proteinas: 38, carbohidratos: 4.1, grasas: 29 },
-            "Requesón": { calorias: 98, proteinas: 11, carbohidratos: 3.4, grasas: 4.3 },
-            // --- NUEVOS AÑADIDOS ---
-            "Hígado de ternera": { calorias: 135, proteinas: 20, carbohidratos: 4, grasas: 3.6 },
-            "Conejo": { calorias: 136, proteinas: 22, carbohidratos: 0, grasas: 4.5 },
-            "Codorniz": { calorias: 134, proteinas: 22, carbohidratos: 0, grasas: 4.5 },
-            "Lomo ibérico": { calorias: 385, proteinas: 43, carbohidratos: 0.5, grasas: 23 },
-            "Lomo de cerdo": { calorias: 143, proteinas: 26, carbohidratos: 0, grasas: 3.5 },
-            "Costillas de cerdo": { calorias: 277, proteinas: 25, carbohidratos: 0, grasas: 19 },
-            "Caballa": { calorias: 205, proteinas: 18.6, carbohidratos: 0, grasas: 14 },
-            "Anchoas (en aceite)": { calorias: 210, proteinas: 29, carbohidratos: 0, grasas: 9.7 },
-            "Rodaballo": { calorias: 95, proteinas: 16, carbohidratos: 0, grasas: 3 },
-            "Lubina": { calorias: 97, proteinas: 18.5, carbohidratos: 0, grasas: 2 },
-            "Dorada": { calorias: 139, proteinas: 20.6, carbohidratos: 0, grasas: 6.2 },
-            "Bogavante (cocido)": { calorias: 98, proteinas: 20.5, carbohidratos: 1.3, grasas: 0.9 },
-            "Vieiras (crudo)": { calorias: 88, proteinas: 17, carbohidratos: 4, grasas: 0.8 },
-            "Ostras (crudo)": { calorias: 68, proteinas: 7, carbohidratos: 5, grasas: 2.5 }
-        },
-    
-        // PROTEÍNAS VEGETALES
-        proteinasVegetales: {
-            "Tofu": { calorias: 76, proteinas: 8, carbohidratos: 2, grasas: 4.8 },
-            "Tempeh": { calorias: 193, proteinas: 19, carbohidratos: 9, grasas: 11 },
-            "Seitán": { calorias: 120, proteinas: 24, carbohidratos: 4, grasas: 1 },
-            "Soja texturizada": { calorias: 340, proteinas: 50, carbohidratos: 30, grasas: 1 },
-            "Soja": { calorias: 173, proteinas: 17, carbohidratos: 10, grasas: 9 },
-            "Garbanzos": { calorias: 364, proteinas: 19, carbohidratos: 61, grasas: 6 },
-            "Lentejas": { calorias: 353, proteinas: 25, carbohidratos: 60, grasas: 1 },
-            "Frijoles negros": { calorias: 341, proteinas: 21, carbohidratos: 62, grasas: 1 },
-            "Frijoles rojos": { calorias: 337, proteinas: 22, carbohidratos: 61, grasas: 1 },
-            "Judías blancas": { calorias: 337, proteinas: 22, carbohidratos: 61, grasas: 1 },
-            "Alubias": { calorias: 337, proteinas: 22, carbohidratos: 61, grasas: 1 },
-            "Guisantes": { calorias: 81, proteinas: 5, carbohidratos: 14, grasas: 0.4 },
-            "Habas": { calorias: 88, proteinas: 7, carbohidratos: 13, grasas: 0.4 },
-            "Hummus": { calorias: 166, proteinas: 8, carbohidratos: 14, grasas: 9 },
-            "Edamame": { calorias: 122, proteinas: 11, carbohidratos: 10, grasas: 5 },
-            // --- NUEVOS AÑADIDOS ---
-            "Lenteja roja (cruda)": { calorias: 358, proteinas: 24, carbohidratos: 63, grasas: 1 },
-            "Lenteja beluga (cruda)": { calorias: 341, proteinas: 24, carbohidratos: 63, grasas: 1.5 },
-            "Alubia adzuki (cruda)": { calorias: 329, proteinas: 20, carbohidratos: 63, grasas: 0.5 },
-            "Altramuces (cocidos)": { calorias: 119, proteinas: 16, carbohidratos: 10, grasas: 3 },
-            "Levadura nutricional": { calorias: 344, proteinas: 51, carbohidratos: 37, grasas: 4 },
-            "Proteína de guisante (polvo)": { calorias: 370, proteinas: 80, carbohidratos: 1, grasas: 5 }
-        },
-    
-        // CARBOHIDRATOS COMPLEJOS (Valores cocidos para arroces/pastas, crudos para granos secos)
-        carbohidratos: {
-            "Arroz integral": { calorias: 111, proteinas: 2.6, carbohidratos: 23, grasas: 0.9 },
-            "Arroz blanco": { calorias: 130, proteinas: 2.7, carbohidratos: 28, grasas: 0.3 },
-            "Arroz basmati": { calorias: 130, proteinas: 2.7, carbohidratos: 28, grasas: 0.3 },
-            "Quinoa": { calorias: 120, proteinas: 4.4, carbohidratos: 22, grasas: 1.9 },
-            "Avena": { calorias: 389, proteinas: 17, carbohidratos: 66, grasas: 7 },
-            "Avena copos": { calorias: 389, proteinas: 17, carbohidratos: 66, grasas: 7 },
-            "Pasta integral": { calorias: 124, proteinas: 5, carbohidratos: 25, grasas: 1 },
-            "Pasta normal": { calorias: 131, proteinas: 5, carbohidratos: 25, grasas: 1 },
-            "Cuscús": { calorias: 112, proteinas: 3.8, carbohidratos: 23, grasas: 0.2 },
-            "Cuscús integral": { calorias: 112, proteinas: 4, carbohidratos: 22, grasas: 0.6 },
-            "Pan integral": { calorias: 247, proteinas: 13, carbohidratos: 41, grasas: 4 },
-            "Pan blanco": { calorias: 265, proteinas: 9, carbohidratos: 49, grasas: 3 },
-            "Pan de centeno": { calorias: 258, proteinas: 9, carbohidratos: 48, grasas: 3 },
-            "Pan de espelta": { calorias: 250, proteinas: 13, carbohidratos: 45, grasas: 3 },
-            "Tortillas de maíz": { calorias: 218, proteinas: 5.7, carbohidratos: 45, grasas: 2.5 },
-            "Tortillas de trigo": { calorias: 300, proteinas: 10, carbohidratos: 46, grasas: 8 },
-            "Mijo": { calorias: 378, proteinas: 11, carbohidratos: 73, grasas: 4 },
-            "Bulgur": { calorias: 83, proteinas: 3.1, carbohidratos: 19, grasas: 0.2 },
-            "Trigo sarraceno": { calorias: 343, proteinas: 13, carbohidratos: 72, grasas: 3 },
-            "Amaranto": { calorias: 371, proteinas: 14, carbohidratos: 65, grasas: 7 },
-            "Trigo": { calorias: 339, proteinas: 14, carbohidratos: 72, grasas: 2 },
-            "Centeno": { calorias: 338, proteinas: 10, carbohidratos: 76, grasas: 2 },
-            "Cebada": { calorias: 123, proteinas: 2.3, carbohidratos: 28, grasas: 0.4 },
-            // --- NUEVOS AÑADIDOS ---
-            "Arroz salvaje (cocido)": { calorias: 101, proteinas: 4, carbohidratos: 21, grasas: 0.3 },
-            "Arroz negro (cocido)": { calorias: 130, proteinas: 4, carbohidratos: 27, grasas: 0.5 },
-            "Espelta (grano, cocido)": { calorias: 127, proteinas: 5.5, carbohidratos: 26, grasas: 0.7 },
-            "Fideos soba (cocidos)": { calorias: 99, proteinas: 5, carbohidratos: 21, grasas: 0.1 },
-            "Fideos de arroz (cocidos)": { calorias: 109, proteinas: 0.9, carbohidratos: 25, grasas: 0.2 },
-            "Polenta (cocida)": { calorias: 73, proteinas: 1.7, carbohidratos: 16, grasas: 0.4 },
-            "Tapioca (seca)": { calorias: 358, proteinas: 0.2, carbohidratos: 89, grasas: 0 }
-        },
-    
-        // TUBÉRCULOS Y RAIZES
-        tuberculos: {
-            "Patata": { calorias: 77, proteinas: 2, carbohidratos: 17, grasas: 0.1 },
-            "Batata": { calorias: 86, proteinas: 1.6, carbohidratos: 20, grasas: 0.1 },
-            "Boniato": { calorias: 86, proteinas: 1.6, carbohidratos: 20, grasas: 0.1 },
-            "Ñame": { calorias: 118, proteinas: 1.5, carbohidratos: 28, grasas: 0.2 },
-            "Yuca": { calorias: 160, proteinas: 1.4, carbohidratos: 38, grasas: 0.3 },
-            "Remolacha": { calorias: 43, proteinas: 1.6, carbohidratos: 10, grasas: 0.2 },
-            "Zanahoria": { calorias: 41, proteinas: 0.9, carbohidratos: 10, grasas: 0.2 },
-            "Rábano": { calorias: 16, proteinas: 0.7, carbohidratos: 3.4, grasas: 0.1 },
-            "Nabo": { calorias: 28, proteinas: 0.9, carbohidratos: 6, grasas: 0.1 },
-            // --- NUEVOS AÑADIDOS ---
-            "Chirivía": { calorias: 75, proteinas: 1.2, carbohidratos: 18, grasas: 0.3 },
-            "Apionabo": { calorias: 42, proteinas: 1.5, carbohidratos: 9, grasas: 0.3 },
-            "Jícama": { calorias: 38, proteinas: 0.7, carbohidratos: 9, grasas: 0.1 },
-            "Taro (Malanga)": { calorias: 112, proteinas: 1.5, carbohidratos: 26, grasas: 0.2 }
-        },
-    
-        // VERDURAS Y HORTALIZAS
-        verduras: {
-            "Brócoli": { calorias: 34, proteinas: 2.8, carbohidratos: 7, grasas: 0.4 },
-            "Coliflor": { calorias: 25, proteinas: 1.9, carbohidratos: 5, grasas: 0.3 },
-            "Espinacas": { calorias: 23, proteinas: 2.9, carbohidratos: 3.6, grasas: 0.4 },
-            "Acelga": { calorias: 19, proteinas: 1.8, carbohidratos: 3.7, grasas: 0.2 },
-            "Col rizada": { calorias: 49, proteinas: 4.3, carbohidratos: 9, grasas: 0.9 },
-            "Kale": { calorias: 49, proteinas: 4.3, carbohidratos: 9, grasas: 0.9 },
-            "Lechuga": { calorias: 15, proteinas: 1.4, carbohidratos: 3, grasas: 0.2 },
-            "Rúcula": { calorias: 25, proteinas: 2.6, carbohidratos: 3.7, grasas: 0.7 },
-            "Canónigos": { calorias: 14, proteinas: 2, carbohidratos: 2, grasas: 0.4 },
-            "Endibia": { calorias: 17, proteinas: 1.3, carbohidratos: 3.4, grasas: 0.1 },
-            "Tomate": { calorias: 18, proteinas: 0.9, carbohidratos: 3.9, grasas: 0.2 },
-            "Pimiento rojo": { calorias: 31, proteinas: 1, carbohidratos: 7, grasas: 0.3 },
-            "Pimiento verde": { calorias: 20, proteinas: 1, carbohidratos: 5, grasas: 0.2 },
-            "Pimiento amarillo": { calorias: 27, proteinas: 1, carbohidratos: 6, grasas: 0.2 },
-            "Calabacín": { calorias: 17, proteinas: 1.2, carbohidratos: 3.4, grasas: 0.2 },
-            "Berenjena": { calorias: 25, proteinas: 1, carbohidratos: 6, grasas: 0.2 },
-            "Pepino": { calorias: 16, proteinas: 0.7, carbohidratos: 4, grasas: 0.1 },
-            "Calabaza": { calorias: 26, proteinas: 1, carbohidratos: 7, grasas: 0.1 },
-            "Espárragos": { calorias: 20, proteinas: 2.2, carbohidratos: 4, grasas: 0.1 },
-            "Apio": { calorias: 16, proteinas: 0.7, carbohidratos: 3, grasas: 0.2 },
-            "Cebolla": { calorias: 40, proteinas: 1.1, carbohidratos: 9, grasas: 0.1 },
-            "Ajo": { calorias: 149, proteinas: 6.4, carbohidratos: 33, grasas: 0.5 },
-            "Puerro": { calorias: 61, proteinas: 1.5, carbohidratos: 14, grasas: 0.3 },
-            "Champiñones": { calorias: 22, proteinas: 3.1, carbohidratos: 3.3, grasas: 0.3 },
-            "Setas": { calorias: 22, proteinas: 3.1, carbohidratos: 3.3, grasas: 0.3 },
-            "Champiñones portobello": { calorias: 22, proteinas: 3.1, carbohidratos: 3.3, grasas: 0.3 },
-            "Judías verdes": { calorias: 31, proteinas: 1.8, carbohidratos: 7, grasas: 0.1 },
-            "Guisantes verdes": { calorias: 81, proteinas: 5, carbohidratos: 14, grasas: 0.4 },
-            "Maíz": { calorias: 86, proteinas: 3.3, carbohidratos: 19, grasas: 1.2 },
-            "Calabacín italiano": { calorias: 17, proteinas: 1.2, carbohidratos: 3.4, grasas: 0.2 },
-            "Okra": { calorias: 33, proteinas: 1.9, carbohidratos: 7, grasas: 0.2 },
-            "Alcachofa": { calorias: 47, proteinas: 3.3, carbohidratos: 11, grasas: 0.2 },
-            "Bok choy": { calorias: 13, proteinas: 1.5, carbohidratos: 2.2, grasas: 0.2 },
-            "Pak choi": { calorias: 13, proteinas: 1.5, carbohidratos: 2.2, grasas: 0.2 },
-            "Brócoli rabe": { calorias: 22, proteinas: 3.2, carbohidratos: 3, grasas: 0.5 },
-            "Berro": { calorias: 11, proteinas: 2.3, carbohidratos: 1.3, grasas: 0.1 },
-            // --- NUEVOS AÑADIDOS ---
-            "Bimi": { calorias: 35, proteinas: 3.8, carbohidratos: 2.7, grasas: 0.2 },
-            "Setas Shiitake": { calorias: 34, proteinas: 2.2, carbohidratos: 7, grasas: 0.5 },
-            "Setas Ostra": { calorias: 33, proteinas: 3.3, carbohidratos: 6, grasas: 0.4 },
-            "Hinojo (bulbo)": { calorias: 31, proteinas: 1.2, carbohidratos: 7, grasas: 0.2 },
-            "Tirabeques": { calorias: 42, proteinas: 2.8, carbohidratos: 7.6, grasas: 0.2 },
-            "Cardo": { calorias: 17, proteinas: 0.7, carbohidratos: 4, grasas: 0.1 },
-            "Alga Nori (seca)": { calorias: 35, proteinas: 5.8, carbohidratos: 5.1, grasas: 0.3 },
-            "Alga Wakame (seca)": { calorias: 188, proteinas: 18, carbohidratos: 43, grasas: 1.5 },
-            "Chucrut": { calorias: 19, proteinas: 0.9, carbohidratos: 4.3, grasas: 0.1 },
-            "Kimchi": { calorias: 15, proteinas: 1.1, carbohidratos: 2.4, grasas: 0.5 }
-        },
-    
-        // FRUTAS
-        frutas: {
-            "Plátano": { calorias: 89, proteinas: 1.1, carbohidratos: 23, grasas: 0.3 },
-            "Manzana": { calorias: 52, proteinas: 0.3, carbohidratos: 14, grasas: 0.2 },
-            "Pera": { calorias: 57, proteinas: 0.4, carbohidratos: 15, grasas: 0.1 },
-            "Naranja": { calorias: 47, proteinas: 0.9, carbohidratos: 12, grasas: 0.1 },
-            "Mandarina": { calorias: 53, proteinas: 0.8, carbohidratos: 13, grasas: 0.3 },
-            "Fresas": { calorias: 32, proteinas: 0.7, carbohidratos: 8, grasas: 0.3 },
-            "Arándanos": { calorias: 57, proteinas: 0.7, carbohidratos: 14, grasas: 0.3 },
-            "Moras": { calorias: 43, proteinas: 1.4, carbohidratos: 10, grasas: 0.5 },
-            "Frambuesas": { calorias: 52, proteinas: 1.2, carbohidratos: 12, grasas: 0.7 },
-            "Uvas": { calorias: 69, proteinas: 0.7, carbohidratos: 18, grasas: 0.2 },
-            "Mango": { calorias: 60, proteinas: 0.8, carbohidratos: 15, grasas: 0.4 },
-            "Piña": { calorias: 50, proteinas: 0.5, carbohidratos: 13, grasas: 0.1 },
-            "Papaya": { calorias: 43, proteinas: 0.5, carbohidratos: 11, grasas: 0.3 },
-            "Melón": { calorias: 34, proteinas: 0.8, carbohidratos: 8, grasas: 0.2 },
-            "Sandía": { calorias: 30, proteinas: 0.6, carbohidratos: 8, grasas: 0.2 },
-            "Kiwi": { calorias: 61, proteinas: 1.1, carbohidratos: 15, grasas: 0.5 },
-            "Aguacate": { calorias: 160, proteinas: 2, carbohidratos: 9, grasas: 15 },
-            "Granada": { calorias: 83, proteinas: 1.7, carbohidratos: 19, grasas: 1.2 },
-            "Cerezas": { calorias: 63, proteinas: 1, carbohidratos: 16, grasas: 0.2 },
-            "Melocotón": { calorias: 39, proteinas: 0.9, carbohidratos: 10, grasas: 0.3 },
-            "Albaricoque": { calorias: 48, proteinas: 1.4, carbohidratos: 11, grasas: 0.4 },
-            "Ciruela": { calorias: 46, proteinas: 0.7, carbohidratos: 11, grasas: 0.3 },
-            "Pomelo": { calorias: 42, proteinas: 0.8, carbohidratos: 11, grasas: 0.1 },
-            "Lima": { calorias: 30, proteinas: 0.7, carbohidratos: 11, grasas: 0.2 },
-            "Limón": { calorias: 29, proteinas: 1.1, carbohidratos: 9, grasas: 0.3 },
-            "Caqui": { calorias: 70, proteinas: 0.6, carbohidratos: 18, grasas: 0.2 },
-            "Higo": { calorias: 74, proteinas: 0.8, carbohidratos: 19, grasas: 0.3 },
-            "Dátiles": { calorias: 282, proteinas: 2.5, carbohidratos: 75, grasas: 0.4 },
-            "Coco": { calorias: 354, proteinas: 3.3, carbohidratos: 15, grasas: 33 },
-            // --- NUEVOS AÑADIDOS ---
-            "Lichi": { calorias: 66, proteinas: 0.8, carbohidratos: 17, grasas: 0.4 },
-            "Maracuyá": { calorias: 97, proteinas: 2.2, carbohidratos: 23, grasas: 0.7 },
-            "Guayaba": { calorias: 68, proteinas: 2.6, carbohidratos: 14, grasas: 1 },
-            "Pitahaya": { calorias: 60, proteinas: 1.2, carbohidratos: 13, grasas: 0.4 },
-            "Níspero": { calorias: 47, proteinas: 0.4, carbohidratos: 12, grasas: 0.2 },
-            "Membrillo": { calorias: 57, proteinas: 0.4, carbohidratos: 15, grasas: 0.1 }
-        },
-    
-        // FRUTOS SECOS Y SEMILLAS
-        frutosSecos: {
-            "Almendras": { calorias: 579, proteinas: 21, carbohidratos: 22, grasas: 50 },
-            "Nueces": { calorias: 654, proteinas: 15, carbohidratos: 14, grasas: 65 },
-            "Anacardos": { calorias: 553, proteinas: 18, carbohidratos: 30, grasas: 44 },
-            "Avellanas": { calorias: 628, proteinas: 15, carbohidratos: 17, grasas: 61 },
-            "Pistachos": { calorias: 560, proteinas: 20, carbohidratos: 28, grasas: 45 },
-            "Cacahuetes": { calorias: 567, proteinas: 26, carbohidratos: 16, grasas: 49 },
-            "Pacanas": { calorias: 691, proteinas: 9, carbohidratos: 14, grasas: 72 },
-            "Nueces de Brasil": { calorias: 659, proteinas: 14, carbohidratos: 12, grasas: 67 },
-            "Piñones": { calorias: 673, proteinas: 14, carbohidratos: 13, grasas: 68 },
-            "Macadamias": { calorias: 718, proteinas: 8, carbohidratos: 14, grasas: 76 },
-            "Semillas de chía": { calorias: 486, proteinas: 17, carbohidratos: 42, grasas: 31 },
-            "Semillas de lino": { calorias: 534, proteinas: 18, carbohidratos: 29, grasas: 42 },
-            "Semillas de girasol": { calorias: 584, proteinas: 21, carbohidratos: 20, grasas: 51 },
-            "Semillas de calabaza": { calorias: 559, proteinas: 30, carbohidratos: 10, grasas: 49 },
-            "Semillas de sésamo": { calorias: 573, proteinas: 18, carbohidratos: 23, grasas: 50 },
-            "Semillas de cáñamo": { calorias: 553, proteinas: 31, carbohidratos: 9, grasas: 48 },
-            "Mantequilla de almendras": { calorias: 614, proteinas: 21, carbohidratos: 19, grasas: 56 },
-            "Mantequilla de cacahuete": { calorias: 588, proteinas: 25, carbohidratos: 20, grasas: 50 },
-            "Crema de avellanas": { calorias: 628, proteinas: 15, carbohidratos: 17, grasas: 61 },
-            "Tahini": { calorias: 595, proteinas: 17, carbohidratos: 21, grasas: 54 },
-            // --- NUEVOS AÑADIDOS ---
-            "Nueces de nogal": { calorias: 654, proteinas: 15, carbohidratos: 14, grasas: 65 },
-            "Almendras tostadas": { calorias: 597, proteinas: 21, carbohidratos: 19, grasas: 52 },
-            "Pipas de girasol peladas": { calorias: 584, proteinas: 21, carbohidratos: 20, grasas: 51 },
-            "Semillas de amapola": { calorias: 525, proteinas: 18, carbohidratos: 28, grasas: 42 },
-            "Semillas de amaranto": { calorias: 371, proteinas: 14, carbohidratos: 65, grasas: 7 },
-            "Castañas (asadas)": { calorias: 245, proteinas: 3.2, carbohidratos: 53, grasas: 2.2 }
-        },
-    
-        // LÁCTEOS Y DERIVADOS
-        lacteos: {
-            "Leche entera": { calorias: 61, proteinas: 3.2, carbohidratos: 4.8, grasas: 3.3 },
-            "Leche semidesnatada": { calorias: 50, proteinas: 3.4, carbohidratos: 5, grasas: 1.6 },
-            "Leche desnatada": { calorias: 34, proteinas: 3.4, carbohidratos: 5, grasas: 0.1 },
-            "Yogur griego": { calorias: 59, proteinas: 10, carbohidratos: 3.6, grasas: 0.4 },
-            "Yogur natural": { calorias: 59, proteinas: 10, carbohidratos: 3.6, grasas: 0.4 },
-            "Yogur desnatado": { calorias: 56, proteinas: 10, carbohidratos: 4, grasas: 0.1 },
-            "Kéfir": { calorias: 41, proteinas: 3.3, carbohidratos: 4.5, grasas: 1 },
-            "Queso fresco": { calorias: 98, proteinas: 17, carbohidratos: 3, grasas: 2 },
-            "Queso cottage": { calorias: 98, proteinas: 11, carbohidratos: 3.4, grasas: 4.3 },
-            "Queso feta": { calorias: 264, proteinas: 14, carbohidratos: 4, grasas: 21 },
-            "Queso mozzarella": { calorias: 300, proteinas: 22, carbohidratos: 2.2, grasas: 22 },
-            "Queso parmesano": { calorias: 431, proteinas: 38, carbohidratos: 4.1, grasas: 29 },
-            "Requesón": { calorias: 98, proteinas: 11, carbohidratos: 3.4, grasas: 4.3 },
-            "Cuajada": { calorias: 98, proteinas: 11, carbohidratos: 3.4, grasas: 4.3 },
-            "Leche de almendras": { calorias: 17, proteinas: 0.6, carbohidratos: 1.5, grasas: 1.1 },
-            "Leche de soja": { calorias: 33, proteinas: 2.9, carbohidratos: 1.8, grasas: 1.8 },
-            "Leche de avena": { calorias: 43, proteinas: 1.3, carbohidratos: 7, grasas: 0.8 },
-            "Leche de coco": { calorias: 230, proteinas: 2.3, carbohidratos: 6, grasas: 24 },
-            // --- NUEVOS AÑADIDOS ---
-            "Leche de cabra": { calorias: 69, proteinas: 3.6, carbohidratos: 4.5, grasas: 4.1 },
-            "Queso de cabra (rulo)": { calorias: 264, proteinas: 18.5, carbohidratos: 2.2, grasas: 20 },
-            "Queso Roquefort": { calorias: 369, proteinas: 21.5, carbohidratos: 2, grasas: 30.6 },
-            "Queso Burrata": { calorias: 240, proteinas: 18, carbohidratos: 1, grasas: 18 },
-            "Skyr (natural)": { calorias: 63, proteinas: 11, carbohidratos: 4, grasas: 0.2 },
-            "Yogur de soja": { calorias: 54, proteinas: 4, carbohidratos: 3.5, grasas: 2.3 }
-        },
-    
-        // GRASAS Y ACEITES
-        grasas: {
-            "Aceite de oliva": { calorias: 884, proteinas: 0, carbohidratos: 0, grasas: 100 },
-            "Aceite de coco": { calorias: 862, proteinas: 0, carbohidratos: 0, grasas: 100 },
-            "Aceite de aguacate": { calorias: 884, proteinas: 0, carbohidratos: 0, grasas: 100 },
-            "Aceite de girasol": { calorias: 884, proteinas: 0, carbohidratos: 0, grasas: 100 },
-            "Mantequilla": { calorias: 717, proteinas: 0.9, carbohidratos: 0.1, grasas: 81 },
-            "Mantequilla clarificada": { calorias: 900, proteinas: 0, carbohidratos: 0, grasas: 100 },
-            "Ghee": { calorias: 900, proteinas: 0, carbohidratos: 0, grasas: 100 },
-            "Mayonesa": { calorias: 680, proteinas: 1, carbohidratos: 0.6, grasas: 75 },
-            // --- NUEVOS AÑADIDOS ---
-            "Aceite de sésamo": { calorias: 884, proteinas: 0, carbohidratos: 0, grasas: 100 },
-            "Aceite de lino": { calorias: 884, proteinas: 0, carbohidratos: 0, grasas: 100 },
-            "Manteca de cerdo": { calorias: 902, proteinas: 0, carbohidratos: 0, grasas: 100 },
-            "Aceitunas verdes": { calorias: 145, proteinas: 1, carbohidratos: 3.8, grasas: 15.3 },
-            "Aceitunas negras": { calorias: 115, proteinas: 0.8, carbohidratos: 6.3, grasas: 10.7 }
-        },
-    
-        // SUPERALIMENTOS Y COMPLEMENTOS
-        superalimentos: {
-            "Espirulina": { calorias: 290, proteinas: 57, carbohidratos: 24, grasas: 8 },
-            "Chlorella": { calorias: 370, proteinas: 60, carbohidratos: 30, grasas: 10 },
-            "Polen": { calorias: 326, proteinas: 21, carbohidratos: 51, grasas: 5 },
-            "Jalea real": { calorias: 310, proteinas: 13, carbohidratos: 49, grasas: 4 },
-            "Maca": { calorias: 325, proteinas: 10, carbohidratos: 59, grasas: 2 },
-            "Cacao en polvo": { calorias: 228, proteinas: 20, carbohidratos: 58, grasas: 14 },
-            "Miel": { calorias: 304, proteinas: 0.3, carbohidratos: 82, grasas: 0 },
-            "Sirope de arce": { calorias: 260, proteinas: 0, carbohidratos: 67, grasas: 0 },
-            "Açai (polvo)": { calorias: 533, proteinas: 8, carbohidratos: 44, grasas: 48 },
-            "Bayas de goji": { calorias: 349, proteinas: 14, carbohidratos: 77, grasas: 0.4 },
-            "Matcha": { calorias: 324, proteinas: 30, carbohidratos: 39, grasas: 5 },
-            "Cúrcuma (polvo)": { calorias: 354, proteinas: 8, carbohidratos: 65, grasas: 10 },
-            "Jengibre (fresco)": { calorias: 80, proteinas: 1.8, carbohidratos: 18, grasas: 0.8 },
-            "Moringa (polvo)": { calorias: 205, proteinas: 27, carbohidratos: 38, grasas: 2 },
-            "Acerola (polvo)": { calorias: 32, proteinas: 0.4, carbohidratos: 8, grasas: 0.3 },
-            "Stevia": { calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0 },
-            "Azúcar de coco": { calorias: 380, proteinas: 0, carbohidratos: 98, grasas: 0 },
-            "Miso (pasta)": { calorias: 198, proteinas: 12, carbohidratos: 28, grasas: 6 },
-            "Bayas de Goji (secas)": { calorias: 349, proteinas: 14.3, carbohidratos: 77, grasas: 0.4 }
-        },
-    
-        // BEBIDAS Y BATIDOS
-        bebidas: {
-            "Proteína en polvo": { calorias: 387, proteinas: 75, carbohidratos: 8, grasas: 6 },
-            "Proteína vegana": { calorias: 370, proteinas: 70, carbohidratos: 15, grasas: 4 },
-            "Batido proteico": { calorias: 150, proteinas: 25, carbohidratos: 5, grasas: 2 },
-            "Café": { calorias: 2, proteinas: 0.1, carbohidratos: 0, grasas: 0 },
-            "Té verde": { calorias: 2, proteinas: 0.2, carbohidratos: 0, grasas: 0 },
-            "Té negro": { calorias: 2, proteinas: 0.2, carbohidratos: 0, grasas: 0 },
-            "Infusión": { calorias: 2, proteinas: 0.2, carbohidratos: 0, grasas: 0 },
-            "Zumo de naranja": { calorias: 45, proteinas: 0.7, carbohidratos: 10, grasas: 0.2 },
-            "Zumo de manzana": { calorias: 46, proteinas: 0.1, carbohidratos: 11, grasas: 0.1 },
-            "Agua": { calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0 },
-            // --- NUEVOS AÑADIDOS ---
-            "Kombucha": { calorias: 12, proteinas: 0, carbohidratos: 3, grasas: 0 }
-        },
-    
-        // SNACKS Y COMPLEMENTOS
-        snacks: {
-            "Granola": { calorias: 471, proteinas: 10, carbohidratos: 64, grasas: 20 },
-            "Granola light": { calorias: 400, proteinas: 8, carbohidratos: 65, grasas: 12 },
-            "Barrita proteica": { calorias: 350, proteinas: 20, carbohidratos: 30, grasas: 12 },
-            "Barrita energética": { calorias: 300, proteinas: 5, carbohidratos: 50, grasas: 8 },
-            "Galletas integrales": { calorias: 420, proteinas: 9, carbohidratos: 70, grasas: 9 },
-            "Palomitas": { calorias: 387, proteinas: 13, carbohidratos: 78, grasas: 5 },
-            "Plátano deshidratado": { calorias: 346, proteinas: 3.9, carbohidratos: 88, grasas: 1 },
-            "Pasas": { calorias: 299, proteinas: 3.1, carbohidratos: 79, grasas: 0.5 },
-            "Ciruelas pasas": { calorias: 240, proteinas: 2.2, carbohidratos: 64, grasas: 0.4 },
-            "Orejones": { calorias: 241, proteinas: 3.4, carbohidratos: 63, grasas: 0.5 },
-            "Chocolate negro 85%": { calorias: 598, proteinas: 12, carbohidratos: 45, grasas: 43 },
-            "Chocolate negro 70%": { calorias: 598, proteinas: 12, carbohidratos: 46, grasas: 42 },
-            "Chips de kale": { calorias: 350, proteinas: 15, carbohidratos: 35, grasas: 20 },
-            "Zanahorias baby": { calorias: 41, proteinas: 0.9, carbohidratos: 10, grasas: 0.2 }
-        }
+// ============================================================================
+// CONSTANTES Y CONFIGURACIÓN
+// ============================================================================
+
+const CATEGORIA_ALIMENTOS = {
+    ACEITES_GRASAS: 'Otros',
+    VERDURAS: 'Verduras',
+    FRUTAS: 'Fruta',
+    FRUTOS_SECOS: 'Fruto seco',
+    SEMILLAS: 'Semilla',
+    PROTEINA_ANIMAL: 'Origen animal',
+    CARNE_BLANCA: 'Carne blanca',
+    CARNE_ROJA: 'Carne roja',
+    PESCADO_AZUL: 'Pescado azul',
+    PESCADO_BLANCO: 'Pescado blanco',
+    PESCADO_SEMIGRASO: 'Pescado semigraso',
+    MARISCO: 'Marisco',
+    EMBUTIDO: 'Embutido',
+    VISCERA: 'Víscera',
+    CEREAL: 'Cereal',
+    PAN: 'Pan',
+    PASTA: 'Pasta',
+    TUBERCULO: 'Tubérculo',
+    LEGUMBRES: 'Legumbres',
+    LACTEOS: 'Leche',
+    POSTRE: 'Postre',
+    BEBIDA: 'Bebida',
+    PLATO_PREPARADO: 'Plato preparado',
+    VEGANO_VEGETARIANO: 'Apto para veganos y vegetarianos'
+};
+
+const MACRONUTRIENTE = {
+    PROTEINAS: 'Proteínas',
+    GRASAS: 'Grasas',
+    HIDRATOS: 'Hidratos de carbono',
+    GRASAS_PROTEINAS: 'Grasas y proteínas',
+    HIDRATOS_GRASAS: 'Hidratos de carbono y grasas'
+};
+
+// Factores de conversión calórica
+const CALORIAS_POR_GRAMO = {
+    PROTEINAS: 4,
+    CARBOHIDRATOS: 4,
+    GRASAS: 9
+};
+
+// ============================================================================
+// HELPER FUNCTIONS - UTILIDADES
+// ============================================================================
+
+/**
+ * Normaliza un valor numérico nutricional
+ * @param {string|number} valor - Valor a normalizar
+ * @returns {number} Valor numérico
+ */
+function normalizarValor(valor) {
+    if (!valor || valor === 'Irrelevante') return 0;
+    if (typeof valor === 'number') return valor;
+    return parseFloat(String(valor).replace(',', '.')) || 0;
+}
+
+/**
+ * Calcula calorías basadas en macronutrientes
+ * @param {number} proteinas - Gramos de proteínas
+ * @param {number} carbohidratos - Gramos de carbohidratos
+ * @param {number} grasas - Gramos de grasas
+ * @returns {number} Calorías totales
+ */
+function calcularCalorias(proteinas, carbohidratos, grasas) {
+    return (proteinas * CALORIAS_POR_GRAMO.PROTEINAS) +
+           (carbohidratos * CALORIAS_POR_GRAMO.CARBOHIDRATOS) +
+           (grasas * CALORIAS_POR_GRAMO.GRASAS);
+}
+
+/**
+ * Crea un objeto de alimento normalizado
+ * @param {Object} data - Datos del alimento
+ * @returns {Object} Objeto de alimento normalizado
+ */
+function crearAlimento(data) {
+    const proteinas = normalizarValor(data.proteínas || data.PROTEÍNAS);
+    const hidratos = normalizarValor(data.carbohidratos || data.HIDRATOS);
+    const grasas = normalizarValor(data.grasas || data.GRASAS);
+    const calorias = normalizarValor(data.calorias || data.CALORÍAS) || calcularCalorias(proteinas, hidratos, grasas);
+
+    return {
+        ALIMENTO: data.nombre || data.ALIMENTO,
+        MACRONUTRIENTE_PRINCIPAL: data.categoria_principal || data['MACRONUTRIENTE PRINCIPAL'] || data.MACRONUTRIENTE_PRINCIPAL,
+        CLASIFICACIÓN: data.subcategoria || data.CLASIFICACIÓN,
+        UNIDAD: data.presentacion || data.UNIDAD || '',
+        PESO_POR_UNIDAD: data.peso || data['PESO POR UNIDAD'] || data.PESO_POR_UNIDAD || '',
+        MARCA_REGISTRADA: data.marca || data['MARCA REGISTRADA'] || data.MARCA_REGISTRADA || '',
+        NOMBRE_DEL_PRODUCTO: data.producto || data['NOMBRE DEL PRODUCTO'] || data.NOMBRE_DEL_PRODUCTO || '',
+        OTRAS_NOTAS: data.notas || data.descripcion || data['OTRAS NOTAS'] || data.OTRAS_NOTAS || '',
+        CALORÍAS: Math.round(calorias),
+        PROTEÍNAS: proteinas,
+        GRASAS: grasas,
+        GRASAS_SATURADAS: normalizarValor(data.grasas_saturadas || data['GRASAS SATURADAS'] || data.GRASAS_SATURADAS),
+        HIDRATOS: hidratos,
+        AZÚCARES: normalizarValor(data.azucar || data.AZÚCARES)
     };
-    
-    // Función para obtener información nutricional de un alimento
-    function obtenerInfoNutricional(nombreAlimento, cantidad = 100) {
-        const nombreLower = nombreAlimento.toLowerCase();
-        
-        // Buscar en todas las categorías
-        for (const categoria in baseDatosAlimentos) {
-            for (const alimento in baseDatosAlimentos[categoria]) {
-                // Búsqueda más flexible
-                if (alimento.toLowerCase() === nombreLower || alimento.toLowerCase().includes(nombreLower)) {
-                    const info = baseDatosAlimentos[categoria][alimento];
-                    const factor = cantidad / 100;
-                    return {
-                        nombre: alimento,
-                        categoria: categoria,
-                        calorias: Math.round(info.calorias * factor),
-                        proteinas: Math.round(info.proteinas * factor * 10) / 10,
-                        carbohidratos: Math.round(info.carbohidratos * factor * 10) / 10,
-                        grasas: Math.round(info.grasas * factor * 10) / 10
-                    };
-                }
-            }
-        }
-        
-        return null;
+}
+
+// ============================================================================
+// BASE DE DATOS DE ALIMENTOS
+// ============================================================================
+
+const baseDatosAlimentos = [
+    // ACEITES Y GRASAS
+    {
+          "nombre": "Aceite de coco",
+          "categoria_principal": "Grasas",
+          "subcategoria": "Otros",
+          "proteínas": 0.0,
+          "grasas": 100.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Aceite de lino",
+          "categoria_principal": "Grasas",
+          "subcategoria": "Otros",
+          "proteínas": 0.0,
+          "grasas": 100.0,
+          "carbohidratos": 0.0,
+          "fibra": 0.0,
+          "azucar": 0.0
+    },
+    {
+          "nombre": "Aceite de oliva",
+          "categoria_principal": "Grasas",
+          "subcategoria": "Otros",
+          "presentacion": "Cucharada sopera",
+          "peso": "6 g",
+          "proteínas": 0.0,
+          "grasas": 100.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Aceitunas negras",
+          "categoria_principal": "Grasas",
+          "subcategoria": "Verduras",
+          "proteínas": 0.0,
+          "grasas": 18.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 2.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Aceitunas verdes",
+          "categoria_principal": "Grasas",
+          "subcategoria": "Verduras",
+          "proteínas": 0.0,
+          "grasas": 15.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 2.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Acelgas",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Verduras",
+          "proteínas": 2.0,
+          "grasas": 0.4,
+          "carbohidratos": "Irrelevante",
+          "fibra": 4.5,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Aguacate",
+          "categoria_principal": "Grasas",
+          "subcategoria": "Fruta",
+          "presentacion": "Pieza de fruta",
+          "peso": "100 g",
+          "notas": "Tamaño mediano, sin hueso y sin piel",
+          "proteínas": 2.0,
+          "grasas": 15.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 9.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Alcachofas",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Verduras",
+          "proteínas": 2.3,
+          "grasas": 0.1,
+          "carbohidratos": "Irrelevante",
+          "fibra": 7.5,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Almedra",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Fruto seco",
+          "proteínas": 20.0,
+          "grasas": 53.5,
+          "carbohidratos": "Irrelevante",
+          "fibra": 3.5,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Anacardo",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Fruto seco",
+          "proteínas": 17.5,
+          "grasas": 42.2,
+          "carbohidratos": "Irrelevante",
+          "fibra": 32.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Apio",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Verduras",
+          "proteínas": 1.3,
+          "grasas": 0.2,
+          "carbohidratos": "Irrelevante",
+          "fibra": 1.3,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Arroz basmati (1)",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "proteínas": 9.0,
+          "grasas": 0.6,
+          "carbohidratos": "Irrelevante",
+          "fibra": 78.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Arroz basmati (2)",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "presentacion": "Envase individual",
+          "peso": "125 g",
+          "marca": "Brillante",
+          "producto": "Sabroz Arroz Basmati",
+          "descripcion": "Ideal por si no tienes tiempo para cocinar.",
+          "proteínas": 3.9,
+          "grasas": 2.2,
+          "carbohidratos": "Irrelevante",
+          "fibra": 31.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Arroz blanco (1)",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "proteínas": 6.7,
+          "grasas": 1.1,
+          "carbohidratos": "Irrelevante",
+          "fibra": 77.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Arroz blanco (2)",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "presentacion": "Envase individual",
+          "peso": "125 g",
+          "marca": "Brillante",
+          "producto": "Sabroz ARROZ BLANCO COCIDO",
+          "descripcion": "Ideal por si no tienes tiempo para cocinar.",
+          "proteínas": 3.0,
+          "grasas": 2.3,
+          "carbohidratos": "Irrelevante",
+          "fibra": 24.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Arroz integral (1)",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "proteínas": 8.4,
+          "grasas": 2.5,
+          "carbohidratos": "Irrelevante",
+          "fibra": 71.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Arroz integral (2)",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "presentacion": "Envase individual",
+          "peso": "125 g",
+          "marca": "Brillante",
+          "producto": "Sabroz ARROZ INTEGRAL",
+          "descripcion": "Ideal por si no tienes tiempo para cocinar.",
+          "proteínas": 4.0,
+          "grasas": 2.9,
+          "carbohidratos": "Irrelevante",
+          "fibra": 30.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Arroz vaporizado",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "proteínas": 7.9,
+          "grasas": 0.7,
+          "carbohidratos": "Irrelevante",
+          "fibra": 76.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Atún",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Pescado azul",
+          "proteínas": 23.0,
+          "grasas": 12.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Atún claro al natural - lata",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Pescado azul",
+          "presentacion": "Lata",
+          "peso": "60 g",
+          "marca": "Hacendado",
+          "descripcion": "Ideal por si no tienes tiempo para cocinar. El peso es de una lata escurrida.",
+          "proteínas": 21.0,
+          "grasas": 1.2,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.9,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Avellana",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Fruto seco",
+          "proteínas": 14.1,
+          "grasas": 54.4,
+          "carbohidratos": "Irrelevante",
+          "fibra": 5.3,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Avena en polvo Prozis - Banana Walnut",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "presentacion": "Scoop",
+          "peso": "40 g",
+          "marca": "Prozis",
+          "producto": "Oatmeal + WHEY PROTEIN BANANA - WALNUT",
+          "descripcion": "Si aplicas el código:'guerrero' podrás disfrutar de un 10% de descuento en toda la web👌🏻Si contratas alguno de mis servicios online el descuento será mayor.",
+          "proteínas": 31.0,
+          "grasas": 5.9,
+          "carbohidratos": 1.2,
+          "fibra": 45.0,
+          "azucar": 2.5
+    },
+    {
+          "nombre": "Avena en polvo Prozis - chocolate",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "presentacion": "Scoop",
+          "peso": "40 g",
+          "marca": "Prozis",
+          "producto": "OATS INSTANT CHOCOLATE FLAVOUR",
+          "descripcion": "Si aplicas el código:'guerrero' podrás disfrutar de un 10% de descuento en toda la web👌🏻Si contratas alguno de mis servicios online el descuento será mayor.",
+          "proteínas": 12.0,
+          "grasas": 7.1,
+          "carbohidratos": 1.7,
+          "fibra": 67.0,
+          "azucar": 1.0
+    },
+    {
+          "nombre": "Avena en polvo Prozis - Nutchoc",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "presentacion": "Scoop",
+          "marca": "Prozis",
+          "producto": "Oatmeal + WHEY PROTEIN NUTCHOC",
+          "descripcion": "Si aplicas el código:'guerrero' podrás disfrutar de un 10% de descuento en toda la web👌🏻Si contratas alguno de mis servicios online el descuento será mayor. El sabor es chocolate negro con avellanas.",
+          "proteínas": 31.0,
+          "grasas": 7.5,
+          "carbohidratos": 1.9,
+          "fibra": 41.0,
+          "azucar": 1.8
+    },
+    {
+          "nombre": "Bagels",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Pan",
+          "presentacion": "Envase individual",
+          "peso": "75 g",
+          "marca": "Bimbo",
+          "producto": "BAGELS CLÁSICO",
+          "proteínas": 11.0,
+          "grasas": 2.7,
+          "carbohidratos": 0.4,
+          "fibra": 53.0,
+          "azucar": 11.0
+    },
+    {
+          "nombre": "Batido proteico - chocolate (1)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Origen animal",
+          "presentacion": "Envase individual",
+          "peso": "330 g",
+          "marca": "Hacendado",
+          "producto": "WHEY +PROTEÍNAS CHOCOLATE",
+          "proteínas": 7.9,
+          "grasas": 0.6,
+          "carbohidratos": 0.5,
+          "fibra": 2.3,
+          "azucar": 2.2
+    },
+    {
+          "nombre": "Batido proteico - chocolate (2)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Origen animal",
+          "presentacion": "Envase individual",
+          "peso": "200 g",
+          "marca": "Carrefour",
+          "producto": "Postre lácteo al cacaco PROteína Plus",
+          "proteínas": 10.0,
+          "grasas": 1.6,
+          "carbohidratos": 1.0,
+          "fibra": 4.3,
+          "azucar": 4.1
+    },
+    {
+          "nombre": "Batido proteico - chocolate (3)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "350 g",
+          "marca": "Margui",
+          "producto": "BATIDO CACAO",
+          "notas": "A fecha 23/12/23 se puede encontrar en Ahorramás",
+          "proteínas": 11.0,
+          "grasas": 0.5,
+          "carbohidratos": 0.2,
+          "fibra": 5.2,
+          "azucar": 5.1
+    },
+    {
+          "nombre": "Batido proteico - chocolate (4)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "330 g",
+          "marca": "Kaiku",
+          "producto": "PROTEIN 98% WHEY Sabor choco & avellana",
+          "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+          "proteínas": 9.3,
+          "grasas": 0.9,
+          "carbohidratos": 0.4,
+          "fibra": 4.5,
+          "azucar": 3.6
+    },
+    {
+          "nombre": "Batido proteico - chocolate (5)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "500 g",
+          "marca": "Arla",
+          "producto": "PROTEIN MILK DRINK",
+          "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+          "proteínas": 5.6,
+          "grasas": 0.9,
+          "carbohidratos": 0.6,
+          "fibra": 4.9,
+          "azucar": 4.7
+    },
+    {
+          "nombre": "Batido proteico - chocolate (6)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "250 g",
+          "marca": "Danone",
+          "producto": "YoPRO PROTEIN SHAKE",
+          "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+          "proteínas": 6.0,
+          "grasas": 0.3,
+          "carbohidratos": 0.2,
+          "fibra": 5.1,
+          "azucar": 4.9
+    },
+    {
+          "nombre": "Batido proteico - chocolate (7)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "330 g",
+          "marca": "Pascual",
+          "producto": "DINAMIC PROTEIN Sport",
+          "notas": "A fecha 3/05/24 se puede encontrar en Carrefour",
+          "proteínas": 9.1,
+          "grasas": 0.3,
+          "carbohidratos": 0.1,
+          "fibra": 0.3,
+          "azucar": 0.1
+    },
+    {
+          "nombre": "Batido proteico - cookies",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "330 g",
+          "marca": "Pascual",
+          "producto": "DINAMIC PROTEIN Sport",
+          "notas": "A fecha 3/05/24 se puede encontrar en Carrefour",
+          "proteínas": 7.6,
+          "grasas": 0.3,
+          "carbohidratos": 0.1,
+          "fibra": 3.2,
+          "azucar": 2.6
+    },
+    {
+          "nombre": "Batido proteico - fresa & vainilla",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "330 g",
+          "marca": "Kaiku",
+          "producto": "PROTEIN 100% WHEY",
+          "notas": "A fecha 23/12/23 se puede encontrar en Ahorramás",
+          "proteínas": 9.1,
+          "grasas": 0.5,
+          "carbohidratos": 0.3,
+          "fibra": 4.6,
+          "azucar": 3.8
+    },
+    {
+          "nombre": "Batido proteico - plátano",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "345 g",
+          "marca": "Nestlé",
+          "producto": "Lindahls PRO+ Sabor plátano",
+          "notas": "A fecha 19/07/23 se puede encontrar en Alcampo",
+          "proteínas": 7.6,
+          "grasas": 0.3,
+          "carbohidratos": 0.2,
+          "fibra": 3.3,
+          "azucar": 2.9
+    },
+    {
+          "nombre": "Batido proteico - plátano & cacahuete",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "330 g",
+          "marca": "Pascual",
+          "producto": "DINAMIC PROTEIN",
+          "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+          "proteínas": 7.6,
+          "grasas": 0.2,
+          "carbohidratos": 0.1,
+          "fibra": 4.0,
+          "azucar": 3.5
+    },
+    {
+          "nombre": "Batido proteico - Prozis",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Origen animal",
+          "presentacion": "Scoop",
+          "peso": "30 g",
+          "marca": "Prozis",
+          "producto": "XTREME ISOXP - WHEY PROTEIN ISOLATE",
+          "descripcion": "Es la proteína más limpia del mercado. Si aplicas el código:'guerrero' podrás disfrutar de un 10% de descuento en toda la web👌🏻Si contratas alguno de mis servicios online el descuento será mayor.",
+          "proteínas": 88.0,
+          "grasas": 0.0,
+          "carbohidratos": 0.2,
+          "fibra": 1.6,
+          "azucar": 0.0
+    },
+    {
+          "nombre": "Batido proteico - vainilla (1)",
+          "categoria_principal": "Origen animal",
+          "subcategoria": "Origen animal",
+          "presentacion": "Envase individual",
+          "peso": "330 g",
+          "marca": "Hacendado",
+          "producto": "WHEY +PROTEÍNAS VAINILLA",
+          "proteínas": 7.9,
+          "grasas": 0.6,
+          "carbohidratos": 0.4,
+          "fibra": 2.2,
+          "azucar": 2.1
+    },
+    {
+          "nombre": "Batido proteico - vainilla (2)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Origen animal",
+          "presentacion": "Envase individual",
+          "peso": "330 g",
+          "marca": "Carrefour",
+          "producto": "Bebida láctea de vainilla PROteína Plus",
+          "notas": "Producto sin gluten.",
+          "proteínas": 11.0,
+          "grasas": 0.0,
+          "carbohidratos": 0.1,
+          "fibra": 5.5,
+          "azucar": 5.4
+    },
+    {
+          "nombre": "Batido proteico - vainilla (3)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Origen animal",
+          "presentacion": "Envase individual",
+          "peso": "330 g",
+          "marca": "Danone",
+          "producto": "YoPRO",
+          "proteínas": 7.6,
+          "grasas": 0.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 4.9,
+          "azucar": 4.9
+    },
+    {
+          "nombre": "Batido proteico - vainilla (4)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "350 g",
+          "marca": "Milbona",
+          "producto": "HIGH PROTEIN DRINK - VANILLA FLAVOUR",
+          "notas": "A fecha 23/12/23 se puede encontrar en Lidl",
+          "proteínas": 10.5,
+          "grasas": 0.2,
+          "carbohidratos": 0.1,
+          "fibra": 5.5,
+          "azucar": 5.5
+    },
+    {
+          "nombre": "Batido proteico - vainilla (5)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "250 g",
+          "marca": "Danone",
+          "producto": "YoPRO PROTEIN SHAKE",
+          "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+          "proteínas": 6.0,
+          "grasas": 0.1,
+          "carbohidratos": 0.1,
+          "fibra": 4.9,
+          "azucar": 4.9
+    },
+    {
+          "nombre": "Berenjena",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Verduras",
+          "proteínas": 1.2,
+          "grasas": 0.2,
+          "carbohidratos": "Irrelevante",
+          "fibra": 4.4,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Boniato o batata",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Tubérculo",
+          "proteínas": 1.2,
+          "grasas": 0.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 21.5,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Bonito",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Pescado azul",
+          "proteínas": 21.0,
+          "grasas": 6.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Boquerón",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Pescado azul",
+          "proteínas": 17.6,
+          "grasas": 6.3,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Caballa",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Pescado azul",
+          "proteínas": 15.0,
+          "grasas": 10.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.8,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Caballo",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Carne roja",
+          "proteínas": 21.0,
+          "grasas": 1.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Cacahuete",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Fruto seco",
+          "proteínas": 27.0,
+          "grasas": 49.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 8.5,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Cacahuete polvo",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Fruto seco",
+          "marca": "Hacendado",
+          "producto": "+PROTEÍNAS cacahuete en polvo desgrasado",
+          "notas": "A fecha 04/04/25 se puede encontrar en Mercadona",
+          "proteínas": 46.7,
+          "grasas": 13.2,
+          "carbohidratos": 1.7,
+          "fibra": 21.0,
+          "azucar": 10.0
+    },
+    {
+          "nombre": "Calamar",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Marisco",
+          "proteínas": 12.0,
+          "grasas": 0.5,
+          "carbohidratos": "Irrelevante",
+          "fibra": 1.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Cerdo",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Carne blanca",
+          "proteínas": 20.0,
+          "grasas": 8.3,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Cereales de avena (1)",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "presentacion": "Cuenco o bol tamaño normal",
+          "peso": "150 g",
+          "marca": "Hacendado",
+          "producto": "AVENA Crunchy",
+          "notas": "A fecha 23/4/23 se puede encontrar en Mercadona",
+          "proteínas": 13.0,
+          "grasas": 5.8,
+          "carbohidratos": 1.0,
+          "fibra": 66.0,
+          "azucar": 4.6
+    },
+    {
+          "nombre": "Cereales de avena (2)",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "presentacion": "Cuenco o bol tamaño normal",
+          "peso": "150 g",
+          "marca": "Hacendado",
+          "producto": "AVENA Crunchy CACAO",
+          "notas": "A fecha 04/04/25 se puede encontrar en Mercadona",
+          "proteínas": 13.0,
+          "grasas": 6.4,
+          "carbohidratos": 1.6,
+          "fibra": 65.0,
+          "azucar": 9.0
+    },
+    {
+          "nombre": "Champiñones",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Verduras",
+          "proteínas": 3.3,
+          "grasas": 0.4,
+          "carbohidratos": "Irrelevante",
+          "fibra": 2.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Chocolate 99%",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Otros",
+          "proteínas": 15.0,
+          "grasas": 54.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 8.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Ciruela",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Fruta",
+          "proteínas": 0.6,
+          "grasas": 0.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 9.5,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Clara de huevo",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Origen animal",
+          "marca": "Hacendado",
+          "proteínas": 11.0,
+          "grasas": 0.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Codorniz",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Carne blanca",
+          "proteínas": 23.0,
+          "grasas": 1.6,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Conejo",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Carne blanca",
+          "proteínas": 23.0,
+          "grasas": 4.6,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Copa de nata y chocolate",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "150 g",
+          "marca": "Hacendado",
+          "producto": "+PROTEÍNAS Chocolate Nata",
+          "proteínas": 10.0,
+          "grasas": 2.4,
+          "carbohidratos": 1.6,
+          "fibra": 5.0,
+          "azucar": 4.0
+    },
+    {
+          "nombre": "Copos de avena",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "presentacion": "Cucharada sopera",
+          "peso": "12 g",
+          "marca": "Hacendado",
+          "producto": "COPOS DE AVENA EXTRA SUAVES",
+          "proteínas": 14.0,
+          "grasas": 7.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 59.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Corn Flakes",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "presentacion": "Envase individual",
+          "peso": "30 g",
+          "marca": "Kellogg´s",
+          "producto": "Kellogg´s Corn Flakes",
+          "proteínas": 7.0,
+          "grasas": 0.9,
+          "carbohidratos": 0.2,
+          "fibra": 84.0,
+          "azucar": 8.0
+    },
+    {
+          "nombre": "Crema de arroz",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "proteínas": 8.0,
+          "grasas": 1.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 85.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Crema de cacahuete - chocolate",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Cucharada sopera",
+          "peso": "10 g",
+          "marca": "Prozis",
+          "producto": "Peanut ChocoButter",
+          "descripcion": "Si aplicas el código:'guerrero' podrás disfrutar de un 10% de descuento en toda la web👌🏻Si contratas alguno de mis servicios online el descuento será mayor.",
+          "proteínas": 16.0,
+          "grasas": 51.0,
+          "carbohidratos": 21.0,
+          "fibra": 26.0,
+          "azucar": 5.2
+    },
+    {
+          "nombre": "Crema de manteca de cacao proteica",
+          "categoria_principal": "Grasas",
+          "subcategoria": "Postre",
+          "presentacion": "Cucharada sopera",
+          "peso": "10 g",
+          "marca": "Prozis",
+          "producto": "ChocoButter + WHEY PROTEIN",
+          "descripcion": "Si aplicas el código:'guerrero' podrás disfrutar de un 10% de descuento en toda la web👌🏻Si contratas alguno de mis servicios online el descuento será mayor.",
+          "proteínas": 22.0,
+          "grasas": 40.0,
+          "carbohidratos": 8.4,
+          "fibra": 33.0,
+          "azucar": 6.8
+    },
+    {
+          "nombre": "Cuscuz",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Plato preparado",
+          "presentacion": "Envase individual",
+          "peso": "250 g",
+          "marca": "Hacendado",
+          "producto": "Tabulé oriental",
+          "proteínas": 3.8,
+          "grasas": 5.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 24.8,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Dátiles",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Fruta",
+          "proteínas": 2.2,
+          "grasas": 0.4,
+          "carbohidratos": "Irrelevante",
+          "fibra": 71.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Dorada",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Pescado blanco",
+          "proteínas": 17.0,
+          "grasas": 1.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Embutido de pavo",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Embutido",
+          "proteínas": 16.5,
+          "grasas": 0.5,
+          "carbohidratos": "Irrelevante",
+          "fibra": 1.3,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Embutido de pechuga de pollo",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Embutido",
+          "marca": "Hacendado",
+          "proteínas": 16.9,
+          "grasas": 1.2,
+          "carbohidratos": "Irrelevante",
+          "fibra": 1.3,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Emperador",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Pescado semigraso",
+          "proteínas": 23.8,
+          "grasas": 8.2,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Ensalada de marisco",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Otros",
+          "presentacion": "Envase individual",
+          "peso": "300 g",
+          "marca": "Hacendado",
+          "notas": "A fecha 04/04/25 se puede encontrar en Mercadona",
+          "proteínas": 10.2,
+          "grasas": 7.9,
+          "carbohidratos": 1.2,
+          "fibra": 23.8,
+          "azucar": 5.3
+    },
+    {
+          "nombre": "Ensalada de pollo queso",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Otros",
+          "presentacion": "Envase individual",
+          "peso": "250 g",
+          "marca": "Hacendado",
+          "notas": "A fecha 04/04/25 se puede encontrar en Mercadona",
+          "proteínas": 7.9,
+          "grasas": 12.0,
+          "carbohidratos": 2.8,
+          "fibra": 6.3,
+          "azucar": 5.0
+    },
+    {
+          "nombre": "Espárragos trigueros",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Verduras",
+          "proteínas": 2.2,
+          "grasas": 0.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 2.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Espinacas",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Verduras",
+          "proteínas": 2.6,
+          "grasas": 0.3,
+          "carbohidratos": "Irrelevante",
+          "fibra": 1.2,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Flan (1)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "100 g",
+          "marca": "Hacendado",
+          "producto": "Flan de Huevo Ovo",
+          "proteínas": 6.3,
+          "grasas": 1.5,
+          "carbohidratos": 0.6,
+          "fibra": 8.2,
+          "azucar": 6.1
+    },
+    {
+          "nombre": "Flan (2)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "100 g",
+          "marca": "Hacendado",
+          "producto": "+PROTEÍNAS FLAN",
+          "proteínas": 10.0,
+          "grasas": 0.2,
+          "carbohidratos": 0.2,
+          "fibra": 5.9,
+          "azucar": 4.0
+    },
+    {
+          "nombre": "Flan (3)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "160 g",
+          "marca": "Reina",
+          "producto": "Flan clara de huevo",
+          "notas": "A fecha 23/12/23 se puede encontrar en Ahorramás",
+          "proteínas": 8.0,
+          "grasas": 0.0,
+          "carbohidratos": 0.0,
+          "fibra": 8.1,
+          "azucar": 4.2
+    },
+    {
+          "nombre": "Frutos rojos",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Fruta",
+          "proteínas": 0.9,
+          "grasas": 0.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 5.5,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Frutos secos varios",
+          "categoria_principal": "Grasas",
+          "subcategoria": "Fruto seco",
+          "presentacion": "Envase individual",
+          "peso": "50 g",
+          "marca": "Hacendado",
+          "descripcion": "Bolsita de mix de frutos secos (almendra, nuez, pistacho mora blanca, anacardo y arándano azul)",
+          "proteínas": 16.0,
+          "grasas": 33.0,
+          "carbohidratos": 3.8,
+          "fibra": 34.0,
+          "azucar": 30.0
+    },
+    {
+          "nombre": "Gambas",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Marisco",
+          "proteínas": 20.0,
+          "grasas": 1.4,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Garbanzos cocidos (conserva bote de cristal)",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Legumbres",
+          "marca": "Hacendado",
+          "proteínas": 5.5,
+          "grasas": 2.2,
+          "carbohidratos": "Irrelevante",
+          "fibra": 9.5,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Garbanzos crudos",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Legumbres",
+          "proteínas": 19.4,
+          "grasas": 5.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 55.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Gazpacho con aceite",
+          "categoria_principal": "Grasas",
+          "subcategoria": "Plato preparado",
+          "presentacion": "Envase individual",
+          "peso": "330 g",
+          "marca": "Hacendado",
+          "proteínas": 0.6,
+          "grasas": 7.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 2.5,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Gelatina proteica",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Otros",
+          "presentacion": "Envase individual",
+          "peso": "100 g",
+          "marca": "Hacendado",
+          "producto": "+PROTEÍNAS SABOR frutos silvestres",
+          "proteínas": 6.0,
+          "grasas": 0.0,
+          "carbohidratos": 0.0,
+          "fibra": 3.8,
+          "azucar": 3.7
+    },
+    {
+          "nombre": "Granola",
+          "categoria_principal": "Hidratos de carbono y grasas",
+          "subcategoria": "Cereal",
+          "presentacion": "Cuenco o bol tamaño normal",
+          "peso": "150 g",
+          "marca": "Hacendado",
+          "proteínas": 13.6,
+          "grasas": 22.7,
+          "carbohidratos": 3.5,
+          "fibra": 50.2,
+          "azucar": 4.7
+    },
+    {
+          "nombre": "Guacamole",
+          "categoria_principal": "Grasas",
+          "subcategoria": "Fruta",
+          "presentacion": "Cucharadita de café",
+          "peso": "10 g",
+          "marca": "Hacendado",
+          "proteínas": 1.9,
+          "grasas": 13.7,
+          "carbohidratos": 3.8,
+          "fibra": 2.0,
+          "azucar": 1.4
+    },
+    {
+          "nombre": "Guisantes",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Verduras",
+          "proteínas": 6.0,
+          "grasas": 0.5,
+          "carbohidratos": "Irrelevante",
+          "fibra": 13.1,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Gula",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Origen animal",
+          "presentacion": "Envase individual",
+          "peso": "100 g",
+          "marca": "La gula del norte",
+          "notas": "A fecha 17/1/25 se puede encontrar en Ahorramás",
+          "proteínas": 9.2,
+          "grasas": 10.0,
+          "carbohidratos": 1.0,
+          "fibra": 8.2,
+          "azucar": 1.8
+    },
+    {
+          "nombre": "Harina de arroz",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "presentacion": "Vaso de tamaño normal",
+          "peso": "125 g",
+          "marca": "Hacendado",
+          "proteínas": 7.4,
+          "grasas": 0.5,
+          "carbohidratos": "Irrelevante",
+          "fibra": 79.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Hígado",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Víscera",
+          "proteínas": 20.5,
+          "grasas": 4.5,
+          "carbohidratos": "Irrelevante",
+          "fibra": 1.6,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Higos secos",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Fruta",
+          "proteínas": 3.5,
+          "grasas": 2.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 53.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Huevo",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Origen animal",
+          "presentacion": "Huevo tamaño normal",
+          "peso": "59 g",
+          "marca": "Hacendado",
+          "descripcion": "Huevo de gallina campera.",
+          "proteínas": 12.5,
+          "grasas": 11.1,
+          "carbohidratos": 3.1,
+          "fibra": 0.0,
+          "azucar": 0.4
+    },
+    {
+          "nombre": "Jamón cocido",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Embutido",
+          "proteínas": 18.4,
+          "grasas": 3.1,
+          "carbohidratos": "Irrelevante",
+          "fibra": 1.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Jamón serrano",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Embutido",
+          "proteínas": 28.0,
+          "grasas": 12.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Judías verdes",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Verduras",
+          "proteínas": 2.3,
+          "grasas": 0.2,
+          "carbohidratos": "Irrelevante",
+          "fibra": 5.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Leche de almendras",
+          "categoria_principal": "Grasas",
+          "subcategoria": "Leche",
+          "presentacion": "Vaso de tamaño normal",
+          "peso": "250 g",
+          "marca": "Alpro",
+          "producto": "SIN AZÚCAR ALMENDRAS",
+          "notas": "A fecha 23/4/24 se puede encontrar en Ahorramás",
+          "proteínas": 0.4,
+          "grasas": 1.1,
+          "carbohidratos": 0.1,
+          "fibra": 0.0,
+          "azucar": 0.0
+    },
+    {
+          "nombre": "Leche de avena",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Leche",
+          "presentacion": "Vaso de tamaño normal",
+          "peso": "250 g",
+          "marca": "Alpro",
+          "producto": "BARISTA AVENA",
+          "notas": "A fecha 23/04/24 se puede encontrar en Ahorramás",
+          "proteínas": 0.8,
+          "grasas": 3.0,
+          "carbohidratos": 0.3,
+          "fibra": 6.7,
+          "azucar": 3.3
+    },
+    {
+          "nombre": "Leche proteica - chocolate",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Leche",
+          "presentacion": "Vaso de tamaño normal",
+          "peso": "250 g",
+          "marca": "Alpro",
+          "producto": "PLANT PROTEIN",
+          "notas": "A fecha 22/02/24 se puede encontrar en Carrefour Apta para personas veganas.",
+          "proteínas": 5.0,
+          "grasas": 2.8,
+          "carbohidratos": 0.6,
+          "fibra": 5.3,
+          "azucar": 5.0
+    },
+    {
+          "nombre": "Leche proteica (1)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Leche",
+          "presentacion": "Vaso de tamaño normal",
+          "peso": "250 g",
+          "marca": "Asturiana",
+          "producto": "Central lechera Asturiana suprema desnatada",
+          "notas": "No contiene lactosa",
+          "proteínas": 5.0,
+          "grasas": 0.1,
+          "carbohidratos": 0.1,
+          "fibra": 4.7,
+          "azucar": 4.7
+    },
+    {
+          "nombre": "Leche proteica (2)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Leche",
+          "presentacion": "Vaso de tamaño normal",
+          "peso": "250 g",
+          "marca": "Puleva",
+          "producto": "Proteína Extra Pro",
+          "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+          "proteínas": 5.0,
+          "grasas": 0.5,
+          "carbohidratos": 0.3,
+          "fibra": 5.0,
+          "azucar": 5.0
+    },
+    {
+          "nombre": "Leche proteica (3)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Leche",
+          "presentacion": "Vaso de tamaño normal",
+          "peso": "250 g",
+          "marca": "VEMONDO",
+          "producto": "HIGH PROTEIN SOJA",
+          "notas": "A fecha 02/03/25 se puede encontrar en Lidl",
+          "proteínas": 5.0,
+          "grasas": 2.2,
+          "carbohidratos": 0.3,
+          "fibra": 2.5,
+          "azucar": 2.4
+    },
+    {
+          "nombre": "Leche proteica (4)",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Leche",
+          "presentacion": "Vaso de tamaño normal",
+          "peso": "250 g",
+          "marca": "Pascual",
+          "producto": "Movit LECHE CALCIO",
+          "notas": "A fecha 02/03/25 se puede encontrar en Carrefour",
+          "proteínas": 3.9,
+          "grasas": 0.4,
+          "carbohidratos": 0.3,
+          "fibra": 5.1,
+          "azucar": 5.1
+    },
+    {
+          "nombre": "Leche proteica (5)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Leche",
+          "presentacion": "Vaso de tamaño normal",
+          "peso": "250 g",
+          "marca": "Carrefour",
+          "producto": "LECHE DESNATADA CALCIO* PROteína Plus",
+          "proteínas": 8.0,
+          "grasas": 0.2,
+          "carbohidratos": 0.1,
+          "fibra": 4.8,
+          "azucar": 4.8
+    },
+    {
+          "nombre": "Lechuga",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Verduras",
+          "proteínas": 1.5,
+          "grasas": 0.3,
+          "carbohidratos": "Irrelevante",
+          "fibra": 1.4,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Lenguado",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Pescado blanco",
+          "proteínas": 18.8,
+          "grasas": 1.2,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Lentejas cocidas",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Legumbres",
+          "proteínas": 8.2,
+          "grasas": 0.4,
+          "carbohidratos": "Irrelevante",
+          "fibra": 10.7,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Lomo embuchado",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Embutido",
+          "presentacion": "Envase individual",
+          "peso": "125 g",
+          "marca": "Hacendado",
+          "descripcion": "El producto está dividido en 4 unidades de 31 g.",
+          "proteínas": 38.0,
+          "grasas": 5.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Lubina",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Pescado blanco",
+          "proteínas": 18.0,
+          "grasas": 1.3,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.5,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Maíz",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "proteínas": 2.5,
+          "grasas": 1.4,
+          "carbohidratos": "Irrelevante",
+          "fibra": 14.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Maíz - lata",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "presentacion": "Lata",
+          "peso": "70 g",
+          "marca": "Hacendado",
+          "descripcion": "El peso es de una lata escurrida.",
+          "proteínas": 2.5,
+          "grasas": 1.4,
+          "carbohidratos": "Irrelevante",
+          "fibra": 14.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Mandarina",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Fruta",
+          "proteínas": 0.8,
+          "grasas": 0.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 16.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Mantequilla",
+          "categoria_principal": "Grasas",
+          "subcategoria": "Otros",
+          "proteínas": 1.0,
+          "grasas": 83.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 1.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Manzana",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Fruta",
+          "presentacion": "Pieza de fruta",
+          "peso": "209 g",
+          "descripcion": "Tamaño mediano",
+          "proteínas": 0.3,
+          "grasas": 0.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 12.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Melocotón",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Fruta",
+          "proteínas": 0.6,
+          "grasas": 0.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 9.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Melón",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Fruta",
+          "proteínas": 0.6,
+          "grasas": 0.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 6.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Merluza",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Pescado blanco",
+          "proteínas": 15.9,
+          "grasas": 2.8,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.8,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Mero",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Pescado blanco",
+          "proteínas": 17.8,
+          "grasas": 2.3,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Miel de flores",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Otros",
+          "proteínas": 1.0,
+          "grasas": 0.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 83.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Mousse - chocolate (1)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "200 g",
+          "marca": "Hacendado",
+          "producto": "+PROTEÍNAS MOUSSE Chocolate",
+          "proteínas": 10.0,
+          "grasas": 1.6,
+          "carbohidratos": 1.1,
+          "fibra": 5.0,
+          "azucar": 4.0
+    },
+    {
+          "nombre": "Mousse - chocolate (2)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "150 g",
+          "marca": "Valio",
+          "proteínas": 12.0,
+          "grasas": 1.8,
+          "carbohidratos": 1.0,
+          "fibra": 5.7,
+          "azucar": 4.9
+    },
+    {
+          "nombre": "Mousse - chocolate (3)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "100 g",
+          "marca": "Reina",
+          "producto": "Mousse chocolate rico en proteínas",
+          "notas": "A fecha 19/07/23 se puede encontrar en Alcampo",
+          "proteínas": 10.0,
+          "grasas": 2.7,
+          "carbohidratos": 2.1,
+          "fibra": 15.0,
+          "azucar": 8.3
+    },
+    {
+          "nombre": "Mousse - chocolate (4)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "150 g",
+          "marca": "Danone",
+          "producto": "YoPRO PROTEIN MOUSSE",
+          "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+          "proteínas": 10.0,
+          "grasas": 2.3,
+          "carbohidratos": 1.6,
+          "fibra": 5.6,
+          "azucar": 4.3
+    },
+    {
+          "nombre": "Mousse - vainilla",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "200 g",
+          "marca": "Hacendado",
+          "producto": "+PROTEÍNAS MOUSSE Vainilla",
+          "proteínas": 10.0,
+          "grasas": 1.8,
+          "carbohidratos": 1.2,
+          "fibra": 5.0,
+          "azucar": 4.0
+    },
+    {
+          "nombre": "Mozzarella light",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Origen animal",
+          "presentacion": "Cucharada sopera",
+          "peso": "25 g",
+          "marca": "Hacendado",
+          "producto": "Mozzarella light",
+          "proteínas": 17.0,
+          "grasas": 9.0,
+          "carbohidratos": 6.0,
+          "fibra": 1.0,
+          "azucar": 0.8
+    },
+    {
+          "nombre": "Muesli",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "presentacion": "Cuenco o bol tamaño normal",
+          "peso": "150 g",
+          "proteínas": 9.0,
+          "grasas": 13.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 64.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Muesli proteico",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Cereal",
+          "presentacion": "Cuenco o bol tamaño normal",
+          "peso": "150 g",
+          "marca": "Crownfield",
+          "producto": "HIGH PROTEIN CRUNCHY MUESLI ROASTED PEANUTS",
+          "notas": "A fecha 21/04/25 se puede encontrar en Lidl",
+          "proteínas": 25.0,
+          "grasas": 15.8,
+          "carbohidratos": 2.5,
+          "fibra": 50.6,
+          "azucar": 13.4
+    },
+    {
+          "nombre": "Mújol",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Pescado blanco",
+          "proteínas": 15.8,
+          "grasas": 6.8,
+          "carbohidratos": "Irrelevante",
+          "fibra": 1.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Natillas proteicas - chocolate (1)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "125 g",
+          "marca": "Milbona",
+          "producto": "Natillas Chocolate Creme Chocolate",
+          "notas": "A fecha 23/12/23 se puede encontrar en Lidl",
+          "proteínas": 10.0,
+          "grasas": 1.5,
+          "carbohidratos": 1.0,
+          "fibra": 6.7,
+          "azucar": 4.0
+    },
+    {
+          "nombre": "Natillas proteicas - chocolate (2)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "120 g",
+          "marca": "Danone",
+          "producto": "+PROTEÍNA Natillas de chocolate",
+          "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+          "proteínas": 5.0,
+          "grasas": 1.5,
+          "carbohidratos": 0.9,
+          "fibra": 10.9,
+          "azucar": 7.1
+    },
+    {
+          "nombre": "Natillas proteicas - vainilla (1)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "120 g",
+          "marca": "Hacendado",
+          "producto": "+PROTEÍNAS NATILLAS Sabor Vainilla",
+          "proteínas": 10.0,
+          "grasas": 1.5,
+          "carbohidratos": 1.0,
+          "fibra": 5.8,
+          "azucar": 3.6
+    },
+    {
+          "nombre": "Natillas proteicas - vainilla (2)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "125 g",
+          "marca": "Reina",
+          "producto": "NATILLAS VAINILLA",
+          "proteínas": 10.0,
+          "grasas": 1.3,
+          "carbohidratos": 0.9,
+          "fibra": 7.7,
+          "azucar": 5.9
+    },
+    {
+          "nombre": "Natillas proteicas - vainilla (3)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "120 g",
+          "marca": "Danone",
+          "producto": "+PROTEÍNA Natillas Sabor Vainilla",
+          "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+          "proteínas": 5.0,
+          "grasas": 1.4,
+          "carbohidratos": 0.8,
+          "fibra": 11.9,
+          "azucar": 7.5
+    },
+    {
+          "nombre": "Nueces",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Fruto seco",
+          "proteínas": 14.0,
+          "grasas": 59.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 4.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Ñoquis",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Otros",
+          "proteínas": 6.0,
+          "grasas": 2.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 38.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Palometa",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Pescado semigraso",
+          "proteínas": 20.0,
+          "grasas": 5.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Pan blanco",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Pan",
+          "proteínas": 7.8,
+          "grasas": 1.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 58.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Pan blanco de molde (1)",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Pan",
+          "presentacion": "Rebanada",
+          "peso": "28 g",
+          "proteínas": 8.0,
+          "grasas": 2.1,
+          "carbohidratos": 0.5,
+          "fibra": 42.0,
+          "azucar": 3.9
+    },
+    {
+          "nombre": "Pan blanco de molde (2)",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Pan",
+          "presentacion": "Rebanada",
+          "peso": "72 g",
+          "marca": "The Rustik Bakery",
+          "producto": "The Rustik Pan Bakery Masa Madre CLÁSICA",
+          "proteínas": 1.1,
+          "grasas": 1.5,
+          "carbohidratos": 0.3,
+          "fibra": 45.0,
+          "azucar": 3.8
+    },
+    {
+          "nombre": "Pan chapata cristal",
+          "categoria_principal": "Hidratos de carbono y grasas",
+          "subcategoria": "Pan",
+          "presentacion": "Envase individual",
+          "peso": "82 g",
+          "marca": "Hacendado",
+          "producto": "Pan chapata cristal",
+          "proteínas": 9.6,
+          "grasas": 5.8,
+          "carbohidratos": 1.0,
+          "fibra": 50.0,
+          "azucar": 2.6
+    },
+    {
+          "nombre": "Pan de hamburguesa",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Pan",
+          "presentacion": "Envase individual",
+          "peso": "75 g",
+          "marca": "Hacendado",
+          "producto": "MAX BURGER",
+          "descripcion": "Una unidad son dos panes.",
+          "proteínas": 9.4,
+          "grasas": 5.9,
+          "carbohidratos": 0.9,
+          "fibra": 44.0,
+          "azucar": 4.7
+    },
+    {
+          "nombre": "Pan de molde integral proteico",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Pan",
+          "presentacion": "Rebanada",
+          "peso": "63 g",
+          "marca": "Carrefour",
+          "producto": "PAN DE MOLDE PROteína Plus",
+          "proteínas": 24.0,
+          "grasas": 12.0,
+          "carbohidratos": 1.8,
+          "fibra": 9.7,
+          "azucar": 2.2
+    },
+    {
+          "nombre": "Pan integral",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Pan",
+          "proteínas": 8.0,
+          "grasas": 1.4,
+          "carbohidratos": "Irrelevante",
+          "fibra": 49.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Pan mollete",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Pan",
+          "presentacion": "Envase individual",
+          "peso": "104 g",
+          "marca": "Hacendado",
+          "producto": "Pan mollete",
+          "proteínas": 7.5,
+          "grasas": 1.1,
+          "carbohidratos": 0.2,
+          "fibra": 53.0,
+          "azucar": 1.8
+    },
+    {
+          "nombre": "Pan proteico (1)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Pan",
+          "presentacion": "Rebanada",
+          "peso": "40 g",
+          "marca": "La Cestera",
+          "producto": "HIGH PROTEIN Alto contenido de fibra",
+          "notas": "A fecha 4/06/24 se puede encontrar en Lidl",
+          "proteínas": 26.8,
+          "grasas": 9.6,
+          "carbohidratos": 1.1,
+          "fibra": 17.7,
+          "azucar": 2.2
+    },
+    {
+          "nombre": "Pan proteico (2)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Pan",
+          "presentacion": "Rebanada",
+          "peso": "20 g",
+          "marca": "Ketterer Pan Alemán",
+          "producto": "The Protein Bread",
+          "notas": "A fecha 31/07/24 se puede encontrar en Carrefour",
+          "proteínas": 25.3,
+          "grasas": 15.2,
+          "carbohidratos": 1.9,
+          "fibra": 7.6,
+          "azucar": 1.5
+    },
+    {
+          "nombre": "Pan proteico (3)",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Pan",
+          "presentacion": "Rebanada",
+          "peso": "25 g",
+          "marca": "Bestdiet",
+          "producto": "PAN CON SEMILLAS KETO PROTEINA",
+          "notas": "A fecha 22/10/24 se puede encontrar en Ahorramás",
+          "proteínas": 24.0,
+          "grasas": 14.0,
+          "carbohidratos": 8.0,
+          "fibra": 14.0,
+          "azucar": 1.7
+    },
+    {
+          "nombre": "Pan tostado de tomate y aceite",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Pan",
+          "presentacion": "Rebanada",
+          "peso": "10 g",
+          "marca": "Hacendado",
+          "producto": "Tomate",
+          "proteínas": 9.4,
+          "grasas": 29.3,
+          "carbohidratos": 2.7,
+          "fibra": 51.2,
+          "azucar": 4.8
+    },
+    {
+          "nombre": "Panecillo",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Pan",
+          "presentacion": "Envase individual",
+          "peso": "56 g",
+          "marca": "Hacendado",
+          "producto": "Panecillo",
+          "proteínas": 8.2,
+          "grasas": 1.1,
+          "carbohidratos": 0.2,
+          "fibra": 53.0,
+          "azucar": 3.2
+    },
+    {
+          "nombre": "Pasas",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Fruta",
+          "proteínas": 3.0,
+          "grasas": 1.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 59.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Pasta",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Pasta",
+          "proteínas": 12.9,
+          "grasas": 1.5,
+          "carbohidratos": "Irrelevante",
+          "fibra": 82.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Pasta de lentejas rojas",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Pasta",
+          "marca": "Hacendado",
+          "producto": "FUSILLI 100% LENTEJAS ROJAS",
+          "proteínas": 26.0,
+          "grasas": 1.7,
+          "carbohidratos": 0.4,
+          "fibra": 50.0,
+          "azucar": 1.2
+    },
+    {
+          "nombre": "Pasta integral",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Pasta",
+          "proteínas": 12.0,
+          "grasas": 2.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 70.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Patata (1)",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Tubérculo",
+          "proteínas": 2.5,
+          "grasas": 0.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 18.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Patata (2)",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Tubérculo",
+          "marca": "Hacendado",
+          "producto": "Horno Air-Fryer",
+          "descripcion": "Ideal por si no tienes tiempo para cocinar.",
+          "proteínas": 2.3,
+          "grasas": 5.8,
+          "carbohidratos": 0.7,
+          "fibra": 23.0,
+          "azucar": 0.9
+    },
+    {
+          "nombre": "Pavo",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Carne blanca",
+          "proteínas": 21.9,
+          "grasas": 2.2,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Pepino",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Verduras",
+          "proteínas": 0.7,
+          "grasas": 0.2,
+          "carbohidratos": "Irrelevante",
+          "fibra": 1.9,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Perdiz",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Carne blanca",
+          "proteínas": 23.0,
+          "grasas": 1.6,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Pescadilla",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Carne blanca",
+          "proteínas": 16.0,
+          "grasas": 0.6,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.8,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Pez espada",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Pescado azul",
+          "proteínas": 17.0,
+          "grasas": 4.3,
+          "carbohidratos": "Irrelevante",
+          "fibra": 1.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Plátano",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Fruta",
+          "proteínas": 1.2,
+          "grasas": 0.3,
+          "carbohidratos": "Irrelevante",
+          "fibra": 20.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Poke salmón",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Otros",
+          "presentacion": "Envase individual",
+          "peso": "400 g",
+          "marca": "Hacendado",
+          "notas": "A fecha 04/04/25 se puede encontrar en Mercadona",
+          "proteínas": 3.5,
+          "grasas": 3.9,
+          "carbohidratos": 0.6,
+          "fibra": 27.0,
+          "azucar": 5.5
+    },
+    {
+          "nombre": "Pollo",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Carne blanca",
+          "proteínas": 21.8,
+          "grasas": 1.7,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Potón & Pota",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Marisco",
+          "marca": "Hacendado",
+          "producto": "RODAJA DE POTÓN DEL PACÍFICO - TENTÁCULOS DE POTA CORTADOS",
+          "descripcion": "Producto congelado.",
+          "proteínas": 17.0,
+          "grasas": 0.9,
+          "carbohidratos": "Irrelevante",
+          "fibra": 1.3,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Potro",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Carne roja",
+          "proteínas": 20.8,
+          "grasas": 2.8,
+          "carbohidratos": "Irrelevante",
+          "fibra": 0.0,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Pudding proteico - avellana",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "200 g",
+          "marca": "Milbona",
+          "producto": "HIGH PROTEIN PUDDING - HAZELNUT FLAVOUR",
+          "notas": "A fecha 23/12/23 se puede encontrar en Lidl",
+          "proteínas": 10.0,
+          "grasas": 1.5,
+          "carbohidratos": 1.0,
+          "fibra": 5.8,
+          "azucar": 4.8
+    },
+    {
+          "nombre": "Pudding proteico - cacahuete",
+          "categoria_principal": "Grasas y proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "200 g",
+          "marca": "Carrefour",
+          "producto": "Pudding sabor a cacahuete PROteína Plus",
+          "proteínas": 10.0,
+          "grasas": 1.5,
+          "carbohidratos": 1.1,
+          "fibra": 5.1,
+          "azucar": 4.4
+    },
+    {
+          "nombre": "Pudding proteico - caramelo (1)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "180 g",
+          "marca": "Danone",
+          "producto": "YoPRO PROTEIN PUDDING",
+          "proteínas": 10.1,
+          "grasas": 1.5,
+          "carbohidratos": 1.0,
+          "fibra": 6.5,
+          "azucar": 4.9
+    },
+    {
+          "nombre": "Pudding proteico - caramelo (2)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "180 g",
+          "marca": "Valio",
+          "producto": "PROfeel PROTEIN PUDDING",
+          "proteínas": 11.0,
+          "grasas": 1.5,
+          "carbohidratos": 1.0,
+          "fibra": 5.8,
+          "azucar": 4.0
+    },
+    {
+          "nombre": "Pudding proteico - chocolate (1)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "180 g",
+          "marca": "Danone",
+          "producto": "YoPRO PROTEIN PUDDING",
+          "proteínas": 10.2,
+          "grasas": 1.8,
+          "carbohidratos": 1.2,
+          "fibra": 6.3,
+          "azucar": 4.8
+    },
+    {
+          "nombre": "Pudding proteico - chocolate (2)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "180 g",
+          "marca": "Valio",
+          "producto": "PROfeel PROTEIN PUDDING CHOCOLATE",
+          "notas": "A fecha 19/07/23 se puede encontrar en Alcampo",
+          "proteínas": 11.0,
+          "grasas": 1.5,
+          "carbohidratos": 1.0,
+          "fibra": 6.0,
+          "azucar": 4.1
+    },
+    {
+          "nombre": "Pudding proteico - chocolate & caramelo",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "150 g",
+          "marca": "Milbona",
+          "producto": "HIGH PROTEIN - CHOCOLATE & CARAMEL FLAVOUR Pudding side by side",
+          "notas": "A fecha 21/04/25 se puede encontrar en Lidl",
+          "proteínas": 10.0,
+          "grasas": 1.6,
+          "carbohidratos": 1.0,
+          "fibra": 6.5,
+          "azucar": 4.9
+    },
+    {
+          "nombre": "Pudding proteico - vainilla (1)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Apto para veganos",
+          "presentacion": "Envase individual",
+          "peso": "200 g",
+          "marca": "Alpro",
+          "proteínas": 10.0,
+          "grasas": 2.5,
+          "carbohidratos": 0.5,
+          "fibra": 7.4,
+          "azucar": 4.9
+    },
+    {
+          "nombre": "Pudding proteico - vainilla (2)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "180 g",
+          "marca": "Danone",
+          "producto": "YoPRO PROTEIN PUDDING",
+          "notas": "A fecha 19/07/23 se puede encontrar en Alcampo",
+          "proteínas": 10.1,
+          "grasas": 1.4,
+          "carbohidratos": 1.0,
+          "fibra": 5.0,
+          "azucar": 3.8
+    },
+    {
+          "nombre": "Pulpo",
+          "categoria_principal": "",
+          "subcategoria": "Marisco",
+          "proteínas": 10.6,
+          "grasas": 1.0,
+          "carbohidratos": 0.0,
+          "fibra": 1.5,
+          "azucar": 0.0
+    },
+    {
+          "nombre": "Puré de patata",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Tubérculo",
+          "presentacion": "Envase individual",
+          "peso": "215 g",
+          "marca": "Maggi",
+          "producto": "el puré Original",
+          "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+          "proteínas": 7.4,
+          "grasas": 0.8,
+          "carbohidratos": 0.6,
+          "fibra": 74.0,
+          "azucar": 3.5
+    },
+    {
+          "nombre": "Queso corteza semi dura",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Origen animal",
+          "presentacion": "Loncha",
+          "peso": "22 g",
+          "marca": "Arla",
+          "producto": "PROTEIN DELITE 5% FAT",
+          "proteínas": 34.0,
+          "grasas": 5.0,
+          "carbohidratos": 3.2,
+          "fibra": 0.0,
+          "azucar": 0.0
+    },
+    {
+          "nombre": "Queso cottage",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Origen animal",
+          "presentacion": "Cucharada sopera",
+          "peso": "10 g",
+          "marca": "Arla",
+          "producto": "PROTEIN cottage cheese",
+          "notas": "A fecha 05/04/25 se puede encontrar en Carrefour",
+          "proteínas": 15.0,
+          "grasas": 1.5,
+          "carbohidratos": 1.0,
+          "fibra": 2.1,
+          "azucar": 2.1
+    },
+    {
+          "nombre": "Queso delite",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Origen animal",
+          "presentacion": "Loncha",
+          "peso": "21 g",
+          "marca": "Arla",
+          "producto": "PROTEIN DELITE 5% FAT",
+          "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+          "proteínas": 34.0,
+          "grasas": 5.0,
+          "carbohidratos": 3.2,
+          "fibra": 0.5,
+          "azucar": 0.5
+    },
+    {
+          "nombre": "Queso fresco (1)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Origen animal",
+          "proteínas": 8.0,
+          "grasas": 0.0,
+          "carbohidratos": "Irrelevante",
+          "fibra": 3.5,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Queso fresco (2)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Origen animal",
+          "presentacion": "Envase individual",
+          "peso": "70 g",
+          "marca": "Burgo de Arias",
+          "producto": "PROTEIN plus",
+          "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+          "proteínas": 14.0,
+          "grasas": 2.8,
+          "carbohidratos": 1.9,
+          "fibra": 4.0,
+          "azucar": 3.3
+    },
+    {
+          "nombre": "Queso fresco batido (1)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Origen animal",
+          "presentacion": "Envase individual",
+          "peso": "120 g",
+          "marca": "Hacendado",
+          "proteínas": 8.0,
+          "grasas": 0.0,
+          "carbohidratos": 0.0,
+          "fibra": 3.5,
+          "azucar": 3.5
+    },
+    {
+          "nombre": "Queso fresco batido (2)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Postre",
+          "presentacion": "Envase individual",
+          "peso": "150 g",
+          "marca": "Margui",
+          "producto": "SKYR NATURAL",
+          "notas": "A fecha 19/07/23 se puede encontrar en Alcampo",
+          "proteínas": 8.0,
+          "grasas": 0.5,
+          "carbohidratos": 0.1,
+          "fibra": 4.1,
+          "azucar": 4.1
+    },
+    {
+          "nombre": "Queso havarti",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Origen animal",
+          "presentacion": "Loncha",
+          "peso": "31 g",
+          "marca": "Arla",
+          "producto": "- Your naturally tasty - HAVARTI MATURED FOR EXTREA TASTE",
+          "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+          "proteínas": 26.0,
+          "grasas": 26.0,
+          "carbohidratos": 17.0,
+          "fibra": 0.1,
+          "azucar": 0.1
+    },
+    {
+          "nombre": "Queso havarti light (1)",
+          "categoria_principal": "Proteínas",
+          "subcategoria": "Origen animal",
+          "presentacion": "Loncha",
+          "peso": "24 g",
+          "marca": "Hacendado",
+          "descripcion": "Una unidad es una loncha y pesa 24 g. Por cada 100 g aporta 12 g de grasas saturadas y 0,4 g de azúcares.",
+        "proteínas": 27.0,
+        "grasas": 17.0,
+        "carbohidratos": 12.0,
+        "fibra": 1.6,
+        "azucar": 0.4
+    },
+    {
+        "nombre": "Queso havarti light (2)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Origen animal",
+        "presentacion": "Loncha",
+        "peso": "31 g",
+        "marca": "Arla",
+        "producto": "- Your naturally tasty - HAVARTI LIGHT",
+        "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+        "proteínas": 29.0,
+        "grasas": 16.0,
+        "carbohidratos": 10.0,
+        "fibra": 0.5,
+        "azucar": 0.5
+    },
+    {
+        "nombre": "Queso madurado",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Origen animal",
+        "presentacion": "Loncha",
+        "peso": "28 g",
+        "marca": "Carrefour",
+        "producto": "Queso en lonchas PROteínas Plus",
+        "proteínas": 34.0,
+        "grasas": 10.0,
+        "carbohidratos": 6.6,
+        "fibra": 0.0,
+        "azucar": 0.0
+    },
+    {
+        "nombre": "Quinoa",
+        "categoria_principal": "Hidratos de carbono",
+        "subcategoria": "Cereal",
+        "proteínas": 13.0,
+        "grasas": 6.0,
+        "carbohidratos": "Irrelevante",
+        "fibra": 70.0,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Quinoa blanca y roja",
+        "categoria_principal": "Hidratos de carbono",
+        "subcategoria": "Cereal",
+        "presentacion": "Envase individual",
+        "peso": "125 g",
+        "marca": "Brillante",
+        "producto": "Sabroz QUINOA REAL BLANCA Y ROJA",
+        "proteínas": 4.7,
+        "grasas": 3.1,
+        "carbohidratos": "Irrelevante",
+        "fibra": 24.0,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Rape",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Pescado blanco",
+        "proteínas": 18.7,
+        "grasas": 0.3,
+        "carbohidratos": "Irrelevante",
+        "fibra": 1.3,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Raya",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Pescado blanco",
+        "proteínas": 17.1,
+        "grasas": 0.9,
+        "carbohidratos": "Irrelevante",
+        "fibra": 0.8,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Requesón",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "proteínas": 12.2,
+        "grasas": 0.0,
+        "carbohidratos": "Irrelevante",
+        "fibra": 5.2,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Rodaballo",
+        "categoria_principal": "Grasas y proteínas",
+        "subcategoria": "Pescado blanco",
+        "proteínas": 16.1,
+        "grasas": 3.6,
+        "carbohidratos": "Irrelevante",
+        "fibra": 1.3,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Salmón",
+        "categoria_principal": "Grasas y proteínas",
+        "subcategoria": "Pescado azul",
+        "proteínas": 18.4,
+        "grasas": 12.0,
+        "carbohidratos": "Irrelevante",
+        "fibra": 0.0,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Salmonete",
+        "categoria_principal": "Grasas y proteínas",
+        "subcategoria": "Pescado semigraso",
+        "proteínas": 14.1,
+        "grasas": 3.7,
+        "carbohidratos": "Irrelevante",
+        "fibra": 2.0,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Salmorejo con aceite",
+        "categoria_principal": "Grasas",
+        "subcategoria": "Plato preparado",
+        "presentacion": "Envase individual",
+        "peso": "330 g",
+        "marca": "Hacendado",
+        "producto": "Salmorejo fresco con aceite de oliva virgen extra",
+        "proteínas": 1.5,
+        "grasas": 10.0,
+        "carbohidratos": 1.4,
+        "fibra": 9.5,
+        "azucar": 2.1
+    },
+    {
+        "nombre": "Sandía",
+        "categoria_principal": "Hidratos de carbono",
+        "subcategoria": "Fruta",
+        "proteínas": 0.4,
+        "grasas": 0.0,
+        "carbohidratos": "Irrelevante",
+        "fibra": 4.5,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Sándwich de atún",
+        "categoria_principal": "Hidratos de carbono",
+        "subcategoria": "Plato preparado",
+        "presentacion": "Envase individual",
+        "peso": "185 g",
+        "marca": "Hacendado",
+        "producto": "ATÚN · HUEVO · TOMATE - Pan de tomate",
+        "proteínas": 10.9,
+        "grasas": 7.7,
+        "carbohidratos": 2.3,
+        "fibra": 20.0,
+        "azucar": 4.2
+    },
+    {
+        "nombre": "Sardinas",
+        "categoria_principal": "Grasas y proteínas",
+        "subcategoria": "Pescado azul",
+        "proteínas": 18.1,
+        "grasas": 7.5,
+        "carbohidratos": "Irrelevante",
+        "fibra": 1.3,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Sardinillas",
+        "categoria_principal": "Grasas y proteínas",
+        "subcategoria": "Pescado azul",
+        "proteínas": 17.1,
+        "grasas": 33.0,
+        "carbohidratos": "Irrelevante",
+        "fibra": 0.1,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Sargo",
+        "categoria_principal": "Grasas y proteínas",
+        "subcategoria": "Pescado azul",
+        "proteínas": 15.0,
+        "grasas": 4.4,
+        "carbohidratos": "Irrelevante",
+        "fibra": 1.0,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Seitán",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Apto para veganos y vegetarianos",
+        "proteínas": 24.3,
+        "grasas": 1.5,
+        "carbohidratos": "Irrelevante",
+        "fibra": 3.6,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Semillas de girasol",
+        "categoria_principal": "Grasas y proteínas",
+        "subcategoria": "Semilla",
+        "proteínas": 27.0,
+        "grasas": 43.0,
+        "carbohidratos": "Irrelevante",
+        "fibra": 20.0,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Sepia",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Marisco",
+        "proteínas": 18.0,
+        "grasas": 0.5,
+        "carbohidratos": "Irrelevante",
+        "fibra": 0.8,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Snack de coco (bizcochito)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "40 g",
+        "marca": "Nestlé",
+        "producto": "Lindahls PRO+SNACK COCONUT",
+        "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+        "proteínas": 16.1,
+        "grasas": 18.1,
+        "carbohidratos": 9.5,
+        "fibra": 36.8,
+        "azucar": 3.0
+    },
+    {
+        "nombre": "Sushi",
+        "categoria_principal": "Hidratos de carbono",
+        "subcategoria": "Plato preparado",
+        "marca": "Ahorramas",
+        "producto": "Waka - me",
+        "descripcion": "Bandeja de sushi variado 22 piezas",
+        "proteínas": 8.7,
+        "grasas": 3.6,
+        "carbohidratos": 0.7,
+        "fibra": 25.0,
+        "azucar": 2.5
+    },
+    {
+        "nombre": "Ternera",
+        "categoria_principal": "Grasas y proteínas",
+        "subcategoria": "Carne roja",
+        "proteínas": 20.7,
+        "grasas": 5.4,
+        "carbohidratos": "Irrelevante",
+        "fibra": 0.0,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Tiras de pollo",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Carne blanca",
+        "presentacion": "Envase individual",
+        "peso": "140 g",
+        "marca": "Hacendado",
+        "producto": "Tiras pollo frango",
+        "proteínas": 23.4,
+        "grasas": 0.4,
+        "carbohidratos": "Irrelevante",
+        "fibra": 0.6,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Tiras de pollo al horno",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Carne blanca",
+        "presentacion": "Envase individual",
+        "peso": "140 g",
+        "marca": "Hacendado",
+        "producto": "Tiras pollo al horno Frango no Forno",
+        "proteínas": 23.4,
+        "grasas": 0.4,
+        "carbohidratos": "Irrelevante",
+        "fibra": 0.6,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Tofu",
+        "categoria_principal": "Grasas y proteínas",
+        "subcategoria": "Apto para veganos y vegetarianos",
+        "proteínas": 11.0,
+        "grasas": 7.0,
+        "carbohidratos": "Irrelevante",
+        "fibra": 0.0,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Tomate rallado",
+        "categoria_principal": "Hidratos de carbono",
+        "subcategoria": "Verduras",
+        "presentacion": "Cucharada sopera",
+        "peso": "23 g",
+        "marca": "Hacendado",
+        "producto": "TOMATE RALLADO FRESCO 100% natural",
+        "proteínas": 0.5,
+        "grasas": 0.5,
+        "carbohidratos": "Irrelevante",
+        "fibra": 3.6,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Tomates Cherry",
+        "categoria_principal": "Hidratos de carbono",
+        "subcategoria": "Verduras",
+        "presentacion": "Envase individual",
+        "peso": "8 g",
+        "proteínas": 0.8,
+        "grasas": 0.2,
+        "carbohidratos": "Irrelevante",
+        "fibra": 3.9,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Tortas de arroz",
+        "categoria_principal": "Hidratos de carbono",
+        "subcategoria": "Cereal",
+        "presentacion": "Envase individual",
+        "peso": "31 g",
+        "marca": "Hacendado",
+        "descripcion": "El peso por unidad es de 1 torta de arroz, no de un paquete.",
+        "proteínas": 2.6,
+        "grasas": 0.9,
+        "carbohidratos": "Irrelevante",
+        "fibra": 23.0,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Tortilla de patata",
+        "categoria_principal": "Hidratos de carbono y grasas",
+        "subcategoria": "Plato preparado",
+        "presentacion": "Envase individual",
+        "peso": "600 g",
+        "marca": "Hacendado",
+        "proteínas": 5.7,
+        "grasas": 9.8,
+        "carbohidratos": "Irrelevante",
+        "fibra": 11.0,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Tortilla de patata con cebolla",
+        "categoria_principal": "Hidratos de carbono y grasas",
+        "subcategoria": "Plato preparado",
+        "presentacion": "Envase individual",
+        "peso": "600 g",
+        "marca": "Hacendado",
+        "proteínas": 5.7,
+        "grasas": 11.0,
+        "carbohidratos": "Irrelevante",
+        "fibra": 17.0,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Tortilla de trigo",
+        "categoria_principal": "Hidratos de carbono",
+        "subcategoria": "Cereal",
+        "presentacion": "Envase individual",
+        "peso": "28 g",
+        "marca": "OLD EL PASO",
+        "producto": "8 Tortilla POCKETS",
+        "notas": "A fecha 23/04/24 se puede encontrar en Ahorramás",
+        "proteínas": 9.6,
+        "grasas": 10.9,
+        "carbohidratos": 1.3,
+        "fibra": 52.2,
+        "azucar": 1.5
+    },
+    {
+        "nombre": "Trucha",
+        "categoria_principal": "Grasas y proteínas",
+        "subcategoria": "Pescado azul",
+        "proteínas": 15.7,
+        "grasas": 3.0,
+        "carbohidratos": "Irrelevante",
+        "fibra": 0.0,
+        "azucar": "Irrelevante"
+    },
+    {
+        "nombre": "Verduras variadas",
+        "categoria_principal": "Hidratos de carbono",
+        "subcategoria": "Verduras",
+        "presentacion": "Cuenco o bol tamaño normal",
+        "peso": "150 g",
+        "marca": "Hacendado",
+        "producto": "Salteado de verduras",
+        "descripcion": "Producto congelado.",
+        "proteínas": 2.0,
+        "grasas": 0.3,
+        "carbohidratos": 0.0,
+        "fibra": 5.0,
+        "azucar": 1.8
+    },
+    {
+        "nombre": "Yatekomo - parrilla",
+        "categoria_principal": "Hidratos de carbono",
+        "subcategoria": "Otros",
+        "presentacion": "Envase individual",
+        "peso": "60 g",
+        "marca": "Gallina Blanca",
+        "producto": "Yatekomo PARRILLA",
+        "proteínas": 2.0,
+        "grasas": 3.9,
+        "carbohidratos": 1.9,
+        "fibra": 12.0,
+        "azucar": 0.7
+    },
+    {
+        "nombre": "Yatekomo - pollo",
+        "categoria_principal": "Hidratos de carbono",
+        "subcategoria": "Otros",
+        "presentacion": "Envase individual",
+        "peso": "60 g",
+        "marca": "Gallina Blanca",
+        "producto": "Yatekomo POLLO",
+        "proteínas": 2.1,
+        "grasas": 3.9,
+        "carbohidratos": 1.9,
+        "fibra": 12.0,
+        "azucar": 0.4
+    },
+    {
+        "nombre": "Yogur griego",
+        "categoria_principal": "Grasas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "125 g",
+        "marca": "Hacendado",
+        "producto": "Yogur al estilo GRIEGO NATURAL",
+        "proteínas": 3.9,
+        "grasas": 10.8,
+        "carbohidratos": 6.7,
+        "fibra": 3.9,
+        "azucar": 3.9
+    },
+    {
+        "nombre": "Yogur líquido proteico - fresa (1)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "280 g",
+        "marca": "Hacendado",
+        "producto": "+PROTEÍNAS sabor fresa",
+        "proteínas": 7.1,
+        "grasas": 0.4,
+        "carbohidratos": 0.2,
+        "fibra": 4.8,
+        "azucar": 4.5
+    },
+    {
+        "nombre": "Yogur líquido proteico - fresa (2)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "345 g",
+        "marca": "Nestlé",
+        "producto": "Lindahls PRO+ Sabor fresa",
+        "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+        "proteínas": 7.6,
+        "grasas": 0.3,
+        "carbohidratos": 0.2,
+        "fibra": 3.2,
+        "azucar": 2.4
+    },
+    {
+        "nombre": "Yogur líquido proteico - fresa (3)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "381 g",
+        "marca": "Carrefour",
+        "producto": "YOGUR LÍQUIDO SABOR FRESA PROTEína Plus",
+        "proteínas": 7.5,
+        "grasas": 0.5,
+        "carbohidratos": 0.2,
+        "fibra": 4.7,
+        "azucar": 4.6
+    },
+    {
+        "nombre": "Yogur líquido proteico - fresa (4)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "300 g",
+        "marca": "Danone",
+        "producto": "YoPRO PROTEIN DRINK",
+        "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+        "proteínas": 8.3,
+        "grasas": 0.4,
+        "carbohidratos": 0.2,
+        "fibra": 5.4,
+        "azucar": 5.2
+    },
+    {
+        "nombre": "Yogur líquido proteico - fresa (5)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "100 g",
+        "marca": "Danone",
+        "producto": "YOPRO HIGH PROTEIN SHOTS",
+        "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+        "proteínas": 8.3,
+        "grasas": 0.4,
+        "carbohidratos": 0.2,
+        "fibra": 5.4,
+        "azucar": 5.2
+    },
+    {
+        "nombre": "Yogur líquido proteico - fresa (6)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "270 g",
+        "marca": "Danone",
+        "producto": "+PROTEÍNA NUTRICIÓN DIARIA",
+        "notas": "A fecha 4/06/24 se puede encontrar en Carrefour",
+        "proteínas": 6.0,
+        "grasas": 0.2,
+        "carbohidratos": 0.2,
+        "fibra": 5.8,
+        "azucar": 5.6
+    },
+    {
+        "nombre": "Yogur líquido proteico - helado de fresa",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "250 g",
+        "marca": "Valio",
+        "producto": "PROfeel PROTEIN MILKSHAKE STRAWBERRY ICE CREAM",
+        "notas": "A fecha 02/03/25 se puede encontrar en Carrefour",
+        "proteínas": 10.0,
+        "grasas": 1.5,
+        "carbohidratos": 0.9,
+        "fibra": 4.6,
+        "azucar": 4.4
+    },
+    {
+        "nombre": "Yogur líquido proteico - mango",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "300 g",
+        "marca": "Danone",
+        "producto": "YoPRO PROTEIN DRINK",
+        "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+        "proteínas": 8.3,
+        "grasas": 0.4,
+        "carbohidratos": 0.3,
+        "fibra": 5.4,
+        "azucar": 5.2
+    },
+    {
+        "nombre": "Yogur líquido proteico - plátano (1)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "280 g",
+        "marca": "Hacendado",
+        "producto": "+PROTEÍNAS sabor plátano",
+        "proteínas": 7.1,
+        "grasas": 0.4,
+        "carbohidratos": 0.2,
+        "fibra": 4.8,
+        "azucar": 4.5
+    },
+    {
+        "nombre": "Yogur líquido proteico - plátano (2)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "381 g",
+        "marca": "Carrefour",
+        "producto": "YOGUR LÍQUIDO SABOR PLÁTANO PROTEína Plus",
+        "proteínas": 7.5,
+        "grasas": 0.5,
+        "carbohidratos": 0.2,
+        "fibra": 4.7,
+        "azucar": 4.6
+    },
+    {
+        "nombre": "Yogur líquido proteico - tropical (1)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "280 g",
+        "marca": "Hacendado",
+        "producto": "+PROTEÍNAS sabor tropical",
+        "proteínas": 7.1,
+        "grasas": 0.4,
+        "carbohidratos": 0.2,
+        "fibra": 4.7,
+        "azucar": 4.3
+    },
+    {
+        "nombre": "Yogur líquido proteico - tropical (2)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "400 g",
+        "marca": "Margui",
+        "producto": "YOGUR LÍQUIDO TROPICAL",
+        "notas": "A fecha 23/12/23 se puede encontrar en Ahorramás",
+        "proteínas": 7.5,
+        "grasas": 0.5,
+        "carbohidratos": 0.2,
+        "fibra": 4.7,
+        "azucar": 4.6
+    },
+    {
+        "nombre": "Yogur líquido proteico - tropical (3)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "345 g",
+        "marca": "Nestlé",
+        "producto": "Lindahls PRO+ Sabor tropical",
+        "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+        "proteínas": 7.6,
+        "grasas": 0.3,
+        "carbohidratos": 0.2,
+        "fibra": 3.3,
+        "azucar": 2.4
+    },
+    {
+        "nombre": "Yogur líquido proteico - tropical (4)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "400 g",
+        "marca": "Carrefour",
+        "producto": "YOGUR LÍQUIDO SABOR TROPICAL PROTEína Plus",
+        "proteínas": 7.5,
+        "grasas": 0.5,
+        "carbohidratos": 0.2,
+        "fibra": 4.7,
+        "azucar": 4.6
+    },
+    {
+        "nombre": "Yogur proteico - arándanos",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "120 g",
+        "marca": "Hacendado",
+        "producto": "+PROTEÍNAS con arándanos",
+        "proteínas": 8.3,
+        "grasas": 0.0,
+        "carbohidratos": 0.0,
+        "fibra": 5.0,
+        "azucar": 4.6
+    },
+    {
+        "nombre": "Yogur proteico - café",
+        "categoria_principal": "Hidratos de carbono",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "170 g",
+        "marca": "Pastoret",
+        "producto": "Proteico Cremoso TOFFEE de CAFÉ",
+        "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+        "proteínas": 8.6,
+        "grasas": 0.5,
+        "carbohidratos": 0.1,
+        "fibra": 10.9,
+        "azucar": 10.9
+    },
+    {
+        "nombre": "Yogur proteico - caramelo macchiato",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "160 g",
+        "marca": "Danone",
+        "producto": "YoPRO PROTEINA SABOR CARAMEL MACCHIATO",
+        "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+        "proteínas": 9.4,
+        "grasas": 0.1,
+        "carbohidratos": 0.1,
+        "fibra": 4.1,
+        "azucar": 3.1
+    },
+    {
+        "nombre": "Yogur proteico - chocolate (1)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "200 g",
+        "marca": "Carrefour",
+        "producto": "Postre lácteo al cacao PROteína Plus",
+        "proteínas": 10.0,
+        "grasas": 1.6,
+        "carbohidratos": 1.0,
+        "fibra": 4.3,
+        "azucar": 4.1
+    },
+    {
+        "nombre": "Yogur proteico - chocolate (2)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "120 g",
+        "marca": "Hacendado",
+        "producto": "+PROTEÍNAS Chocolate",
+        "proteínas": 8.4,
+        "grasas": 1.1,
+        "carbohidratos": 0.6,
+        "fibra": 8.7,
+        "azucar": 6.6
+    },
+    {
+        "nombre": "Yogur proteico - chocolate (3)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "200 g",
+        "marca": "Auchan",
+        "producto": "PROTEIN + POSTRE LÁCTEO DE CACAO",
+        "notas": "A fecha 19/07/23 se puede encontrar en Alcampo",
+        "proteínas": 10.0,
+        "grasas": 1.6,
+        "carbohidratos": 1.1,
+        "fibra": 4.3,
+        "azucar": 4.1
+    },
+    {
+        "nombre": "Yogur proteico - chocolate (4)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "200 g",
+        "marca": "Margui",
+        "producto": "POSTRE CACAO PROTEÍNAS",
+        "notas": "A fecha 19/07/23 se puede encontrar en Alcampo",
+        "proteínas": 10.0,
+        "grasas": 1.6,
+        "carbohidratos": 1.1,
+        "fibra": 4.3,
+        "azucar": 4.1
+    },
+    {
+        "nombre": "Yogur proteico - chocolate (5)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "200 g",
+        "marca": "Milbona",
+        "producto": "HIGH PROTEIN DOBLE CHOCOLATE - CHOCOLATE Y NATA CON CHOCOLATE",
+        "notas": "A fecha 23/12/23 se puede encontrar en Lidl",
+        "proteínas": 10.0,
+        "grasas": 2.4,
+        "carbohidratos": 1.6,
+        "fibra": 5.5,
+        "azucar": 4.5
+    },
+    {
+        "nombre": "Yogur proteico - frambuesa",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "200 g",
+        "marca": "Milbona",
+        "producto": "HIGH PROTEIN QUARK - FRAMBUESA",
+        "notas": "A fecha 23/12/23 se puede encontrar en Lidl",
+        "proteínas": 12.5,
+        "grasas": 0.5,
+        "carbohidratos": 0.4,
+        "fibra": 3.6,
+        "azucar": 3.2
+    },
+    {
+        "nombre": "Yogur proteico - fresa (1)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "120 g",
+        "marca": "Hacendado",
+        "producto": "+PROTEÍNAS con fresa",
+        "proteínas": 8.3,
+        "grasas": 0.0,
+        "carbohidratos": 0.0,
+        "fibra": 5.0,
+        "azucar": 4.6
+    },
+    {
+        "nombre": "Yogur proteico - fresa (2)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "150 g",
+        "marca": "Margui",
+        "producto": "SKYR FRESA",
+        "notas": "A fecha 19/07/23 se puede encontrar en Alcampo",
+        "proteínas": 6.9,
+        "grasas": 0.5,
+        "carbohidratos": 0.1,
+        "fibra": 4.5,
+        "azucar": 4.1
+    },
+    {
+        "nombre": "Yogur proteico - fresa (3)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "160 g",
+        "marca": "Danone",
+        "producto": "YoPRO PROTEINA STRAWBERRY",
+        "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+        "proteínas": 9.4,
+        "grasas": 0.1,
+        "carbohidratos": 0.1,
+        "fibra": 3.9,
+        "azucar": 3.6
+    },
+    {
+        "nombre": "Yogur proteico - fresa (4)",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "200 g",
+        "marca": "Día",
+        "producto": "Día Láctea HIGH PROTEIN",
+        "notas": "A fecha 13/07/24 se puede encontrar en Día",
+        "proteínas": 12.4,
+        "grasas": 0.4,
+        "carbohidratos": 0.3,
+        "fibra": 3.3,
+        "azucar": 2.8
+    },
+    {
+        "nombre": "Yogur proteico - fresa (7)",
+        "categoria_principal": "Hidratos de carbono",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "400 g",
+        "marca": "Alpro",
+        "producto": "SKYR STYLE + PROTEÍNA FRESA",
+        "notas": "A fecha 02/03/25 se puede encontrar en Carrefour Apta para personas veganas.",
+        "proteínas": 5.2,
+        "grasas": 3.0,
+        "carbohidratos": 0.5,
+        "fibra": 8.5,
+        "azucar": 8.2
+    },
+    {
+        "nombre": "Yogur proteico - limón",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "120 g",
+        "marca": "Hacendado",
+        "producto": "+PROTEÍNAS Limón",
+        "proteínas": 8.3,
+        "grasas": 0.0,
+        "carbohidratos": 0.0,
+        "fibra": 5.2,
+        "azucar": 4.6
+    },
+    {
+        "nombre": "Yogur proteico - limón & cookies",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "160 g",
+        "marca": "Nestlé",
+        "producto": "Lindahls PRO+ Sabor limón & cookies",
+        "notas": "A fecha 19/07/23 se puede encontrar en Alcampo",
+        "proteínas": 10.0,
+        "grasas": 0.2,
+        "carbohidratos": 0.1,
+        "fibra": 4.1,
+        "azucar": 3.7
+    },
+    {
+        "nombre": "Yogur proteico - mango",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "170 g",
+        "marca": "Pastoret",
+        "producto": "Proteico Cremoso MANGO",
+        "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+        "proteínas": 8.6,
+        "grasas": 0.5,
+        "carbohidratos": 0.1,
+        "fibra": 11.3,
+        "azucar": 11.3
+    },
+    {
+        "nombre": "Yogur proteico - mango & maracuyá",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "120 g",
+        "marca": "Hacendado",
+        "producto": "+PROTEÍNAS con Puré mango maracuyá",
+        "proteínas": 8.3,
+        "grasas": 0.0,
+        "carbohidratos": 0.0,
+        "fibra": 5.8,
+        "azucar": 5.3
+    },
+    {
+        "nombre": "Yogur proteico - mango & vainilla",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "175 g",
+        "marca": "Valio",
+        "producto": "PROfeel PROTEIN SNACK",
+        "proteínas": 10.0,
+        "grasas": 0.2,
+        "carbohidratos": 0.1,
+        "fibra": 3.8,
+        "azucar": 3.4
+    },
+    {
+        "nombre": "Yogur proteico - natural",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "120 g",
+        "marca": "Hacendado",
+        "producto": "+PROTEÍNAS NATURAL",
+        "proteínas": 10.0,
+        "grasas": 0.0,
+        "carbohidratos": 0.0,
+        "fibra": 3.1,
+        "azucar": 3.1
+    },
+    {
+        "nombre": "Yogur proteico - plátano",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "170 g",
+        "marca": "Pastoret",
+        "producto": "Proteico Cremoso PLÁTANO",
+        "notas": "A fecha 22/02/24 se puede encontrar en Carrefour",
+        "proteínas": 8.6,
+        "grasas": 0.5,
+        "carbohidratos": 0.1,
+        "fibra": 12.5,
+        "azucar": 12.5
+    },
+    {
+        "nombre": "Yogur proteico - vainilla",
+        "categoria_principal": "Proteínas",
+        "subcategoria": "Postre",
+        "presentacion": "Envase individual",
+        "peso": "200 g",
+        "marca": "Margui",
+        "producto": "POSTRE VAINILLA PROTEÍNAS",
+        "notas": "A fecha 19/07/23 se puede encontrar en Alcampo",
+        "proteínas": 10.0,
+        "grasas": 1.5,
+        "carbohidratos": 1.0,
+        "fibra": 4.5,
+        "azucar": 4.4
+    },
+    {
+          "nombre": "Zanahoria",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Verduras",
+          "proteínas": 0.9,
+          "grasas": 0.2,
+          "carbohidratos": "Irrelevante",
+          "fibra": 7.3,
+          "azucar": "Irrelevante"
+    },
+    {
+          "nombre": "Zumo de naranja",
+          "categoria_principal": "Hidratos de carbono",
+          "subcategoria": "Fruta",
+          "presentacion": "Vaso de tamaño normal",
+          "peso": "250 g",
+          "proteínas": 0.7,
+          "grasas": 0.1,
+          "carbohidratos": 0.0,
+          "fibra": 9.9,
+          "azucar": 9.3
     }
-    
-    // Función para obtener todos los alimentos de una categoría
-    function obtenerAlimentosPorCategoria(categoria) {
-        return baseDatosAlimentos[categoria] || {};
+].map(crearAlimento); // Normalizar todos los alimentos al cargarlos
+
+// ============================================================================
+// API PÚBLICA - FUNCIONES DE BÚSQUEDA Y CONSULTA
+// ============================================================================
+
+/**
+ * Clase para gestionar la base de datos de alimentos
+ */
+class AlimentosDB {
+    constructor(alimentos) {
+        this.alimentos = alimentos;
+        this.indiceNombres = this._crearIndiceNombres();
+        this.indiceCategorias = this._crearIndiceCategorias();
     }
-    
-    // Función para buscar alimentos por nombre parcial
-    function buscarAlimentos(termino) {
-        const resultados = [];
-        const terminoLower = termino.toLowerCase();
-        
-        for (const categoria in baseDatosAlimentos) {
-            for (const alimento in baseDatosAlimentos[categoria]) {
-                if (alimento.toLowerCase().includes(terminoLower)) {
-                    resultados.push({
-                        nombre: alimento,
-                        categoria: categoria,
-                        ...baseDatosAlimentos[categoria][alimento]
-                    });
-                }
-            }
-        }
-        
-        return resultados;
+
+    /**
+     * Crea un índice de nombres para búsquedas más rápidas
+     * @private
+     */
+    _crearIndiceNombres() {
+        const indice = new Map();
+        this.alimentos.forEach((alimento, idx) => {
+            const nombre = alimento.ALIMENTO.toLowerCase();
+            indice.set(nombre, idx);
+        });
+        return indice;
     }
-    
-    // Exportar para uso global
+
+    /**
+     * Crea un índice de categorías para filtrado rápido
+     * @private
+     */
+    _crearIndiceCategorias() {
+        const indice = new Map();
+        this.alimentos.forEach((alimento, idx) => {
+            const categoria = alimento.CLASIFICACIÓN;
+            if (!indice.has(categoria)) {
+                indice.set(categoria, []);
+            }
+            indice.get(categoria).push(idx);
+        });
+        return indice;
+    }
+
+    /**
+     * Obtiene información nutricional de un alimento
+     * @param {string} nombreAlimento - Nombre del alimento
+     * @param {number} cantidad - Cantidad en gramos (por defecto 100g)
+     * @returns {Object|null} Información nutricional o null si no se encuentra
+     */
+    obtenerInfoNutricional(nombreAlimento, cantidad = 100) {
+        const nombreLower = nombreAlimento.toLowerCase();
+        const factor = cantidad / 100;
+
+        // Búsqueda exacta primero
+        if (this.indiceNombres.has(nombreLower)) {
+            const idx = this.indiceNombres.get(nombreLower);
+            return this._calcularNutrientes(this.alimentos[idx], factor);
+        }
+
+        // Búsqueda parcial
+        const alimento = this.alimentos.find(a => 
+            a.ALIMENTO.toLowerCase().includes(nombreLower)
+        );
+
+        return alimento ? this._calcularNutrientes(alimento, factor) : null;
+    }
+
+    /**
+     * Calcula los nutrientes ajustados por cantidad
+     * @private
+     */
+    _calcularNutrientes(alimento, factor) {
+        return {
+            nombre: alimento.ALIMENTO,
+            categoria: alimento.CLASIFICACIÓN,
+            macronutrientePrincipal: alimento.MACRONUTRIENTE_PRINCIPAL,
+            calorias: Math.round(alimento.CALORÍAS * factor),
+            proteinas: Math.round(alimento.PROTEÍNAS * factor * 10) / 10,
+            carbohidratos: Math.round(alimento.HIDRATOS * factor * 10) / 10,
+            grasas: Math.round(alimento.GRASAS * factor * 10) / 10,
+            grasasSaturadas: alimento.GRASAS_SATURADAS > 0 ? 
+                Math.round(alimento.GRASAS_SATURADAS * factor * 10) / 10 : null,
+            azucares: alimento.AZÚCARES > 0 ? 
+                Math.round(alimento.AZÚCARES * factor * 10) / 10 : null,
+            unidad: alimento.UNIDAD,
+            pesoPorUnidad: alimento.PESO_POR_UNIDAD,
+            marca: alimento.MARCA_REGISTRADA,
+            producto: alimento.NOMBRE_DEL_PRODUCTO,
+            notas: alimento.OTRAS_NOTAS
+        };
+    }
+
+    /**
+     * Obtiene todos los alimentos de una categoría
+     * @param {string} categoria - Nombre de la categoría
+     * @returns {Array} Array de alimentos
+     */
+    obtenerAlimentosPorCategoria(categoria) {
+        if (!this.indiceCategorias.has(categoria)) {
+            return [];
+        }
+        
+        const indices = this.indiceCategorias.get(categoria);
+        return indices.map(idx => this.alimentos[idx]);
+    }
+
+    /**
+     * Busca alimentos por nombre parcial
+     * @param {string} termino - Término de búsqueda
+     * @param {number} limite - Número máximo de resultados (por defecto 50)
+     * @returns {Array} Array de alimentos que coinciden
+     */
+    buscarAlimentos(termino, limite = 50) {
+        const terminoLower = termino.toLowerCase();
+        const resultados = [];
+
+        for (const alimento of this.alimentos) {
+            if (alimento.ALIMENTO.toLowerCase().includes(terminoLower)) {
+                resultados.push(alimento);
+                if (resultados.length >= limite) break;
+            }
+        }
+
+        return resultados;
+    }
+
+    /**
+     * Obtiene estadísticas de la base de datos
+     * @returns {Object} Estadísticas
+     */
+    obtenerEstadisticas() {
+        const categorias = {};
+        const macronutrientes = {};
+
+        this.alimentos.forEach(alimento => {
+            // Contar por categoría
+            const cat = alimento.CLASIFICACIÓN;
+            categorias[cat] = (categorias[cat] || 0) + 1;
+
+            // Contar por macronutriente principal
+            const macro = alimento.MACRONUTRIENTE_PRINCIPAL;
+            macronutrientes[macro] = (macronutrientes[macro] || 0) + 1;
+        });
+
+        return {
+            totalAlimentos: this.alimentos.length,
+            categorias,
+            macronutrientes,
+            ultimaActualizacion: new Date().toISOString()
+        };
+    }
+
+    /**
+     * Filtra alimentos por múltiples criterios
+     * @param {Object} filtros - Objeto con criterios de filtrado
+     * @returns {Array} Alimentos filtrados
+     */
+    filtrar(filtros) {
+        return this.alimentos.filter(alimento => {
+            // Filtro por categoría
+            if (filtros.categoria && alimento.CLASIFICACIÓN !== filtros.categoria) {
+                return false;
+            }
+
+            // Filtro por macronutriente principal
+            if (filtros.macronutriente && alimento.MACRONUTRIENTE_PRINCIPAL !== filtros.macronutriente) {
+                return false;
+            }
+
+            // Filtro por rango de calorías
+            if (filtros.caloriasMin && alimento.CALORÍAS < filtros.caloriasMin) {
+                return false;
+            }
+            if (filtros.caloriasMax && alimento.CALORÍAS > filtros.caloriasMax) {
+                return false;
+            }
+
+            // Filtro por rango de proteínas
+            if (filtros.proteinasMin && alimento.PROTEÍNAS < filtros.proteinasMin) {
+                return false;
+            }
+
+            return true;
+        });
+    }
+
+    /**
+     * Obtiene todos los alimentos
+     * @returns {Array} Todos los alimentos
+     */
+    obtenerTodos() {
+        return [...this.alimentos];
+    }
+
+    /**
+     * Obtiene lista de categorías únicas
+     * @returns {Array} Array de categorías
+     */
+    obtenerCategorias() {
+        return Array.from(this.indiceCategorias.keys()).sort();
+    }
+}
+
+// ============================================================================
+// INICIALIZACIÓN Y EXPORTACIÓN
+// ============================================================================
+
+// Crear instancia de la base de datos
+const alimentosDB = new AlimentosDB(baseDatosAlimentos);
+
+// Funciones legacy para compatibilidad con código existente
+function obtenerInfoNutricional(nombreAlimento, cantidad = 100) {
+    return alimentosDB.obtenerInfoNutricional(nombreAlimento, cantidad);
+}
+
+function obtenerAlimentosPorCategoria(categoria) {
+    return alimentosDB.obtenerAlimentosPorCategoria(categoria);
+}
+
+function buscarAlimentos(termino, limite = 50) {
+    return alimentosDB.buscarAlimentos(termino, limite);
+}
+
+function obtenerTodosLosAlimentos() {
+    return alimentosDB.obtenerTodos();
+}
+
+// Exportar para uso global
+if (typeof window !== 'undefined') {
     window.baseDatosAlimentos = baseDatosAlimentos;
+    window.alimentosDB = alimentosDB;
     window.obtenerInfoNutricional = obtenerInfoNutricional;
     window.obtenerAlimentosPorCategoria = obtenerAlimentosPorCategoria;
     window.buscarAlimentos = buscarAlimentos;
+    window.obtenerTodosLosAlimentos = obtenerTodosLosAlimentos;
+    window.CATEGORIA_ALIMENTOS = CATEGORIA_ALIMENTOS;
+    window.MACRONUTRIENTE = MACRONUTRIENTE;
+    
+    console.log('✅ Base de Datos de Alimentos v3.0 cargada');
+    console.log(`📊 Total alimentos: ${baseDatosAlimentos.length}`);
+    console.log(`📂 Categorías disponibles: ${alimentosDB.obtenerCategorias().length}`);
+}
+
+// Exportar para módulos ES6 (si se usa)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        baseDatosAlimentos,
+        alimentosDB,
+        obtenerInfoNutricional,
+        obtenerAlimentosPorCategoria,
+        buscarAlimentos,
+        CATEGORIA_ALIMENTOS,
+        MACRONUTRIENTE
+    };
+}

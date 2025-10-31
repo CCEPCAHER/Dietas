@@ -300,10 +300,6 @@ class UIManager {
         document.getElementById('objetivo').value = dieta.objetivo || '';
         document.getElementById('prohibiciones').value = dieta.prohibiciones || '';
         document.getElementById('duracion').value = dieta.duracion || 'semana';
-        const planEjercicioInput = document.getElementById('planEjercicio');
-        if (planEjercicioInput) {
-            planEjercicioInput.value = dieta.planEjercicio || '';
-        }
 
         // Actualizar macros si existen
         if (dieta.calorias) {

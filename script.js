@@ -934,7 +934,6 @@ window.mostrarResultados = function() {
     mostrarInfoUsuario();
     mostrarPlanAlimentacion();
     mostrarProhibiciones();
-    mostrarPlanEjercicio();
     
     resultadosDiv.classList.remove('oculto');
     
@@ -1066,9 +1065,111 @@ function mostrarInfoUsuario() {
     }
 }
 
+function mostrarTablaEditable() {
+    const planDiv = document.getElementById('plan-alimentacion');
+    
+    // Asegurar que tablaEditable esté inicializada - reintentar si no está disponible
+    let intentos = 0;
+    const maxIntentos = 5;
+    
+    const intentarInicializar = () => {
+        if (!window.tablaEditable) {
+            if (typeof window.inicializarTablaEditable === 'function') {
+                console.log('Intentando inicializar TablaEditable...');
+                window.inicializarTablaEditable();
+            }
+            
+            if (!window.tablaEditable && intentos < maxIntentos) {
+                intentos++;
+                console.log(`Reintentando inicialización (${intentos}/${maxIntentos})...`);
+                setTimeout(intentarInicializar, 200);
+                return;
+            }
+        }
+        
+        if (!window.tablaEditable) {
+            planDiv.innerHTML = `
+                <div class="mensaje-error-modulo">
+                    <h3>⚠️ Error: Módulo no disponible</h3>
+                    <p>
+                        El módulo de tabla editable no está cargado correctamente.
+                    </p>
+                    <p>
+                        <strong>Solución:</strong> Recarga la página (Ctrl + F5)
+                    </p>
+                    <p style="margin-top: 10px; font-size: 12px; color: #666;">
+                        Verifica la consola del navegador para más detalles.
+                    </p>
+                </div>
+            `;
+            console.error('❌ TablaEditable no está disponible después de', maxIntentos, 'intentos');
+            console.error('Verifica que base-datos-alimentos.js esté cargado antes de tabla-editable.js');
+            return;
+        }
+        
+        // TablaEditable está disponible, continuar
+        try {
+            // Mostrar instrucciones y objetivos
+            let html = `
+                <div class="banner-modo-manual">
+                    <h3>📝 Modo Manual Activado</h3>
+                    <p>
+                        <strong>Objetivos Nutricionales Diarios:</strong><br>
+                        🔥 Calorías: ${datosUsuario.calorias || 0} kcal | 
+                        💪 Proteínas: ${datosUsuario.proteinas || 0}g | 
+                        🥑 Grasas: ${datosUsuario.grasas || 0}g | 
+                        🍚 Hidratos: ${datosUsuario.carbohidratos || 0}g
+                    </p>
+                    <p>
+                        Las tablas incluyen filas vacías para empezar. Escribe el nombre de un alimento para buscar
+                        (mínimo 1 carácter). Los valores nutricionales se calcularán automáticamente.
+                    </p>
+                </div>
+            `;
+            
+            // Generar la tabla editable
+            if (typeof window.tablaEditable.generarTablaHTML === 'function') {
+                html += window.tablaEditable.generarTablaHTML();
+            } else {
+                throw new Error('método generarTablaHTML no disponible');
+            }
+            
+            planDiv.innerHTML = html;
+            
+            // Inicializar tablas con filas vacías después de insertar el HTML
+            setTimeout(() => {
+                if (typeof window.tablaEditable.inicializarTablasVacias === 'function') {
+                    window.tablaEditable.inicializarTablasVacias(3); // 3 filas vacías por comida
+                    console.log('✅ Tabla editable inicializada correctamente');
+                } else {
+                    console.error('❌ Método inicializarTablasVacias no disponible');
+                }
+            }, 150);
+        } catch (error) {
+            console.error('Error al mostrar tabla editable:', error);
+            planDiv.innerHTML = `
+                <div class="mensaje-error-modulo">
+                    <h3>⚠️ Error al generar tabla</h3>
+                    <p>Error: ${error.message}</p>
+                    <p>Recarga la página (Ctrl + F5) e intenta de nuevo.</p>
+                </div>
+            `;
+        }
+    };
+    
+    // Empezar intento de inicialización
+    intentarInicializar();
+}
+
 function mostrarPlanAlimentacion() {
     const planDiv = document.getElementById('plan-alimentacion');
-    const { objetivo, duracion } = datosUsuario;
+    const { objetivo, duracion, modoGeneracion } = datosUsuario;
+    
+    // Verificar si el modo es manual
+    if (modoGeneracion === 'manual') {
+        mostrarTablaEditable();
+        return;
+    }
     
     // Verificar si hay base de datos ampliada disponible
     let planSemana;
@@ -1132,24 +1233,6 @@ function mostrarPlanAlimentacion() {
         semanaActual.forEach(dia => {
             htmlPlan += generarDiaHTML(dia, false);
         });
-    }
-    
-    // Agregar suplementación si está habilitada
-    if (datosUsuario.incluirSuplementacion) {
-        if (datosUsuario.suplementacionPersonalizada && datosUsuario.suplementacionPersonalizada.trim() !== '') {
-            // Suplementación personalizada
-            htmlPlan += `
-                <div class="suplementacion-section" style="margin: 12px 0; padding: 12px; background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); border-radius: 8px; border-left: 4px solid #ff9800;">
-                    <h3 style="color: #e65100; margin-bottom: 10px; font-size: 13pt; text-align: center;">💊 SUPLEMENTACIÓN PERSONALIZADA</h3>
-                    <div style="background: white; padding: 10px; border-radius: 6px;">
-                        <p style="margin: 0; color: #5d4037; font-size: 9pt; white-space: pre-wrap; line-height: 1.4;">${datosUsuario.suplementacionPersonalizada}</p>
-                    </div>
-                </div>
-            `;
-        } else {
-            // Suplementación automática
-            htmlPlan += generarSuplementacion(datosUsuario.objetivo);
-        }
     }
     
     // Calcular hidratación recomendada
@@ -1306,159 +1389,6 @@ function mostrarProhibiciones() {
         `;
     }
 }
-
-// Función para generar recomendaciones de suplementación
-function generarSuplementacion(objetivo) {
-    const suplementos = {
-        aumentar: {
-            titulo: "💊 SUPLEMENTACIÓN RECOMENDADA PARA GANAR MASA MUSCULAR",
-            basicos: [
-                "• Proteína Whey (25-30g post-entreno) - Recuperación muscular",
-                "• Creatina Monohidrato (5g/día) - Fuerza y volumen",
-                "• BCAA's (5-10g durante/post-entreno) - Recuperación"
-            ],
-            opcionales: [
-                "• Glutamina (5g post-entreno)",
-                "• Beta-Alanina (3-5g pre-entreno)",
-                "• Omega-3 (2-3g EPA/DHA con comidas)",
-                "• Multivitamínico",
-                "• Vitamina D3 (2000-4000 UI)"
-            ],
-            nota: "⚠️ Consulta con un profesional antes de iniciar cualquier suplementación."
-        },
-        adelgazar: {
-            titulo: "💊 SUPLEMENTACIÓN RECOMENDADA PARA PÉRDIDA DE PESO",
-            basicos: [
-                "• Proteína (20-25g entre comidas) - Saciedad",
-                "• Fibra / Psyllium (5-10g antes de comidas)",
-                "• Omega-3 (2-3g EPA/DHA) - Control de apetito"
-            ],
-            opcionales: [
-                "• Cafeína (200-400mg pre-entreno)",
-                "• Té Verde EGCG (400-500mg)",
-                "• L-Carnitina (1-2g pre-entreno)",
-                "• Multivitamínico en déficit calórico"
-            ],
-            nota: "⚠️ La suplementación es complementaria. El déficit calórico y ejercicio son fundamentales."
-        },
-        mantener: {
-            titulo: "💊 SUPLEMENTACIÓN RECOMENDADA PARA MANTENIMIENTO",
-            basicos: [
-                "• Omega-3 (2g EPA/DHA) - Salud cardiovascular",
-                "• Multivitamínico - Cobertura nutricional",
-                "• Vitamina D3 (2000 UI) - Salud ósea"
-            ],
-            opcionales: [
-                "• Proteína en polvo (conveniencia)",
-                "• Magnesio (300-400mg noche)",
-                "• Probióticos - Salud digestiva",
-                "• Colágeno (10g) - Articulaciones"
-            ],
-            nota: "⚠️ Alimentación equilibrada es la base. Suplementación cubre carencias específicas."
-        }
-    };
-    
-    const sup = suplementos[objetivo] || suplementos.mantener;
-    let html = `<div class="suplementacion-section" style="margin: 12px 0; padding: 12px; background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); border-radius: 8px; border-left: 4px solid #ff9800;">`;
-    html += `<h3 style="color: #e65100; margin-bottom: 10px; font-size: 13pt; text-align: center;">${sup.titulo}</h3>`;
-    html += `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">`;
-    html += `<div style="background: white; padding: 8px; border-radius: 6px;">`;
-    html += `<h4 style="color: #f57c00; margin-bottom: 6px; font-size: 10pt;">Esenciales</h4><ul style="list-style: none; padding: 0; margin: 0;">`;
-    sup.basicos.forEach(item => html += `<li style="padding: 4px 0; border-bottom: 1px solid #ffe0b2; color: #5d4037; font-size: 8.5pt;">${item}</li>`);
-    html += `</ul></div>`;
-    html += `<div style="background: white; padding: 8px; border-radius: 6px;">`;
-    html += `<h4 style="color: #f57c00; margin-bottom: 6px; font-size: 10pt;">Opcionales</h4><ul style="list-style: none; padding: 0; margin: 0;">`;
-    sup.opcionales.forEach(item => html += `<li style="padding: 4px 0; border-bottom: 1px solid #ffe0b2; color: #5d4037; font-size: 8.5pt;">${item}</li>`);
-    html += `</ul></div>`;
-    html += `</div>`;
-    html += `<p style="margin-top: 8px; padding: 8px; background: #fff8e1; border-radius: 4px; color: #f57c00; font-weight: 600; text-align: center; font-size: 8.5pt;">${sup.nota}</p>`;
-    html += `</div>`;
-    
-    return html;
-}
-
-function generarTextoPlanEjercicio(plan) {
-    let texto = `${plan.nombre}\n\n`;
-    texto += `${plan.descripcion}\n`;
-    texto += `Frecuencia: ${plan.frecuencia}\n\n`;
-    
-    plan.semanas.forEach((semana, idx) => {
-        if (plan.semanas.length > 1) {
-            texto += `--- SEMANA ${semana.numero} ---\n\n`;
-        }
-        
-        semana.dias.forEach(dia => {
-            texto += `${dia.dia} - ${dia.grupoMuscular}\n`;
-            texto += `Duración: ${dia.duracion}\n`;
-            if (dia.cardio) {
-                texto += `Cardio: ${dia.cardio}\n`;
-            }
-            texto += `\nEjercicios:\n`;
-            
-            dia.ejercicios.forEach(ej => {
-                texto += `• ${ej.nombre}: ${ej.series}x${ej.repeticiones}`;
-                if (ej.descanso && ej.descanso !== '-') {
-                    texto += ` (descanso: ${ej.descanso})`;
-                }
-                if (ej.notas && ej.notas.trim() !== '') {
-                    texto += ` - ${ej.notas}`;
-                }
-                texto += '\n';
-            });
-            texto += '\n';
-        });
-    });
-    
-    return texto;
-}
-
-function mostrarPlanEjercicio() {
-    const planEjercicioDiv = document.getElementById('plan-ejercicio-content');
-    const planEjercicioContainer = document.getElementById('plan-ejercicio-container');
-    
-    if (planEjercicioDiv && planEjercicioContainer) {
-        if (datosUsuario.planEjercicio && datosUsuario.planEjercicio.trim() !== '') {
-            // Formatear el texto con HTML adecuado
-            const texto = datosUsuario.planEjercicio;
-            
-            // Reemplazar saltos de línea con <br> para asegurar que se muestren en PDF
-            let html = texto.split('\n').map(line => {
-                line = line.replace(/\s+/g, ' ').trim();
-                if (!line) return '';
-                
-                // Títulos de semana
-                if (line.includes('SEMANA')) {
-                    return `<h3 style="color: #667eea; margin: 20px 0 10px; font-weight: bold; font-size: 18pt;">${line}</h3>`;
-                }
-                
-                // Días
-                if (line.includes('LUNES') || line.includes('MARTES') || line.includes('MIÉRCOLES') || 
-                    line.includes('JUEVES') || line.includes('VIERNES') || line.includes('SÁBADO') || line.includes('DOMINGO')) {
-                    return `<h4 style="color: #764ba2; margin: 15px 0 8px; font-weight: bold; font-size: 15pt;">${line}</h4>`;
-                }
-                
-                // Ejercicios con bullet
-                if (line.startsWith('•') || line.match(/^[A-Z].*:\s*\d+x\d+/)) {
-                    return `<div style="margin: 8px 0; padding-left: 15px; font-size: 11pt; line-height: 1.6;">${line.replace(/^•\s*/, '')}</div>`;
-                }
-                
-                // Texto normal
-                if (line.match(/^[A-Z].+/)) {
-                    return `<div style="margin: 5px 0; font-size: 11pt; font-weight: 600; color: #495057;">${line}</div>`;
-                }
-                
-                // Cualquier otra línea
-                return `<div style="margin: 3px 0; font-size: 11pt; color: #6c757d;">${line}</div>`;
-            }).filter(html => html !== '').join('');
-            
-            planEjercicioDiv.innerHTML = html;
-            planEjercicioContainer.style.display = 'block';
-        } else {
-            planEjercicioContainer.style.display = 'none';
-        }
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     // Event listener para el formulario
     const dietForm = document.getElementById('dietForm');
@@ -1481,24 +1411,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const prohibicionesAdicionales = document.getElementById('prohibiciones').value;
             const todasLasProhibiciones = [...intolerancias, prohibicionesAdicionales].filter(p => p.trim() !== '').join(', ');
             
-            // Generar plan de ejercicio automático si está seleccionado
-            const tipoPlan = document.getElementById('tipoPlanEjercicio').value;
-            const nivelEjercicio = document.getElementById('nivelEjercicio').value;
-            let planEjercicioTexto = '';
-            
-            if (tipoPlan === 'automatico' && window.generarPlanEjercicio) {
-                const planEjercicio = window.generarPlanEjercicio(
-                    document.getElementById('objetivo').value,
-                    nivelEjercicio,
-                    document.getElementById('duracion').value
-                );
-                if (planEjercicio) {
-                    planEjercicioTexto = generarTextoPlanEjercicio(planEjercicio);
-                }
-            } else {
-                planEjercicioTexto = document.getElementById('planEjercicio').value;
-            }
-            
             datosUsuario = {
                 nombre: document.getElementById('nombre').value,
                 fechaRegistro: document.getElementById('fechaRegistro').value,
@@ -1508,46 +1420,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 peso: parseFloat(document.getElementById('peso').value),
                 tipoPersona: document.getElementById('tipoPersona').value,
                 objetivo: document.getElementById('objetivo').value,
+                modoGeneracion: document.getElementById('modoGeneracion').value || 'automatico',
                 prohibiciones: todasLasProhibiciones,
                 intolerancias: intolerancias,
-                duracion: document.getElementById('duracion').value,
-                planEjercicio: planEjercicioTexto,
-                nivelEjercicio: nivelEjercicio,
-                incluirSuplementacion: document.getElementById('incluirSuplementacion').checked,
-                suplementacionPersonalizada: document.getElementById('suplementacionPersonalizada').value
+                duracion: document.getElementById('duracion').value
             };
             
             calcularMacronutrientes();
             window.datosUsuario = datosUsuario; // Actualizar referencia global
             mostrarResultados();
-        });
-    }
-    
-    // Listener para tipo de plan de ejercicio
-    const tipoPlanEjercicio = document.getElementById('tipoPlanEjercicio');
-    const planEjercicioPersonalizado = document.getElementById('planEjercicioPersonalizado');
-    
-    if (tipoPlanEjercicio && planEjercicioPersonalizado) {
-        tipoPlanEjercicio.addEventListener('change', function() {
-            if (this.value === 'personalizado') {
-                planEjercicioPersonalizado.style.display = 'block';
-            } else {
-                planEjercicioPersonalizado.style.display = 'none';
-            }
-        });
-    }
-    
-    // Listener para checkbox de suplementación
-    const incluirSuplementacion = document.getElementById('incluirSuplementacion');
-    const suplementacionPersonalizada = document.getElementById('suplementacion-personalizada');
-    
-    if (incluirSuplementacion && suplementacionPersonalizada) {
-        incluirSuplementacion.addEventListener('change', function() {
-            if (this.checked) {
-                suplementacionPersonalizada.style.display = 'block';
-            } else {
-                suplementacionPersonalizada.style.display = 'none';
-            }
         });
     }
     
@@ -1630,10 +1511,20 @@ function inicializarBotones() {
         const nuevoBtnEditar = document.getElementById('btnEditarDieta');
         
         nuevoBtnEditar.addEventListener('click', function() {
-            if (window.habilitarEdicionDieta) {
-                window.habilitarEdicionDieta();
+            // Usar el nuevo sistema de tabla editable para edición
+            if (window.tablaEditable) {
+                // Cambiar al modo manual si no está ya activado
+                const modoActual = datosUsuario.modoGeneracion || 'automatico';
+                if (modoActual !== 'manual') {
+                    datosUsuario.modoGeneracion = 'manual';
+                    mostrarTablaEditable();
+                    mostrarNotificacion('✏️ Modo edición activado. Puedes editar alimentos directamente en las tablas.', 'info');
+                } else {
+                    mostrarTablaEditable();
+                    mostrarNotificacion('✏️ Modo edición ya activado. Haz clic en cualquier fila para editar.', 'info');
+                }
             } else {
-                mostrarNotificacion('⚠️ Sistema de edición no disponible', 'error');
+                mostrarNotificacion('⚠️ Sistema de edición no disponible. Recarga la página.', 'error');
             }
         });
     }
@@ -1848,9 +1739,9 @@ function inicializarBotones() {
                 section.remove();
             });
             
-            // Estilizar otros elementos
+            // Remover elementos obsoletos que ya no se usan
             clone.querySelectorAll('.plan-ejercicio-container').forEach(container => {
-                container.style.cssText = 'margin-top: 12px; padding: 12px; background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%); border-radius: 8px; border: 2px solid #667eea;';
+                container.remove();
             });
             
             clone.querySelectorAll('.notas-agua-section').forEach(section => {

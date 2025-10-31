@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dietfy - Aplicación de Dietas Personalizadas</title>
+    <title>MAIKAFIT - Dietas Personalizadas</title>
     <link rel="stylesheet" href="styles.css">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -27,7 +27,7 @@
             </button>
         </div>
         
-        <h1>Calculadora de Dietas Personalizadas</h1>
+        <h1>MAIKAFIT · Dietas Personalizadas</h1>
         
         <div class="form-container">
             <form id="dietForm">
@@ -117,57 +117,68 @@
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label for="modoGeneracion">
+                        Modo de generación del plan:
+                        <span class="tooltip-icon" data-tooltip="Automático: el sistema genera el plan completo. Manual: tú introduces cada alimento y cantidad.">ℹ️</span>
+                    </label>
+                    <select id="modoGeneracion" name="modoGeneracion" title="Selecciona el modo de generación del plan" required>
+                        <option value="automatico">Generación Automática</option>
+                        <option value="manual">Generación Manual (Editable)</option>
+                    </select>
+                </div>
+
                 <h2>Prohibiciones y Alergias</h2>
 
                 <div class="form-group">
                     <label>Selecciona intolerancias comunes (opcional):</label>
                     <div class="checkbox-group">
                         <label class="checkbox-label">
-                            <input type="checkbox" name="intolerancia" value="lactosa" id="intol-lactosa">
+                            <input type="checkbox" name="intolerancia" value="lactosa" id="intol-lactosa" title="Marcar si tienes intolerancia a la lactosa">
                             <span>Lactosa</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="intolerancia" value="gluten" id="intol-gluten">
+                            <input type="checkbox" name="intolerancia" value="gluten" id="intol-gluten" title="Marcar si tienes intolerancia al gluten">
                             <span>Gluten</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="intolerancia" value="frutos-secos" id="intol-frutos-secos">
+                            <input type="checkbox" name="intolerancia" value="frutos-secos" id="intol-frutos-secos" title="Marcar si tienes alergia a los frutos secos">
                             <span>Frutos Secos</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="intolerancia" value="huevo" id="intol-huevo">
+                            <input type="checkbox" name="intolerancia" value="huevo" id="intol-huevo" title="Marcar si tienes alergia al huevo">
                             <span>Huevo</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="intolerancia" value="pescado" id="intol-pescado">
+                            <input type="checkbox" name="intolerancia" value="pescado" id="intol-pescado" title="Marcar si tienes alergia al pescado">
                             <span>Pescado</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="intolerancia" value="mariscos" id="intol-mariscos">
+                            <input type="checkbox" name="intolerancia" value="mariscos" id="intol-mariscos" title="Marcar si tienes alergia a los mariscos">
                             <span>Mariscos</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="intolerancia" value="soja" id="intol-soja">
+                            <input type="checkbox" name="intolerancia" value="soja" id="intol-soja" title="Marcar si tienes alergia a la soja">
                             <span>Soja</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="intolerancia" value="cacahuetes" id="intol-cacahuetes">
+                            <input type="checkbox" name="intolerancia" value="cacahuetes" id="intol-cacahuetes" title="Marcar si tienes alergia a los cacahuetes">
                             <span>Cacahuetes</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="intolerancia" value="carne-roja" id="intol-carne-roja">
+                            <input type="checkbox" name="intolerancia" value="carne-roja" id="intol-carne-roja" title="Marcar si no puedes consumir carne roja">
                             <span>Carne Roja</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="intolerancia" value="cerdo" id="intol-cerdo">
+                            <input type="checkbox" name="intolerancia" value="cerdo" id="intol-cerdo" title="Marcar si no puedes consumir cerdo">
                             <span>Cerdo</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="intolerancia" value="azufre" id="intol-azufre">
+                            <input type="checkbox" name="intolerancia" value="azufre" id="intol-azufre" title="Marcar si tienes intolerancia a los sulfitos">
                             <span>Sulfitos</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="intolerancia" value="levadura" id="intol-levadura">
+                            <input type="checkbox" name="intolerancia" value="levadura" id="intol-levadura" title="Marcar si tienes intolerancia a la levadura">
                             <span>Levadura</span>
                         </label>
                     </div>
@@ -177,23 +188,23 @@
                     <label>Preferencias dietéticas (opcional):</label>
                     <div class="checkbox-group">
                         <label class="checkbox-label">
-                            <input type="checkbox" name="preferencia" value="vegetariano" id="pref-vegetariano">
+                            <input type="checkbox" name="preferencia" value="vegetariano" id="pref-vegetariano" title="Marcar si sigues una dieta vegetariana">
                             <span>Vegetariano</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="preferencia" value="vegano" id="pref-vegano">
+                            <input type="checkbox" name="preferencia" value="vegano" id="pref-vegano" title="Marcar si sigues una dieta vegana">
                             <span>Vegano</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="preferencia" value="pescetariano" id="pref-pescetariano">
+                            <input type="checkbox" name="preferencia" value="pescetariano" id="pref-pescetariano" title="Marcar si sigues una dieta pescetariana">
                             <span>Pescetariano</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="preferencia" value="bajo-carbohidratos" id="pref-bajo-carbs">
+                            <input type="checkbox" name="preferencia" value="bajo-carbohidratos" id="pref-bajo-carbs" title="Marcar si prefieres una dieta baja en carbohidratos">
                             <span>Bajo en Carbohidratos</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" name="preferencia" value="cetogenica" id="pref-keto">
+                            <input type="checkbox" name="preferencia" value="cetogenica" id="pref-keto" title="Marcar si sigues una dieta cetogénica">
                             <span>Cetogénica</span>
                         </label>
                     </div>
@@ -222,64 +233,23 @@
                     <small class="form-help">Recomendación general: 2-3 litros/día. Se calculará una recomendación personalizada según tu peso y actividad.</small>
                 </div>
 
-                <h2>Suplementación</h2>
-
-                <div class="form-group">
-                    <label class="checkbox-label" style="display: inline-flex; align-items: center; margin-bottom: 15px;">
-                        <input type="checkbox" id="incluirSuplementacion" name="incluirSuplementacion" checked>
-                        <span>Incluir recomendaciones de suplementación en el plan</span>
-                    </label>
-                </div>
-
-                <div id="suplementacion-personalizada" style="display: none;">
-                    <div class="form-group">
-                        <label for="suplementacionPersonalizada">Suplementación personalizada (opcional):</label>
-                        <textarea id="suplementacionPersonalizada" name="suplementacionPersonalizada" rows="4" placeholder="Describe aquí suplementos específicos o notas personalizadas sobre suplementación..."></textarea>
-                    </div>
-                </div>
-
-                <h2>Plan de Ejercicio</h2>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="nivelEjercicio">Nivel de ejercicio:</label>
-                        <select id="nivelEjercicio" name="nivelEjercicio" title="Selecciona tu nivel de experiencia">
-                            <option value="principiante">Principiante</option>
-                            <option value="intermedio">Intermedio</option>
-                            <option value="avanzado">Avanzado</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="tipoPlanEjercicio">Tipo de plan:</label>
-                        <select id="tipoPlanEjercicio" name="tipoPlanEjercicio" title="Selecciona el tipo de plan">
-                            <option value="automatico">Automático (Recomendado)</option>
-                            <option value="personalizado">Personalizado</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group" id="planEjercicioPersonalizado" style="display: none;">
-                    <label for="planEjercicio">Indica tu plan de ejercicio personalizado (opcional):</label>
-                    <textarea id="planEjercicio" name="planEjercicio" rows="6" title="Plan de ejercicio semanal personalizado" placeholder="Ej: Lunes - Piernas: Sentadillas 4x10, Prensa 3x12, Extensión de cuádriceps 3x15&#10;Martes - Espalda: Dominadas 4x8, Remo con barra 4x10, Jalones 3x12&#10;Miércoles - Pecho: Press banca 4x8, Aperturas 3x12, Fondos 3x10..."></textarea>
-                </div>
-
-                <button type="submit" class="btn-submit">✨ Generar Plan de Alimentación</button>
+                <button type="submit" class="btn-submit" title="Generar plan de alimentación personalizado">✨ Generar Plan de Alimentación</button>
             </form>
         </div>
 
         <div id="resultados" class="resultados oculto">
             <div class="print-header">
                 <div class="btn-container">
-                    <button type="button" id="btnGuardar" class="btn-save">
+                    <button type="button" id="btnGuardar" class="btn-save" title="Guardar dieta en Firebase">
                         💾 Guardar Dieta
                     </button>
-                    <button type="button" id="btnEditarDieta" class="btn-edit">
+                    <button type="button" id="btnEditarDieta" class="btn-edit" title="Editar la dieta antes de descargar">
                         ✏️ Editar Dieta
                     </button>
-                    <button type="button" id="btnDescargar" class="btn-download">
+                    <button type="button" id="btnDescargar" class="btn-download" title="Descargar plan en formato PDF">
                         📥 Descargar Plan en PDF
                     </button>
-                    <button type="button" id="btnNuevo" class="btn-new">
+                    <button type="button" id="btnNuevo" class="btn-new" title="Crear una nueva dieta">
                         🔄 Nueva Dieta
                     </button>
                 </div>
@@ -293,11 +263,11 @@
                 </div>
 
                 <div class="tabs">
-                    <button class="tab active" data-tab="dieta">DIETA</button>
-                    <button class="tab" data-tab="alimentos">ALIMENTOS</button>
-                    <button class="tab" data-tab="revisiones">REVISIONES</button>
-                    <button class="tab" data-tab="calendario">CALENDARIO</button>
-                    <button class="tab" data-tab="prohibiciones">PROHIBICIONES</button>
+                    <button class="tab active" data-tab="dieta" title="Ver plan de comidas semanal">DIETA</button>
+                    <button class="tab" data-tab="alimentos" title="Ver lista de alimentos recomendados">ALIMENTOS</button>
+                    <button class="tab" data-tab="revisiones" title="Ver revisiones y seguimiento">REVISIONES</button>
+                    <button class="tab" data-tab="calendario" title="Ver calendario de comidas">CALENDARIO</button>
+                    <button class="tab" data-tab="prohibiciones" title="Ver alimentos prohibidos y alergias">PROHIBICIONES</button>
                 </div>
 
                 <div id="tab-dieta" class="tab-content active">
@@ -354,14 +324,6 @@
                     <div id="nota-agua" class="notas-agua-section" style="margin-top: 30px; padding: 15px; background: #d1ecf1; border-radius: 8px; border-left: 4px solid #17a2b8;">
                         <h4 style="color: #0c5460; margin-bottom: 10px;">📝 NOTA IMPORTANTE</h4>
                         <p style="margin: 0; color: #0c5460;">Recuerda beber al menos 2-3 litros de agua al día. Ajusta las porciones según tu nivel de saciedad y energía.</p>
-                    </div>
-
-                    <!-- Plan de Ejercicio -->
-                    <div id="plan-ejercicio-container" class="plan-ejercicio-container" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 2px solid #667eea;">
-                        <h3 style="color: #667eea; margin-bottom: 15px; font-size: 1.5em;">🏋️ Plan de Ejercicio</h3>
-                        <div id="plan-ejercicio-content" style="white-space: pre-line; line-height: 1.8; font-size: 1.1em; color: #333;">
-                            <!-- Se llenará con JS -->
-                        </div>
                     </div>
                 </div>
 
@@ -451,10 +413,11 @@
     <script src="clienteService.js"></script>
     <script src="base-datos-alimentos.js"></script>
     <script src="generador-dietas.js"></script>
-    <script src="planes-ejercicio.js"></script>
-    <script src="editor-dietas.js"></script>
+    <!-- editor-dietas.js REMOVIDO: Sistema antiguo reemplazado por tabla-editable.js -->
     <script src="verificar-firestore.js"></script>
     <script src="cliente-manager.js"></script>
+    <script src="tabla-editable.js"></script>
+    <script src="diagnostico-tabla-editable.js"></script>
     <script src="ui-manager.js"></script>
     <script src="script.js"></script>
 </body>

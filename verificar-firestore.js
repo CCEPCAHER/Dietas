@@ -30,10 +30,23 @@ function verificarFirestore() {
     }
     console.log('✅ Usuario autenticado:', user.email);
     
-    // Probar lectura simple
-    window.firebaseDb.collection('test').limit(1).get()
-        .then(() => {
-            console.log('✅ Conexión a Firestore funciona');
+    // Probar lectura de clientes (colección con permisos configurados)
+    window.firebaseDb.collection('clientes')
+        .where('nutricionistaId', '==', user.uid)
+        .limit(1)
+        .get()
+        .then((snapshot) => {
+            console.log('✅ Conexión a Firestore funciona correctamente');
+            console.log('📊 Clientes encontrados:', snapshot.size);
+            
+            if (snapshot.size === 0) {
+                console.log('ℹ️ No tienes clientes registrados aún');
+            } else {
+                snapshot.forEach(doc => {
+                    console.log('📄 Cliente ID:', doc.id);
+                    console.log('📋 Datos:', doc.data());
+                });
+            }
         })
         .catch((error) => {
             console.error('❌ Error de conexión:', error);
@@ -43,6 +56,7 @@ function verificarFirestore() {
             if (error.code === 'permission-denied') {
                 console.error('⚠️ PROBLEMA: Permisos denegados');
                 console.log('Solución: Actualiza las reglas de Firestore en Firebase Console');
+                console.log('Las reglas actuales deberían permitir el acceso a clientes.');
             } else if (error.code === 'unavailable') {
                 console.error('⚠️ PROBLEMA: Firestore no disponible');
                 console.log('Solución: Verifica tu conexión a internet');

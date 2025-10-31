@@ -248,66 +248,6 @@ h3 {
     font-weight: 600;
     margin: 0;
 }
-
-/* Estilos para suplementación */
-.suplementacion-section {
-    margin: 30px 0;
-    padding: 25px;
-    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-    border-radius: 12px;
-    border-left: 5px solid #ff9800;
-}
-
-.suplementacion-section h3 {
-    color: #e65100;
-    margin-bottom: 20px;
-    font-size: 18pt;
-    text-align: center;
-}
-
-.suplementos-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 15px;
-}
-
-.suplementos-basicos, .suplementos-opcionales {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.suplementos-basicos h4, .suplementos-opcionales h4 {
-    color: #f57c00;
-    margin-bottom: 10px;
-    font-size: 13pt;
-}
-
-.suplementos-basicos ul, .suplementos-opcionales ul {
-    list-style: none;
-    padding: 0;
-}
-
-.suplementos-basicos li, .suplementos-opcionales li {
-    padding: 8px 0;
-    border-bottom: 1px solid #ffe0b2;
-    color: #5d4037;
-    font-size: 10pt;
-}
-
-.suplementos-nota {
-    margin-top: 15px;
-    padding: 12px;
-    background: #fff8e1;
-    border-radius: 6px;
-    color: #f57c00;
-    font-weight: 600;
-    text-align: center;
-    font-size: 10pt;
-}
-
 /* Estilos para grupo de checkboxes de intolerancias */
 .checkbox-group {
     display: grid;
@@ -1352,10 +1292,6 @@ table tbody tr:hover {
         font-size: 2em;
     }
     
-    .suplementos-content {
-        grid-template-columns: 1fr;
-    }
-    
     .actividad-grid {
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     }
@@ -1406,10 +1342,6 @@ table tbody tr:hover {
         grid-template-columns: 1fr;
     }
     
-    .suplementos-content {
-        grid-template-columns: 1fr;
-    }
-    
     .tabs {
         overflow-x: auto;
         white-space: nowrap;
@@ -1446,7 +1378,7 @@ table tbody tr:hover {
         flex-direction: column;
     }
     
-    .btn-ver-ficha, .btn-generar-dieta {
+    .btn-ver-ficha, .btn-generar-dieta, .btn-eliminar-cliente {
         width: 100%;
     }
 }
@@ -1553,7 +1485,8 @@ table tbody tr:hover {
 }
 
 .btn-ver-ficha,
-.btn-generar-dieta {
+.btn-generar-dieta,
+.btn-eliminar-cliente {
     flex: 1;
     padding: 10px 15px;
     border: none;
@@ -1571,6 +1504,23 @@ table tbody tr:hover {
 .btn-generar-dieta {
     background: #28a745;
     color: white;
+}
+
+.btn-eliminar-cliente {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-eliminar-cliente:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.btn-eliminar-cliente:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .btn-ver-ficha:hover,
@@ -1727,6 +1677,52 @@ table tbody tr:hover {
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-cancelar:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+}
+
+/* Estilos para formulario de edición de cliente */
+.form-editar-cliente {
+    padding: 20px 0;
+}
+
+.form-section-header {
+    margin: 30px 0 20px 0;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    text-align: center;
+}
+
+.btn-editar-cliente {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-editar-cliente:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.btn-editar-cliente:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* Botón flotante para crear cliente */
@@ -1773,4 +1769,389 @@ table tbody tr:hover {
         height: 50px;
         font-size: 20px;
     }
+}
+
+/* ============================================
+   ESTILOS PARA TABLA EDITABLE
+   ============================================ */
+
+.tabla-editable-container {
+    margin: 20px 0;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #667eea;
+}
+
+.comida-section {
+    margin-bottom: 30px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Evitar que el desplegable del autocompletado quede recortado por la tabla */
+.tabla-alimentos {
+    overflow: visible; /* sobrescribe overflow del selector table */
+    position: relative;
+}
+
+.comida-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #667eea;
+}
+
+.comida-header h3 {
+    margin: 0;
+    color: #667eea;
+}
+
+.btn-add-alimento {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.btn-add-alimento:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}
+
+.tabla-alimentos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+
+.tabla-alimentos thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.tabla-alimentos th {
+    padding: 12px 8px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.tabla-alimentos td {
+    padding: 8px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.tabla-alimentos tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.tabla-alimentos tbody tr.fila-vacia {
+    background: #fefefe;
+    border-left: 3px solid #667eea;
+}
+
+.tabla-alimentos tbody tr.fila-vacia:hover {
+    background: #f0f4ff;
+}
+
+.input-alimento {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.input-alimento:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.input-gramos {
+    width: 80px;
+    padding: 8px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.input-gramos:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.valor-calculado {
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+}
+
+.btn-delete-row {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.btn-delete-row:hover {
+    background: #c82333;
+    transform: scale(1.05);
+}
+
+.totales-comida {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding: 10px;
+    background: #e9ecef;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+.totales-comida span {
+    padding: 5px 10px;
+    background: white;
+    border-radius: 5px;
+}
+
+.totales-diarios {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.totales-diarios h3 {
+    color: white;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.totales-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.total-item {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.total-item-label {
+    font-size: 12px;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.total-item-value {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.autocomplete-container {
+    position: relative;
+}
+
+.autocomplete-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #667eea;
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+    max-height: 360px; /* lista más larga */
+    overflow-y: auto;
+    z-index: 3000; /* por encima de tarjetas/modales livianos */
+    margin-top: 2px;
+    overscroll-behavior: contain;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.autocomplete-item {
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.autocomplete-item:hover {
+    background: #667eea;
+    color: white;
+}
+
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.alimento-info {
+    font-size: 11px;
+    color: #666;
+    margin-top: 3px;
+}
+
+.autocomplete-item:hover .alimento-info {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.autocomplete-item.seleccionado {
+    background: #667eea;
+    color: white;
+    transform: translateX(3px);
+}
+
+.autocomplete-item.seleccionado .alimento-info {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.resultado-destacado {
+    background: linear-gradient(90deg, #e3f2fd 0%, #ffffff 100%);
+    border-left: 4px solid #2196f3;
+    font-weight: 600;
+}
+
+.resultado-destacado:hover {
+    background: linear-gradient(90deg, #2196f3 0%, #1976d2 100%);
+    color: white;
+    transform: translateX(3px);
+}
+
+.resultado-destacado:hover .alimento-info {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.autocomplete-item mark {
+    font-weight: 700;
+    background: #ffeb3b !important;
+    color: #000;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.input-alimento::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+.input-alimento:focus::placeholder {
+    color: #ccc;
+}
+
+@media (max-width: 768px) {
+    .tabla-alimentos {
+        font-size: 12px;
+    }
+    
+    .tabla-alimentos th,
+    .tabla-alimentos td {
+        padding: 6px 4px;
+    }
+    
+    .input-gramos {
+        width: 60px;
+    }
+    
+    .totales-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* ============================================
+   ESTILOS PARA COMPONENTES DINÁMICOS
+   ============================================ */
+
+.mensaje-error-modulo {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.mensaje-error-modulo h3 {
+    color: #856404;
+    margin: 0 0 10px 0;
+}
+
+.mensaje-error-modulo p {
+    color: #856404;
+    margin: 10px 0;
+}
+
+.banner-modo-manual {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.banner-modo-manual h3 {
+    margin: 0 0 10px 0;
+    color: white;
+}
+
+.banner-modo-manual p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.banner-modo-manual p:last-child {
+    margin: 10px 0 0 0;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.autocomplete-list-hidden {
+    display: none !important;
+}
+
+.autocomplete-header {
+    padding: 8px;
+    background: #f0f0f0;
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+}
+
+.autocomplete-sin-resultados {
+    color: #999;
+    padding: 15px;
+    text-align: center;
+}
+
+.autocomplete-sin-resultados strong {
+    font-weight: 700;
+}
+
+.autocomplete-sugerencia {
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.autocomplete-sugerencia-rapida {
+    font-size: 12px;
 }
