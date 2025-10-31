@@ -1018,7 +1018,7 @@ class TablaEditable {
         window.mostrarNotificacion?.('✅ Día replicado a toda la semana', 'success');
     }
 
-    // Exportación PDF minimalista con marca MAIKAFIT
+    // Exportación PDF minimalista con marca MAIKA PORCUNA
     exportarPDFMinimalista() {
         // Guardar día actual antes de exportar
         this.planSemana[this.diaActual] = this.obtenerDatos();
@@ -1048,7 +1048,7 @@ class TablaEditable {
             return `<div class="comida"><strong>${comida}</strong>${lis}</div>`;
         };
 
-        let contenido = `<div class='header'><div class='brand'>MAIKAFIT</div><div class='cliente'>${cab.fecha}</div></div>`;
+        let contenido = `<div class='header'><div class='brand'>MAIKA PORCUNA</div><div class='cliente'>${cab.fecha}</div></div>`;
         contenido += `<div class='meta'><strong>${cab.nombre}</strong>${cab.email ? ' · ' + cab.email : ''}${cab.telefono ? ' · ' + cab.telefono : ''}</div>`;
         const subtags = [];
         if (cab.edad) subtags.push(`Edad: ${cab.edad}`);
@@ -1081,7 +1081,7 @@ class TablaEditable {
             contenido += `</div>`;
         });
 
-        win.document.write(`<html><head><title>Plan MAIKAFIT</title>${estilo}</head><body>${contenido}</body></html>`);
+        win.document.write(`<html><head><title>Plan MAIKA PORCUNA</title>${estilo}</head><body>${contenido}</body></html>`);
         win.document.close();
         win.focus();
         // Dejar la impresión a criterio del usuario (evitar bloqueo popups en algunos navegadores)

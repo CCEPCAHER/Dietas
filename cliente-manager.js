@@ -31,7 +31,10 @@ class ClienteManager {
         clienteSection.className = 'clientes-section oculto';
         clienteSection.innerHTML = `
             <div class="clientes-header">
-                <h2>👥 Gestión de Clientes</h2>
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                    <button id="btnAtrasClientes" class="btn-volver" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1em;">← Atrás</button>
+                    <h2 style="margin: 0;">👥 Gestión de Clientes</h2>
+                </div>
                 <div class="clientes-controls">
                     <input type="text" id="buscarCliente" placeholder="🔍 Buscar por nombre, email, teléfono o DNI..." class="buscar-input">
                     <button id="btnNuevoCliente" class="btn-nuevo-cliente">➕ Nuevo Cliente</button>
@@ -41,8 +44,11 @@ class ClienteManager {
         `;
         
         // Insertar después del título principal
+        const mainHeader = mainContainer.querySelector('.main-header');
         const titulo = mainContainer.querySelector('h1');
-        if (titulo) {
+        if (mainHeader) {
+            mainHeader.insertAdjacentElement('afterend', clienteSection);
+        } else if (titulo) {
             titulo.insertAdjacentElement('afterend', clienteSection);
         } else {
             mainContainer.insertBefore(clienteSection, mainContainer.firstChild);
@@ -101,6 +107,10 @@ class ClienteManager {
             }
             if (e.target && e.target.classList.contains('btn-flotante')) {
                 this.mostrarFormularioNuevoCliente();
+            }
+            // Botón atrás en sección clientes
+            if (e.target && e.target.id === 'btnAtrasClientes') {
+                this.volverAFormulario();
             }
         });
 
@@ -242,6 +252,22 @@ class ClienteManager {
         setTimeout(() => {
             seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 200);
+    }
+
+    volverAFormulario() {
+        const seccion = document.getElementById('clientesSection');
+        const formContainer = document.querySelector('.form-container');
+        const resultados = document.getElementById('resultados');
+        
+        if (seccion) {
+            seccion.classList.add('oculto');
+        }
+        if (formContainer) {
+            formContainer.style.display = '';
+        }
+        
+        // Scroll a la parte superior
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     async cargarClientes() {
