@@ -4,6 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAIKA PORCUNA - Plan de Alimentación Personalizada</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Aplicación profesional para la creación de planes de alimentación personalizados - Nutrición, Dietética, Suplementación y Nutrición Deportiva">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="MAIKA PORCUNA">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- Manifest y Iconos -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Favicon e iconos Apple -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icon-16x16.png">
+    <link rel="apple-touch-icon" href="/icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="/icon-167x167.png">
+    
     <link rel="stylesheet" href="styles.css">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -435,5 +455,20 @@
     <script src="diagnostico-tabla-editable.js"></script>
     <script src="ui-manager.js"></script>
     <script src="script.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker registrado exitosamente:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.error('❌ Error al registrar Service Worker:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>

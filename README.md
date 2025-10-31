@@ -1,6 +1,16 @@
-# 🥗 Dietfy - Sistema Profesional de Gestión de Dietas
+# 🥗 MAIKA PORCUNA - Sistema Profesional de Gestión de Dietas
 
-Sistema completo y profesional para la creación, gestión y seguimiento de planes de alimentación personalizados. Incluye gestión de clientes, historial de consultas, seguimiento de progreso e integración con Firebase.
+Sistema completo y profesional para la creación, gestión y seguimiento de planes de alimentación personalizados. Incluye gestión de clientes, historial de consultas, seguimiento de progreso, integración con Firebase y funcionalidad PWA (Progressive Web App).
+
+## 📱 PWA - Progressive Web App
+
+Esta aplicación es una **PWA instalable** que funciona como una app nativa:
+- ✅ Instalable en móviles y tablets
+- ✅ Funciona offline
+- ✅ Icono personalizado con foto de la nutricionista
+- ✅ Carga rápida
+
+**Ver `PWA_INSTALL.md` para instrucciones de instalación.**
 
 ## ✨ Características Principales
 
@@ -89,7 +99,23 @@ service cloud.firestore {
 
 ⚠️ **Nota**: Esta regla es para desarrollo. Para producción, configura reglas más específicas.
 
-### 4. Abrir la Aplicación
+### 4. Configurar PWA (Opcional pero Recomendado)
+
+Para hacer la app instalable en móviles:
+
+```bash
+# 1. Instalar Pillow
+pip install Pillow
+
+# 2. Generar iconos desde tu imagen
+python generar_iconos.py ruta/a/tu/imagen.jpg
+
+# Los iconos se crearán automáticamente en la raíz del proyecto
+```
+
+Ver `PWA_INSTALL.md` para instrucciones completas.
+
+### 5. Abrir la Aplicación
 
 Simplemente abre `index.html` en tu navegador.
 
@@ -106,10 +132,14 @@ Dietas-main/
 ├── clienteService.js          # Servicio para gestionar clientes
 ├── base-datos-alimentos.js    # Base de datos ampliada de alimentos
 ├── generador-dietas.js        # Generador de planes variados
-├── editor-dietas.js            # Editor de dietas antes de PDF
 ├── cliente-manager.js          # Gestor de interfaz de clientes
+├── tabla-editable.js           # Sistema de edición de dietas
 ├── ui-manager.js              # Gestor de UI y autenticación
 ├── verificar-firestore.js     # Script de verificación
+├── manifest.json              # Manifest de PWA
+├── sw.js                      # Service Worker para PWA
+├── generar_iconos.py          # Script para generar iconos
+├── PWA_INSTALL.md            # Guía de instalación PWA
 ├── .gitignore                 # Archivos ignorados por Git
 ├── README.md                  # Este archivo
 ├── CONFIGURACION.md           # Guía de configuración detallada
