@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Script para generar todos los iconos PWA desde una imagen original
 Requisitos: pip install Pillow
@@ -7,6 +8,12 @@ Requisitos: pip install Pillow
 from PIL import Image
 import sys
 import os
+import io
+
+# Configurar la salida a UTF-8 para Windows
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 def generar_iconos(imagen_original, output_dir="."):
     """

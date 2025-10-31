@@ -1035,6 +1035,8 @@ class TablaEditable {
                 .brand{font-weight:900;font-size:24px;color:#4f46e5;letter-spacing:0.5px}
                 .cliente{font-size:12px;color:#555}
                 .meta{margin-top:4px; font-size:12px; color:#374151}
+                .nutricionista{display:flex;justify-content:center;gap:20px;margin-top:8px;font-size:11px;color:#6b7280}
+                .nutricionista-item{display:flex;align-items:center;gap:4px}
                 .card{border:1px solid #e5e7eb; border-radius:10px; padding:14px; margin:14px 0}
                 h2{margin:12px 0 6px 0;color:#111827;border-bottom:2px solid #e5e7eb;padding-bottom:6px}
                 .comida{margin:8px 0}
@@ -1049,6 +1051,7 @@ class TablaEditable {
         };
 
         let contenido = `<div class='header'><div class='brand'>MAIKA PORCUNA</div><div class='cliente'>${cab.fecha}</div></div>`;
+        contenido += `<div class='nutricionista'><div class='nutricionista-item'>📧 Maikafit1977@gmail.com</div><div class='nutricionista-item'>📞 +34 650 229 987</div></div>`;
         contenido += `<div class='meta'><strong>${cab.nombre}</strong>${cab.email ? ' · ' + cab.email : ''}${cab.telefono ? ' · ' + cab.telefono : ''}</div>`;
         const subtags = [];
         if (cab.edad) subtags.push(`Edad: ${cab.edad}`);

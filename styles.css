@@ -460,6 +460,27 @@ h3 {
     opacity: 1;
 }
 
+.nutricionista-contacto-header {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.contacto-item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 0.95em;
+    margin: 0;
+}
+
+.contacto-icon-header {
+    font-size: 1.1em;
+}
+
 .pdf-footer {
     margin-top: 40px;
     padding: 20px;
