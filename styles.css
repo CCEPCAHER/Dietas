@@ -954,31 +954,156 @@ table tbody tr:hover {
     }
     
     /* Tabla editable mobile */
+    .tabla-editable-container {
+        padding: 15px;
+        margin: 10px 0;
+    }
+    
     .comida-section {
         padding: 10px;
+        margin-bottom: 20px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
-    .tabla-alimentos {
-        font-size: 11px;
+    .comida-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
     }
     
-    .tabla-alimentos th,
-    .tabla-alimentos td {
-        padding: 4px 2px;
-    }
-    
-    .input-gramos {
-        width: 50px;
-        padding: 5px;
+    .comida-header h3 {
+        font-size: 1.1em;
+        margin-bottom: 10px;
     }
     
     .btn-add-alimento {
         padding: 6px 10px;
-        font-size: 12px;
+        font-size: 11px;
+        width: 100%;
+        margin-top: 5px;
+    }
+    
+    /* Tablas responsive - scroll horizontal */
+    
+    .tabla-alimentos {
+        font-size: 10px;
+        min-width: 700px;
+        width: auto;
+    }
+    
+    .tabla-alimentos th,
+    .tabla-alimentos td {
+        padding: 6px 3px;
+        white-space: nowrap;
+    }
+    
+    .tabla-alimentos th {
+        font-size: 9px;
+        font-weight: 700;
+    }
+    
+    .input-alimento {
+        font-size: 11px;
+        padding: 5px;
+    }
+    
+    .input-gramos {
+        width: 45px;
+        padding: 3px;
+        font-size: 11px;
+    }
+    
+    .valor-calculado {
+        font-size: 10px;
+        font-weight: 600;
+    }
+    
+    .btn-delete-row {
+        padding: 3px 6px;
+        font-size: 10px;
     }
     
     .totales-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .totales-comida {
+        flex-wrap: wrap;
+        gap: 5px;
+        font-size: 0.85em;
+    }
+    
+    /* Banner modo manual ajustado */
+    .banner-modo-manual p {
+        font-size: 12px;
+        line-height: 1.4;
+    }
+    
+    /* Controles de día mobile */
+    .tabla-editable-container > .comida-header {
+        margin-bottom: 15px;
+    }
+    
+    .tabla-editable-container > .comida-header > div {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .tabla-editable-container > .comida-header > div > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .tabla-editable-container > .comida-header select {
+        width: 100%;
+        padding: 8px;
+        font-size: 14px;
+    }
+    
+    .tabla-editable-container > .comida-header button {
+        width: 100%;
+        margin-top: 5px;
+        font-size: 12px;
+        padding: 10px;
+    }
+    
+    /* Totales diarios mobile */
+    .totales-diarios {
+        padding: 15px;
+        margin-top: 15px;
+    }
+    
+    .totales-diarios h3 {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+    }
+    
+    .total-item {
+        padding: 10px;
+    }
+    
+    .total-item-label {
+        font-size: 10px;
+    }
+    
+    .total-item-value {
+        font-size: 18px;
+    }
+    
+    /* Autocomplete mobile */
+    .autocomplete-list {
+        max-height: 200px;
+        font-size: 10px;
+    }
+    
+    .autocomplete-item {
+        padding: 8px;
+    }
+    
+    .alimento-info {
+        font-size: 9px;
     }
     
     /* PDF header mobile */
@@ -989,13 +1114,6 @@ table tbody tr:hover {
     .pdf-footer {
         padding: 15px;
         font-size: 0.85em;
-    }
-    
-    /* Totales comidas mobile */
-    .totales-comida {
-        flex-direction: column;
-        gap: 8px;
-        font-size: 0.9em;
     }
     
     /* Auth tabs mobile */
