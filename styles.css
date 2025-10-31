@@ -375,18 +375,6 @@ h3 {
     margin-bottom: 30px;
 }
 
-@media (max-width: 1024px) {
-    .btn-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .btn-container {
-        grid-template-columns: 1fr;
-    }
-}
-
 .oculto {
     display: none !important;
 }
@@ -774,7 +762,7 @@ table tbody tr:hover {
     }
 }
 
-/* Responsive - Mobile First Approach */
+/* Mobile First - Dispositivos muy pequeños (320px - 480px) */
 @media (max-width: 480px) {
     body {
         padding: 10px;
@@ -820,11 +808,14 @@ table tbody tr:hover {
     
     .tabs {
         gap: 5px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
     .tab {
-        padding: 10px 12px;
-        font-size: 0.75em;
+        padding: 8px 10px;
+        font-size: 0.7em;
+        white-space: nowrap;
     }
     
     .user-menu {
@@ -846,8 +837,14 @@ table tbody tr:hover {
     }
     
     .modal-content {
-        margin: 10% auto;
-        padding: 20px;
+        margin: 5% auto;
+        padding: 15px;
+        width: 95%;
+    }
+    
+    .modal-extra-large {
+        width: 95%;
+        max-width: 95%;
     }
     
     .tabla-comidas {
@@ -858,6 +855,22 @@ table tbody tr:hover {
     
     .tabla-comidas table {
         min-width: 700px;
+    }
+    
+    /* Tablas responsive */
+    table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .macro-table table,
+    .info-usuario-table table {
+        min-width: 600px;
+    }
+    
+    .tabla-horarios {
+        min-width: 300px;
     }
     
     .dia-plan {
@@ -875,11 +888,145 @@ table tbody tr:hover {
         height: 45px;
         font-size: 18px;
     }
+    
+    /* Checkboxes responsivos */
+    .checkbox-group {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .checkbox-label {
+        padding: 8px;
+        font-size: 0.9em;
+    }
+    
+    /* TMB section mobile */
+    .tmb-section {
+        padding: 15px;
+    }
+    
+    .tmb-section h3 {
+        font-size: 1.2em;
+    }
+    
+    .tmb-number {
+        font-size: 1.8em;
+    }
+    
+    .actividad-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .actividad-card {
+        padding: 12px;
+    }
+    
+    /* Tooltips mobile */
+    .tooltip-icon:hover::after {
+        width: 200px;
+        font-size: 0.75em;
+    }
+    
+    /* Cliente cards mobile */
+    .cliente-card {
+        padding: 15px;
+    }
+    
+    .cliente-actions {
+        flex-direction: column;
+    }
+    
+    .btn-ver-ficha,
+    .btn-generar-dieta,
+    .btn-eliminar-cliente {
+        width: 100%;
+        margin-top: 5px;
+    }
+    
+    /* Dieta cards mobile */
+    .dieta-card {
+        flex-direction: column;
+        padding: 15px;
+    }
+    
+    .dieta-actions {
+        width: 100%;
+    }
+    
+    /* Tabla editable mobile */
+    .comida-section {
+        padding: 10px;
+    }
+    
+    .tabla-alimentos {
+        font-size: 11px;
+    }
+    
+    .tabla-alimentos th,
+    .tabla-alimentos td {
+        padding: 4px 2px;
+    }
+    
+    .input-gramos {
+        width: 50px;
+        padding: 5px;
+    }
+    
+    .btn-add-alimento {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .totales-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* PDF header mobile */
+    .pdf-header h1 {
+        font-size: 1.5em;
+    }
+    
+    .pdf-footer {
+        padding: 15px;
+        font-size: 0.85em;
+    }
+    
+    /* Totales comidas mobile */
+    .totales-comida {
+        flex-direction: column;
+        gap: 8px;
+        font-size: 0.9em;
+    }
+    
+    /* Auth tabs mobile */
+    .auth-tabs {
+        gap: 5px;
+    }
+    
+    .auth-tab {
+        padding: 8px 12px;
+        font-size: 0.85em;
+    }
+    
+    /* Banner modo manual mobile */
+    .banner-modo-manual {
+        padding: 15px;
+    }
+    
+    .banner-modo-manual h3 {
+        font-size: 1.1em;
+    }
 }
 
+/* Tablets pequeños (481px - 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
     .container {
         padding: 25px;
+        border-radius: 18px;
     }
     
     h1 {
@@ -895,6 +1042,10 @@ table tbody tr:hover {
     }
     
     .macro-info {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .checkbox-group {
         grid-template-columns: repeat(2, 1fr);
     }
     
@@ -914,25 +1065,116 @@ table tbody tr:hover {
     .user-menu {
         gap: 8px;
     }
+    
+    .modal-content {
+        margin: 5% auto;
+        padding: 25px;
+    }
+    
+    /* Tablas responsive */
+    table {
+        font-size: 0.9em;
+    }
+    
+    .macro-table table,
+    .info-usuario-table table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    .btn-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .totales-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .actividad-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
+/* Tablets medianas (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        padding: 30px;
+    }
+    
+    h1 {
+        font-size: 2em;
+    }
+    
+    .btn-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .tabs {
+        gap: 15px;
+    }
+    
+    .tab {
+        padding: 12px 20px;
+    }
+    
+    .user-menu {
+        gap: 12px;
+    }
+    
+    .actividad-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .clientes-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Desktop y pantallas grandes */
+@media (min-width: 1025px) {
+    .btn-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .actividad-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    
+    .clientes-list {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1600px;
+    }
+    
+    .tabs {
+        gap: 20px;
+    }
+    
+    .tab {
+        padding: 14px 28px;
+    }
+}
+
+/* Ajustes adicionales para todas las pantallas móviles */
 @media (max-width: 768px) {
     .container {
-        padding: 20px;
+        padding: 20px 15px;
     }
     
     .tabs {
         flex-direction: row;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
     .tab {
         width: auto;
-        flex: 1 1 auto;
-    }
-    
-    .btn-container {
-        grid-template-columns: 1fr;
+        flex: 0 0 auto;
     }
     
     table {
@@ -948,34 +1190,61 @@ table tbody tr:hover {
     .info-usuario-table table {
         display: block;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Listas de clientes responsive */
+    .clientes-list {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Controles de clientes */
+    .clientes-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .buscar-input {
+        min-width: 100%;
+    }
+    
+    /* Info usuario responsive */
+    .ficha-cliente {
+        max-height: 85vh;
+    }
+    
+    .ficha-actions {
+        flex-direction: column;
+    }
+    
+    .btn-editar-cliente,
+    .btn-cancelar {
+        width: 100%;
+    }
+    
+    /* Form sections */
+    .form-cliente {
+        max-height: 75vh;
+    }
+    
+    .form-section-header {
+        font-size: 1em;
     }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-    .btn-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .tabs {
-        gap: 15px;
-    }
-    
-    .user-menu {
-        gap: 12px;
-    }
+/* Mejoras de usabilidad para móviles - Área táctil mejorada */
+button, .btn-login, .btn-logout, .btn-dietas, .btn-clientes,
+.btn-submit, .btn-download, .btn-new, .btn-save, .btn-edit,
+.btn-cargar, .btn-eliminar, .btn-nuevo-cliente, .tab,
+.checkbox-label, .autocomplete-item {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(102, 126, 234, 0.2);
 }
 
-@media (min-width: 1200px) {
-    .container {
-        max-width: 1600px;
-    }
-    
-    .tabs {
-        gap: 20px;
-    }
-    
-    .tab {
-        padding: 14px 28px;
+/* Prevenir zoom en inputs en iOS */
+@media (max-width: 768px) {
+    input, select, textarea {
+        font-size: 16px !important;
     }
 }
 
@@ -1278,177 +1547,6 @@ table tbody tr:hover {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 20px;
-}
-
-/* === MEDIA QUERIES PARA DISEÑO RESPONSIVO === */
-
-/* Tablets y dispositivos medianos */
-@media (max-width: 1024px) {
-    .container {
-        padding: 30px 20px;
-    }
-    
-    h1 {
-        font-size: 2em;
-    }
-    
-    .actividad-grid {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    }
-    
-    .clientes-list {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    }
-}
-
-/* Móviles y tablets pequeñas */
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
-    
-    .container {
-        padding: 20px 15px;
-        border-radius: 15px;
-    }
-    
-    h1 {
-        font-size: 1.8em;
-        margin-bottom: 20px;
-    }
-    
-    h2 {
-        font-size: 1.3em;
-    }
-    
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-    
-    .checkbox-group {
-        grid-template-columns: 1fr;
-    }
-    
-    .tmb-value {
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    .tmb-number {
-        font-size: 2em;
-    }
-    
-    .actividad-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .tabs {
-        overflow-x: auto;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    .tab {
-        font-size: 0.85em;
-        padding: 10px 15px;
-    }
-    
-    .btn-container {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .btn-save, .btn-generar, .btn-editar, .btn-volver {
-        width: 100%;
-    }
-    
-    .clientes-controls {
-        flex-direction: column;
-    }
-    
-    .buscar-input {
-        min-width: 100%;
-    }
-    
-    .clientes-list {
-        grid-template-columns: 1fr;
-    }
-    
-    .cliente-actions {
-        flex-direction: column;
-    }
-    
-    .btn-ver-ficha, .btn-generar-dieta, .btn-eliminar-cliente {
-        width: 100%;
-    }
-}
-
-/* Móviles pequeños */
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.5em;
-    }
-    
-    h2 {
-        font-size: 1.1em;
-    }
-    
-    .form-group label {
-        font-size: 0.9em;
-    }
-    
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        font-size: 0.95em;
-        padding: 10px;
-    }
-    
-    .tmb-section h3 {
-        font-size: 1.3em;
-    }
-    
-    .tmb-number {
-        font-size: 1.8em;
-    }
-    
-    .actividad-tdee {
-        font-size: 1.2em;
-    }
-    
-    .tooltip-icon:hover::after {
-        width: 200px;
-        font-size: 0.8em;
-    }
-}
-
-/* Modo impresión / PDF */
-@media print {
-    .print-header {
-        display: block !important;
-    }
-    
-    .btn-container,
-    .tabs,
-    .btn-editar-item,
-    .btn-eliminar-item,
-    .btn-agregar-rapido {
-        display: none !important;
-    }
-    
-    .tab-content {
-        display: block !important;
-    }
-    
-    .container {
-        box-shadow: none;
-        padding: 20px;
-    }
-    
-    body {
-        background: white;
-        padding: 0;
-    }
 }
 
 .cliente-card {
