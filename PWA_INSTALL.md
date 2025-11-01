@@ -211,10 +211,30 @@ Cuando hagas cambios importantes:
 
 ## 🐛 Solución de Problemas
 
-### El icono no aparece
-- Verifica que los archivos estén en la raíz del proyecto
-- Limpia el cache del navegador (Ctrl+Shift+Delete)
-- Revisa la consola del navegador para errores
+### El icono no aparece o solo se ve la letra "M"
+**Este es un problema común de caché del navegador. Sigue estos pasos:**
+
+1. **Desinstala la PWA actual:**
+   - **Android**: Mantén presionado el icono → "Desinstalar" o "Quitar app"
+   - **iPhone**: Mantén presionado el icono → "Quitar app"
+
+2. **Limpia completamente la caché:**
+   - **Chrome (Android)**: Configuración → Aplicaciones → Chrome → Almacenamiento → "Borrar caché" y "Borrar datos"
+   - **Safari (iPhone)**: Ajustes → Safari → "Borrar historial y datos de sitios web"
+
+3. **Cierra completamente el navegador:**
+   - Cierra todas las pestañas
+   - Fuerza el cierre de la app
+
+4. **Vuelve a instalar:**
+   - Abre la página web de nuevo
+   - Android: Menú (3 puntos) → "Instalar app"
+   - iPhone: Compartir → "Agregar a Pantalla de inicio"
+
+5. **Si sigue sin funcionar:**
+   - Verifica que los archivos `icon-192x192.png` y `icon-512x512.png` existan
+   - Abre DevTools (F12) → Application → Manifest y verifica los iconos
+   - Revisa la consola del navegador para errores
 
 ### Service Worker no se registra
 - Verifica que estás usando HTTPS o localhost

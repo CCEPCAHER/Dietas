@@ -8,6 +8,7 @@
   "theme_color": "#667eea",
   "orientation": "portrait-primary",
   "scope": "/",
+  "id": "/?source=pwa",
   "icons": [
     {
       "src": "/icon-16x16.png",
@@ -67,7 +68,7 @@
       "src": "/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     },
     {
       "src": "/icon-384x384.png",
@@ -79,7 +80,7 @@
       "src": "/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     }
   ],
   "categories": ["health", "lifestyle", "productivity"],

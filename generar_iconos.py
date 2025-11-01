@@ -75,8 +75,8 @@ def generar_iconos(imagen_original, output_dir="."):
             filename = f"icon-{size}x{size}.png"
             filepath = os.path.join(output_dir, filename)
             
-            # Guardar con alta calidad
-            resized.save(filepath, "PNG", optimize=True)
+            # Guardar con alta calidad y sin optimizar para PWA
+            resized.save(filepath, "PNG", optimize=False)
             print(f"✅ {filename:25s} [{size:3d}x{size:3d}px]")
         
         print("-" * 50)
