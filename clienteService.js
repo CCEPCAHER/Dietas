@@ -331,6 +331,90 @@ class ClienteService {
         }
     }
 
+    async agregarProgresoCliente(clienteId, progresoData, pesoActual) {
+        try {
+            const clienteDoc = await this.db.collection('clientes').doc(clienteId).get();
+            if (!clienteDoc.exists) {
+                throw new Error('Cliente no encontrado');
+            }
+
+            const user = window.authManager.getCurrentUser();
+            const clienteData = clienteDoc.data();
+
+            if (clienteData.nutricionistaId !== user.uid) {
+                throw new Error('No tienes permiso para actualizar este cliente');
+            }
+
+            // Convertir fecha a timestamp de Firestore
+            const fechaFirestore = firebase.firestore.Timestamp.fromDate(new Date(progresoData.fecha));
+            
+            const progreso = {
+                fecha: fechaFirestore,
+                valor: progresoData.valor,
+                imc: progresoData.imc,
+                notas: progresoData.notas
+            };
+
+            // Actualizar historialMedidas y peso actual si se proporciona
+            const updates = {
+                'progreso.peso': firebase.firestore.FieldValue.arrayUnion(progreso),
+                fechaModificacion: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            // Actualizar peso actual si se proporciona
+            if (pesoActual && pesoActual.toString().trim() !== '') {
+                updates.pesoActual = parseFloat(pesoActual);
+                
+                // Recalcular IMC si hay altura
+                if (clienteData.altura) {
+                    updates.imc = (parseFloat(pesoActual) / Math.pow(clienteData.altura / 100, 2)).toFixed(1);
+                }
+            }
+
+            await this.db.collection('clientes').doc(clienteId).update(updates);
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error al agregar progreso:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async agregarConsultaCliente(clienteId, consultaData) {
+        try {
+            const clienteDoc = await this.db.collection('clientes').doc(clienteId).get();
+            if (!clienteDoc.exists) {
+                throw new Error('Cliente no encontrado');
+            }
+
+            const user = window.authManager.getCurrentUser();
+            const clienteData = clienteDoc.data();
+
+            if (clienteData.nutricionistaId !== user.uid) {
+                throw new Error('No tienes permiso para actualizar este cliente');
+            }
+
+            // Convertir fecha a timestamp de Firestore
+            const fechaFirestore = firebase.firestore.Timestamp.fromDate(new Date(consultaData.fecha));
+            
+            const consulta = {
+                fecha: fechaFirestore,
+                motivo: consultaData.motivo,
+                notas: consultaData.notas
+            };
+
+            await this.db.collection('clientes').doc(clienteId).update({
+                historialConsultas: firebase.firestore.FieldValue.arrayUnion(consulta),
+                fechaModificacion: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error al agregar consulta:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
     async eliminarCliente(clienteId) {
         try {
             const user = window.authManager.getCurrentUser();

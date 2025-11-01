@@ -461,6 +461,7 @@ class ClienteManager {
                     <div class="ficha-datos">
                         ${this.generarHTMLMedidas(cliente.medidasIniciales, cliente.historialMedidas)}
                     </div>
+                    ${this.generarHTMLProgresoMedidas(cliente.medidasIniciales, cliente.historialMedidas)}
                     <button class="btn-agregar-medidas" onclick="clienteManager.agregarMedidas('${clienteId}')" style="margin-top: 10px;">📏 Registrar Nuevas Medidas</button>
                 </div>
 
@@ -495,6 +496,11 @@ class ClienteManager {
         `;
 
         modal.style.display = 'block';
+        
+        // Renderizar gráficas después de mostrar el modal
+        setTimeout(() => {
+            this.renderizarGraficas(cliente);
+        }, 100);
     }
 
     generarHTMLMedidas(medidasIniciales, historialMedidas) {
@@ -563,8 +569,148 @@ class ClienteManager {
     }
 
     generarHTMLProgreso(progreso) {
-        // Implementar visualización de progreso
-        return '<p>No hay registros de progreso aún.</p>';
+        let html = '';
+        
+        // Si hay historial de peso, crear gráfica
+        if (progreso && progreso.peso && progreso.peso.length > 0) {
+            html += '<div style="margin-bottom: 30px;"><h4 style="color: #667eea; margin-bottom: 10px;">📈 Evolución del Peso</h4>';
+            html += '<canvas id="chart-peso" style="max-height: 300px;"></canvas></div>';
+        }
+        
+        if (!progreso || Object.keys(progreso).length === 0) {
+            html += '<p style="color: #666; font-style: italic;">No hay registros de progreso aún.</p>';
+        }
+        
+        return html;
+    }
+    
+    generarHTMLProgresoMedidas(medidasIniciales, historialMedidas) {
+        if (!historialMedidas || historialMedidas.length === 0) {
+            return '';
+        }
+        
+        let html = '<div style="margin-top: 20px;"><h4 style="color: #667eea; margin-bottom: 10px;">📊 Gráfica de Medidas</h4>';
+        html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">';
+        
+        // Crear gráficas para medidas más comunes
+        const medidasClave = ['cintura', 'cadera', 'brazoDer', 'brazoIzq', 'musloDer'];
+        const nomMedidas = {
+            cintura: 'Cintura',
+            cadera: 'Cadera',
+            brazoDer: 'Brazo Derecho',
+            brazoIzq: 'Brazo Izquierdo',
+            musloDer: 'Muslo Derecho'
+        };
+        
+        medidasClave.forEach(medida => {
+            if (medidasIniciales && medidasIniciales[medida] !== null && medidasIniciales[medida] !== undefined) {
+                html += `<div><canvas id="chart-${medida}" style="max-height: 200px;"></canvas></div>`;
+            }
+        });
+        
+        html += '</div></div>';
+        return html;
+    }
+    
+    renderizarGraficas(cliente) {
+        // Graficar peso si existe historial
+        if (cliente.progreso && cliente.progreso.peso && cliente.progreso.peso.length > 0) {
+            const ctxPeso = document.getElementById('chart-peso');
+            if (ctxPeso) {
+                const pesos = cliente.progreso.peso.map(p => p.valor || p);
+                const fechas = cliente.progreso.peso.map(p => {
+                    if (p.fecha && p.fecha.toDate) {
+                        return p.fecha.toDate().toLocaleDateString('es-ES');
+                    }
+                    return 'Fecha no disponible';
+                });
+                
+                new Chart(ctxPeso, {
+                    type: 'line',
+                    data: {
+                        labels: fechas,
+                        datasets: [{
+                            label: 'Peso (kg)',
+                            data: pesos,
+                            borderColor: 'rgb(102, 126, 234)',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: true, position: 'top' },
+                            title: { display: false }
+                        },
+                        scales: {
+                            y: { beginAtZero: false }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Graficar medidas
+        if (cliente.historialMedidas && cliente.historialMedidas.length > 0) {
+            const medidasClave = ['cintura', 'cadera', 'brazoDer', 'brazoIzq', 'musloDer'];
+            const nomMedidas = {
+                cintura: 'Cintura',
+                cadera: 'Cadera',
+                brazoDer: 'Brazo Derecho',
+                brazoIzq: 'Brazo Izquierdo',
+                musloDer: 'Muslo Derecho'
+            };
+            
+            medidasClave.forEach(medida => {
+                const ctx = document.getElementById(`chart-${medida}`);
+                if (ctx && cliente.medidasIniciales && cliente.medidasIniciales[medida] !== null) {
+                    const valores = [cliente.medidasIniciales[medida]];
+                    const fechas = ['Inicial'];
+                    
+                    cliente.historialMedidas.forEach(hm => {
+                        if (hm[medida] !== null && hm[medida] !== undefined) {
+                            valores.push(hm[medida]);
+                            const fecha = hm.fecha?.toDate ? hm.fecha.toDate().toLocaleDateString('es-ES') : 'Fecha';
+                            fechas.push(fecha);
+                        }
+                    });
+                    
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: fechas,
+                            datasets: [{
+                                label: cliente.medidasIniciales[medida] ? 'Evolución' : 'Medida',
+                                data: valores,
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                title: { 
+                                    display: true, 
+                                    text: nomMedidas[medida] || medida, 
+                                    position: 'top',
+                                    font: { size: 12, weight: 'bold' }
+                                }
+                            },
+                            scales: {
+                                y: { beginAtZero: false }
+                            }
+                        }
+                    });
+                }
+            });
+        }
     }
 
     generarHTMLConsultas(consultas) {
@@ -972,11 +1118,175 @@ class ClienteManager {
     }
 
     agregarProgreso(clienteId) {
-        alert('Función de agregar progreso en desarrollo');
+        const modal = document.createElement('div');
+        modal.id = 'modalAgregarProgreso';
+        modal.className = 'modal';
+        modal.style.display = 'block';
+
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h2>➕ Agregar Registro de Progreso</h2>
+                    <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                </div>
+                <form id="formAgregarProgreso" class="form-progreso">
+                    <div class="form-group">
+                        <label>Fecha *</label>
+                        <input type="date" id="progresoFecha" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Peso (kg)</label>
+                            <input type="number" id="progresoPeso" step="0.1" min="40" max="200" placeholder="kg">
+                        </div>
+                        <div class="form-group">
+                            <label>IMC</label>
+                            <input type="number" id="progresoIMC" step="0.1" min="15" max="50" placeholder="auto">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notas adicionales (opcional)</label>
+                        <textarea id="progresoNotas" rows="3" placeholder="Observaciones, estado general, problemas, etc..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-guardar">💾 Guardar Progreso</button>
+                        <button type="button" class="btn-cancelar" onclick="this.closest('.modal').remove()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        document.getElementById('progresoFecha').valueAsDate = new Date();
+        
+        // Cerrar al hacer clic fuera
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.remove();
+        });
+        
+        // Guardar progreso
+        document.getElementById('formAgregarProgreso').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.guardarProgreso(clienteId);
+        });
+        
+        // Calcular IMC automáticamente si hay peso y altura
+        document.getElementById('progresoPeso').addEventListener('input', () => {
+            this.calcularIMCAuto(clienteId);
+        });
+    }
+    
+    async calcularIMCAuto(clienteId) {
+        try {
+            const resultado = await window.clienteService.obtenerClientePorId(clienteId);
+            if (resultado.success && resultado.cliente.altura) {
+                const peso = parseFloat(document.getElementById('progresoPeso').value);
+                const altura = resultado.cliente.altura / 100; // convertir cm a metros
+                if (peso && altura) {
+                    const imc = (peso / (altura * altura)).toFixed(1);
+                    document.getElementById('progresoIMC').value = imc;
+                }
+            }
+        } catch (error) {
+            console.error('Error al calcular IMC automático:', error);
+        }
+    }
+
+    async guardarProgreso(clienteId) {
+        const fecha = document.getElementById('progresoFecha').value;
+        const peso = parseFloat(document.getElementById('progresoPeso').value);
+        const imc = parseFloat(document.getElementById('progresoIMC').value);
+        const notas = document.getElementById('progresoNotas').value;
+        
+        if (!fecha) {
+            window.mostrarNotificacion?.('⚠️ La fecha es obligatoria', 'warning');
+            return;
+        }
+        
+        const progreso = {
+            fecha: new Date(fecha),
+            valor: peso,
+            imc: isNaN(imc) ? null : imc,
+            notas: notas
+        };
+        
+        const resultado = await window.clienteService.agregarProgresoCliente(clienteId, progreso, peso);
+        
+        if (resultado.success) {
+            window.mostrarNotificacion?.('✅ Progreso registrado correctamente', 'success');
+            document.getElementById('modalAgregarProgreso').remove();
+            await this.mostrarFichaCliente(clienteId); // Recargar ficha
+        } else {
+            window.mostrarNotificacion?.('❌ Error al guardar progreso: ' + resultado.error, 'error');
+        }
     }
 
     agregarConsulta(clienteId) {
-        alert('Función de agregar consulta en desarrollo');
+        const modal = document.createElement('div');
+        modal.id = 'modalAgregarConsulta';
+        modal.className = 'modal';
+        modal.style.display = 'block';
+
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 700px;">
+                <div class="modal-header">
+                    <h2>➕ Nueva Consulta</h2>
+                    <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                </div>
+                <form id="formAgregarConsulta" class="form-consulta">
+                    <div class="form-group">
+                        <label>Fecha de consulta *</label>
+                        <input type="date" id="consultaFecha" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Motivo de consulta</label>
+                        <input type="text" id="consultaMotivo" placeholder="Ej: Revisión mensual, seguimiento, inicio de plan, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label>Notas y observaciones *</label>
+                        <textarea id="consultaNotas" rows="6" required placeholder="Escribe tus observaciones, recomendaciones, cambios, etc..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-guardar">💾 Guardar Consulta</button>
+                        <button type="button" class="btn-cancelar" onclick="this.closest('.modal').remove()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        document.getElementById('consultaFecha').valueAsDate = new Date();
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.remove();
+        });
+        
+        document.getElementById('formAgregarConsulta').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.guardarConsulta(clienteId);
+        });
+    }
+    
+    async guardarConsulta(clienteId) {
+        const fecha = document.getElementById('consultaFecha').value;
+        const motivo = document.getElementById('consultaMotivo').value;
+        const notas = document.getElementById('consultaNotas').value;
+        
+        const consulta = {
+            fecha: new Date(fecha),
+            motivo: motivo,
+            notas: notas
+        };
+        
+        const resultado = await window.clienteService.agregarConsultaCliente(clienteId, consulta);
+        
+        if (resultado.success) {
+            window.mostrarNotificacion?.('✅ Consulta registrada correctamente', 'success');
+            document.getElementById('modalAgregarConsulta').remove();
+            await this.mostrarFichaCliente(clienteId);
+        } else {
+            window.mostrarNotificacion?.('❌ Error al guardar consulta: ' + resultado.error, 'error');
+        }
     }
 
     async editarCliente(clienteId) {

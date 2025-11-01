@@ -115,6 +115,36 @@ class TablaEditable {
                     <span>G: <strong id="total-gras-${comidaId}">0</strong>g</span>
                     <span>H: <strong id="total-hidr-${comidaId}">0</strong>g</span>
                 </div>
+                
+                <!-- Barras de progreso para esta comida -->
+                <div class="comida-progress-bars" id="progress-${comidaId}" style="margin-top: 10px; padding: 10px; background: rgba(102, 126, 234, 0.05); border-radius: 8px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                        <div class="mini-progress-item">
+                            <div style="font-size: 11px; color: #667eea; margin-bottom: 3px;">🔥 Calorías: <span id="mini-progress-cal-${comidaId}">0</span></div>
+                            <div class="mini-progress-bar" id="mini-bar-cal-${comidaId}">
+                                <div class="mini-progress-fill" id="mini-fill-cal-${comidaId}" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="mini-progress-item">
+                            <div style="font-size: 11px; color: #667eea; margin-bottom: 3px;">💪 Proteínas: <span id="mini-progress-prot-${comidaId}">0</span>g</div>
+                            <div class="mini-progress-bar" id="mini-bar-prot-${comidaId}">
+                                <div class="mini-progress-fill" id="mini-fill-prot-${comidaId}" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="mini-progress-item">
+                            <div style="font-size: 11px; color: #667eea; margin-bottom: 3px;">🥑 Grasas: <span id="mini-progress-gras-${comidaId}">0</span>g</div>
+                            <div class="mini-progress-bar" id="mini-bar-gras-${comidaId}">
+                                <div class="mini-progress-fill" id="mini-fill-gras-${comidaId}" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="mini-progress-item">
+                            <div style="font-size: 11px; color: #667eea; margin-bottom: 3px;">🍚 Hidratos: <span id="mini-progress-hidr-${comidaId}">0</span>g</div>
+                            <div class="mini-progress-bar" id="mini-bar-hidr-${comidaId}">
+                                <div class="mini-progress-fill" id="mini-fill-hidr-${comidaId}" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
     }
@@ -937,8 +967,55 @@ class TablaEditable {
         document.getElementById(`total-gras-${comidaId}`).textContent = totalGras.toFixed(1);
         document.getElementById(`total-hidr-${comidaId}`).textContent = totalHidr.toFixed(1);
 
+        // Actualizar barras de progreso de esta comida
+        this.actualizarProgresoComida(comidaId, totalCal, totalProt, totalGras, totalHidr);
+
         // Actualizar totales diarios
         this.actualizarTotalesDiarios();
+    }
+
+    actualizarProgresoComida(comidaId, calorias, proteinas, grasas, carbohidratos) {
+        const objetivos = this.obtenerObjetivosNutricionales();
+        
+        // Calcular porcentaje de consumo diario aproximado (dividir por 5 comidas)
+        const objetivoCal = objetivos.calorias / 5;
+        const objetivoProt = objetivos.proteinas / 5;
+        const objetivoGras = objetivos.grasas / 5;
+        const objetivoCarb = objetivos.carbohidratos / 5;
+        
+        // Actualizar cada barra
+        this.actualizarMiniProgreso(`mini-progress-cal-${comidaId}`, `mini-fill-cal-${comidaId}`, calorias, objetivoCal);
+        this.actualizarMiniProgreso(`mini-progress-prot-${comidaId}`, `mini-fill-prot-${comidaId}`, proteinas, objetivoProt);
+        this.actualizarMiniProgreso(`mini-progress-gras-${comidaId}`, `mini-fill-gras-${comidaId}`, grasas, objetivoGras);
+        this.actualizarMiniProgreso(`mini-progress-hidr-${comidaId}`, `mini-fill-hidr-${comidaId}`, carbohidratos, objetivoCarb);
+    }
+
+    actualizarMiniProgreso(textId, fillId, actual, objetivo) {
+        const textElem = document.getElementById(textId);
+        const fillElem = document.getElementById(fillId);
+        
+        if (!textElem || !fillElem || !objetivo) return;
+        
+        const porcentaje = objetivo > 0 ? Math.min((actual / objetivo) * 100, 150) : 0;
+        
+        // Actualizar texto
+        if (textId.includes('cal')) {
+            textElem.textContent = Math.round(actual);
+        } else {
+            textElem.textContent = actual.toFixed(1);
+        }
+        
+        // Actualizar barra
+        fillElem.style.width = porcentaje + '%';
+        
+        // Colorear según el progreso
+        if (porcentaje < 70) {
+            fillElem.style.background = 'linear-gradient(90deg, #ffc107, #ff9800)';
+        } else if (porcentaje >= 70 && porcentaje <= 130) {
+            fillElem.style.background = 'linear-gradient(90deg, #28a745, #20c997)';
+        } else {
+            fillElem.style.background = 'linear-gradient(90deg, #dc3545, #c82333)';
+        }
     }
 
     // Actualizar totales diarios (suma de todas las comidas)

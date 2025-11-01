@@ -969,8 +969,8 @@ function mostrarTablaMacros() {
         <tr id="macro-calorias">
             <td>CALORÍAS</td>
             <td>${calorias} kcal</td>
-            <td>-</td>
-            <td>${calorias} kcal</td>
+            <td><input type="number" class="ajuste-manual-input" id="ajuste-calorias" placeholder="${calorias}" value="${calorias}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('calorias', this.value)"></td>
+            <td id="seleccionado-calorias">${calorias} kcal</td>
             <td>100%</td>
             <td id="consumido-calorias" style="font-weight:bold;">${consumido.calorias} kcal</td>
             <td id="estado-calorias">${obtenerEstadoMacro(consumido.calorias, calorias)}</td>
@@ -978,8 +978,8 @@ function mostrarTablaMacros() {
         <tr id="macro-proteinas">
             <td>PROTEÍNAS</td>
             <td>${proteinas}g</td>
-            <td>-</td>
-            <td>${proteinas}g</td>
+            <td><input type="number" class="ajuste-manual-input" id="ajuste-proteinas" placeholder="${proteinas}" value="${proteinas}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('proteinas', this.value)"></td>
+            <td id="seleccionado-proteinas">${proteinas}g</td>
             <td>${proteinasPercent}%</td>
             <td id="consumido-proteinas" style="font-weight:bold;">${consumido.proteinas}g</td>
             <td id="estado-proteinas">${obtenerEstadoMacro(consumido.proteinas, proteinas)}</td>
@@ -987,8 +987,8 @@ function mostrarTablaMacros() {
         <tr id="macro-grasas">
             <td>GRASAS</td>
             <td>${grasas}g</td>
-            <td>-</td>
-            <td>${grasas}g</td>
+            <td><input type="number" class="ajuste-manual-input" id="ajuste-grasas" placeholder="${grasas}" value="${grasas}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('grasas', this.value)"></td>
+            <td id="seleccionado-grasas">${grasas}g</td>
             <td>${grasasPercent}%</td>
             <td id="consumido-grasas" style="font-weight:bold;">${consumido.grasas}g</td>
             <td id="estado-grasas">${obtenerEstadoMacro(consumido.grasas, grasas)}</td>
@@ -996,8 +996,8 @@ function mostrarTablaMacros() {
         <tr id="macro-carbohidratos">
             <td>CARBOHIDRATOS</td>
             <td>${carbohidratos}g</td>
-            <td>-</td>
-            <td>${carbohidratos}g</td>
+            <td><input type="number" class="ajuste-manual-input" id="ajuste-carbohidratos" placeholder="${carbohidratos}" value="${carbohidratos}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('carbohidratos', this.value)"></td>
+            <td id="seleccionado-carbohidratos">${carbohidratos}g</td>
             <td>${carbohidratosPercent}%</td>
             <td id="consumido-carbohidratos" style="font-weight:bold;">${consumido.carbohidratos}g</td>
             <td id="estado-carbohidratos">${obtenerEstadoMacro(consumido.carbohidratos, carbohidratos)}</td>
@@ -1101,6 +1101,63 @@ function configurarActualizacionMacros() {
     
     // Actualizar inmediatamente
     setTimeout(() => actualizarConsumidoEnTabla(), 500);
+}
+
+function ajustarMacroManual(macro, valor) {
+    const numValor = parseFloat(valor);
+    if (isNaN(numValor) || numValor < 0) {
+        alert('Por favor introduce un valor numérico válido');
+        return;
+    }
+    
+    // Actualizar el valor seleccionado
+    const seleccionadoElem = document.getElementById(`seleccionado-${macro}`);
+    if (macro === 'calorias') {
+        seleccionadoElem.textContent = Math.round(numValor) + ' kcal';
+        // Actualizar datosUsuario
+        datosUsuario.calorias = Math.round(numValor);
+        
+        // Recalcular porcentajes de otros macros
+        actualizarPorcentajesMacros();
+    } else {
+        seleccionadoElem.textContent = numValor.toFixed(1) + 'g';
+        // Actualizar datosUsuario
+        datosUsuario[macro] = numValor;
+    }
+    
+    // Notificar cambio
+    console.log(`✅ Macro ${macro} ajustado a: ${numValor}`);
+    
+    // Opcional: mostrar notificación visual
+    if (window.mostrarNotificacion) {
+        window.mostrarNotificacion(`✅ ${macro} ajustado a ${numValor}${macro === 'calorias' ? ' kcal' : 'g'}`, 'success');
+    }
+}
+
+function actualizarPorcentajesMacros() {
+    // Recalcular porcentajes cuando cambian las calorías
+    const { calorias, proteinas, grasas, carbohidratos } = datosUsuario;
+    
+    if (calorias > 0) {
+        const proteinasPercent = Math.round((proteinas * 4 / calorias) * 100);
+        const grasasPercent = Math.round((grasas * 9 / calorias) * 100);
+        const carbohidratosPercent = Math.round((carbohidratos * 4 / calorias) * 100);
+        
+        // Actualizar en la tabla
+        const filas = {
+            'macro-proteinas': proteinasPercent,
+            'macro-grasas': grasasPercent,
+            'macro-carbohidratos': carbohidratosPercent
+        };
+        
+        Object.entries(filas).forEach(([rowId, percent]) => {
+            const row = document.getElementById(rowId);
+            if (row) {
+                const cell = row.querySelector('td:nth-child(5)');
+                if (cell) cell.textContent = percent + '%';
+            }
+        });
+    }
 }
 
 function mostrarInfoUsuario() {
