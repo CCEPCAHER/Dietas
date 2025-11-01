@@ -40,20 +40,11 @@ def generar_iconos(imagen_original, output_dir="."):
         # Crear una versión cuadrada
         min_dim = min(width, height)
         
-        # Si la imagen es más alta que ancha, recortar desde arriba
-        # Si es más ancha que alta, centrar horizontalmente
-        if height > width:
-            # Imagen vertical: recortar desde arriba para mostrar el rostro
-            left = 0
-            top = 0
-            right = width
-            bottom = width
-        else:
-            # Imagen horizontal: centrar
-            left = (width - min_dim) / 2
-            top = 0
-            right = (width + min_dim) / 2
-            bottom = min_dim
+        # Recortar centrado verticalmente y horizontalmente
+        left = (width - min_dim) / 2
+        top = (height - min_dim) / 2
+        right = (width + min_dim) / 2
+        bottom = (height + min_dim) / 2
         
         img_cropped = img.crop((left, top, right, bottom))
         print(f"✂️  Imagen recortada a: {min_dim}x{min_dim}")

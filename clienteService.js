@@ -22,6 +22,7 @@ class ClienteService {
                 fechaModificacion: firebase.firestore.FieldValue.serverTimestamp(),
                 historialConsultas: [],
                 historialDietas: [],
+                historialMedidas: [],
                 progreso: {
                     peso: [],
                     medidas: [],
@@ -270,6 +271,62 @@ class ClienteService {
             return { success: true };
         } catch (error) {
             console.error('Error al agregar progreso:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async agregarMedidasCliente(clienteId, medidasData, pesoActual) {
+        try {
+            const clienteDoc = await this.db.collection('clientes').doc(clienteId).get();
+            if (!clienteDoc.exists) {
+                throw new Error('Cliente no encontrado');
+            }
+
+            const user = window.authManager.getCurrentUser();
+            const clienteData = clienteDoc.data();
+
+            if (clienteData.nutricionistaId !== user.uid) {
+                throw new Error('No tienes permiso para actualizar este cliente');
+            }
+
+            // Convertir fecha a timestamp de Firestore
+            const fechaFirestore = firebase.firestore.Timestamp.fromDate(new Date(medidasData.fecha));
+            
+            const medida = {
+                fecha: fechaFirestore,
+                cintura: medidasData.cintura,
+                cadera: medidasData.cadera,
+                brazoDer: medidasData.brazoDer,
+                brazoIzq: medidasData.brazoIzq,
+                musloDer: medidasData.musloDer,
+                musloIzq: medidasData.musloIzq,
+                pecho: medidasData.pecho,
+                cuello: medidasData.cuello,
+                peso: medidasData.peso,
+                notas: medidasData.notas
+            };
+
+            // Actualizar historialMedidas y peso actual si se proporciona
+            const updates = {
+                historialMedidas: firebase.firestore.FieldValue.arrayUnion(medida),
+                fechaModificacion: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            // Actualizar peso actual si se proporciona
+            if (pesoActual && pesoActual.trim() !== '') {
+                updates.pesoActual = parseFloat(pesoActual);
+                
+                // Recalcular IMC si hay altura
+                if (clienteData.altura) {
+                    updates.imc = (parseFloat(pesoActual) / Math.pow(clienteData.altura / 100, 2)).toFixed(1);
+                }
+            }
+
+            await this.db.collection('clientes').doc(clienteId).update(updates);
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error al agregar medidas:', error);
             return { success: false, error: error.message };
         }
     }

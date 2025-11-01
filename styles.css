@@ -593,10 +593,23 @@ table tbody tr:hover {
     background: #90ee90;
     color: #333;
     font-size: 0.85em;
+    white-space: nowrap;
 }
 
 .tabla-macros td {
     background: #e0ffe0;
+}
+
+/* Estilos para columnas de seguimiento */
+.tabla-macros td:nth-child(6) {
+    font-weight: bold;
+    font-size: 1.05em;
+    color: #667eea;
+}
+
+.tabla-macros td:nth-child(7) {
+    text-align: center;
+    font-size: 1.1em;
 }
 
 .tabla-info {
@@ -2346,9 +2359,11 @@ button, .btn-login, .btn-logout, .btn-dietas, .btn-clientes,
     background: rgba(255, 255, 255, 0.2);
     padding: 15px;
     border-radius: 8px;
+    border: 2px solid transparent;
     text-align: center;
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
+    transition: border 0.3s ease;
 }
 
 .total-item-label {
@@ -2360,6 +2375,37 @@ button, .btn-login, .btn-logout, .btn-dietas, .btn-clientes,
 .total-item-value {
     font-size: 24px;
     font-weight: 700;
+}
+
+.total-item-objetivo {
+    font-size: 11px;
+    opacity: 0.8;
+    margin-top: 3px;
+    font-style: italic;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #28a745, #20c997);
+    border-radius: 10px;
+    transition: width 0.3s ease, background 0.3s ease;
+    min-width: 0;
+}
+
+.progress-text {
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 4px;
+    color: white;
 }
 
 .autocomplete-container {

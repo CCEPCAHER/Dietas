@@ -120,29 +120,63 @@ class TablaEditable {
     }
 
     generarTotalesDiarios() {
+        const objetivos = this.obtenerObjetivosNutricionales();
         return `
             <div class="totales-diarios">
-                <h3>📊 Totales Diarios</h3>
+                <h3>📊 Totales Diarios vs Objetivos</h3>
                 <div class="totales-grid">
-                    <div class="total-item">
+                    <div class="total-item" id="total-item-calorias">
                         <div class="total-item-label">Calorías</div>
                         <div class="total-item-value" id="total-diario-calorias">0</div>
+                        <div class="total-item-objetivo" id="objetivo-calorias">${objetivos.calorias} kcal</div>
+                        <div class="progress-bar" id="progress-calorias">
+                            <div class="progress-fill" id="progress-fill-calorias" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text" id="progress-text-calorias">0%</div>
                     </div>
-                    <div class="total-item">
+                    <div class="total-item" id="total-item-proteinas">
                         <div class="total-item-label">Proteínas</div>
                         <div class="total-item-value" id="total-diario-proteinas">0g</div>
+                        <div class="total-item-objetivo" id="objetivo-proteinas">${objetivos.proteinas}g</div>
+                        <div class="progress-bar" id="progress-proteinas">
+                            <div class="progress-fill" id="progress-fill-proteinas" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text" id="progress-text-proteinas">0%</div>
                     </div>
-                    <div class="total-item">
+                    <div class="total-item" id="total-item-grasas">
                         <div class="total-item-label">Grasas</div>
                         <div class="total-item-value" id="total-diario-grasas">0g</div>
+                        <div class="total-item-objetivo" id="objetivo-grasas">${objetivos.grasas}g</div>
+                        <div class="progress-bar" id="progress-grasas">
+                            <div class="progress-fill" id="progress-fill-grasas" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text" id="progress-text-grasas">0%</div>
                     </div>
-                    <div class="total-item">
+                    <div class="total-item" id="total-item-hidratos">
                         <div class="total-item-label">Hidratos</div>
                         <div class="total-item-value" id="total-diario-hidratos">0g</div>
+                        <div class="total-item-objetivo" id="objetivo-hidratos">${objetivos.carbohidratos}g</div>
+                        <div class="progress-bar" id="progress-hidratos">
+                            <div class="progress-fill" id="progress-fill-hidratos" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text" id="progress-text-hidratos">0%</div>
                     </div>
                 </div>
+                <div id="alerta-macros" style="margin-top: 15px; padding: 10px; border-radius: 8px; display: none;"></div>
             </div>
         `;
+    }
+
+    obtenerObjetivosNutricionales() {
+        if (window.datosUsuario) {
+            return {
+                calorias: window.datosUsuario.calorias || 0,
+                proteinas: window.datosUsuario.proteinas || 0,
+                grasas: window.datosUsuario.grasas || 0,
+                carbohidratos: window.datosUsuario.carbohidratos || 0
+            };
+        }
+        return { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0 };
     }
 
     // Agregar una nueva fila vacía a una comida
@@ -923,6 +957,112 @@ class TablaEditable {
         document.getElementById('total-diario-proteinas').textContent = totalProt.toFixed(1) + 'g';
         document.getElementById('total-diario-grasas').textContent = totalGras.toFixed(1) + 'g';
         document.getElementById('total-diario-hidratos').textContent = totalHidr.toFixed(1) + 'g';
+
+        // Actualizar barras de progreso y alertas
+        this.actualizarProgresoMacros(totalCal, totalProt, totalGras, totalHidr);
+        
+        // Actualizar también la tabla principal de macronutrientes si existe
+        if (typeof window.actualizarConsumidoEnTabla === 'function') {
+            window.actualizarConsumidoEnTabla();
+        }
+    }
+
+    actualizarProgresoMacros(calorias, proteinas, grasas, carbohidratos) {
+        const objetivos = this.obtenerObjetivosNutricionales();
+        
+        // Actualizar cada macro
+        this.actualizarProgresoIndividual('calorias', calorias, objetivos.calorias, 1);
+        this.actualizarProgresoIndividual('proteinas', proteinas, objetivos.proteinas, 1);
+        this.actualizarProgresoIndividual('grasas', grasas, objetivos.grasas, 1);
+        this.actualizarProgresoIndividual('hidratos', carbohidratos, objetivos.carbohidratos, 1);
+
+        // Generar alertas
+        this.generarAlertasMacros(calorias, proteinas, grasas, carbohidratos, objetivos);
+    }
+
+    actualizarProgresoIndividual(macro, actual, objetivo, factor = 1) {
+        const progressBar = document.getElementById(`progress-${macro}`);
+        const progressFill = document.getElementById(`progress-fill-${macro}`);
+        const progressText = document.getElementById(`progress-text-${macro}`);
+        const totalItem = document.getElementById(`total-item-${macro}`);
+        
+        if (!progressBar || !objetivo) return;
+
+        const porcentaje = objetivo > 0 ? Math.min((actual / objetivo) * 100, 150) : 0;
+        const diferencia = actual - objetivo;
+        
+        // Actualizar barra y texto
+        progressFill.style.width = porcentaje + '%';
+        progressText.textContent = porcentaje.toFixed(0) + '%';
+        
+        // Colorear según el progreso
+        if (porcentaje < 90) {
+            // Faltante (amarillo)
+            progressFill.style.background = 'linear-gradient(90deg, #ffc107, #ff9800)';
+            totalItem.style.border = '2px solid #ffc107';
+        } else if (porcentaje >= 90 && porcentaje <= 110) {
+            // Óptimo (verde)
+            progressFill.style.background = 'linear-gradient(90deg, #28a745, #20c997)';
+            totalItem.style.border = '2px solid #28a745';
+        } else {
+            // Excedente (rojo)
+            progressFill.style.background = 'linear-gradient(90deg, #dc3545, #c82333)';
+            totalItem.style.border = '2px solid #dc3545';
+        }
+    }
+
+    generarAlertasMacros(calorias, proteinas, grasas, carbohidratos, objetivos) {
+        const alertaDiv = document.getElementById('alerta-macros');
+        if (!alertaDiv) return;
+
+        const alertas = [];
+        
+        // Calorías
+        if (calorias < objetivos.calorias * 0.9) {
+            const falta = Math.round(objetivos.calorias - calorias);
+            alertas.push(`⚠️ Faltan ${falta} kcal (${((falta/objetivos.calorias)*100).toFixed(0)}%)`);
+        } else if (calorias > objetivos.calorias * 1.15) {
+            const sobra = Math.round(calorias - objetivos.calorias);
+            alertas.push(`🔥 Exceso de ${sobra} kcal (${((sobra/objetivos.calorias)*100).toFixed(0)}%)`);
+        }
+
+        // Proteínas
+        if (proteinas < objetivos.proteinas * 0.8 && objetivos.proteinas > 0) {
+            const falta = (objetivos.proteinas - proteinas).toFixed(1);
+            alertas.push(`💪 Faltan ${falta}g de proteínas`);
+        }
+
+        // Grasas
+        if (grasas < objetivos.grasas * 0.7 && objetivos.grasas > 0) {
+            const falta = (objetivos.grasas - grasas).toFixed(1);
+            alertas.push(`🥑 Faltan ${falta}g de grasas saludables`);
+        }
+
+        // Carbohidratos
+        if (carbohidratos < objetivos.carbohidratos * 0.8 && objetivos.carbohidratos > 0) {
+            const falta = (objetivos.carbohidratos - carbohidratos).toFixed(1);
+            alertas.push(`🍚 Faltan ${falta}g de carbohidratos`);
+        }
+
+        // Mostrar alertas
+        if (alertas.length > 0) {
+            alertaDiv.innerHTML = `
+                <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px;">
+                    <strong style="color: #856404;">📊 Recomendaciones:</strong>
+                    <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #856404;">
+                        ${alertas.map(alerta => `<li>${alerta}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+            alertaDiv.style.display = 'block';
+        } else {
+            alertaDiv.innerHTML = `
+                <div style="background: #d4edda; border-left: 4px solid #28a745; padding: 12px; color: #155724;">
+                    ✅ <strong>Objetivos nutricionales en rango óptimo</strong>
+                </div>
+            `;
+            alertaDiv.style.display = 'block';
+        }
     }
 
     // Eliminar una fila

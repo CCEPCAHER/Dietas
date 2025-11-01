@@ -959,36 +959,148 @@ function mostrarTablaMacros() {
     const grasasPercent = Math.round((grasas * 9 / calorias) * 100);
     const carbohidratosPercent = Math.round((carbohidratos * 4 / calorias) * 100);
     
+    // Obtener consumo real si existe tablaEditable
+    let consumido = { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0 };
+    if (window.tablaEditable) {
+        consumido = obtenerConsumidoActual();
+    }
+    
     tbody.innerHTML = `
-        <tr>
+        <tr id="macro-calorias">
             <td>CALORÍAS</td>
             <td>${calorias} kcal</td>
             <td>-</td>
             <td>${calorias} kcal</td>
             <td>100%</td>
+            <td id="consumido-calorias" style="font-weight:bold;">${consumido.calorias} kcal</td>
+            <td id="estado-calorias">${obtenerEstadoMacro(consumido.calorias, calorias)}</td>
         </tr>
-        <tr>
+        <tr id="macro-proteinas">
             <td>PROTEÍNAS</td>
             <td>${proteinas}g</td>
             <td>-</td>
             <td>${proteinas}g</td>
             <td>${proteinasPercent}%</td>
+            <td id="consumido-proteinas" style="font-weight:bold;">${consumido.proteinas}g</td>
+            <td id="estado-proteinas">${obtenerEstadoMacro(consumido.proteinas, proteinas)}</td>
         </tr>
-        <tr>
+        <tr id="macro-grasas">
             <td>GRASAS</td>
             <td>${grasas}g</td>
             <td>-</td>
             <td>${grasas}g</td>
             <td>${grasasPercent}%</td>
+            <td id="consumido-grasas" style="font-weight:bold;">${consumido.grasas}g</td>
+            <td id="estado-grasas">${obtenerEstadoMacro(consumido.grasas, grasas)}</td>
         </tr>
-        <tr>
+        <tr id="macro-carbohidratos">
             <td>CARBOHIDRATOS</td>
             <td>${carbohidratos}g</td>
             <td>-</td>
             <td>${carbohidratos}g</td>
             <td>${carbohidratosPercent}%</td>
+            <td id="consumido-carbohidratos" style="font-weight:bold;">${consumido.carbohidratos}g</td>
+            <td id="estado-carbohidratos">${obtenerEstadoMacro(consumido.carbohidratos, carbohidratos)}</td>
         </tr>
     `;
+    
+    // Configurar actualización periódica
+    configurarActualizacionMacros();
+}
+
+function obtenerConsumidoActual() {
+    if (!window.tablaEditable) return { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0 };
+    
+    const caloriasElem = document.getElementById('total-diario-calorias');
+    const proteinasElem = document.getElementById('total-diario-proteinas');
+    const grasasElem = document.getElementById('total-diario-grasas');
+    const hidratosElem = document.getElementById('total-diario-hidratos');
+    
+    return {
+        calorias: caloriasElem ? parseFloat(caloriasElem.textContent) || 0 : 0,
+        proteinas: proteinasElem ? parseFloat(proteinasElem.textContent) || 0 : 0,
+        grasas: grasasElem ? parseFloat(grasasElem.textContent) || 0 : 0,
+        carbohidratos: hidratosElem ? parseFloat(hidratosElem.textContent) || 0 : 0
+    };
+}
+
+function obtenerEstadoMacro(consumido, objetivo) {
+    if (!objetivo || objetivo === 0) return '<span style="color:#999;">-</span>';
+    
+    const porcentaje = (consumido / objetivo) * 100;
+    
+    if (porcentaje < 80) {
+        return `<span style="color:#ffc107;font-weight:bold;">⚠️ ${porcentaje.toFixed(0)}%</span>`;
+    } else if (porcentaje >= 80 && porcentaje <= 120) {
+        return `<span style="color:#28a745;font-weight:bold;">✅ ${porcentaje.toFixed(0)}%</span>`;
+    } else {
+        return `<span style="color:#dc3545;font-weight:bold;">🔥 ${porcentaje.toFixed(0)}%</span>`;
+    }
+}
+
+function actualizarConsumidoEnTabla() {
+    const consumido = obtenerConsumidoActual();
+    const { calorias, proteinas, grasas, carbohidratos } = datosUsuario;
+    
+    // Actualizar valores consumidos
+    const calElem = document.getElementById('consumido-calorias');
+    const protElem = document.getElementById('consumido-proteinas');
+    const grasElem = document.getElementById('consumido-grasas');
+    const carbElem = document.getElementById('consumido-carbohidratos');
+    
+    if (calElem) calElem.textContent = Math.round(consumido.calorias) + ' kcal';
+    if (protElem) protElem.textContent = consumido.proteinas.toFixed(1) + 'g';
+    if (grasElem) grasElem.textContent = consumido.grasas.toFixed(1) + 'g';
+    if (carbElem) carbElem.textContent = consumido.carbohidratos.toFixed(1) + 'g';
+    
+    // Actualizar estados
+    const estadoCal = document.getElementById('estado-calorias');
+    const estadoProt = document.getElementById('estado-proteinas');
+    const estadoGras = document.getElementById('estado-grasas');
+    const estadoCarb = document.getElementById('estado-carbohidratos');
+    
+    if (estadoCal) estadoCal.innerHTML = obtenerEstadoMacro(consumido.calorias, calorias);
+    if (estadoProt) estadoProt.innerHTML = obtenerEstadoMacro(consumido.proteinas, proteinas);
+    if (estadoGras) estadoGras.innerHTML = obtenerEstadoMacro(consumido.grasas, grasas);
+    if (estadoCarb) estadoCarb.innerHTML = obtenerEstadoMacro(consumido.carbohidratos, carbohidratos);
+    
+    // Colorear filas según estado
+    colorearFilaMacro('macro-calorias', consumido.calorias, calorias);
+    colorearFilaMacro('macro-proteinas', consumido.proteinas, proteinas);
+    colorearFilaMacro('macro-grasas', consumido.grasas, grasas);
+    colorearFilaMacro('macro-carbohidratos', consumido.carbohidratos, carbohidratos);
+}
+
+function colorearFilaMacro(rowId, consumido, objetivo) {
+    const row = document.getElementById(rowId);
+    if (!row || !objetivo) return;
+    
+    const porcentaje = (consumido / objetivo) * 100;
+    
+    // Remover colores anteriores
+    row.style.background = '';
+    
+    if (porcentaje < 80) {
+        row.style.background = 'rgba(255, 193, 7, 0.1)';
+    } else if (porcentaje > 120) {
+        row.style.background = 'rgba(220, 53, 69, 0.1)';
+    } else {
+        row.style.background = 'rgba(40, 167, 69, 0.1)';
+    }
+}
+
+function configurarActualizacionMacros() {
+    // Actualizar cada 2 segundos cuando esté en modo manual
+    if (window.intervalMacros) clearInterval(window.intervalMacros);
+    
+    window.intervalMacros = setInterval(() => {
+        if (window.tablaEditable) {
+            actualizarConsumidoEnTabla();
+        }
+    }, 2000);
+    
+    // Actualizar inmediatamente
+    setTimeout(() => actualizarConsumidoEnTabla(), 500);
 }
 
 function mostrarInfoUsuario() {

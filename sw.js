@@ -1,5 +1,5 @@
 // Service Worker para MAIKA PORCUNA - PWA
-const CACHE_NAME = 'maika-porcuna-v2.0.0';
+const CACHE_NAME = 'maika-porcuna-v3.0.0';
 const urlsToCache = [
   '/',
   '/index.html',

@@ -457,6 +457,14 @@ class ClienteManager {
                 </div>
 
                 <div class="ficha-seccion">
+                    <h3>📏 Medidas Corporales</h3>
+                    <div class="ficha-datos">
+                        ${this.generarHTMLMedidas(cliente.medidasIniciales, cliente.historialMedidas)}
+                    </div>
+                    <button class="btn-agregar-medidas" onclick="clienteManager.agregarMedidas('${clienteId}')" style="margin-top: 10px;">📏 Registrar Nuevas Medidas</button>
+                </div>
+
+                <div class="ficha-seccion">
                     <h3>📊 Progreso</h3>
                     <div id="progresoContent">
                         ${this.generarHTMLProgreso(cliente.progreso || {})}
@@ -487,6 +495,71 @@ class ClienteManager {
         `;
 
         modal.style.display = 'block';
+    }
+
+    generarHTMLMedidas(medidasIniciales, historialMedidas) {
+        let html = '';
+        
+        if (!medidasIniciales || Object.keys(medidasIniciales).length === 0) {
+            html += '<p style="color: #666; font-style: italic;">No hay medidas corporales registradas.</p>';
+            return html;
+        }
+
+        html += '<div style="margin-bottom: 20px;"><h4 style="color: #667eea; margin-bottom: 10px;">Medidas Iniciales</h4>';
+        html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">';
+        
+        const labels = {
+            cintura: 'Cintura',
+            cadera: 'Cadera',
+            brazoDer: 'Brazo Der.',
+            brazoIzq: 'Brazo Izq.',
+            musloDer: 'Muslo Der.',
+            musloIzq: 'Muslo Izq.',
+            pecho: 'Pecho',
+            cuello: 'Cuello'
+        };
+
+        for (const [key, value] of Object.entries(medidasIniciales)) {
+            if (value !== null && value !== undefined) {
+                html += `<div style="background: #f8f9fa; padding: 8px; border-radius: 5px;">
+                    <strong>${labels[key] || key}:</strong> ${value} cm
+                </div>`;
+            }
+        }
+        html += '</div></div>';
+
+        // Mostrar historial de medidas
+        if (historialMedidas && historialMedidas.length > 0) {
+            html += '<div style="margin-top: 20px;"><h4 style="color: #667eea; margin-bottom: 10px;">Historial de Medidas</h4>';
+            
+            historialMedidas.slice(-3).reverse().forEach((medida, index) => {
+                const fecha = medida.fecha?.toDate ? 
+                    medida.fecha.toDate().toLocaleDateString('es-ES') : 
+                    'Fecha no disponible';
+                
+                html += `<div style="background: #e7f3ff; padding: 10px; border-radius: 5px; margin-bottom: 10px; border-left: 3px solid #667eea;">
+                    <strong style="color: #667eea;">${fecha}</strong>`;
+                
+                for (const [key, value] of Object.entries(medida)) {
+                    if (key !== 'fecha' && value !== null && value !== undefined && labels[key]) {
+                        const cambio = medidasIniciales[key] ? 
+                            (value - medidasIniciales[key]).toFixed(1) : '0';
+                        const colorCambio = cambio > 0 ? '#28a745' : cambio < 0 ? '#dc3545' : '#666';
+                        const icono = cambio > 0 ? '📈' : cambio < 0 ? '📉' : '➡️';
+                        
+                        html += `<div style="margin-top: 5px;">
+                            ${labels[key]}: ${value} cm 
+                            <span style="color: ${colorCambio}; font-size: 0.9em;">(${icono} ${cambio > 0 ? '+' : ''}${cambio})</span>
+                        </div>`;
+                    }
+                }
+                
+                html += '</div>';
+            });
+            html += '</div>';
+        }
+
+        return html;
     }
 
     generarHTMLProgreso(progreso) {
@@ -593,6 +666,48 @@ class ClienteManager {
                         <input type="number" id="clientePesoInicial" step="0.1" min="40" max="200">
                     </div>
                 </div>
+
+                <h4>📏 Medidas Corporales Iniciales (cm)</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cintura</label>
+                        <input type="number" id="clienteCintura" step="0.1" min="50" max="200" placeholder="cm">
+                    </div>
+                    <div class="form-group">
+                        <label>Cadera</label>
+                        <input type="number" id="clienteCadera" step="0.1" min="50" max="200" placeholder="cm">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Brazo derecho</label>
+                        <input type="number" id="clienteBrazoDer" step="0.1" min="15" max="80" placeholder="cm">
+                    </div>
+                    <div class="form-group">
+                        <label>Brazo izquierdo</label>
+                        <input type="number" id="clienteBrazoIzq" step="0.1" min="15" max="80" placeholder="cm">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Muslo derecho</label>
+                        <input type="number" id="clienteMusloDer" step="0.1" min="30" max="100" placeholder="cm">
+                    </div>
+                    <div class="form-group">
+                        <label>Muslo izquierdo</label>
+                        <input type="number" id="clienteMusloIzq" step="0.1" min="30" max="100" placeholder="cm">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Pecho/Tórax</label>
+                        <input type="number" id="clientePecho" step="0.1" min="70" max="200" placeholder="cm">
+                    </div>
+                    <div class="form-group">
+                        <label>Cuello</label>
+                        <input type="number" id="clienteCuello" step="0.1" min="25" max="60" placeholder="cm">
+                    </div>
+                </div>
                 <div class="form-group">
                     <label>Alergias</label>
                     <textarea id="clienteAlergias" rows="2" placeholder="Ej: Lactosa, frutos secos..."></textarea>
@@ -643,6 +758,17 @@ class ClienteManager {
             altura: parseInt(document.getElementById('clienteAltura').value) || null,
             pesoInicial: parseFloat(document.getElementById('clientePesoInicial').value) || null,
             pesoActual: parseFloat(document.getElementById('clientePesoInicial').value) || null,
+            // Medidas corporales iniciales
+            medidasIniciales: {
+                cintura: parseFloat(document.getElementById('clienteCintura').value) || null,
+                cadera: parseFloat(document.getElementById('clienteCadera').value) || null,
+                brazoDer: parseFloat(document.getElementById('clienteBrazoDer').value) || null,
+                brazoIzq: parseFloat(document.getElementById('clienteBrazoIzq').value) || null,
+                musloDer: parseFloat(document.getElementById('clienteMusloDer').value) || null,
+                musloIzq: parseFloat(document.getElementById('clienteMusloIzq').value) || null,
+                pecho: parseFloat(document.getElementById('clientePecho').value) || null,
+                cuello: parseFloat(document.getElementById('clienteCuello').value) || null
+            },
             alergias: document.getElementById('clienteAlergias').value,
             patologias: document.getElementById('clientePatologias').value,
             medicacion: document.getElementById('clienteMedicacion').value,
@@ -712,6 +838,137 @@ class ClienteManager {
     async verDietaDetalle(dietaId) {
         // Implementar visualización de dieta detallada
         alert('Función de visualización de dieta en desarrollo');
+    }
+
+    async agregarMedidas(clienteId) {
+        const modal = document.createElement('div');
+        modal.id = 'modalAgregarMedidas';
+        modal.className = 'modal';
+        modal.style.display = 'block';
+
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 700px;">
+                <div class="modal-header">
+                    <h2>📏 Registrar Nuevas Medidas Corporales</h2>
+                    <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                </div>
+                <form id="formAgregarMedidas" class="form-medidas">
+                    <div class="form-group">
+                        <label>Fecha de medición *</label>
+                        <input type="date" id="medidaFecha" required>
+                    </div>
+
+                    <h4 style="margin-top: 20px; color: #667eea;">Medidas Corporales (cm)</h4>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cintura</label>
+                            <input type="number" id="medidaCintura" step="0.1" min="50" max="200" placeholder="cm">
+                        </div>
+                        <div class="form-group">
+                            <label>Cadera</label>
+                            <input type="number" id="medidaCadera" step="0.1" min="50" max="200" placeholder="cm">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Brazo derecho</label>
+                            <input type="number" id="medidaBrazoDer" step="0.1" min="15" max="80" placeholder="cm">
+                        </div>
+                        <div class="form-group">
+                            <label>Brazo izquierdo</label>
+                            <input type="number" id="medidaBrazoIzq" step="0.1" min="15" max="80" placeholder="cm">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Muslo derecho</label>
+                            <input type="number" id="medidaMusloDer" step="0.1" min="30" max="100" placeholder="cm">
+                        </div>
+                        <div class="form-group">
+                            <label>Muslo izquierdo</label>
+                            <input type="number" id="medidaMusloIzq" step="0.1" min="30" max="100" placeholder="cm">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Pecho/Tórax</label>
+                            <input type="number" id="medidaPecho" step="0.1" min="70" max="200" placeholder="cm">
+                        </div>
+                        <div class="form-group">
+                            <label>Cuello</label>
+                            <input type="number" id="medidaCuello" step="0.1" min="25" max="60" placeholder="cm">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Peso actual (kg)</label>
+                            <input type="number" id="medidaPeso" step="0.1" min="40" max="200" placeholder="kg">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notas adicionales (opcional)</label>
+                        <textarea id="medidaNotas" rows="3" placeholder="Observaciones sobre el estado del cliente..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-guardar">💾 Guardar Medidas</button>
+                        <button type="button" class="btn-cancelar" onclick="this.closest('.modal').remove()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Establecer fecha actual por defecto
+        document.getElementById('medidaFecha').valueAsDate = new Date();
+
+        // Cerrar modal al hacer clic fuera
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+
+        // Manejar submit
+        document.getElementById('formAgregarMedidas').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.guardarMedidas(clienteId);
+        });
+    }
+
+    async guardarMedidas(clienteId) {
+        const fecha = document.getElementById('medidaFecha').value;
+        const medidas = {
+            fecha: new Date(fecha),
+            cintura: parseFloat(document.getElementById('medidaCintura').value) || null,
+            cadera: parseFloat(document.getElementById('medidaCadera').value) || null,
+            brazoDer: parseFloat(document.getElementById('medidaBrazoDer').value) || null,
+            brazoIzq: parseFloat(document.getElementById('medidaBrazoIzq').value) || null,
+            musloDer: parseFloat(document.getElementById('medidaMusloDer').value) || null,
+            musloIzq: parseFloat(document.getElementById('medidaMusloIzq').value) || null,
+            pecho: parseFloat(document.getElementById('medidaPecho').value) || null,
+            cuello: parseFloat(document.getElementById('medidaCuello').value) || null,
+            peso: parseFloat(document.getElementById('medidaPeso').value) || null,
+            notas: document.getElementById('medidaNotas').value
+        };
+
+        // Guardar medidas en el cliente
+        const resultado = await window.clienteService.agregarMedidasCliente(clienteId, medidas, document.getElementById('medidaPeso').value);
+
+        if (resultado.success) {
+            window.mostrarNotificacion?.('✅ Medidas registradas correctamente', 'success');
+            document.getElementById('modalAgregarMedidas').remove();
+            await this.mostrarFichaCliente(clienteId); // Recargar ficha
+        } else {
+            window.mostrarNotificacion?.('❌ Error al guardar medidas: ' + resultado.error, 'error');
+        }
     }
 
     agregarProgreso(clienteId) {
