@@ -249,7 +249,20 @@ function obtenerDistribucionComida(objetivo, tipoComida, calTotales, protTotales
         }
     };
     
-    const dist = distribuciones[objetivo][tipoComida];
+    const dist = distribuciones[objetivo]?.[tipoComida];
+    
+    // Validar que la distribución exista
+    if (!dist) {
+        console.error(`No se encontró distribución para objetivo: ${objetivo}, comida: ${tipoComida}`);
+        // Retornar distribución por defecto (proporcional)
+        const numComidas = 5;
+        return {
+            calorias: Math.round(calTotales / numComidas),
+            proteinas: Math.round(protTotales / numComidas),
+            carbohidratos: Math.round(carbTotales / numComidas),
+            grasas: Math.round(grasTotales / numComidas * 10) / 10
+        };
+    }
     
     return {
         calorias: Math.round(calTotales * dist.cal),
