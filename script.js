@@ -1078,9 +1078,15 @@ function mostrarTablaMacros() {
     const tbody = document.getElementById('tabla-macros-body');
     const { calorias, proteinas, grasas, carbohidratos } = datosUsuario;
     
-    const proteinasPercent = Math.round((proteinas * 4 / calorias) * 100);
-    const grasasPercent = Math.round((grasas * 9 / calorias) * 100);
-    const carbohidratosPercent = Math.round((carbohidratos * 4 / calorias) * 100);
+    // Validar que las variables existan
+    const caloriasVal = calorias || 0;
+    const proteinasVal = proteinas || 0;
+    const grasasVal = grasas || 0;
+    const carbohidratosVal = carbohidratos || 0;
+    
+    const proteinasPercent = caloriasVal > 0 ? Math.round((proteinasVal * 4 / caloriasVal) * 100) : 0;
+    const grasasPercent = caloriasVal > 0 ? Math.round((grasasVal * 9 / caloriasVal) * 100) : 0;
+    const carbohidratosPercent = caloriasVal > 0 ? Math.round((carbohidratosVal * 4 / caloriasVal) * 100) : 0;
     
     // Obtener consumo real si existe tablaEditable
     let consumido = { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0 };
@@ -1091,39 +1097,39 @@ function mostrarTablaMacros() {
     tbody.innerHTML = `
         <tr id="macro-calorias">
             <td>CALORÍAS</td>
-            <td>${calorias} kcal</td>
-            <td><input type="number" class="ajuste-manual-input" id="ajuste-calorias" placeholder="${calorias}" value="${calorias}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('calorias', this.value)"></td>
-            <td id="seleccionado-calorias">${calorias} kcal</td>
+            <td>${caloriasVal} kcal</td>
+            <td><input type="number" class="ajuste-manual-input" id="ajuste-calorias" placeholder="${caloriasVal}" value="${caloriasVal}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('calorias', this.value)"></td>
+            <td id="seleccionado-calorias">${caloriasVal} kcal</td>
             <td>100%</td>
             <td id="consumido-calorias" style="font-weight:bold;">${consumido.calorias} kcal</td>
-            <td id="estado-calorias">${obtenerEstadoMacro(consumido.calorias, calorias)}</td>
+            <td id="estado-calorias">${obtenerEstadoMacro(consumido.calorias, caloriasVal)}</td>
         </tr>
         <tr id="macro-proteinas">
             <td>PROTEÍNAS</td>
-            <td>${proteinas}g</td>
-            <td><input type="number" class="ajuste-manual-input" id="ajuste-proteinas" placeholder="${proteinas}" value="${proteinas}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('proteinas', this.value)"></td>
-            <td id="seleccionado-proteinas">${proteinas}g</td>
+            <td>${proteinasVal}g</td>
+            <td><input type="number" class="ajuste-manual-input" id="ajuste-proteinas" placeholder="${proteinasVal}" value="${proteinasVal}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('proteinas', this.value)"></td>
+            <td id="seleccionado-proteinas">${proteinasVal}g</td>
             <td>${proteinasPercent}%</td>
             <td id="consumido-proteinas" style="font-weight:bold;">${consumido.proteinas}g</td>
-            <td id="estado-proteinas">${obtenerEstadoMacro(consumido.proteinas, proteinas)}</td>
+            <td id="estado-proteinas">${obtenerEstadoMacro(consumido.proteinas, proteinasVal)}</td>
         </tr>
         <tr id="macro-grasas">
             <td>GRASAS</td>
-            <td>${grasas}g</td>
-            <td><input type="number" class="ajuste-manual-input" id="ajuste-grasas" placeholder="${grasas}" value="${grasas}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('grasas', this.value)"></td>
-            <td id="seleccionado-grasas">${grasas}g</td>
+            <td>${grasasVal}g</td>
+            <td><input type="number" class="ajuste-manual-input" id="ajuste-grasas" placeholder="${grasasVal}" value="${grasasVal}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('grasas', this.value)"></td>
+            <td id="seleccionado-grasas">${grasasVal}g</td>
             <td>${grasasPercent}%</td>
             <td id="consumido-grasas" style="font-weight:bold;">${consumido.grasas}g</td>
-            <td id="estado-grasas">${obtenerEstadoMacro(consumido.grasas, grasas)}</td>
+            <td id="estado-grasas">${obtenerEstadoMacro(consumido.grasas, grasasVal)}</td>
         </tr>
         <tr id="macro-carbohidratos">
             <td>CARBOHIDRATOS</td>
-            <td>${carbohidratos}g</td>
-            <td><input type="number" class="ajuste-manual-input" id="ajuste-carbohidratos" placeholder="${carbohidratos}" value="${carbohidratos}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('carbohidratos', this.value)"></td>
-            <td id="seleccionado-carbohidratos">${carbohidratos}g</td>
+            <td>${carbohidratosVal}g</td>
+            <td><input type="number" class="ajuste-manual-input" id="ajuste-carbohidratos" placeholder="${carbohidratosVal}" value="${carbohidratosVal}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('carbohidratos', this.value)"></td>
+            <td id="seleccionado-carbohidratos">${carbohidratosVal}g</td>
             <td>${carbohidratosPercent}%</td>
             <td id="consumido-carbohidratos" style="font-weight:bold;">${consumido.carbohidratos}g</td>
-            <td id="estado-carbohidratos">${obtenerEstadoMacro(consumido.carbohidratos, carbohidratos)}</td>
+            <td id="estado-carbohidratos">${obtenerEstadoMacro(consumido.carbohidratos, carbohidratosVal)}</td>
         </tr>
     `;
     
