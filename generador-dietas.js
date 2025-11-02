@@ -6,6 +6,40 @@ let alimentosUsadosSemana = [];
 let alimentosUsadosHistorial = [];
 
 /**
+ * Obtiene alimentos de la base de datos por categoría y macronutriente
+ * @param {string[]} categorias - Array de categorías (CLASIFICACIÓN)
+ * @param {string} macronutriente - Macronutriente principal
+ * @param {number} limite - Límite de resultados
+ * @returns {string[]} Array de nombres de alimentos
+ */
+function obtenerAlimentosDeBD(categorias, macronutriente, limite = 20) {
+    if (!window.alimentosDB) {
+        console.warn('⚠️ alimentosDB no disponible');
+        return [];
+    }
+    
+    const alimentosEncontrados = [];
+    
+    // Buscar por categoría
+    for (const categoria of categorias) {
+        const alimentos = window.alimentosDB.obtenerAlimentosPorCategoria(categoria);
+        for (const alimento of alimentos) {
+            const nombre = alimento.ALIMENTO;
+            // Filtrar por macronutriente si se especifica
+            if (!macronutriente || alimento.MACRONUTRIENTE_PRINCIPAL === macronutriente) {
+                if (!alimentosEncontrados.includes(nombre)) {
+                    alimentosEncontrados.push(nombre);
+                    if (alimentosEncontrados.length >= limite) break;
+                }
+            }
+        }
+        if (alimentosEncontrados.length >= limite) break;
+    }
+    
+    return alimentosEncontrados;
+}
+
+/**
  * Verifica si un alimento es compatible con las preferencias dietéticas y restricciones
  * @param {string} nombreAlimento - Nombre del alimento
  * @param {string[]} preferencias - Array de preferencias (ej: ['vegano', 'vegetariano'])
@@ -228,10 +262,15 @@ function obtenerDistribucionComida(objetivo, tipoComida, calTotales, protTotales
 function seleccionarDesayuno(objetivo, distribucion, variacion, restricciones = '', preferencias = []) {
     const alimentos = [];
     
-    // Base de carbohidratos
-    let carbBase = objetivo === 'aumentar' ? 
-        ['Avena', 'Pan integral', 'Quinoa', 'Avena copos', 'Pan de centeno'] :
-        ['Avena', 'Yogur griego', 'Tortillas de maíz', 'Avena copos'];
+    // Base de carbohidratos - consultar base de datos
+    let carbBase = obtenerAlimentosDeBD(['Cereal', 'Pan'], 'Hidratos de carbono', 15);
+    
+    // Si no hay en BD, usar fallback
+    if (carbBase.length === 0) {
+        carbBase = objetivo === 'aumentar' ? 
+            ['Avena', 'Pan integral', 'Quinoa', 'Avena copos', 'Pan de centeno'] :
+            ['Avena', 'Yogur griego', 'Tortillas de maíz', 'Avena copos'];
+    }
     
     // Filtrar según preferencias y restricciones
     carbBase = filtrarAlimentosPorPreferencias(carbBase, preferencias, restricciones);
@@ -245,17 +284,26 @@ function seleccionarDesayuno(objetivo, distribucion, variacion, restricciones = 
     const carbSeleccionado = carbBase.length > 0 ? carbBase[(variacion * 3) % carbBase.length] : 'Avena';
     alimentos.push({ nombre: carbSeleccionado, cantidad: objetivo === 'aumentar' ? 80 : 50 });
     
-    // Proteína - diferentes opciones según preferencias
+    // Proteína - consultar base de datos según preferencias
     let protBase;
     if (preferencias.includes('vegano')) {
-        // Opciones veganas de proteína
-        protBase = ['Tofu', 'Tempeh', 'Legumbres', 'Semillas de chía', 'Semillas de cáñamo', 'Proteína vegana en polvo'];
+        // Opciones veganas - consultar BD
+        protBase = obtenerAlimentosDeBD(['Legumbres', 'Semilla'], 'Proteínas', 15);
+        if (protBase.length === 0) {
+            protBase = ['Tofu', 'Tempeh', 'Legumbres', 'Semillas de chía', 'Semillas de cáñamo', 'Proteína vegana en polvo'];
+        }
     } else if (preferencias.includes('vegetariano') || preferencias.includes('pescetariano')) {
-        // Vegetarianos y pescetarianos pueden comer huevos y lácteos
-        protBase = ['Huevos enteros', 'Claras de huevo', 'Yogur griego', 'Requesón', 'Queso cottage'];
+        // Vegetarianos y pescetarianos - consultar BD
+        protBase = obtenerAlimentosDeBD(['Origen animal', 'Leche'], 'Proteínas', 15);
+        if (protBase.length === 0) {
+            protBase = ['Huevos enteros', 'Claras de huevo', 'Yogur griego', 'Requesón', 'Queso cottage'];
+        }
     } else {
-        // Sin restricciones
-        protBase = ['Huevos enteros', 'Claras de huevo', 'Yogur griego', 'Requesón', 'Queso cottage'];
+        // Sin restricciones - consultar BD
+        protBase = obtenerAlimentosDeBD(['Origen animal', 'Carne blanca', 'Carne roja'], 'Proteínas', 15);
+        if (protBase.length === 0) {
+            protBase = ['Huevos enteros', 'Claras de huevo', 'Yogur griego', 'Requesón', 'Queso cottage'];
+        }
     }
     
     protBase = filtrarAlimentosPorPreferencias(protBase, preferencias, restricciones);
@@ -277,17 +325,23 @@ function seleccionarDesayuno(objetivo, distribucion, variacion, restricciones = 
         alimentos.push({ nombre: protSeleccionado, cantidad: cantidadProt });
     }
     
-    // Fruta - filtrar por restricciones
-    let frutas = ['Plátano', 'Fresas', 'Arándanos', 'Manzana', 'Kiwi', 'Mango'];
+    // Fruta - consultar base de datos
+    let frutas = obtenerAlimentosDeBD(['Fruta'], null, 20);
+    if (frutas.length === 0) {
+        frutas = ['Plátano', 'Fresas', 'Arándanos', 'Manzana', 'Kiwi', 'Mango'];
+    }
     frutas = filtrarAlimentosPorPreferencias(frutas, preferencias, restricciones);
     if (frutas.length > 0) {
         const frutaSeleccionada = frutas[(variacion * 7) % frutas.length];
         alimentos.push({ nombre: frutaSeleccionada, cantidad: objetivo === 'aumentar' ? 150 : 100 });
     }
     
-    // Grasas saludables
+    // Grasas saludables - consultar base de datos
     if (objetivo === 'aumentar') {
-        let grasas = ['Almendras', 'Nueces', 'Aguacate', 'Mantequilla de almendras'];
+        let grasas = obtenerAlimentosDeBD(['Fruto seco', 'Otros'], 'Grasas', 10);
+        if (grasas.length === 0) {
+            grasas = ['Almendras', 'Nueces', 'Aguacate', 'Mantequilla de almendras'];
+        }
         grasas = filtrarAlimentosPorPreferencias(grasas, preferencias, restricciones);
         if (grasas.length > 0) {
             const grasaSeleccionada = grasas[(variacion * 11) % grasas.length];
@@ -297,7 +351,10 @@ function seleccionarDesayuno(objetivo, distribucion, variacion, restricciones = 
     
     // Complementos
     if (objetivo === 'aumentar') {
-        let complementos = ['Miel', 'Leche entera', 'Cacao en polvo'];
+        let complementos = obtenerAlimentosDeBD(['Otros'], null, 10);
+        if (complementos.length === 0) {
+            complementos = ['Miel', 'Leche entera', 'Cacao en polvo'];
+        }
         complementos = filtrarAlimentosPorPreferencias(complementos, preferencias, restricciones);
         if (complementos.length > 0) {
             const complemento = complementos[(variacion * 13) % complementos.length];
@@ -356,51 +413,74 @@ function seleccionarMedioDia(objetivo, distribucion, variacion, restricciones = 
 function seleccionarAlmuerzo(objetivo, distribucion, variacion, restricciones = '', preferencias = []) {
     const alimentos = [];
     
-    // Proteína principal - diferentes opciones según preferencias
+    // Proteína principal - consultar base de datos según preferencias
     let proteinas;
     if (preferencias.includes('vegano')) {
-        proteinas = objetivo === 'aumentar' ?
-            ['Tofu', 'Tempeh', 'Legumbres', 'Lentejas', 'Garbanzos', 'Seitán'] :
-            ['Tofu', 'Legumbres', 'Lentejas', 'Garbanzos', 'Judías verdes', 'Quinoa'];
+        proteinas = obtenerAlimentosDeBD(['Legumbres'], 'Proteínas', 20);
+        if (proteinas.length === 0) {
+            proteinas = objetivo === 'aumentar' ?
+                ['Tofu', 'Tempeh', 'Legumbres', 'Lentejas', 'Garbanzos', 'Seitán'] :
+                ['Tofu', 'Legumbres', 'Lentejas', 'Garbanzos', 'Judías verdes', 'Quinoa'];
+        }
     } else if (preferencias.includes('vegetariano')) {
-        proteinas = objetivo === 'aumentar' ?
-            ['Huevos enteros', 'Tofu', 'Legumbres', 'Lentejas', 'Garbanzos', 'Queso fresco'] :
-            ['Huevos enteros', 'Tofu', 'Legumbres', 'Lentejas', 'Claras de huevo', 'Queso cottage'];
+        proteinas = obtenerAlimentosDeBD(['Origen animal', 'Leche'], 'Proteínas', 20);
+        if (proteinas.length === 0) {
+            proteinas = objetivo === 'aumentar' ?
+                ['Huevos enteros', 'Tofu', 'Legumbres', 'Lentejas', 'Garbanzos', 'Queso fresco'] :
+                ['Huevos enteros', 'Tofu', 'Legumbres', 'Lentejas', 'Claras de huevo', 'Queso cottage'];
+        }
     } else if (preferencias.includes('pescetariano')) {
-        proteinas = objetivo === 'aumentar' ?
-            ['Salmón', 'Atún fresco', 'Huevos enteros', 'Merluza', 'Sepia', 'Tofu'] :
-            ['Salmón', 'Atún fresco', 'Merluza', 'Claras de huevo', 'Sepia', 'Tofu'];
+        proteinas = obtenerAlimentosDeBD(['Pescado azul', 'Pescado blanco', 'Marisco'], 'Proteínas', 20);
+        if (proteinas.length === 0) {
+            proteinas = objetivo === 'aumentar' ?
+                ['Salmón', 'Atún fresco', 'Huevos enteros', 'Merluza', 'Sepia', 'Tofu'] :
+                ['Salmón', 'Atún fresco', 'Merluza', 'Claras de huevo', 'Sepia', 'Tofu'];
+        }
     } else {
-        proteinas = objetivo === 'aumentar' ?
-            ['Pechuga de pollo', 'Ternera magra', 'Salmón', 'Atún fresco', 'Pavo', 'Huevos enteros'] :
-            ['Pechuga de pollo', 'Atún fresco', 'Merluza', 'Pavo', 'Claras de huevo', 'Sepia'];
+        proteinas = obtenerAlimentosDeBD(['Carne blanca', 'Carne roja', 'Pescado azul', 'Pescado blanco'], 'Proteínas', 30);
+        if (proteinas.length === 0) {
+            proteinas = objetivo === 'aumentar' ?
+                ['Pechuga de pollo', 'Ternera magra', 'Salmón', 'Atún fresco', 'Pavo', 'Huevos enteros'] :
+                ['Pechuga de pollo', 'Atún fresco', 'Merluza', 'Pavo', 'Claras de huevo', 'Sepia'];
+        }
     }
     
     proteinas = filtrarAlimentosPorPreferencias(proteinas, preferencias, restricciones);
     const proteinaSeleccionada = proteinas[(variacion * 17) % proteinas.length];
     alimentos.push({ nombre: proteinaSeleccionada, cantidad: objetivo === 'aumentar' ? 200 : 150 });
     
-    // Carbohidrato
-    const carbohidratos = objetivo === 'aumentar' ?
-        ['Arroz integral', 'Pasta integral', 'Quinoa', 'Batata', 'Patata', 'Cuscús'] :
-        ['Arroz integral', 'Quinoa', 'Batata', 'Lentejas', 'Garbanzos', 'Judías verdes'];
-    
+    // Carbohidrato - consultar base de datos
+    let carbohidratos = obtenerAlimentosDeBD(['Cereal', 'Tubérculo', 'Legumbres'], 'Hidratos de carbono', 20);
+    if (carbohidratos.length === 0) {
+        carbohidratos = objetivo === 'aumentar' ?
+            ['Arroz integral', 'Pasta integral', 'Quinoa', 'Batata', 'Patata', 'Cuscús'] :
+            ['Arroz integral', 'Quinoa', 'Batata', 'Lentejas', 'Garbanzos', 'Judías verdes'];
+    }
     const carbSeleccionado = carbohidratos[(variacion * 19) % carbohidratos.length];
     alimentos.push({ nombre: carbSeleccionado, cantidad: objetivo === 'aumentar' ? 150 : 80 });
     
-    // Verduras
-    const verduras = ['Brócoli', 'Espinacas', 'Espárragos', 'Coliflor', 'Calabacín', 'Judías verdes', 'Pimientos', 'Berenjena'];
+    // Verduras - consultar base de datos
+    let verduras = obtenerAlimentosDeBD(['Verduras'], null, 20);
+    if (verduras.length === 0) {
+        verduras = ['Brócoli', 'Espinacas', 'Espárragos', 'Coliflor', 'Calabacín', 'Judías verdes', 'Pimientos', 'Berenjena'];
+    }
     const verduraSeleccionada = verduras[(variacion * 23) % verduras.length];
     alimentos.push({ nombre: verduraSeleccionada, cantidad: 150 });
     
     // Ensalada/verde
-    const ensaladas = ['Lechuga', 'Rúcula', 'Espinacas', 'Canónigos'];
+    let ensaladas = obtenerAlimentosDeBD(['Verduras'], null, 10);
+    if (ensaladas.length === 0) {
+        ensaladas = ['Lechuga', 'Rúcula', 'Espinacas', 'Canónigos'];
+    }
     const ensaladaSeleccionada = ensaladas[(variacion * 29) % ensaladas.length];
     alimentos.push({ nombre: ensaladaSeleccionada, cantidad: 100 });
     
-    // Grasas (solo si es aumentar o mantener)
+    // Grasas - consultar base de datos
     if (objetivo !== 'adelgazar') {
-        const grasas = ['Aguacate', 'Aceite de oliva', 'Nueces', 'Aceite de oliva'];
+        let grasas = obtenerAlimentosDeBD(['Fruto seco', 'Otros'], 'Grasas', 10);
+        if (grasas.length === 0) {
+            grasas = ['Aguacate', 'Aceite de oliva', 'Nueces'];
+        }
         const grasaSeleccionada = grasas[(variacion * 31) % grasas.length];
         alimentos.push({ nombre: grasaSeleccionada, cantidad: grasaSeleccionada === 'Aceite de oliva' ? 10 : (grasaSeleccionada === 'Aguacate' ? 50 : 20) });
     } else {
@@ -471,45 +551,72 @@ function seleccionarMerienda(objetivo, distribucion, variacion, restricciones = 
 function seleccionarCena(objetivo, distribucion, variacion, restricciones = '', preferencias = []) {
     const alimentos = [];
     
-    // Proteína principal - diferentes opciones según preferencias
+    // Proteína principal - consultar base de datos según preferencias
     let proteinas;
     if (preferencias.includes('vegano')) {
-        proteinas = objetivo === 'aumentar' ?
-            ['Tofu', 'Tempeh', 'Legumbres', 'Lentejas', 'Garbanzos', 'Seitán'] :
-            ['Tofu', 'Legumbres', 'Lentejas', 'Garbanzos', 'Judías verdes', 'Quinoa'];
+        proteinas = obtenerAlimentosDeBD(['Legumbres'], 'Proteínas', 20);
+        if (proteinas.length === 0) {
+            proteinas = objetivo === 'aumentar' ?
+                ['Tofu', 'Tempeh', 'Legumbres', 'Lentejas', 'Garbanzos', 'Seitán'] :
+                ['Tofu', 'Legumbres', 'Lentejas', 'Garbanzos', 'Judías verdes', 'Quinoa'];
+        }
     } else if (preferencias.includes('vegetariano')) {
-        proteinas = objetivo === 'aumentar' ?
-            ['Huevos', 'Tofu', 'Legumbres', 'Lentejas', 'Garbanzos', 'Queso fresco'] :
-            ['Huevos', 'Tofu', 'Legumbres', 'Claras de huevo', 'Queso cottage', 'Tofu'];
+        proteinas = obtenerAlimentosDeBD(['Origen animal', 'Leche'], 'Proteínas', 20);
+        if (proteinas.length === 0) {
+            proteinas = objetivo === 'aumentar' ?
+                ['Huevos', 'Tofu', 'Legumbres', 'Lentejas', 'Garbanzos', 'Queso fresco'] :
+                ['Huevos', 'Tofu', 'Legumbres', 'Claras de huevo', 'Queso cottage', 'Tofu'];
+        }
     } else if (preferencias.includes('pescetariano')) {
-        proteinas = objetivo === 'aumentar' ?
-            ['Salmón', 'Atún', 'Huevos', 'Merluza', 'Sepia', 'Tofu'] :
-            ['Merluza', 'Salmón', 'Sepia', 'Claras de huevo', 'Atún', 'Tofu'];
+        proteinas = obtenerAlimentosDeBD(['Pescado azul', 'Pescado blanco', 'Pescado semigraso', 'Marisco'], 'Proteínas', 20);
+        if (proteinas.length === 0) {
+            proteinas = objetivo === 'aumentar' ?
+                ['Salmón', 'Atún', 'Huevos', 'Merluza', 'Sepia', 'Tofu'] :
+                ['Merluza', 'Salmón', 'Sepia', 'Claras de huevo', 'Atún', 'Tofu'];
+        }
     } else {
-        proteinas = objetivo === 'aumentar' ?
-            ['Salmón', 'Pollo al horno', 'Pavo', 'Ternera magra', 'Atún', 'Huevos'] :
-            ['Merluza', 'Pollo a la plancha', 'Pavo', 'Sepia', 'Claras de huevo', 'Tofu'];
+        proteinas = obtenerAlimentosDeBD(['Carne blanca', 'Carne roja', 'Pescado azul', 'Pescado blanco'], 'Proteínas', 30);
+        if (proteinas.length === 0) {
+            proteinas = objetivo === 'aumentar' ?
+                ['Salmón', 'Pollo al horno', 'Pavo', 'Ternera magra', 'Atún', 'Huevos'] :
+                ['Merluza', 'Pollo a la plancha', 'Pavo', 'Sepia', 'Claras de huevo', 'Tofu'];
+        }
     }
     
     proteinas = filtrarAlimentosPorPreferencias(proteinas, preferencias, restricciones);
     const proteinaSeleccionada = proteinas[(variacion * 37) % proteinas.length];
     alimentos.push({ nombre: proteinaSeleccionada, cantidad: objetivo === 'aumentar' ? 180 : 140 });
     
-    // Carbohidrato (menor en cena)
-    const carbohidratos = objetivo === 'aumentar' ?
-        ['Batata', 'Quinoa', 'Arroz integral', 'Patata', 'Cuscús'] :
-        ['Verduras al vapor', 'Ensalada', 'Coliflor', 'Espárragos'];
+    // Carbohidrato (menor en cena) - consultar base de datos
+    let carbohidratos;
+    if (objetivo === 'aumentar') {
+        carbohidratos = obtenerAlimentosDeBD(['Tubérculo', 'Cereal'], 'Hidratos de carbono', 20);
+        if (carbohidratos.length === 0) {
+            carbohidratos = ['Batata', 'Quinoa', 'Arroz integral', 'Patata', 'Cuscús'];
+        }
+    } else {
+        carbohidratos = obtenerAlimentosDeBD(['Verduras'], null, 10);
+        if (carbohidratos.length === 0) {
+            carbohidratos = ['Verduras al vapor', 'Ensalada', 'Coliflor', 'Espárragos'];
+        }
+    }
     
     const carbSeleccionado = carbohidratos[(variacion * 41) % carbohidratos.length];
     alimentos.push({ nombre: carbSeleccionado, cantidad: objetivo === 'aumentar' ? 150 : (carbSeleccionado.includes('Ensalada') || carbSeleccionado.includes('verdura') ? 200 : 100) });
     
-    // Verduras
-    const verduras = ['Espárragos', 'Brócoli', 'Espinacas', 'Calabacín', 'Judías verdes', 'Pimientos', 'Berenjena', 'Coliflor'];
+    // Verduras - consultar base de datos
+    let verduras = obtenerAlimentosDeBD(['Verduras'], null, 20);
+    if (verduras.length === 0) {
+        verduras = ['Espárragos', 'Brócoli', 'Espinacas', 'Calabacín', 'Judías verdes', 'Pimientos', 'Berenjena', 'Coliflor'];
+    }
     const verduraSeleccionada = verduras[(variacion * 43) % verduras.length];
     alimentos.push({ nombre: verduraSeleccionada, cantidad: 150 });
     
-    // Ensalada
-    const ensaladas = ['Ensalada verde', 'Lechuga', 'Rúcula', 'Espinacas'];
+    // Ensalada - consultar base de datos
+    let ensaladas = obtenerAlimentosDeBD(['Verduras'], null, 10);
+    if (ensaladas.length === 0) {
+        ensaladas = ['Ensalada verde', 'Lechuga', 'Rúcula', 'Espinacas'];
+    }
     const ensaladaSeleccionada = ensaladas[(variacion * 47) % ensaladas.length];
     alimentos.push({ nombre: ensaladaSeleccionada, cantidad: 100 });
     
