@@ -859,7 +859,13 @@ let datosUsuario = {};
 window.datosUsuario = datosUsuario; // Exportar para uso en otros módulos
 
 function calcularMacronutrientes() {
-    const { edad, sexo, altura, peso, objetivo, tipoPersona } = datosUsuario;
+    // Obtener valores del formulario o datosUsuario (prioridad al formulario)
+    const edad = parseInt(document.getElementById('edad')?.value) || datosUsuario.edad;
+    const sexo = document.getElementById('sexo')?.value || datosUsuario.sexo;
+    const altura = parseInt(document.getElementById('altura')?.value) || datosUsuario.altura;
+    const peso = parseFloat(document.getElementById('peso')?.value) || datosUsuario.peso;
+    const objetivo = document.getElementById('objetivo')?.value || datosUsuario.objetivo;
+    const tipoPersona = document.getElementById('tipoPersona')?.value || datosUsuario.tipoPersona;
     
     // Obtener valores del formulario (pueden no estar en datosUsuario aún)
     const actividadFisicaDeporte = document.getElementById('actividadFisicaDeporte')?.value || datosUsuario.actividadFisicaDeporte || 'moderada';
