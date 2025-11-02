@@ -1610,6 +1610,13 @@ function mostrarPlanAlimentacion() {
         return;
     }
     
+    // Validar que objetivo exista
+    if (!objetivo) {
+        console.error('❌ Objetivo no definido en datosUsuario');
+        mostrarNotificacion('❌ Error: No se ha definido el objetivo de la dieta', 'error');
+        return;
+    }
+    
     // Verificar si hay base de datos ampliada disponible
     let planSemana;
     if (window.generarPlanVariado && window.baseDatosAlimentos) {

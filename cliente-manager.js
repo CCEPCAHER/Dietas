@@ -1163,7 +1163,16 @@ class ClienteManager {
         const tipoActividad = (cliente.tipoPersona || '').toLowerCase();
         const tp = ['sedentaria','activa','muy-activa'].includes(tipoActividad) ? tipoActividad : '';
         document.getElementById('tipoPersona').value = tp;
-        document.getElementById('objetivo').value = cliente.objetivo || '';
+        // Mapear objetivo del cliente al formato del generador
+        const mapObjetivo = (obj) => {
+            if (!obj) return '';
+            const objetivoLower = String(obj).toLowerCase();
+            if (objetivoLower.includes('aumentar') || objetivoLower.includes('masa')) return 'aumentar';
+            if (objetivoLower.includes('adelgazar') || objetivoLower.includes('perder') || objetivoLower.includes('reducir')) return 'adelgazar';
+            if (objetivoLower.includes('mantener')) return 'mantener';
+            return obj; // Si no coincide, devolver original
+        };
+        document.getElementById('objetivo').value = mapObjetivo(cliente.objetivo);
         document.getElementById('prohibiciones').value = cliente.alergias || '';
 
         // Guardar referencia al cliente
