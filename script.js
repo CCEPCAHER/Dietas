@@ -1287,6 +1287,9 @@ function mostrarInfoUsuario() {
     const tbody = document.getElementById('tabla-info-body');
     const { nombre, fechaRegistro, sexo, edad, peso, altura, tipoPersona, imc, sexo: sexoUsuario } = datosUsuario;
     
+    // Validar que tipoPersona exista
+    const tipoPersonaFormateado = tipoPersona ? (tipoPersona.charAt(0).toUpperCase() + tipoPersona.slice(1).replace('-', ' ')) : 'No especificado';
+    
     // Calcular TMB (Tasa Metabólica Basal) con fórmula de Mifflin-St Jeor
     let tmb;
     if (sexoUsuario === 'masculino') {
@@ -1313,7 +1316,7 @@ function mostrarInfoUsuario() {
             <td>${edad}</td>
             <td>${peso}</td>
             <td>${altura}</td>
-            <td>${tipoPersona.charAt(0).toUpperCase() + tipoPersona.slice(1).replace('-', ' ')}</td>
+            <td>${tipoPersonaFormateado}</td>
             <td>${imc}</td>
         </tr>
     `;
