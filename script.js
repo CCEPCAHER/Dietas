@@ -886,8 +886,27 @@ function calcularMacronutrientes() {
         tmb = 10 * peso + 6.25 * altura - 5 * edad - 161;
     }
     tmb = Math.round(tmb);
+
+    // Ajuste NEAT (actividad no deportiva) basado en tipo de persona
+    // Esto replica la hoja Excel: para 'activa' se suma ~37.5% del TMB
+    let porcentajeNEAT;
+    switch (tipoPersona) {
+        case 'sedentaria':
+            porcentajeNEAT = 0.0;
+            break;
+        case 'activa':
+            porcentajeNEAT = 0.375; // coincide con ejemplo Excel
+            break;
+        case 'muy-activa':
+            porcentajeNEAT = 0.55;
+            break;
+        default:
+            porcentajeNEAT = 0.15; // valor conservador si no hay dato
+    }
+    const neat = Math.round(tmb * porcentajeNEAT);
+    const tmbAjustado = tmb + neat;
     
-    // Calcular efecto termogénico de alimentos (TEF) como porcentaje del TMB
+    // Calcular efecto termogénico de alimentos (TEF) como porcentaje del TMB ajustado
     let porcentajeTEF;
     switch(tipoTermogenico) {
         case 'sedentaria': 
@@ -902,8 +921,8 @@ function calcularMacronutrientes() {
         default: 
             porcentajeTEF = 0.15;
     }
-    // TEF se calcula como porcentaje del TMB (no del gasto total)
-    const tef = Math.round(tmb * porcentajeTEF);
+    // TEF se calcula como porcentaje del TMB ajustado (no del gasto total)
+    const tef = Math.round(tmbAjustado * porcentajeTEF);
     
     // Calcular actividad física del deporte (valores basados en ejemplos reales)
     // Estos valores representan el gasto adicional por actividad física del deporte en días de entrenamiento
@@ -934,8 +953,8 @@ function calcularMacronutrientes() {
     }
     
     // Calcular gasto calórico base (sin superávit/déficit)
-    const gastoBaseEntreno = tmb + tef + actividadFisicaDeporteKcal;
-    const gastoBaseDescanso = tmb + tef;
+    const gastoBaseEntreno = tmbAjustado + tef + actividadFisicaDeporteKcal;
+    const gastoBaseDescanso = tmbAjustado + tef;
     
     // Calcular superávit/déficit (puede ser positivo o negativo)
     const superavitEntrenoKcal = Math.round(gastoBaseEntreno * (superavitEntreno / 100));
