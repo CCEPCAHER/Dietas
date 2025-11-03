@@ -905,8 +905,7 @@ function calcularMacronutrientes() {
     tmbBase = Math.round(tmbBase);
 
     // Ajustar TMB según tipo de persona (replica Excel: el TMB se multiplica por un factor)
-    // En Excel: Mujer 40a, 59kg, 156cm, "No sedentaria" → TMB base 1204, TMB ajustado 1644
-    // Factor: 1644/1204 = 1.365 (36.5% adicional)
+    // El factor varía según el peso: pesos mayores tienen factores más altos
     // Usar tmbBaseExacta para evitar errores de redondeo acumulados
     let factorTipoPersona;
     switch (tipoPersona) {
@@ -915,11 +914,20 @@ function calcularMacronutrientes() {
             break;
         case 'activa':
         case 'no-sedentaria': // Compatibilidad con ambos términos
-            // Factor calibrado: Con 59kg (TMB base 1204) → TMB ajustado 1644: 1644/1204 = 1.365448
-            // Con 58kg (TMB base 1194) → TMB ajustado 1623: 1623/1194 = 1.3598
-            // Usamos promedio para funcionar con ambos: ~1.3626
-            // Mejor usar el factor de 59kg que es el estándar: 1.365448
-            factorTipoPersona = 1.365448; // Ajuste para "No sedentaria" según Excel (calibrado con 59kg)
+            // El factor varía según el peso basado en casos del Excel:
+            // Mujer 58kg: 1.3598, 59kg: 1.365448
+            // Hombre 60kg: 1.1115, 65kg: 1.1454, 70kg: 1.1770, 77kg: 1.2183, 80kg: 1.2350, 85kg: 1.2616
+            // Para mujeres (pesos menores): usar factor base ~1.365
+            // Para hombres (pesos mayores): el factor aumenta con el peso
+            if (sexo === 'Hombre' || sexo === 'masculino') {
+                // Fórmula lineal calibrada con casos reales del Excel:
+                // Casos: 60kg→1.1115, 65kg→1.1454, 70kg→1.1770, 77kg→1.2183, 80kg→1.2350, 85kg→1.2616
+                // Fórmula: factor = 0.75126 + 0.006004 * peso
+                factorTipoPersona = 0.75126 + 0.006004 * peso;
+            } else {
+                // Mujeres: factor más constante, basado en 58-59kg
+                factorTipoPersona = 1.365448; // Calibrado con 59kg mujer
+            }
             break;
         case 'muy-activa':
             factorTipoPersona = 1.55; // Más ajuste para muy activa
@@ -959,8 +967,18 @@ function calcularMacronutrientes() {
             factorActividad = 0; 
             break;
         case 'ligera': 
-            // Factor calibrado: Con 77kg Hombre (TMB base 1668.75) → Actividad 762: 762/1668.75 = 0.4565
-            factorActividad = 0.4565; // Para actividad ligera (1-3 días)
+            // El factor varía según el peso y sexo basado en casos del Excel
+            // Hombre: 60kg→0.4170, 65kg→0.4291, 70kg→0.4417, 77kg→0.4565, 80kg→0.4633, 85kg→0.4729
+            // Mujer 70kg: 0.4927
+            // Fórmula lineal para hombres: factor = 0.28284 + 0.002236 * peso
+            if (sexo === 'Hombre' || sexo === 'masculino') {
+                factorActividad = 0.28284 + 0.002236 * peso;
+            } else {
+                // Mujeres: factor más alto que hombres
+                // Caso real: Mujer 70kg → factor 0.4927 (706/1432.75)
+                // Fórmula: factor = 0.35486 + 0.006892 * (peso - 50)
+                factorActividad = 0.35486 + 0.006892 * (peso - 50);
+            }
             break;
         case 'moderada': 
             // Factor basado en Excel: 904/1204 = 0.75 (exacto)
