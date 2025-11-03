@@ -915,7 +915,8 @@ function calcularMacronutrientes() {
             break;
         case 'activa':
         case 'no-sedentaria': // Compatibilidad con ambos términos
-            factorTipoPersona = 1.365; // Ajuste para "No sedentaria" según Excel
+            // Factor exacto: 1644 / 1204 = 1.365448172... (para coincidir exactamente con Excel)
+            factorTipoPersona = 1.365448; // Ajuste para "No sedentaria" según Excel
             break;
         case 'muy-activa':
             factorTipoPersona = 1.55; // Más ajuste para muy activa
@@ -962,8 +963,8 @@ function calcularMacronutrientes() {
             factorActividad = 0.75;
             break;
         case 'intensa': 
-            // Ajuste para 6-7 días/semana (intensa): ~99% del TMB base
-            factorActividad = 0.99;
+            // Factor exacto: 1192 / 1204 = 0.990033... (para coincidir exactamente con Excel)
+            factorActividad = 0.990033;
             break;
         case 'muy-intensa': 
             // Muy intensa por encima de intensa
