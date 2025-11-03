@@ -962,9 +962,11 @@ function calcularMacronutrientes() {
             factorActividad = 0.75;
             break;
         case 'intensa': 
-            factorActividad = 0.9;
+            // Ajuste para 6-7 días/semana (intensa): ~99% del TMB base
+            factorActividad = 0.99;
             break;
         case 'muy-intensa': 
+            // Muy intensa por encima de intensa
             factorActividad = 1.125;
             break;
         default: 
