@@ -869,7 +869,20 @@ function calcularMacronutrientes() {
     
     // Obtener valores del formulario (pueden no estar en datosUsuario aún)
     const actividadFisicaDeporte = document.getElementById('actividadFisicaDeporte')?.value || datosUsuario.actividadFisicaDeporte || 'moderada';
-    const tipoTermogenico = document.getElementById('tipoTermogenico')?.value || datosUsuario.tipoTermogenico || 'no-sedentaria';
+    // Mapear tipoPersona a tipoTermogenico si no está definido
+    let tipoTermogenico = document.getElementById('tipoTermogenico')?.value || datosUsuario.tipoTermogenico;
+    if (!tipoTermogenico) {
+        // Mapear según tipoPersona (compatibilidad con Excel)
+        if (tipoPersona === 'sedentaria') {
+            tipoTermogenico = 'sedentaria';
+        } else if (tipoPersona === 'activa' || tipoPersona === 'no-sedentaria') {
+            tipoTermogenico = 'no-sedentaria';
+        } else if (tipoPersona === 'muy-activa') {
+            tipoTermogenico = 'culturista';
+        } else {
+            tipoTermogenico = 'no-sedentaria'; // Valor por defecto
+        }
+    }
     const superavitEntreno = parseFloat(document.getElementById('superavitEntreno')?.value || datosUsuario.superavitEntreno || 5);
     const superavitDescanso = parseFloat(document.getElementById('superavitDescanso')?.value || datosUsuario.superavitDescanso || 5);
     
@@ -878,33 +891,34 @@ function calcularMacronutrientes() {
     const diasEntreno = Array.from(diasEntrenoCheckboxes).map(cb => cb.value);
     datosUsuario.diasEntreno = diasEntreno;
     
-    // Calcular TMB usando fórmula de Mifflin-St Jeor
-    let tmb;
+    // Calcular TMB base usando fórmula de Mifflin-St Jeor
+    let tmbBase;
     if (sexo === 'Hombre' || sexo === 'masculino') {
-        tmb = 10 * peso + 6.25 * altura - 5 * edad + 5;
+        tmbBase = 10 * peso + 6.25 * altura - 5 * edad + 5;
     } else {
-        tmb = 10 * peso + 6.25 * altura - 5 * edad - 161;
+        tmbBase = 10 * peso + 6.25 * altura - 5 * edad - 161;
     }
-    tmb = Math.round(tmb);
+    tmbBase = Math.round(tmbBase);
 
-    // Ajuste NEAT (actividad no deportiva) basado en tipo de persona
-    // Esto replica la hoja Excel: para 'activa' se suma ~37.5% del TMB
-    let porcentajeNEAT;
+    // Ajustar TMB según tipo de persona (replica Excel: el TMB se multiplica por un factor)
+    // En Excel: Mujer 40a, 59kg, 156cm, "No sedentaria" → TMB base 1204, TMB ajustado 1644
+    // Factor: 1644/1204 = 1.365 (36.5% adicional)
+    let factorTipoPersona;
     switch (tipoPersona) {
         case 'sedentaria':
-            porcentajeNEAT = 0.0;
+            factorTipoPersona = 1.0; // Sin ajuste
             break;
         case 'activa':
-            porcentajeNEAT = 0.375; // coincide con ejemplo Excel
+        case 'no-sedentaria': // Compatibilidad con ambos términos
+            factorTipoPersona = 1.365; // Ajuste para "No sedentaria" según Excel
             break;
         case 'muy-activa':
-            porcentajeNEAT = 0.55;
+            factorTipoPersona = 1.55; // Más ajuste para muy activa
             break;
         default:
-            porcentajeNEAT = 0.15; // valor conservador si no hay dato
+            factorTipoPersona = 1.15; // Valor conservador si no hay dato
     }
-    const neat = Math.round(tmb * porcentajeNEAT);
-    const tmbAjustado = tmb + neat;
+    const tmb = Math.round(tmbBase * factorTipoPersona);
     
     // Calcular efecto termogénico de alimentos (TEF) como porcentaje del TMB ajustado
     let porcentajeTEF;
@@ -921,40 +935,40 @@ function calcularMacronutrientes() {
         default: 
             porcentajeTEF = 0.15;
     }
-    // TEF se calcula como porcentaje del TMB ajustado (no del gasto total)
-    const tef = Math.round(tmbAjustado * porcentajeTEF);
+    // TEF se calcula como porcentaje del TMB ajustado (como en Excel)
+    const tef = Math.round(tmb * porcentajeTEF);
     
-    // Calcular actividad física del deporte (valores basados en ejemplos reales)
-    // Estos valores representan el gasto adicional por actividad física del deporte en días de entrenamiento
+    // Calcular actividad física del deporte basado en TMB BASE (no ajustado)
+    // En Excel: actividad moderada = 904 kcal para TMB base 1204 → factor 0.75
     let actividadFisicaDeporteKcal;
     switch(actividadFisicaDeporte) {
         case 'sedentario': 
             actividadFisicaDeporteKcal = 0; 
             break;
         case 'ligera': 
-            // Basado en ejemplo: ~787 kcal para TMB ~2098, pero escalamos proporcionalmente
-            // Factor aproximado: 0.375, pero ajustado para valores más realistas
-            actividadFisicaDeporteKcal = Math.round(tmb * 0.375); 
+            // Factor basado en relación TMB: ~0.5 del TMB base
+            actividadFisicaDeporteKcal = Math.round(tmbBase * 0.5); 
             break;
         case 'moderada': 
-            // Basado en ejemplo: 1154 kcal para TMB 2098 = factor 0.55
-            actividadFisicaDeporteKcal = Math.round(tmb * 0.55); 
+            // Factor basado en Excel: 904/1204 = 0.75
+            actividadFisicaDeporteKcal = Math.round(tmbBase * 0.75); 
             break;
         case 'intensa': 
-            // Para actividad intensa: ~1.5x moderada
-            actividadFisicaDeporteKcal = Math.round(tmb * 0.825); 
+            // Para actividad intensa: ~1.2x moderada
+            actividadFisicaDeporteKcal = Math.round(tmbBase * 0.9); 
             break;
         case 'muy-intensa': 
-            // Para muy intensa: ~2x moderada
-            actividadFisicaDeporteKcal = Math.round(tmb * 1.1); 
+            // Para muy intensa: ~1.5x moderada
+            actividadFisicaDeporteKcal = Math.round(tmbBase * 1.125); 
             break;
         default: 
-            actividadFisicaDeporteKcal = Math.round(tmb * 0.55);
+            actividadFisicaDeporteKcal = Math.round(tmbBase * 0.75);
     }
     
     // Calcular gasto calórico base (sin superávit/déficit)
-    const gastoBaseEntreno = tmbAjustado + tef + actividadFisicaDeporteKcal;
-    const gastoBaseDescanso = tmbAjustado + tef;
+    // Excel: Total = TMB ajustado + TEF + Actividad física
+    const gastoBaseEntreno = tmb + tef + actividadFisicaDeporteKcal;
+    const gastoBaseDescanso = tmb + tef;
     
     // Calcular superávit/déficit (puede ser positivo o negativo)
     const superavitEntrenoKcal = Math.round(gastoBaseEntreno * (superavitEntreno / 100));
@@ -966,7 +980,8 @@ function calcularMacronutrientes() {
     const caloriasDescanso = gastoBaseDescanso + superavitDescansoKcal;
     
     // Guardar todos los cálculos en datosUsuario
-    datosUsuario.tmb = tmb;
+    datosUsuario.tmbBase = tmbBase; // TMB base (Mifflin-St Jeor)
+    datosUsuario.tmb = tmb; // TMB ajustado por tipo de persona
     datosUsuario.tef = tef;
     datosUsuario.porcentajeTEF = porcentajeTEF * 100;
     datosUsuario.actividadFisicaDeporte = actividadFisicaDeporte;
