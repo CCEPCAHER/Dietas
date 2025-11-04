@@ -1660,13 +1660,59 @@ function mostrarTablaEditable() {
             
             planDiv.innerHTML = html;
             
-            // Inicializar tablas con filas vacías después de insertar el HTML
+            // Inicializar tablas después de insertar el HTML
             setTimeout(() => {
-                if (typeof window.tablaEditable.inicializarTablasVacias === 'function') {
-                    window.tablaEditable.inicializarTablasVacias(3); // 3 filas vacías por comida
-                    console.log('✅ Tabla editable inicializada correctamente');
+                // Verificar si hay datos guardados de una dieta generada automáticamente
+                if (datosUsuario.planSemana && Object.keys(datosUsuario.planSemana).length > 0) {
+                    // Cargar datos guardados en TablaEditable
+                    console.log('📋 Cargando dieta generada automáticamente para edición...');
+                    
+                    // Cargar planSemana en tablaEditable
+                    window.tablaEditable.planSemana = datosUsuario.planSemana;
+                    
+                    // Cargar el primer día disponible
+                    const dias = Object.keys(datosUsuario.planSemana);
+                    if (dias.length > 0) {
+                        const primerDia = dias[0];
+                        window.tablaEditable.diaActual = primerDia;
+                        
+                        // Actualizar selector de día
+                        const selectorDia = document.getElementById('selector-dia');
+                        if (selectorDia) {
+                            selectorDia.value = primerDia;
+                        }
+                        
+                        // Cargar datos del primer día
+                        const datosDia = datosUsuario.planSemana[primerDia];
+                        if (datosDia && typeof window.tablaEditable.cargarDatos === 'function') {
+                            window.tablaEditable.cargarDatos(datosDia);
+                            
+                            // Actualizar totales y estilos del día
+                            if (typeof window.tablaEditable.actualizarTotalesDiarios === 'function') {
+                                window.tablaEditable.actualizarTotalesDiarios();
+                            }
+                            if (typeof window.tablaEditable.actualizarEstilosDia === 'function') {
+                                window.tablaEditable.actualizarEstilosDia();
+                            }
+                            
+                            console.log('✅ Dieta cargada correctamente para edición');
+                        }
+                        
+                        // Cargar todos los días de la semana
+                        dias.forEach(dia => {
+                            if (dia !== primerDia && datosUsuario.planSemana[dia]) {
+                                window.tablaEditable.planSemana[dia] = datosUsuario.planSemana[dia];
+                            }
+                        });
+                    }
                 } else {
-                    console.error('❌ Método inicializarTablasVacias no disponible');
+                    // Si no hay datos guardados, inicializar tablas vacías
+                    if (typeof window.tablaEditable.inicializarTablasVacias === 'function') {
+                        window.tablaEditable.inicializarTablasVacias(3); // 3 filas vacías por comida
+                        console.log('✅ Tabla editable inicializada correctamente');
+                    } else {
+                        console.error('❌ Método inicializarTablasVacias no disponible');
+                    }
                 }
             }, 150);
         } catch (error) {
@@ -1795,6 +1841,59 @@ function mostrarPlanAlimentacion() {
     `;
     
     planDiv.innerHTML = htmlPlan;
+    
+    // Guardar el planSemana en formato compatible con TablaEditable
+    // Convertir array de días a objeto { Dia: { ... } }
+    if (planSemana && planSemana.length > 0) {
+        const planSemanaEditable = {};
+        
+        planSemana.forEach((diaPlan) => {
+            let nombreDia = diaPlan.dia || diaPlan.diaSemana;
+            if (!nombreDia) return;
+            
+            // Normalizar nombre del día a formato TablaEditable (primera letra mayúscula, resto minúsculas)
+            // Ejemplo: "LUNES" -> "Lunes", "Lunes" -> "Lunes"
+            nombreDia = nombreDia.charAt(0).toUpperCase() + nombreDia.slice(1).toLowerCase();
+            
+            // Mapeo especial para días con tildes
+            const mapaDias = {
+                'Miercoles': 'Miércoles',
+                'Sabado': 'Sábado'
+            };
+            if (mapaDias[nombreDia]) {
+                nombreDia = mapaDias[nombreDia];
+            }
+            
+            // Convertir estructura del plan automático a formato TablaEditable
+            const datosDia = {
+                'Desayuno': convertirComida(diaPlan.comidas.desayuno),
+                'Media Mañana': convertirComida(diaPlan.comidas.medioDia),
+                'Comida': convertirComida(diaPlan.comidas.almuerzo),
+                'Merienda': convertirComida(diaPlan.comidas.merienda),
+                'Cena': convertirComida(diaPlan.comidas.cena)
+            };
+            
+            planSemanaEditable[nombreDia] = datosDia;
+        });
+        
+        // Guardar en datosUsuario para que pueda ser cargado por TablaEditable
+        datosUsuario.planSemana = planSemanaEditable;
+        window.datosUsuario = datosUsuario;
+    }
+}
+
+// Función helper para convertir comidas del plan automático al formato TablaEditable
+function convertirComida(comida) {
+    if (!comida || !comida.alimentos) return [];
+    
+    return comida.alimentos.map(alimento => ({
+        alimento: alimento.nombre || alimento.alimento || '',
+        gramos: alimento.gramos || alimento.cantidad || 0,
+        calorias: alimento.calorias || 0,
+        proteinas: alimento.proteinas || alimento.proteínas || 0,
+        grasas: alimento.grasas || 0,
+        hidratos: alimento.hidratos || alimento.carbohidratos || 0
+    }));
 }
 
 // Función helper para detectar si un día es de descanso
