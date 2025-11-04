@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
     min-height: 100vh;
     padding: 20px;
 }
@@ -25,19 +25,20 @@ body {
     text-align: center;
     margin-bottom: 40px;
     padding-bottom: 20px;
-    border-bottom: 3px solid #667eea;
+    border-bottom: 3px solid #4c51bf;
 }
 
 .main-header h1 {
-    color: #667eea;
+    color: #4c51bf;
     font-size: 3em;
     font-weight: 900;
     margin-bottom: 10px;
     letter-spacing: 2px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
 
 .subtitle-header {
-    color: #764ba2;
+    color: #553c9a;
     font-size: 1.1em;
     font-weight: 600;
     margin: 10px 0;
@@ -46,10 +47,11 @@ body {
 }
 
 .plan-title {
-    color: #667eea;
+    color: #4c51bf;
     font-size: 1.8em;
     font-weight: 700;
     margin: 15px 0 0 0;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
 
 h1 {
@@ -60,17 +62,19 @@ h1 {
 }
 
 h2 {
-    color: #667eea;
+    color: #4c51bf;
     margin: 25px 0 15px 0;
     font-size: 1.5em;
-    border-bottom: 2px solid #667eea;
+    border-bottom: 2px solid #4c51bf;
     padding-bottom: 10px;
+    font-weight: 700;
 }
 
 h3 {
-    color: #764ba2;
+    color: #553c9a;
     margin: 20px 0 15px 0;
     font-size: 1.3em;
+    font-weight: 600;
 }
 
 .form-container {
@@ -112,8 +116,8 @@ h3 {
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #4c51bf;
+    box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.15);
 }
 
 .form-help {
@@ -357,7 +361,7 @@ h3 {
 .btn-edit {
     width: 100%;
     padding: 15px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -366,6 +370,8 @@ h3 {
     cursor: pointer;
     transition: transform 0.2s ease;
     margin-top: 10px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(76, 81, 191, 0.3);
 }
 
 .btn-submit:hover,
@@ -434,10 +440,11 @@ h3 {
 .pdf-header {
     text-align: center;
     padding: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
     border-radius: 10px;
     margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .nombre-nutricionista-header {
@@ -457,21 +464,24 @@ h3 {
     font-size: 3em;
     font-weight: 900;
     letter-spacing: 3px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 10px rgba(255,255,255,0.2);
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.3);
     text-transform: uppercase;
     line-height: 1.2;
 }
 
 .subtitle {
     font-size: 0.9em;
-    opacity: 0.9;
+    color: rgba(255, 255, 255, 0.95);
     margin: 5px 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .plan-subtitle {
     font-size: 1.3em;
     font-weight: 700;
     margin-top: 5px;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
     opacity: 1;
 }
 
@@ -534,7 +544,7 @@ h3 {
 }
 
 .tabla-info th {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
     padding: 12px 8px;
     text-align: center;
@@ -599,7 +609,7 @@ h3 {
 }
 
 .tabla-calculos th {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
     padding: 12px;
     text-align: left;
@@ -652,7 +662,7 @@ h3 {
 }
 
 .tabla-macros-distribucion th {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
     padding: 12px;
     text-align: center;
@@ -726,23 +736,27 @@ h3 {
 
 .tab {
     padding: 12px 20px;
-    background: #e9ecef;
-    border: none;
+    background: #f8f9fa;
+    border: 2px solid #dee2e6;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
     transition: all 0.3s ease;
-    color: #555;
+    color: #495057;
     font-size: 0.9em;
 }
 
 .tab:hover {
-    background: #dee2e6;
+    background: #e9ecef;
+    border-color: #667eea;
+    color: #667eea;
 }
 
 .tab.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
+    border-color: #4c51bf;
+    box-shadow: 0 2px 8px rgba(76, 81, 191, 0.3);
 }
 
 .tab-content {
@@ -766,7 +780,7 @@ table {
 }
 
 table thead {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
 }
 
@@ -1914,7 +1928,7 @@ button, .btn-login, .btn-logout, .btn-dietas, .btn-clientes, .btn-gestor-aliment
 }
 
 .btn-login {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
 }
 
@@ -2039,7 +2053,7 @@ button, .btn-login, .btn-logout, .btn-dietas, .btn-clientes, .btn-gestor-aliment
 .btn-auth {
     width: 100%;
     padding: 12px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -2184,7 +2198,7 @@ button, .btn-login, .btn-logout, .btn-dietas, .btn-clientes, .btn-gestor-aliment
 .btn-nuevo-cliente,
 .btn-clientes {
     padding: 12px 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -2403,7 +2417,7 @@ button, .btn-login, .btn-logout, .btn-dietas, .btn-clientes, .btn-gestor-aliment
 
 .btn-editar-cliente {
     padding: 12px 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -2641,7 +2655,7 @@ button, .btn-login, .btn-logout, .btn-dietas, .btn-clientes, .btn-gestor-aliment
 .form-section-header {
     margin: 30px 0 20px 0;
     padding: 15px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
     border-radius: 8px;
     font-size: 1.1em;
@@ -2684,7 +2698,7 @@ button, .btn-login, .btn-logout, .btn-dietas, .btn-clientes, .btn-gestor-aliment
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
     border: none;
     font-size: 24px;
@@ -2802,7 +2816,7 @@ button, .btn-login, .btn-logout, .btn-dietas, .btn-clientes, .btn-gestor-aliment
 }
 
 .tabla-alimentos thead {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
 }
 
@@ -2899,7 +2913,7 @@ button, .btn-login, .btn-logout, .btn-dietas, .btn-clientes, .btn-gestor-aliment
 }
 
 .totales-diarios {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
     padding: 20px;
     border-radius: 10px;
@@ -3145,7 +3159,7 @@ button, .btn-login, .btn-logout, .btn-dietas, .btn-clientes, .btn-gestor-aliment
 }
 
 .banner-modo-manual {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
     padding: 20px;
     border-radius: 10px;
