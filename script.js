@@ -3307,19 +3307,37 @@ function inicializarBotones() {
             const img = new Image();
             img.crossOrigin = 'anonymous';
             
+            // Timeout para evitar esperas indefinidas (5 segundos)
+            const timeout = setTimeout(() => {
+                console.log('Timeout al cargar la imagen:', src);
+                resolve(null);
+            }, 5000);
+            
+            // Función para limpiar timeout y resolver
+            const resolver = (result) => {
+                clearTimeout(timeout);
+                resolve(result);
+            };
+            
             // Función para convertir a base64 cuando la imagen se carga
             const convertir = function() {
                 try {
+                    // Verificar que la imagen se cargó correctamente
+                    if (!img.complete || img.naturalWidth === 0 || img.naturalHeight === 0) {
+                        console.log('La imagen no se cargó correctamente:', src);
+                        resolver(null);
+                        return;
+                    }
                     const canvas = document.createElement('canvas');
                     canvas.width = img.width;
                     canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0);
                     const base64 = canvas.toDataURL('image/png');
-                    resolve(base64);
+                    resolver(base64);
                 } catch (e) {
-                    console.warn('Error convirtiendo imagen a base64:', e);
-                    resolve(src); // Retornar la ruta original como fallback
+                    console.log('Error convirtiendo imagen a base64:', e);
+                    resolver(null); // Retornar null para indicar que falló
                 }
             };
             
@@ -3340,9 +3358,9 @@ function inicializarBotones() {
                     // Intentar siguiente ruta
                     img.src = rutas[intentoActual];
                 } else {
-                    // Si todos fallan, retornar la ruta original
-                    console.warn('No se pudo cargar la imagen después de intentar todas las rutas:', src);
-                    resolve(src);
+                    // Si todos fallan, retornar null (la imagen no se pudo cargar)
+                    console.log('No se pudo cargar la imagen después de intentar todas las rutas:', src);
+                    resolver(null); // Retornar null para indicar que falló
                 }
             };
             
