@@ -17,6 +17,16 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+// Configurar persistencia de sesión (LOCAL = persistir incluso después de cerrar navegador)
+// Esto asegura que el usuario no tenga que volver a iniciar sesión después de actualizar la PWA
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log('✅ Firebase Auth: Persistencia LOCAL configurada');
+    })
+    .catch((error) => {
+        console.warn('⚠️ Firebase Auth: Error al configurar persistencia', error);
+    });
+
 // Exportar para uso en otros módulos
 window.firebaseAuth = auth;
 window.firebaseDb = db;

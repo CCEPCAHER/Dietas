@@ -13,8 +13,8 @@
     <meta name="apple-mobile-web-app-title" content="MAIKA PORCUNA">
     <meta name="mobile-web-app-capable" content="yes">
     
-    <!-- Manifest y Iconos -->
-    <link rel="manifest" href="manifest.json?v=4">
+          <!-- Manifest y Iconos -->
+      <link rel="manifest" href="manifest.json?v=5">
     
     <!-- Favicon e iconos Apple -->
     <link rel="shortcut icon" href="icon-192x192.png?v=4">
@@ -52,7 +52,6 @@
         
         <div class="main-header">
             <div class="header-logo-container">
-                <img src="iconofit.png" alt="IconoFit Logo" class="header-logo">
                 <div class="header-content">
                     <h1>Maika Porcuna</h1>
                     <h2 class="subtitle-header">NUTRICIÓN/DIETÉTICA/SUPLEMENTACIÓN/NUTRICIÓN DEPORTIVA</h2>
@@ -613,19 +612,75 @@
     <script src="ui-manager.js"></script>
     <script src="script.js"></script>
     
-    <!-- Service Worker Registration -->
+    <!-- Service Worker Registration con Auto-actualización -->
     <script>
         if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then((registration) => {
-                        console.log('✅ Service Worker registrado exitosamente:', registration.scope);
-                    })
-                    .catch((error) => {
-                        console.error('❌ Error al registrar Service Worker:', error);
+            let refreshing = false;
+            
+            // Registrar Service Worker
+            navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+                .then((registration) => {
+                    console.log('✅ Service Worker registrado exitosamente:', registration.scope);
+                    
+                    // Detectar cuando hay una nueva versión disponible
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        console.log('🔄 Nueva versión del Service Worker detectada');
+                        
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // Hay una nueva versión instalada
+                                console.log('✨ Nueva versión disponible. Aplicando actualización...');
+                                
+                                // Forzar activación inmediata
+                                newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                
+                                // Recargar la página cuando el nuevo worker esté activo
+                                newWorker.addEventListener('controllerchange', () => {
+                                    if (!refreshing) {
+                                        refreshing = true;
+                                        console.log('🔄 Recargando para aplicar actualización...');
+                                        window.location.reload();
+                                    }
+                                });
+                            }
+                        });
                     });
+                    
+                    // Verificar actualizaciones cada 5 minutos cuando la app está activa
+                    setInterval(() => {
+                        registration.update().then(() => {
+                            console.log('🔍 Verificando actualizaciones...');
+                        }).catch((error) => {
+                            console.log('Verificación de actualizaciones:', error.message);
+                        });
+                    }, 5 * 60 * 1000); // 5 minutos
+                    
+                    // Verificar actualizaciones al recuperar el foco de la ventana
+                    window.addEventListener('focus', () => {
+                        registration.update().catch(() => {});
+                    });
+                    
+                    // Verificar actualizaciones al cargar la página
+                    registration.update().catch(() => {});
+                    
+                })
+                .catch((error) => {
+                    console.error('❌ Error al registrar Service Worker:', error);
+                });
+            
+            // Escuchar cambios del Service Worker
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    console.log('🔄 Controller cambió, recargando...');
+                    window.location.reload();
+                }
             });
         }
+        
+        // La persistencia de Firebase Auth ya está configurada en firebase-config.js
+        // La sesión se mantendrá incluso después de actualizar la PWA
     </script>
 </body>
 </html>

@@ -3002,27 +3002,32 @@ function inicializarBotones() {
                 align-items: flex-start;
                 margin-bottom: 12px;
             }
-            .header-left {
-                display: flex;
-                align-items: flex-start;
-                gap: 15px;
-                flex: 1;
-            }
+                        .header-left {
+                  display: flex;
+                  align-items: flex-start;
+                  gap: 15px;
+                  flex: 1;
+              }
+            .header-right {
+                  display: flex;
+                  align-items: flex-start;
+                  justify-content: flex-end;
+              }
             .logo-pdf {
-                width: 60px;
-                height: 60px;
-                object-fit: contain;
-                flex-shrink: 0;
-            }
-            @media (max-width: 600px) {
+                  width: 120px;
+                  height: 120px;
+                  object-fit: contain;
+                  flex-shrink: 0;
+              }
+              @media (max-width: 600px) {
                 .logo-pdf {
-                    width: 50px;
-                    height: 50px;
-                }
-                .nombre-profesional {
-                    font-size: 18pt;
-                }
-            }
+                      width: 100px;
+                      height: 100px;
+                  }
+                  .nombre-profesional {
+                      font-size: 18pt;
+                  }
+              }
             .nombre-profesional {
                 font-size: 24pt;
                 font-weight: 900;
@@ -3044,11 +3049,13 @@ function inicializarBotones() {
                 display: inline-block;
                 white-space: nowrap;
             }
-            .fecha {
-                font-size: 11pt;
-                color: #333;
-                font-weight: 500;
-            }
+                        .fecha-pdf {
+                  font-size: 10pt;
+                  color: #666;
+                  font-weight: 500;
+                  margin-top: 8px;
+                  text-align: right;
+              }
             .cliente-info {
                 margin-top: 14px;
             }
@@ -3159,26 +3166,28 @@ function inicializarBotones() {
             console.warn('No se pudo cargar el logo:', e);
         }
         
-        const logoHTML = logoBase64 ? `<img src="${logoBase64}" alt="Logo" class="logo-pdf">` : '';
-        
-        return `
-            <div class="header">
-                <div class="header-top">
-                    <div class="header-left">
-                        ${logoHTML}
-                        <div style="flex: 1;">
-                            <div class="nombre-profesional">MAIKA PORCUNA</div>
-                            <div class="contacto">
-                                <span>Maikafit1977@gmail.com</span>
-                                <span>+34 650 229 987</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="fecha">${fecha}</div>
-                </div>
+                  const logoHTML = logoBase64 ? `<img src="${logoBase64}" alt="Logo" class="logo-pdf">` : '';
+          
+          return `
+              <div class="header">
+                  <div class="header-top">
+                      <div class="header-left">
+                          <div style="flex: 1;">
+                              <div class="nombre-profesional">MAIKA PORCUNA</div>
+                              <div class="contacto">
+                                  <span>Maikafit1977@gmail.com</span>
+                                  <span>+34 650 229 987</span>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="header-right">
+                          ${logoHTML}
+                      </div>
+                  </div>
                 <div class="cliente-info">
                     <div class="cliente-nombre">${nombreCliente}</div>
                     <div class="cliente-datos">${subtags.join(' · ')}</div>
+                    <div class="fecha-pdf">${fecha}</div>
                 </div>
             </div>
         `;
@@ -3201,6 +3210,12 @@ function inicializarBotones() {
         if (tablaMacros) {
             const macroTableContainer = tablaMacros.closest('.macro-table') || tablaMacros.parentElement;
             if (macroTableContainer) macroTableContainer.remove();
+        }
+        
+        // Remover tabla de información del usuario si existe (datos duplicados)
+        const infoUsuarioTable = clone.querySelector('.info-usuario-table, #info-usuario-table');
+        if (infoUsuarioTable) {
+            infoUsuarioTable.remove();
         }
         
         // Convertir a texto simple sin colores - MINIMALISTA BLANCO Y NEGRO

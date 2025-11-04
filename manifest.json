@@ -2,7 +2,7 @@
   "name": "MAIKA PORCUNA - Plan de Alimentación Personalizada",
   "short_name": "MAIKA",
   "description": "Aplicación profesional para la creación de planes de alimentación personalizados - Nutrición, Dietética, Suplementación y Nutrición Deportiva",
-  "start_url": "./index.html",
+  "start_url": "./index.html?source=pwa",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",

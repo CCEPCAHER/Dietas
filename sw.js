@@ -1,5 +1,6 @@
 // Service Worker para MAIKA PORCUNA - PWA
-const CACHE_NAME = 'maika-porcuna-v4.0.0';
+// Versión actualizada para auto-actualización automática
+const CACHE_NAME = 'maika-porcuna-v5.0.0';
 const BASE_PATH = self.location.pathname.replace(/sw\.js$/, '');
 const urlsToCache = [
   './',
@@ -31,23 +32,25 @@ const urlsToCache = [
 
 // Instalación del Service Worker
 self.addEventListener('install', (event) => {
-  console.log('Service Worker: Instalando...');
+  console.log('Service Worker: Instalando versión', CACHE_NAME);
+  // Forzar activación inmediata para aplicar actualizaciones
+  self.skipWaiting();
+  
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Service Worker: Cacheando archivos');
-        return cache.addAll(urlsToCache);
-      })
-      .catch((error) => {
-        console.error('Service Worker: Error al cachear archivos', error);
+        // No bloquear la instalación si falla el cacheo
+        return cache.addAll(urlsToCache).catch((error) => {
+          console.warn('Service Worker: Algunos archivos no se pudieron cachear', error);
+        });
       })
   );
-  self.skipWaiting();
 });
 
 // Activación del Service Worker
 self.addEventListener('activate', (event) => {
-  console.log('Service Worker: Activando...');
+  console.log('Service Worker: Activando versión', CACHE_NAME);
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -58,48 +61,56 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
+    }).then(() => {
+      // Tomar control inmediato de todas las páginas
+      return self.clients.claim();
     })
   );
-  return self.clients.claim();
 });
 
-// Interceptar peticiones
+// Interceptar peticiones - Estrategia Network First para siempre obtener la versión más reciente
 self.addEventListener('fetch', (event) => {
+  // No cachear peticiones a Firebase (siempre usar red)
+  if (event.request.url.includes('firebase') || 
+      event.request.url.includes('googleapis') ||
+      event.request.url.includes('gstatic')) {
+    return; // Dejar que Firebase maneje su propia cache
+  }
+
   // Solo cachear peticiones GET
   if (event.request.method !== 'GET') {
     return;
   }
 
   event.respondWith(
-    caches.match(event.request)
+    // ESTRATEGIA NETWORK FIRST: Intentar red primero, luego cache
+    fetch(event.request)
       .then((response) => {
-        // Retornar respuesta del cache si existe
-        if (response) {
+        // Si la respuesta es válida, actualizar cache y retornar
+        if (response && response.status === 200 && response.type === 'basic') {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME)
+            .then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
           return response;
         }
-
-        // Si no está en cache, hacer fetch y guardar en cache
-        return fetch(event.request)
-          .then((response) => {
-            // Verificar que la respuesta es válida
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
+        // Si falla, intentar desde cache
+        throw new Error('Network response not ok');
+      })
+      .catch(() => {
+        // Si falla la red, usar cache
+        return caches.match(event.request)
+          .then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
             }
-
-            // Clonar la respuesta
-            const responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          })
-          .catch(() => {
-            // Si falla el fetch y es una página HTML, retornar index.html
-            if (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html')) {
-              return caches.match('./index.html') || caches.match('./') || caches.match('index.html');
+            // Si es una petición HTML y no hay cache, retornar index.html
+            if (event.request.headers.get('accept') && 
+                event.request.headers.get('accept').includes('text/html')) {
+              return caches.match('./index.html') || 
+                     caches.match('./') || 
+                     caches.match('index.html');
             }
           });
       })
@@ -110,6 +121,22 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
+  }
+  if (event.data && event.data.type === 'CHECK_UPDATE') {
+    // Verificar actualizaciones cuando el cliente lo solicite
+    event.ports[0].postMessage({ updateAvailable: true });
+  }
+});
+
+// Verificar actualizaciones periódicamente (cada hora)
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'check-updates') {
+    event.waitUntil(
+      caches.open(CACHE_NAME).then((cache) => {
+        // Forzar verificación de actualizaciones
+        return fetch('./sw.js', { cache: 'no-store' });
+      })
+    );
   }
 });
 
@@ -139,5 +166,5 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
-console.log('Service Worker cargado correctamente');
+console.log('Service Worker cargado correctamente - Versión', CACHE_NAME);
 
