@@ -1067,10 +1067,15 @@ function calcularMacronutrientes() {
     }
     
     // Calcular macronutrientes diferenciados para días de entreno y descanso
-    // Usando distribución estándar: 50% carbohidratos, 30% grasas, 20% proteínas
-    const porcentajeCarbs = 0.50;
-    const porcentajeGrasas = 0.30;
-    const porcentajeProteinas = 0.20;
+    // Usar porcentajes guardados manualmente o distribución estándar: 50% carbohidratos, 30% grasas, 20% proteínas
+    const porcentajeCarbs = datosUsuario.porcentajeCarbs !== undefined ? datosUsuario.porcentajeCarbs / 100 : 0.50;
+    const porcentajeGrasas = datosUsuario.porcentajeGrasas !== undefined ? datosUsuario.porcentajeGrasas / 100 : 0.30;
+    const porcentajeProteinas = datosUsuario.porcentajeProteinas !== undefined ? datosUsuario.porcentajeProteinas / 100 : 0.20;
+    
+    // Guardar porcentajes en datosUsuario (en formato porcentaje 0-100)
+    datosUsuario.porcentajeCarbs = porcentajeCarbs * 100;
+    datosUsuario.porcentajeGrasas = porcentajeGrasas * 100;
+    datosUsuario.porcentajeProteinas = porcentajeProteinas * 100;
     
     // Macronutrientes día de entreno
     const carbsEntreno = Math.round((caloriasEntreno * porcentajeCarbs) / 4);
@@ -1560,34 +1565,229 @@ function mostrarMacronutrientesDistribucion() {
     
     const {
         carbsEntrenogkg, grasasEntrenogkg, proteinasEntrenogkg,
-        carbsDescansogkg, grasasDescansogkg, proteinasDescansogkg
+        carbsDescansogkg, grasasDescansogkg, proteinasDescansogkg,
+        porcentajeCarbs = 50,
+        porcentajeGrasas = 30,
+        porcentajeProteinas = 20
     } = datosUsuario;
     
     if (!carbsEntrenogkg) return; // Si no hay cálculos, no mostrar
     
+    // Verificar si los porcentajes suman 100%
+    const totalPorcentaje = porcentajeCarbs + porcentajeGrasas + porcentajeProteinas;
+    const sumaCorrecta = Math.abs(totalPorcentaje - 100) < 0.01; // Permitir pequeña diferencia por redondeo
+    
+    // Construir fila de advertencia si no suma 100%
+    let filaAdvertencia = '';
+    if (!sumaCorrecta) {
+        filaAdvertencia = `
+        <tr style="background-color: #fee; border: 2px solid #dc2626;">
+            <td colspan="4" style="padding: 10px; text-align: center; font-weight: 700; color: #dc2626; font-size: 1.1em;">
+                ⚠️ OJO, EL REPARTO DE MACRONUTRIENTES NO SUMA 100% (Suma actual: ${totalPorcentaje.toFixed(1)}%)
+            </td>
+        </tr>
+        `;
+    }
+    
     const html = `
         <tr>
             <td style="font-weight: 700; padding: 10px;">HIDRATOS</td>
-            <td style="padding: 10px; font-weight: 600;">50%</td>
+            <td style="padding: 10px;">
+                <input type="number" 
+                       id="porcentaje-carbs" 
+                       value="${porcentajeCarbs}" 
+                       min="0" 
+                       max="100" 
+                       step="1"
+                       style="width: 70px; padding: 5px; border: 2px solid #1e40af; border-radius: 4px; font-weight: 600; text-align: center;"
+                       onchange="actualizarDistribucionMacros('carbs', this.value)">
+                <span style="font-weight: 600;">%</span>
+            </td>
             <td style="padding: 10px; font-weight: 700; color: #1e40af;">${carbsEntrenogkg} g/kg</td>
             <td style="padding: 10px; font-weight: 700; color: #374151;">${carbsDescansogkg} g/kg</td>
         </tr>
         <tr>
             <td style="font-weight: 700; padding: 10px;">GRASAS</td>
-            <td style="padding: 10px; font-weight: 600;">30%</td>
+            <td style="padding: 10px;">
+                <input type="number" 
+                       id="porcentaje-grasas" 
+                       value="${porcentajeGrasas}" 
+                       min="0" 
+                       max="100" 
+                       step="1"
+                       style="width: 70px; padding: 5px; border: 2px solid #dc2626; border-radius: 4px; font-weight: 600; text-align: center;"
+                       onchange="actualizarDistribucionMacros('grasas', this.value)">
+                <span style="font-weight: 600;">%</span>
+            </td>
             <td style="padding: 10px; font-weight: 700; color: #1e40af;">${grasasEntrenogkg} g/kg</td>
             <td style="padding: 10px; font-weight: 700; color: #374151;">${grasasDescansogkg} g/kg</td>
         </tr>
         <tr>
             <td style="font-weight: 700; padding: 10px;">PROTEÍNAS</td>
-            <td style="padding: 10px; font-weight: 600;">20%</td>
+            <td style="padding: 10px;">
+                <input type="number" 
+                       id="porcentaje-proteinas" 
+                       value="${porcentajeProteinas}" 
+                       min="0" 
+                       max="100" 
+                       step="1"
+                       style="width: 70px; padding: 5px; border: 2px solid #059669; border-radius: 4px; font-weight: 600; text-align: center;"
+                       onchange="actualizarDistribucionMacros('proteinas', this.value)">
+                <span style="font-weight: 600;">%</span>
+            </td>
             <td style="padding: 10px; font-weight: 700; color: #1e40af;">${proteinasEntrenogkg} g/kg</td>
             <td style="padding: 10px; font-weight: 700; color: #374151;">${proteinasDescansogkg} g/kg</td>
         </tr>
+        ${filaAdvertencia}
     `;
     
     tbody.innerHTML = html;
 }
+
+// Función para actualizar la distribución de macronutrientes cuando se modifica manualmente el porcentaje
+window.actualizarDistribucionMacros = function(tipo, valorPorcentaje) {
+    const porcentaje = parseFloat(valorPorcentaje);
+    
+    if (isNaN(porcentaje) || porcentaje < 0 || porcentaje > 100) {
+        alert('Por favor introduce un porcentaje válido entre 0 y 100');
+        // Restaurar valor anterior
+        const valorAnterior = datosUsuario[`porcentaje${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`] || 
+                             (tipo === 'carbs' ? 50 : tipo === 'grasas' ? 30 : 20);
+        document.getElementById(`porcentaje-${tipo}`).value = valorAnterior;
+        return;
+    }
+    
+    // Actualizar porcentaje en datosUsuario
+    if (tipo === 'carbs') {
+        datosUsuario.porcentajeCarbs = porcentaje;
+    } else if (tipo === 'grasas') {
+        datosUsuario.porcentajeGrasas = porcentaje;
+    } else if (tipo === 'proteinas') {
+        datosUsuario.porcentajeProteinas = porcentaje;
+    }
+    
+    // Verificar que la suma de porcentajes sea razonable (permitir ajustes flexibles pero mostrar advertencia en visualización)
+    const totalPorcentaje = datosUsuario.porcentajeCarbs + datosUsuario.porcentajeGrasas + datosUsuario.porcentajeProteinas;
+    if (Math.abs(totalPorcentaje - 100) > 0.01) {
+        console.warn(`Los porcentajes suman ${totalPorcentaje.toFixed(1)}%, que no es exactamente 100%. Se mostrará advertencia en la visualización.`);
+    }
+    
+    // Obtener valores necesarios para recalcular
+    const peso = datosUsuario.peso;
+    const caloriasEntreno = datosUsuario.caloriasEntreno;
+    const caloriasDescanso = datosUsuario.caloriasDescanso;
+    
+    if (!peso || !caloriasEntreno || !caloriasDescanso) {
+        console.error('No se pueden recalcular los macronutrientes: faltan datos básicos');
+        return;
+    }
+    
+    // Convertir porcentajes a decimales
+    const porcentajeCarbs = datosUsuario.porcentajeCarbs / 100;
+    const porcentajeGrasas = datosUsuario.porcentajeGrasas / 100;
+    const porcentajeProteinas = datosUsuario.porcentajeProteinas / 100;
+    
+    // Recalcular gramos desde calorías usando los nuevos porcentajes
+    const carbsEntreno = Math.round((caloriasEntreno * porcentajeCarbs) / 4);
+    const grasasEntreno = Math.round((caloriasEntreno * porcentajeGrasas) / 9);
+    const proteinasEntreno = Math.round((caloriasEntreno * porcentajeProteinas) / 4);
+    
+    const carbsDescanso = Math.round((caloriasDescanso * porcentajeCarbs) / 4);
+    const grasasDescanso = Math.round((caloriasDescanso * porcentajeGrasas) / 9);
+    const proteinasDescanso = Math.round((caloriasDescanso * porcentajeProteinas) / 4);
+    
+    // Recalcular g/kg corporal
+    const carbsEntrenogkg = (carbsEntreno / peso).toFixed(2);
+    const grasasEntrenogkg = (grasasEntreno / peso).toFixed(2);
+    const proteinasEntrenogkg = (proteinasEntreno / peso).toFixed(2);
+    
+    const carbsDescansogkg = (carbsDescanso / peso).toFixed(2);
+    const grasasDescansogkg = (grasasDescanso / peso).toFixed(2);
+    const proteinasDescansogkg = (proteinasDescanso / peso).toFixed(2);
+    
+    // Actualizar datosUsuario con los nuevos valores
+    datosUsuario.carbsEntreno = carbsEntreno;
+    datosUsuario.grasasEntreno = grasasEntreno;
+    datosUsuario.proteinasEntreno = proteinasEntreno;
+    datosUsuario.carbsEntrenogkg = carbsEntrenogkg;
+    datosUsuario.grasasEntrenogkg = grasasEntrenogkg;
+    datosUsuario.proteinasEntrenogkg = proteinasEntrenogkg;
+    
+    datosUsuario.carbsDescanso = carbsDescanso;
+    datosUsuario.grasasDescanso = grasasDescanso;
+    datosUsuario.proteinasDescanso = proteinasDescanso;
+    datosUsuario.carbsDescansogkg = carbsDescansogkg;
+    datosUsuario.grasasDescansogkg = grasasDescansogkg;
+    datosUsuario.proteinasDescansogkg = proteinasDescansogkg;
+    
+    // Recalcular valores promedio para compatibilidad
+    const numDiasEntreno = datosUsuario.diasEntreno?.length || 5;
+    const numDiasDescanso = 7 - numDiasEntreno;
+    datosUsuario.proteinas = Math.round((proteinasEntreno * numDiasEntreno + proteinasDescanso * numDiasDescanso) / 7);
+    datosUsuario.grasas = Math.round((grasasEntreno * numDiasEntreno + grasasDescanso * numDiasDescanso) / 7);
+    datosUsuario.carbohidratos = Math.round((carbsEntreno * numDiasEntreno + carbsDescanso * numDiasDescanso) / 7);
+    
+    // Actualizar la visualización
+    mostrarMacronutrientesDistribucion();
+    
+    // Verificar el modo de generación para decidir cómo actualizar
+    const modoGeneracion = datosUsuario.modoGeneracion || 'automatico';
+    
+    if (modoGeneracion === 'automatico') {
+        // Si está en modo automático, regenerar completamente el plan con los nuevos macronutrientes
+        if (typeof window.mostrarPlanAlimentacion === 'function') {
+            window.mostrarPlanAlimentacion();
+        }
+        // Actualizar la visualización de macros en la tabla principal
+        if (typeof window.mostrarTablaMacros === 'function') {
+            window.mostrarTablaMacros();
+        }
+    } else if (modoGeneracion === 'manual' && window.tablaEditable) {
+        // Si está en modo manual, actualizar objetivos y recalcular progreso
+        // Actualizar la visualización de objetivos en la tabla editable
+        if (typeof window.tablaEditable.actualizarObjetivosVisuales === 'function') {
+            window.tablaEditable.actualizarObjetivosVisuales();
+        }
+        // Actualizar los totales diarios que dependen de los objetivos
+        if (typeof window.tablaEditable.actualizarTotalesDiarios === 'function') {
+            window.tablaEditable.actualizarTotalesDiarios();
+        }
+        // Recalcular el progreso de cada comida para que refleje los nuevos objetivos
+        if (window.tablaEditable.datos) {
+            // Iterar sobre todas las comidas y días para recalcular
+            Object.keys(window.tablaEditable.datos).forEach(dia => {
+                Object.keys(window.tablaEditable.datos[dia]).forEach(comida => {
+                    const filas = window.tablaEditable.datos[dia][comida];
+                    if (filas && filas.length > 0) {
+                        // Recalcular el progreso de esta comida
+                        if (typeof window.tablaEditable.actualizarProgresoComida === 'function') {
+                            window.tablaEditable.actualizarProgresoComida(comida);
+                        }
+                    }
+                });
+            });
+        }
+        // Actualizar la visualización de macros en la tabla principal
+        if (typeof window.mostrarTablaMacros === 'function') {
+            window.mostrarTablaMacros();
+        }
+    }
+    
+    // Mostrar notificación según el modo
+    if (window.mostrarNotificacion) {
+        if (modoGeneracion === 'automatico') {
+            window.mostrarNotificacion(`✅ Distribución de macronutrientes actualizada. El plan completo se ha regenerado con los nuevos valores.`, 'success');
+        } else {
+            window.mostrarNotificacion(`✅ Distribución de macronutrientes actualizada. Los objetivos se han recalculado.`, 'success');
+        }
+    }
+    
+    console.log(`✅ Distribución de macronutrientes actualizada:`, {
+        porcentajeCarbs: datosUsuario.porcentajeCarbs + '%',
+        porcentajeGrasas: datosUsuario.porcentajeGrasas + '%',
+        porcentajeProteinas: datosUsuario.porcentajeProteinas + '%'
+    });
+};
 
 function mostrarTablaEditable() {
     const planDiv = document.getElementById('plan-alimentacion');

@@ -569,7 +569,7 @@ class ClienteManager {
         const categorias = {
             'Torso': ['cintura', 'cadera', 'pecho', 'cuello'],
             'Brazos': ['brazoDer', 'brazoIzq', 'bicepsDer', 'bicepsIzq', 'antebrazoDer', 'antebrazoIzq'],
-            'Piernas': ['musloDer', 'musloIzq', 'cuadricepsDer', 'cuadricepsIzq', 'gemeloDer', 'gemeloIzq', 'pantorrillaDer', 'pantorrillaIzq']
+            'Piernas': ['cuadricepsDer', 'cuadricepsIzq', 'gemeloDer', 'gemeloIzq']
         };
         
         const labels = {
@@ -577,8 +577,6 @@ class ClienteManager {
             cadera: 'Cadera',
             brazoDer: 'Brazo Der.',
             brazoIzq: 'Brazo Izq.',
-            musloDer: 'Muslo Der.',
-            musloIzq: 'Muslo Izq.',
             bicepsDer: 'Bíceps Der.',
             bicepsIzq: 'Bíceps Izq.',
             antebrazoDer: 'Antebrazo Der.',
@@ -587,8 +585,6 @@ class ClienteManager {
             cuadricepsIzq: 'Cuádriceps Izq.',
             gemeloDer: 'Gemelo Der.',
             gemeloIzq: 'Gemelo Izq.',
-            pantorrillaDer: 'Pantorrilla Der.',
-            pantorrillaIzq: 'Pantorrilla Izq.',
             pecho: 'Pecho',
             cuello: 'Cuello'
         };
@@ -703,11 +699,9 @@ class ClienteManager {
             cadera: 'Cadera',
             brazoDer: 'Brazo Derecho',
             brazoIzq: 'Brazo Izquierdo',
-            musloDer: 'Muslo Derecho',
             bicepsDer: 'Bíceps Derecho',
             cuadricepsDer: 'Cuádriceps Derecho',
-            gemeloDer: 'Gemelo Derecho',
-            pantorrillaDer: 'Pantorrilla Derecha'
+            gemeloDer: 'Gemelo Derecho'
         };
         
         medidasClave.forEach(medida => {
@@ -769,11 +763,9 @@ class ClienteManager {
                 cadera: 'Cadera',
                 brazoDer: 'Brazo Derecho',
                 brazoIzq: 'Brazo Izquierdo',
-                musloDer: 'Muslo Derecho',
                 bicepsDer: 'Bíceps Derecho',
                 cuadricepsDer: 'Cuádriceps Derecho',
-                gemeloDer: 'Gemelo Derecho',
-                pantorrillaDer: 'Pantorrilla Derecha'
+                gemeloDer: 'Gemelo Derecho'
             };
             
             medidasClave.forEach(medida => {
@@ -973,16 +965,6 @@ class ClienteManager {
                 </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Muslo derecho</label>
-                            <input type="number" id="clienteMusloDer" step="0.1" min="30" max="100" placeholder="cm">
-                        </div>
-                        <div class="form-group">
-                            <label>Muslo izquierdo</label>
-                            <input type="number" id="clienteMusloIzq" step="0.1" min="30" max="100" placeholder="cm">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
                             <label>Bíceps derecho</label>
                             <input type="number" id="clienteBicepsDer" step="0.1" min="15" max="80" placeholder="cm">
                         </div>
@@ -1029,16 +1011,6 @@ class ClienteManager {
                         <div class="form-group">
                             <label>Cuello</label>
                             <input type="number" id="clienteCuello" step="0.1" min="25" max="60" placeholder="cm">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Pantorrilla derecha</label>
-                            <input type="number" id="clientePantorrillaDer" step="0.1" min="20" max="60" placeholder="cm">
-                        </div>
-                        <div class="form-group">
-                            <label>Pantorrilla izquierda</label>
-                            <input type="number" id="clientePantorrillaIzq" step="0.1" min="20" max="60" placeholder="cm">
                         </div>
                     </div>
                 <div class="form-group">
@@ -1097,8 +1069,6 @@ class ClienteManager {
                 cadera: parseFloat(document.getElementById('clienteCadera').value) || null,
                 brazoDer: parseFloat(document.getElementById('clienteBrazoDer').value) || null,
                 brazoIzq: parseFloat(document.getElementById('clienteBrazoIzq').value) || null,
-                musloDer: parseFloat(document.getElementById('clienteMusloDer').value) || null,
-                musloIzq: parseFloat(document.getElementById('clienteMusloIzq').value) || null,
                 bicepsDer: parseFloat(document.getElementById('clienteBicepsDer').value) || null,
                 bicepsIzq: parseFloat(document.getElementById('clienteBicepsIzq').value) || null,
                 antebrazoDer: parseFloat(document.getElementById('clienteAntebrazoDer').value) || null,
@@ -1107,8 +1077,6 @@ class ClienteManager {
                 cuadricepsIzq: parseFloat(document.getElementById('clienteCuadricepsIzq').value) || null,
                 gemeloDer: parseFloat(document.getElementById('clienteGemeloDer').value) || null,
                 gemeloIzq: parseFloat(document.getElementById('clienteGemeloIzq').value) || null,
-                pantorrillaDer: parseFloat(document.getElementById('clientePantorrillaDer').value) || null,
-                pantorrillaIzq: parseFloat(document.getElementById('clientePantorrillaIzq').value) || null,
                 pecho: parseFloat(document.getElementById('clientePecho').value) || null,
                 cuello: parseFloat(document.getElementById('clienteCuello').value) || null
             },
@@ -1236,17 +1204,6 @@ class ClienteManager {
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Muslo derecho</label>
-                            <input type="number" id="medidaMusloDer" step="0.1" min="30" max="100" placeholder="cm">
-                        </div>
-                        <div class="form-group">
-                            <label>Muslo izquierdo</label>
-                            <input type="number" id="medidaMusloIzq" step="0.1" min="30" max="100" placeholder="cm">
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
                             <label>Bíceps derecho</label>
                             <input type="number" id="medidaBicepsDer" step="0.1" min="15" max="80" placeholder="cm">
                         </div>
@@ -1302,17 +1259,6 @@ class ClienteManager {
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Pantorrilla derecha</label>
-                            <input type="number" id="medidaPantorrillaDer" step="0.1" min="20" max="60" placeholder="cm">
-                        </div>
-                        <div class="form-group">
-                            <label>Pantorrilla izquierda</label>
-                            <input type="number" id="medidaPantorrillaIzq" step="0.1" min="20" max="60" placeholder="cm">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
                             <label>Peso actual (kg)</label>
                             <input type="number" id="medidaPeso" step="0.1" min="40" max="200" placeholder="kg">
                         </div>
@@ -1358,8 +1304,6 @@ class ClienteManager {
             cadera: parseFloat(document.getElementById('medidaCadera').value) || null,
             brazoDer: parseFloat(document.getElementById('medidaBrazoDer').value) || null,
             brazoIzq: parseFloat(document.getElementById('medidaBrazoIzq').value) || null,
-            musloDer: parseFloat(document.getElementById('medidaMusloDer').value) || null,
-            musloIzq: parseFloat(document.getElementById('medidaMusloIzq').value) || null,
             bicepsDer: parseFloat(document.getElementById('medidaBicepsDer').value) || null,
             bicepsIzq: parseFloat(document.getElementById('medidaBicepsIzq').value) || null,
             antebrazoDer: parseFloat(document.getElementById('medidaAntebrazoDer').value) || null,
@@ -1368,8 +1312,6 @@ class ClienteManager {
             cuadricepsIzq: parseFloat(document.getElementById('medidaCuadricepsIzq').value) || null,
             gemeloDer: parseFloat(document.getElementById('medidaGemeloDer').value) || null,
             gemeloIzq: parseFloat(document.getElementById('medidaGemeloIzq').value) || null,
-            pantorrillaDer: parseFloat(document.getElementById('medidaPantorrillaDer').value) || null,
-            pantorrillaIzq: parseFloat(document.getElementById('medidaPantorrillaIzq').value) || null,
             pecho: parseFloat(document.getElementById('medidaPecho').value) || null,
             cuello: parseFloat(document.getElementById('medidaCuello').value) || null,
             peso: parseFloat(document.getElementById('medidaPeso').value) || null,
