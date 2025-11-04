@@ -149,16 +149,27 @@ function generarPlanVariado(objetivo, duracion) {
 function generarSemanaVariada(objetivo, semanaOffset = 0) {
     const diasSemana = ["LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO", "DOMINGO"];
     const semana = [];
+    const datosUsuario = window.datosUsuario || {};
+    const diasEntreno = datosUsuario.diasEntreno || [];
+    
+    // Función para detectar si un día es de descanso
+    const esDiaDescanso = (nombreDia) => {
+        const nombreDiaLower = nombreDia.toLowerCase()
+            .replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i')
+            .replace(/ó/g, 'o').replace(/ú/g, 'u');
+        return !diasEntreno.includes(nombreDiaLower);
+    };
     
     diasSemana.forEach((dia, index) => {
+        const esDescanso = esDiaDescanso(dia);
         const diaPlan = {
             dia: dia,
             comidas: {
-                desayuno: generarComida(objetivo, 'desayuno', index + semanaOffset * 7),
-                medioDia: generarComida(objetivo, 'medioDia', index + semanaOffset * 7),
-                almuerzo: generarComida(objetivo, 'almuerzo', index + semanaOffset * 7),
-                merienda: generarComida(objetivo, 'merienda', index + semanaOffset * 7),
-                cena: generarComida(objetivo, 'cena', index + semanaOffset * 7)
+                desayuno: generarComida(objetivo, 'desayuno', index + semanaOffset * 7, esDescanso),
+                medioDia: generarComida(objetivo, 'medioDia', index + semanaOffset * 7, esDescanso),
+                almuerzo: generarComida(objetivo, 'almuerzo', index + semanaOffset * 7, esDescanso),
+                merienda: generarComida(objetivo, 'merienda', index + semanaOffset * 7, esDescanso),
+                cena: generarComida(objetivo, 'cena', index + semanaOffset * 7, esDescanso)
             }
         };
         semana.push(diaPlan);
@@ -167,7 +178,7 @@ function generarSemanaVariada(objetivo, semanaOffset = 0) {
     return semana;
 }
 
-function generarComida(objetivo, tipoComida, variacion) {
+function generarComida(objetivo, tipoComida, variacion, esDescanso = false) {
     let alimentos = [];
     let calorias = 0;
     let proteinas = 0;
@@ -176,7 +187,38 @@ function generarComida(objetivo, tipoComida, variacion) {
     
     // Obtener datos del usuario desde la variable global
     const datosUsuario = window.datosUsuario || {};
-    const { calorias: calObj, proteinas: protObj, carbohidratos: carbObj, grasas: grasObj, prohibiciones, preferencias = [] } = datosUsuario;
+    const { 
+        calorias: calPromedio, 
+        proteinas: protPromedio, 
+        carbohidratos: carbPromedio, 
+        grasas: grasPromedio,
+        caloriasEntreno, 
+        caloriasDescanso,
+        proteinasEntreno,
+        proteinasDescanso,
+        carbsEntreno,
+        carbsDescanso,
+        grasasEntreno,
+        grasasDescanso,
+        prohibiciones, 
+        preferencias = [] 
+    } = datosUsuario;
+    
+    // Usar valores diferenciados según tipo de día (entreno o descanso)
+    let calObj, protObj, carbObj, grasObj;
+    if (esDescanso) {
+        // Día de descanso
+        calObj = caloriasDescanso || calPromedio;
+        protObj = proteinasDescanso || protPromedio;
+        carbObj = carbsDescanso || carbPromedio;
+        grasObj = grasasDescanso || grasPromedio;
+    } else {
+        // Día de entreno
+        calObj = caloriasEntreno || calPromedio;
+        protObj = proteinasEntreno || protPromedio;
+        carbObj = carbsEntreno || carbPromedio;
+        grasObj = grasasEntreno || grasPromedio;
+    }
     
     // Distribución objetivo según tipo de comida
     const distribucion = obtenerDistribucionComida(objetivo, tipoComida, calObj, protObj, carbObj, grasObj);
@@ -838,33 +880,79 @@ function balancearMacrosComida(alimentos, distribucionObjetivo, objetivo) {
     });
     
     // Tolerancia para ajustes (10% de diferencia)
-    const tolerancia = 0.15;
+    const tolerancia = 0.10;
     
-    // Si estamos dentro de la tolerancia, devolver tal cual
+    // Calcular diferencias porcentuales
+    const diffCal = Math.abs(totalMacros.calorias - distribucionObjetivo.calorias) / distribucionObjetivo.calorias;
     const diffProt = Math.abs(totalMacros.proteinas - distribucionObjetivo.proteinas) / distribucionObjetivo.proteinas;
     const diffCarb = Math.abs(totalMacros.carbohidratos - distribucionObjetivo.carbohidratos) / distribucionObjetivo.carbohidratos;
     const diffGras = Math.abs(totalMacros.grasas - distribucionObjetivo.grasas) / distribucionObjetivo.grasas;
     
-    if (diffProt <= tolerancia && diffCarb <= tolerancia && diffGras <= tolerancia) {
+    // Si estamos dentro de la tolerancia, devolver tal cual
+    if (diffCal <= tolerancia && diffProt <= tolerancia && diffCarb <= tolerancia && diffGras <= tolerancia) {
         return alimentos;
     }
     
-    // Ajustar cantidades
+    // Calcular factor de ajuste basado en las calorías (principalmente) y otros macros
+    // Si estamos por encima, reducir proporcionalmente
+    let factorAjuste = 1.0;
+    if (totalMacros.calorias > distribucionObjetivo.calorias) {
+        // Reducir proporcionalmente para acercarse al objetivo
+        factorAjuste = distribucionObjetivo.calorias / totalMacros.calorias;
+        // Aplicar un límite mínimo (no reducir más del 50% de una vez)
+        factorAjuste = Math.max(factorAjuste, 0.5);
+    } else if (totalMacros.calorias < distribucionObjetivo.calorias) {
+        // Aumentar ligeramente si estamos por debajo
+        factorAjuste = Math.min(distribucionObjetivo.calorias / totalMacros.calorias, 1.2);
+    }
+    
+    // Ajustar cantidades de todos los alimentos proporcionalmente
     const alimentosAjustados = alimentos.map(alimento => {
         const info = obtenerInfoNutricional(alimento.nombre, alimento.cantidad);
         if (!info) return alimento;
         
-        let cantidad = alimento.cantidad;
+        let cantidad = Math.round(alimento.cantidad * factorAjuste);
         
-        // Ajustar según necesidad
-        if (totalMacros.proteinas < distribucionObjetivo.proteinas && info.proteinas > 0) {
-            cantidad = Math.round(cantidad * 1.1);
-        } else if (totalMacros.proteinas > distribucionObjetivo.proteinas && info.proteinas > 0) {
-            cantidad = Math.round(cantidad * 0.95);
+        // Asegurar un mínimo de 10g para que el alimento tenga sentido
+        if (cantidad < 10 && alimento.cantidad > 0) {
+            cantidad = 10;
         }
         
         return { ...alimento, cantidad };
     });
+    
+    // Verificar si el ajuste mejoró la situación
+    const nuevosMacros = {
+        calorias: 0,
+        proteinas: 0,
+        carbohidratos: 0,
+        grasas: 0
+    };
+    
+    alimentosAjustados.forEach(alimento => {
+        const info = obtenerInfoNutricional(alimento.nombre, alimento.cantidad);
+        if (info) {
+            nuevosMacros.calorias += info.calorias;
+            nuevosMacros.proteinas += info.proteinas;
+            nuevosMacros.carbohidratos += info.carbohidratos;
+            nuevosMacros.grasas += info.grasas;
+        }
+    });
+    
+    // Si aún estamos muy por encima, hacer un segundo ajuste más agresivo
+    if (nuevosMacros.calorias > distribucionObjetivo.calorias * 1.15) {
+        const factorAjuste2 = distribucionObjetivo.calorias / nuevosMacros.calorias;
+        return alimentosAjustados.map(alimento => {
+            const info = obtenerInfoNutricional(alimento.nombre, alimento.cantidad);
+            if (!info) return alimento;
+            
+            let cantidad = Math.round(alimento.cantidad * factorAjuste2);
+            if (cantidad < 10 && alimento.cantidad > 0) {
+                cantidad = 10;
+            }
+            return { ...alimento, cantidad };
+        });
+    }
     
     return alimentosAjustados;
 }
