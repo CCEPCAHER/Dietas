@@ -3514,42 +3514,77 @@ function inicializarBotones() {
                     const pdfUrl = URL.createObjectURL(pdfBlob);
                     const filename = `Dieta_${nombreCliente.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
                     
-                    // Descargar PDF - método mejorado para móviles
+                    // Detectar iOS específicamente
+                    const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                    
+                    // Descargar PDF - método mejorado para móviles e iOS
                     if (esMovil) {
-                        // En móviles, intentar descargar directamente
-                        try {
-                            // Para iOS Safari y algunos navegadores móviles
-                            const a = document.createElement('a');
-                            a.href = pdfUrl;
-                            a.download = filename;
-                            a.style.display = 'none';
-                            document.body.appendChild(a);
+                        // Para iOS, usar Web Share API o abrir directamente
+                        if (esIOS) {
+                            let iosManejado = false;
                             
-                            // Crear un evento de toque para móviles
-                            const evento = new MouseEvent('click', {
-                                bubbles: true,
-                                cancelable: true,
-                                view: window
-                            });
-                            a.dispatchEvent(evento);
-                            
-                            // Fallback: abrir en nueva pestaña si la descarga no funciona
-                            setTimeout(() => {
-                                if (document.body.contains(a)) {
-                                    // Si el elemento aún está, abrir en nueva pestaña
-                                    window.open(pdfUrl, '_blank');
-                                    document.body.removeChild(a);
-                                    mostrarNotificacion('✅ PDF generado. Ábrelo en el navegador para compartirlo.', 'info');
-                                } else {
-                                    // Si fue removido, la descarga funcionó
-                                    mostrarNotificacion('✅ PDF generado y descargado', 'success');
+                            // Intentar usar Web Share API primero (iOS 13+)
+                            if (navigator.share && navigator.canShare) {
+                                const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+                                
+                                if (navigator.canShare({ files: [file] })) {
+                                    iosManejado = true;
+                                    navigator.share({
+                                        files: [file],
+                                        title: 'Plan de Alimentación Personalizado',
+                                        text: `Plan de alimentación para ${nombreCliente}`
+                                    }).then(() => {
+                                        mostrarNotificacion('✅ PDF compartido exitosamente', 'success');
+                                        setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
+                                    }).catch((error) => {
+                                        // Si el usuario cancela o falla, abrir en nueva pestaña
+                                        console.log('Web Share cancelado o falló, abriendo en nueva pestaña:', error);
+                                        window.open(pdfUrl, '_blank');
+                                        mostrarNotificacion('📄 PDF generado. Usa el botón de compartir (⫶) en la parte superior para descargarlo o compartirlo.', 'info');
+                                        setTimeout(() => URL.revokeObjectURL(pdfUrl), 5000);
+                                    });
                                 }
-                                setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
-                            }, 100);
-                        } catch (e) {
-                            // Si falla, abrir en nueva pestaña para compartir
-                            window.open(pdfUrl, '_blank');
-                            mostrarNotificacion('✅ PDF generado. Ábrelo en el navegador para compartirlo.', 'info');
+                            }
+                            
+                            // Si Web Share no está disponible o no se usó, abrir directamente en nueva pestaña
+                            if (!iosManejado) {
+                                window.open(pdfUrl, '_blank');
+                                mostrarNotificacion('📄 PDF generado. Usa el botón de compartir (⫶) en la parte superior derecha para descargarlo o compartirlo.', 'info');
+                                setTimeout(() => URL.revokeObjectURL(pdfUrl), 5000);
+                            }
+                            
+                        } else {
+                            // Para Android y otros móviles, intentar descarga directa
+                            try {
+                                const a = document.createElement('a');
+                                a.href = pdfUrl;
+                                a.download = filename;
+                                a.style.display = 'none';
+                                document.body.appendChild(a);
+                                
+                                // Crear un evento de toque para móviles
+                                const evento = new MouseEvent('click', {
+                                    bubbles: true,
+                                    cancelable: true,
+                                    view: window
+                                });
+                                a.dispatchEvent(evento);
+                                
+                                // Fallback: abrir en nueva pestaña si la descarga no funciona
+                                setTimeout(() => {
+                                    if (document.body.contains(a)) {
+                                        window.open(pdfUrl, '_blank');
+                                        document.body.removeChild(a);
+                                        mostrarNotificacion('📄 PDF generado. Ábrelo en el navegador para compartirlo.', 'info');
+                                    } else {
+                                        mostrarNotificacion('✅ PDF generado y descargado', 'success');
+                                    }
+                                    setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
+                                }, 100);
+                            } catch (e) {
+                                window.open(pdfUrl, '_blank');
+                                mostrarNotificacion('📄 PDF generado. Ábrelo en el navegador para compartirlo.', 'info');
+                            }
                         }
                         
                         // Limpiar iframe
