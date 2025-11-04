@@ -3304,8 +3304,46 @@ function inicializarBotones() {
                 return;
             }
             
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
+            // Primero intentar buscar la imagen en el DOM si ya está cargada
+            const imagenesEnDOM = document.querySelectorAll('img[src*="' + src + '"], img[src*="iconofit"]');
+            for (const imgDOM of imagenesEnDOM) {
+                if (imgDOM.complete && imgDOM.naturalWidth > 0 && imgDOM.naturalHeight > 0) {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = imgDOM.naturalWidth;
+                        canvas.height = imgDOM.naturalHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(imgDOM, 0, 0);
+                        const base64 = canvas.toDataURL('image/png');
+                        resolve(base64);
+                        return;
+                    } catch (e) {
+                        // Continuar con el método normal si falla
+                    }
+                }
+            }
+            
+            // Intentar primero con fetch (más robusto para archivos locales y remotos)
+            const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+            const origin = window.location.origin;
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname;
+            const pathname = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+            
+            // Generar todas las posibles rutas
+            const rutas = [
+                src, // Ruta original
+                '/' + src, // Desde raíz
+                './' + src, // Relativa al directorio actual
+                baseUrl + src, // Base URL completa
+                origin + '/' + src, // Origin + raíz
+                origin + pathname + src, // Origin + pathname
+                protocol + '//' + hostname + '/' + src, // Protocolo + hostname + raíz
+                protocol + '//' + hostname + pathname + src // Protocolo + hostname + pathname
+            ];
+            
+            // Eliminar duplicados
+            const rutasUnicas = [...new Set(rutas)];
             
             // Timeout para evitar esperas indefinidas (5 segundos)
             const timeout = setTimeout(() => {
@@ -3319,58 +3357,83 @@ function inicializarBotones() {
                 resolve(result);
             };
             
-            // Función para convertir a base64 cuando la imagen se carga
-            const convertir = function() {
+            // Intentar cargar con fetch primero
+            const intentarFetch = async (rutaIndex = 0) => {
+                if (rutaIndex >= rutasUnicas.length) {
+                    // Si fetch falla con todas las rutas, intentar con Image
+                    cargarConImage();
+                    return;
+                }
+                
+                const ruta = rutasUnicas[rutaIndex];
                 try {
-                    // Verificar que la imagen se cargó correctamente
-                    if (!img.complete || img.naturalWidth === 0 || img.naturalHeight === 0) {
-                        console.log('La imagen no se cargó correctamente:', src);
-                        resolver(null);
-                        return;
+                    const response = await fetch(ruta);
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            resolver(reader.result); // Base64
+                        };
+                        reader.onerror = () => {
+                            intentarFetch(rutaIndex + 1);
+                        };
+                        reader.readAsDataURL(blob);
+                    } else {
+                        intentarFetch(rutaIndex + 1);
                     }
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                    const base64 = canvas.toDataURL('image/png');
-                    resolver(base64);
                 } catch (e) {
-                    console.log('Error convirtiendo imagen a base64:', e);
-                    resolver(null); // Retornar null para indicar que falló
+                    intentarFetch(rutaIndex + 1);
                 }
             };
             
-            img.onload = convertir;
-            
-            // Si falla, intentar con diferentes rutas
-            let intentoActual = 0;
-            const rutas = [
-                src, // Ruta original
-                '/' + src, // Ruta absoluta desde raíz
-                window.location.origin + '/' + src, // Ruta completa
-                window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + src // Ruta relativa al directorio actual
-            ];
-            
-            img.onerror = function() {
-                intentoActual++;
-                if (intentoActual < rutas.length) {
-                    // Intentar siguiente ruta
-                    img.src = rutas[intentoActual];
+            // Método alternativo con Image element
+            const cargarConImage = () => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                
+                // Función para convertir a base64 cuando la imagen se carga
+                const convertir = function() {
+                    try {
+                        // Verificar que la imagen se cargó correctamente
+                        if (!img.complete || img.naturalWidth === 0 || img.naturalHeight === 0) {
+                            resolver(null);
+                            return;
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        const base64 = canvas.toDataURL('image/png');
+                        resolver(base64);
+                    } catch (e) {
+                        resolver(null);
+                    }
+                };
+                
+                img.onload = convertir;
+                
+                let intentoActual = 0;
+                
+                img.onerror = function() {
+                    intentoActual++;
+                    if (intentoActual < rutasUnicas.length) {
+                        img.src = rutasUnicas[intentoActual];
+                    } else {
+                        resolver(null);
+                    }
+                };
+                
+                // Intentar cargar la imagen
+                if (src.startsWith('http')) {
+                    img.src = src;
                 } else {
-                    // Si todos fallan, retornar null (la imagen no se pudo cargar)
-                    console.log('No se pudo cargar la imagen después de intentar todas las rutas:', src);
-                    resolver(null); // Retornar null para indicar que falló
+                    img.src = rutasUnicas[0];
                 }
             };
             
-            // Intentar cargar la imagen
-            if (src.startsWith('http')) {
-                img.src = src;
-            } else {
-                // Probar con la primera ruta
-                img.src = rutas[0];
-            }
+            // Comenzar con fetch
+            intentarFetch(0);
         });
     }
     
