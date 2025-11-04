@@ -3022,7 +3022,7 @@ function inicializarBotones() {
             }
             .header-content {
                 text-align: center;
-                padding: 0 130px;
+                padding: 0 120px;
                 margin-top: 0;
             }
             .titulo-principal {
@@ -3044,15 +3044,16 @@ function inicializarBotones() {
                 line-height: 1.2;
             }
             .especialidades {
-                font-size: 9pt;
+                font-size: 7.5pt;
                 color: #000;
                 font-weight: 700;
                 text-transform: uppercase;
-                letter-spacing: 0.5px;
+                letter-spacing: 0.3px;
                 margin: 0 0 10px 0;
                 line-height: 1.4;
                 white-space: nowrap;
-                overflow: hidden;
+                overflow: visible;
+                word-spacing: 0;
             }
             .contacto {
                 font-size: 11pt;
@@ -3073,7 +3074,7 @@ function inicializarBotones() {
                     height: 80px;
                 }
                 .header-content {
-                    padding: 0 90px;
+                    padding: 0 85px;
                 }
                 .titulo-principal {
                     font-size: 20pt;
@@ -3083,8 +3084,8 @@ function inicializarBotones() {
                     font-size: 18pt;
                 }
                 .especialidades {
-                    font-size: 7pt;
-                    letter-spacing: 0.3px;
+                    font-size: 6.5pt;
+                    letter-spacing: 0.2px;
                 }
             }
             .cliente-info {
