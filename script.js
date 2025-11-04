@@ -2024,6 +2024,38 @@ document.addEventListener('DOMContentLoaded', function() {
             // Obtener días de entrenamiento seleccionados
             const diasEntrenoCheckboxes = document.querySelectorAll('input[name="diaEntreno"]:checked');
             const diasEntreno = Array.from(diasEntrenoCheckboxes).map(cb => cb.value);
+            const numDiasEntreno = diasEntreno.length;
+            
+            // Obtener actividad física del deporte
+            const actividadFisicaDeporte = document.getElementById('actividadFisicaDeporte')?.value || 'moderada';
+            
+            // Validar coherencia entre días de entrenamiento y nivel de actividad
+            const rangosActividad = {
+                'sedentario': { min: 0, max: 2, descripcion: '0-2 días' },
+                'ligera': { min: 1, max: 3, descripcion: '1-3 días' },
+                'moderada': { min: 3, max: 5, descripcion: '3-5 días' },
+                'intensa': { min: 6, max: 7, descripcion: '6-7 días' },
+                'muy-intensa': { min: 6, max: 7, descripcion: '6-7 días' }
+            };
+            
+            const rangoEsperado = rangosActividad[actividadFisicaDeporte];
+            if (rangoEsperado && (numDiasEntreno < rangoEsperado.min || numDiasEntreno > rangoEsperado.max)) {
+                const actividadTexto = {
+                    'sedentario': 'Sedentaria',
+                    'ligera': 'Ligera (1-3 días)',
+                    'moderada': 'Moderada (3-5 días)',
+                    'intensa': 'Intensa (6-7 días)',
+                    'muy-intensa': 'Muy intensa (6-7 días)'
+                }[actividadFisicaDeporte] || actividadFisicaDeporte;
+                
+                mostrarNotificacion(
+                    `⚠️ Inconsistencia detectada: Has seleccionado "${actividadTexto}" pero has marcado ${numDiasEntreno} día(s) de entrenamiento. ` +
+                    `Para esta actividad, el rango esperado es ${rangoEsperado.descripcion}. ` +
+                    `Por favor, ajusta los días de entrenamiento o cambia el nivel de actividad antes de generar el plan.`,
+                    'error'
+                );
+                return; // Detener la generación de la dieta
+            }
             
             datosUsuario = {
                 nombre: document.getElementById('nombre').value,
@@ -2040,7 +2072,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 preferencias: preferencias, // Guardar preferencias dietéticas
                 duracion: document.getElementById('duracion').value,
                 diasEntreno: diasEntreno,
-                actividadFisicaDeporte: document.getElementById('actividadFisicaDeporte')?.value || 'moderada',
+                actividadFisicaDeporte: actividadFisicaDeporte,
                 tipoTermogenico: document.getElementById('tipoTermogenico')?.value || 'no-sedentaria',
                 superavitEntreno: parseFloat(document.getElementById('superavitEntreno')?.value || 5),
                 superavitDescanso: parseFloat(document.getElementById('superavitDescanso')?.value || 5)
