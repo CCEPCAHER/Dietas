@@ -337,7 +337,9 @@ function seleccionarDesayuno(objetivo, distribucion, variacion, restricciones = 
     }
     
     const carbSeleccionado = carbBase.length > 0 ? carbBase[(variacion * 3) % carbBase.length] : 'Avena';
-    alimentos.push({ nombre: carbSeleccionado, cantidad: objetivo === 'aumentar' ? 80 : 50 });
+    // Calcular cantidad basada en la distribución objetivo de carbohidratos
+    const cantidadCarb = calcularCantidadPorDistribucion(carbSeleccionado, distribucion, 'carbohidratos');
+    alimentos.push({ nombre: carbSeleccionado, cantidad: cantidadCarb });
     
     // Proteína - consultar base de datos según preferencias
     let protBase;
@@ -374,9 +376,13 @@ function seleccionarDesayuno(objetivo, distribucion, variacion, restricciones = 
     
     if (protBase.length > 0) {
         const protSeleccionado = protBase[(variacion * 5) % protBase.length];
-        const cantidadProt = protSeleccionado === 'Huevos enteros' || protSeleccionado === 'Claras de huevo' ? 
-            (objetivo === 'aumentar' ? 4 : 2) : 
-            (objetivo === 'aumentar' ? 200 : 150);
+        // Calcular cantidad basada en la distribución objetivo de proteínas
+        let cantidadProt = calcularCantidadPorDistribucion(protSeleccionado, distribucion, 'proteinas');
+        // Ajuste especial para huevos (unidades vs gramos)
+        if (protSeleccionado === 'Huevos enteros' || protSeleccionado === 'Claras de huevo') {
+            // Convertir gramos a unidades aproximadas (1 huevo ≈ 50g)
+            cantidadProt = Math.max(1, Math.min(Math.round(cantidadProt / 50), 6));
+        }
         alimentos.push({ nombre: protSeleccionado, cantidad: cantidadProt });
     }
     
@@ -388,7 +394,9 @@ function seleccionarDesayuno(objetivo, distribucion, variacion, restricciones = 
     frutas = filtrarAlimentosPorPreferencias(frutas, preferencias, restricciones);
     if (frutas.length > 0) {
         const frutaSeleccionada = frutas[(variacion * 7) % frutas.length];
-        alimentos.push({ nombre: frutaSeleccionada, cantidad: objetivo === 'aumentar' ? 150 : 100 });
+        // Calcular cantidad basada en distribución - las frutas aportan carbohidratos
+        const cantidadFruta = calcularCantidadPorDistribucion(frutaSeleccionada, distribucion, 'carbohidratos');
+        alimentos.push({ nombre: frutaSeleccionada, cantidad: Math.max(50, Math.min(cantidadFruta, 200)) });
     }
     
     // Grasas saludables - consultar base de datos
@@ -400,7 +408,9 @@ function seleccionarDesayuno(objetivo, distribucion, variacion, restricciones = 
         grasas = filtrarAlimentosPorPreferencias(grasas, preferencias, restricciones);
         if (grasas.length > 0) {
             const grasaSeleccionada = grasas[(variacion * 11) % grasas.length];
-            alimentos.push({ nombre: grasaSeleccionada, cantidad: grasaSeleccionada.includes('mantequilla') ? 30 : 30 });
+            // Calcular cantidad basada en distribución - limitar grasas para evitar exceso
+            const cantidadGrasa = calcularCantidadPorDistribucion(grasaSeleccionada, distribucion, 'grasas');
+            alimentos.push({ nombre: grasaSeleccionada, cantidad: Math.max(10, Math.min(cantidadGrasa, 50)) });
         }
     }
     
@@ -502,17 +512,26 @@ function seleccionarAlmuerzo(objetivo, distribucion, variacion, restricciones = 
     
     proteinas = filtrarAlimentosPorPreferencias(proteinas, preferencias, restricciones);
     const proteinaSeleccionada = proteinas[(variacion * 17) % proteinas.length];
-    alimentos.push({ nombre: proteinaSeleccionada, cantidad: objetivo === 'aumentar' ? 200 : 150 });
+    // Calcular cantidad basada en distribución objetivo de proteínas
+    let cantidadProt = calcularCantidadPorDistribucion(proteinaSeleccionada, distribucion, 'proteinas');
+    // Ajuste especial para huevos
+    if (proteinaSeleccionada === 'Huevos enteros' || proteinaSeleccionada === 'Huevos' || proteinaSeleccionada === 'Claras de huevo') {
+        cantidadProt = Math.max(1, Math.min(Math.round(cantidadProt / 50), 6));
+    }
+    alimentos.push({ nombre: proteinaSeleccionada, cantidad: cantidadProt });
     
-    // Carbohidrato - consultar base de datos
+    // Carbohidrato - consultar base de datos - PRIORITARIO para aumentar carbohidratos
     let carbohidratos = obtenerAlimentosDeBD(['Cereal', 'Tubérculo', 'Legumbres'], 'Hidratos de carbono', 20);
     if (carbohidratos.length === 0) {
         carbohidratos = objetivo === 'aumentar' ?
             ['Arroz integral', 'Pasta integral', 'Quinoa', 'Batata', 'Patata', 'Cuscús'] :
             ['Arroz integral', 'Quinoa', 'Batata', 'Lentejas', 'Garbanzos', 'Judías verdes'];
     }
-    const carbSeleccionado = carbohidratos[(variacion * 19) % carbohidratos.length];
-    alimentos.push({ nombre: carbSeleccionado, cantidad: objetivo === 'aumentar' ? 150 : 80 });
+    carbohidratos = filtrarAlimentosPorPreferencias(carbohidratos, preferencias, restricciones);
+    const carbSeleccionado = carbohidratos.length > 0 ? carbohidratos[(variacion * 19) % carbohidratos.length] : 'Arroz integral';
+    // Calcular cantidad basada en distribución - priorizar carbohidratos
+    const cantidadCarb = calcularCantidadPorDistribucion(carbSeleccionado, distribucion, 'carbohidratos');
+    alimentos.push({ nombre: carbSeleccionado, cantidad: Math.max(50, Math.min(cantidadCarb, 300)) });
     
     // Verduras - consultar base de datos
     let verduras = obtenerAlimentosDeBD(['Verduras'], null, 20);
@@ -530,15 +549,19 @@ function seleccionarAlmuerzo(objetivo, distribucion, variacion, restricciones = 
     const ensaladaSeleccionada = ensaladas[(variacion * 29) % ensaladas.length];
     alimentos.push({ nombre: ensaladaSeleccionada, cantidad: 100 });
     
-    // Grasas - consultar base de datos
+    // Grasas - consultar base de datos - limitar para evitar exceso
     if (objetivo !== 'adelgazar') {
         let grasas = obtenerAlimentosDeBD(['Fruto seco', 'Otros'], 'Grasas', 10);
         if (grasas.length === 0) {
             grasas = ['Aguacate', 'Aceite de oliva', 'Nueces'];
         }
-        const grasaSeleccionada = grasas[(variacion * 31) % grasas.length];
-        alimentos.push({ nombre: grasaSeleccionada, cantidad: grasaSeleccionada === 'Aceite de oliva' ? 10 : (grasaSeleccionada === 'Aguacate' ? 50 : 20) });
+        grasas = filtrarAlimentosPorPreferencias(grasas, preferencias, restricciones);
+        const grasaSeleccionada = grasas.length > 0 ? grasas[(variacion * 31) % grasas.length] : 'Aceite de oliva';
+        // Calcular cantidad basada en distribución - limitar grasas para evitar exceso
+        const cantidadGrasa = calcularCantidadPorDistribucion(grasaSeleccionada, distribucion, 'grasas');
+        alimentos.push({ nombre: grasaSeleccionada, cantidad: Math.max(5, Math.min(cantidadGrasa, 50)) });
     } else {
+        // Para adelgazar, mínimo de grasas
         alimentos.push({ nombre: 'Aceite de oliva', cantidad: 5 });
     }
     
@@ -640,9 +663,15 @@ function seleccionarCena(objetivo, distribucion, variacion, restricciones = '', 
     
     proteinas = filtrarAlimentosPorPreferencias(proteinas, preferencias, restricciones);
     const proteinaSeleccionada = proteinas[(variacion * 37) % proteinas.length];
-    alimentos.push({ nombre: proteinaSeleccionada, cantidad: objetivo === 'aumentar' ? 180 : 140 });
+    // Calcular cantidad basada en distribución objetivo de proteínas
+    let cantidadProt = calcularCantidadPorDistribucion(proteinaSeleccionada, distribucion, 'proteinas');
+    // Ajuste especial para huevos
+    if (proteinaSeleccionada === 'Huevos enteros' || proteinaSeleccionada === 'Huevos' || proteinaSeleccionada === 'Claras de huevo') {
+        cantidadProt = Math.max(1, Math.min(Math.round(cantidadProt / 50), 6));
+    }
+    alimentos.push({ nombre: proteinaSeleccionada, cantidad: cantidadProt });
     
-    // Carbohidrato (menor en cena) - consultar base de datos
+    // Carbohidrato (menor en cena) - consultar base de datos pero calcular basado en distribución
     let carbohidratos;
     if (objetivo === 'aumentar') {
         carbohidratos = obtenerAlimentosDeBD(['Tubérculo', 'Cereal'], 'Hidratos de carbono', 20);
@@ -655,9 +684,14 @@ function seleccionarCena(objetivo, distribucion, variacion, restricciones = '', 
             carbohidratos = ['Verduras al vapor', 'Ensalada', 'Coliflor', 'Espárragos'];
         }
     }
+    carbohidratos = filtrarAlimentosPorPreferencias(carbohidratos, preferencias, restricciones);
     
-    const carbSeleccionado = carbohidratos[(variacion * 41) % carbohidratos.length];
-    alimentos.push({ nombre: carbSeleccionado, cantidad: objetivo === 'aumentar' ? 150 : (carbSeleccionado.includes('Ensalada') || carbSeleccionado.includes('verdura') ? 200 : 100) });
+    const carbSeleccionado = carbohidratos.length > 0 ? carbohidratos[(variacion * 41) % carbohidratos.length] : 'Batata';
+    // Calcular cantidad basada en distribución - en cena los carbohidratos son menores
+    const cantidadCarb = calcularCantidadPorDistribucion(carbSeleccionado, distribucion, 'carbohidratos');
+    // En cena, reducir un 30% respecto a otras comidas
+    const cantidadCarbCena = Math.round(cantidadCarb * 0.7);
+    alimentos.push({ nombre: carbSeleccionado, cantidad: Math.max(50, Math.min(cantidadCarbCena, 200)) });
     
     // Verduras - consultar base de datos
     let verduras = obtenerAlimentosDeBD(['Verduras'], null, 20);
@@ -675,9 +709,11 @@ function seleccionarCena(objetivo, distribucion, variacion, restricciones = '', 
     const ensaladaSeleccionada = ensaladas[(variacion * 47) % ensaladas.length];
     alimentos.push({ nombre: ensaladaSeleccionada, cantidad: 100 });
     
-    // Grasas (solo si no es adelgazar)
+    // Grasas (solo si no es adelgazar) - limitar para evitar exceso
     if (objetivo !== 'adelgazar') {
-        alimentos.push({ nombre: 'Aceite de oliva', cantidad: 10 });
+        // Calcular cantidad basada en distribución - limitar grasas
+        const cantidadGrasaCena = calcularCantidadPorDistribucion('Aceite de oliva', distribucion, 'grasas');
+        alimentos.push({ nombre: 'Aceite de oliva', cantidad: Math.max(5, Math.min(cantidadGrasaCena, 15)) });
     } else {
         alimentos.push({ nombre: 'Limón', cantidad: 10 });
     }
@@ -831,32 +867,87 @@ function verificarRestricciones(alimento, restricciones) {
 }
 
 // Función para calcular cantidad óptima de un alimento según distribución objetivo
-function calcularCantidadOptima(alimento, distribucion, tipoAlimento) {
+function calcularCantidadOptima(alimento, distribucion, tipoAlimento, porcentajeObjetivo = 0.3) {
     const info = obtenerInfoNutricional(alimento, 100);
     if (!info) return 100;
     
-    // Calcular cuántos gramos necesitamos para alcanzar la distribución objetivo
-    const factor = 1.0; // Factor de ajuste
+    // Calcular cuántos gramos necesitamos para alcanzar el porcentaje objetivo de la distribución
+    // porcentajeObjetivo: qué parte del macro objetivo queremos cubrir con este alimento (ej: 0.3 = 30%)
     
     switch(tipoAlimento) {
         case 'proteina':
             if (info.proteinas > 0) {
-                return Math.round((distribucion.proteinas / info.proteinas) * 100 * factor);
+                const cantidad = Math.round((distribucion.proteinas * porcentajeObjetivo / info.proteinas) * 100);
+                return Math.max(50, Math.min(cantidad, 300)); // Límites razonables
             }
             break;
         case 'carbohidrato':
             if (info.carbohidratos > 0) {
-                return Math.round((distribucion.carbohidratos / info.carbohidratos) * 100 * factor);
+                const cantidad = Math.round((distribucion.carbohidratos * porcentajeObjetivo / info.carbohidratos) * 100);
+                return Math.max(50, Math.min(cantidad, 300)); // Límites razonables
             }
             break;
         case 'grasa':
             if (info.grasas > 0) {
-                return Math.round((distribucion.grasas / info.grasas) * 100 * factor);
+                const cantidad = Math.round((distribucion.grasas * porcentajeObjetivo / info.grasas) * 100);
+                return Math.max(10, Math.min(cantidad, 100)); // Límites razonables para grasas
+            }
+            break;
+        case 'calorias':
+            if (info.calorias > 0) {
+                const cantidad = Math.round((distribucion.calorias * porcentajeObjetivo / info.calorias) * 100);
+                return Math.max(50, Math.min(cantidad, 300));
             }
             break;
     }
     
     return 100;
+}
+
+// Función para calcular cantidad basada en distribución objetivo considerando múltiples macros
+function calcularCantidadPorDistribucion(nombreAlimento, distribucion, prioridad = 'carbohidratos') {
+    const info = obtenerInfoNutricional(nombreAlimento, 100);
+    if (!info) return 100;
+    
+    // Calcular ratios de macronutrientes
+    const ratioCarbos = info.carbohidratos / info.calorias || 0;
+    const ratioGrasas = info.grasas / info.calorias || 0;
+    const ratioProteinas = info.proteinas / info.calorias || 0;
+    
+    let cantidad = 100;
+    
+    // Calcular cantidad según la prioridad
+    if (prioridad === 'carbohidratos' && ratioCarbos > 0.2) {
+        // Priorizar carbohidratos - calcular para cubrir parte del objetivo
+        const porcentajeObjetivo = ratioCarbos > 0.6 ? 0.4 : 0.3; // Más cantidad si es alto en carbos
+        cantidad = Math.round((distribucion.carbohidratos * porcentajeObjetivo / info.carbohidratos) * 100);
+    } else if (prioridad === 'proteinas' && ratioProteinas > 0.2) {
+        // Priorizar proteínas
+        const porcentajeObjetivo = ratioProteinas > 0.5 ? 0.35 : 0.25;
+        cantidad = Math.round((distribucion.proteinas * porcentajeObjetivo / info.proteinas) * 100);
+    } else if (prioridad === 'grasas' && ratioGrasas > 0.3) {
+        // Priorizar grasas (pero con moderación)
+        const porcentajeObjetivo = 0.15; // Menos cantidad para grasas
+        cantidad = Math.round((distribucion.grasas * porcentajeObjetivo / info.grasas) * 100);
+    } else {
+        // Calcular basado en calorías
+        const porcentajeObjetivo = 0.25;
+        cantidad = Math.round((distribucion.calorias * porcentajeObjetivo / info.calorias) * 100);
+    }
+    
+    // Aplicar límites razonables
+    if (ratioGrasas > 0.7) {
+        // Alimentos muy altos en grasas (aceites) - límites más estrictos
+        cantidad = Math.max(10, Math.min(cantidad, 50));
+    } else if (ratioCarbos > 0.6 || ratioProteinas > 0.5) {
+        // Alimentos altos en carbos o proteínas - límites más amplios
+        cantidad = Math.max(50, Math.min(cantidad, 300));
+    } else {
+        // Alimentos balanceados
+        cantidad = Math.max(30, Math.min(cantidad, 250));
+    }
+    
+    return cantidad;
 }
 
 // Función para balancear macros de una comida
