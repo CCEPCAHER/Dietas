@@ -1665,7 +1665,7 @@ function mostrarTablaEditable() {
                 // Verificar si hay datos guardados de una dieta generada automáticamente
                 if (datosUsuario.planSemana && Object.keys(datosUsuario.planSemana).length > 0) {
                     // Cargar datos guardados en TablaEditable
-                    console.log('📋 Cargando dieta generada automáticamente para edición...');
+                    console.log('📋 Cargando dieta generada automáticamente para edición...', datosUsuario.planSemana);
                     
                     // Cargar planSemana en tablaEditable
                     window.tablaEditable.planSemana = datosUsuario.planSemana;
@@ -1684,18 +1684,24 @@ function mostrarTablaEditable() {
                         
                         // Cargar datos del primer día
                         const datosDia = datosUsuario.planSemana[primerDia];
+                        console.log('📋 Datos del día:', primerDia, datosDia);
+                        
                         if (datosDia && typeof window.tablaEditable.cargarDatos === 'function') {
-                            window.tablaEditable.cargarDatos(datosDia);
-                            
-                            // Actualizar totales y estilos del día
-                            if (typeof window.tablaEditable.actualizarTotalesDiarios === 'function') {
-                                window.tablaEditable.actualizarTotalesDiarios();
-                            }
-                            if (typeof window.tablaEditable.actualizarEstilosDia === 'function') {
-                                window.tablaEditable.actualizarEstilosDia();
-                            }
-                            
-                            console.log('✅ Dieta cargada correctamente para edición');
+                            // Esperar un poco más para asegurar que los elementos del DOM estén listos
+                            setTimeout(() => {
+                                window.tablaEditable.cargarDatos(datosDia);
+                                
+                                // Actualizar totales y estilos del día después de un pequeño delay
+                                setTimeout(() => {
+                                    if (typeof window.tablaEditable.actualizarTotalesDiarios === 'function') {
+                                        window.tablaEditable.actualizarTotalesDiarios();
+                                    }
+                                    if (typeof window.tablaEditable.actualizarEstilosDia === 'function') {
+                                        window.tablaEditable.actualizarEstilosDia();
+                                    }
+                                    console.log('✅ Dieta cargada correctamente para edición');
+                                }, 100);
+                            }, 50);
                         }
                         
                         // Cargar todos los días de la semana
@@ -1707,6 +1713,7 @@ function mostrarTablaEditable() {
                     }
                 } else {
                     // Si no hay datos guardados, inicializar tablas vacías
+                    console.log('📋 No hay datos guardados, inicializando tablas vacías');
                     if (typeof window.tablaEditable.inicializarTablasVacias === 'function') {
                         window.tablaEditable.inicializarTablasVacias(3); // 3 filas vacías por comida
                         console.log('✅ Tabla editable inicializada correctamente');
@@ -1714,7 +1721,7 @@ function mostrarTablaEditable() {
                         console.error('❌ Método inicializarTablasVacias no disponible');
                     }
                 }
-            }, 150);
+            }, 200);
         } catch (error) {
             console.error('Error al mostrar tabla editable:', error);
             planDiv.innerHTML = `
@@ -1882,18 +1889,100 @@ function mostrarPlanAlimentacion() {
     }
 }
 
+// Función helper para parsear un string formateado de alimento y extraer nombre y cantidad
+function parsearAlimentoFormateado(alimentoStr) {
+    if (!alimentoStr || typeof alimentoStr !== 'string') {
+        return { nombre: '', gramos: 0 };
+    }
+    
+    // Ejemplos de formatos:
+    // "Arroz basmati (1) (76g)"
+    // "Barrita proteica (1 unidad)"
+    // "Plátano (110g)"
+    // "Codorniz (190g)"
+    
+    // Intentar extraer cantidad en gramos: buscar el último "(XXg)" en el string
+    // Ejemplos: "Arroz basmati (1) (76g)" -> extraer "76g"
+    const regexGramos = /\((\d+(?:\.\d+)?)g\)/g;
+    const matchesGramos = [...alimentoStr.matchAll(regexGramos)];
+    let gramos = 0;
+    
+    if (matchesGramos.length > 0) {
+        // Tomar el último match (el más específico)
+        gramos = parseFloat(matchesGramos[matchesGramos.length - 1][1]);
+    } else {
+        // Intentar extraer unidades: "(1 unidad)", "(2 unidades)"
+        const regexUnidades = /\((\d+)\s*(?:unidad|unidades)\)/i;
+        const matchUnidades = alimentoStr.match(regexUnidades);
+        if (matchUnidades) {
+            const unidades = parseInt(matchUnidades[1]);
+            // Convertir unidades a gramos aproximados según el tipo de alimento
+            if (alimentoStr.toLowerCase().includes('huevo')) {
+                gramos = unidades * 50; // Aproximadamente 50g por huevo
+            } else if (alimentoStr.toLowerCase().includes('barrita')) {
+                gramos = unidades * 50; // Aproximadamente 50g por barrita
+            } else if (alimentoStr.toLowerCase().includes('tortilla')) {
+                gramos = unidades * 30; // Aproximadamente 30g por tortilla
+            } else {
+                gramos = unidades * 50; // Valor por defecto
+            }
+        }
+    }
+    
+    // Extraer nombre: todo antes del primer paréntesis
+    // Ejemplo: "Arroz basmati (1) (76g)" -> "Arroz basmati"
+    const nombre = alimentoStr.split('(')[0].trim();
+    
+    return { nombre, gramos };
+}
+
 // Función helper para convertir comidas del plan automático al formato TablaEditable
 function convertirComida(comida) {
     if (!comida || !comida.alimentos) return [];
     
-    return comida.alimentos.map(alimento => ({
-        alimento: alimento.nombre || alimento.alimento || '',
-        gramos: alimento.gramos || alimento.cantidad || 0,
-        calorias: alimento.calorias || 0,
-        proteinas: alimento.proteinas || alimento.proteínas || 0,
-        grasas: alimento.grasas || 0,
-        hidratos: alimento.hidratos || alimento.carbohidratos || 0
-    }));
+    return comida.alimentos.map(alimento => {
+        // Los alimentos pueden venir como strings formateados o como objetos
+        let nombre, gramos, calorias, proteinas, grasas, hidratos;
+        
+        if (typeof alimento === 'string') {
+            // Es un string formateado, necesitamos parsearlo
+            const parsed = parsearAlimentoFormateado(alimento);
+            nombre = parsed.nombre;
+            gramos = parsed.gramos;
+            
+            // Obtener valores nutricionales desde la base de datos
+            if (window.obtenerInfoNutricional && nombre) {
+                const info = window.obtenerInfoNutricional(nombre, gramos);
+                if (info) {
+                    calorias = info.calorias || 0;
+                    proteinas = info.proteinas || 0;
+                    grasas = info.grasas || 0;
+                    hidratos = info.carbohidratos || info.hidratos || 0;
+                } else {
+                    calorias = proteinas = grasas = hidratos = 0;
+                }
+            } else {
+                calorias = proteinas = grasas = hidratos = 0;
+            }
+        } else {
+            // Es un objeto
+            nombre = alimento.nombre || alimento.alimento || '';
+            gramos = alimento.gramos || alimento.cantidad || 0;
+            calorias = alimento.calorias || 0;
+            proteinas = alimento.proteinas || alimento.proteínas || 0;
+            grasas = alimento.grasas || 0;
+            hidratos = alimento.hidratos || alimento.carbohidratos || 0;
+        }
+        
+        return {
+            alimento: nombre,
+            gramos: gramos,
+            calorias: calorias,
+            proteinas: proteinas,
+            grasas: grasas,
+            hidratos: hidratos
+        };
+    });
 }
 
 // Función helper para detectar si un día es de descanso
