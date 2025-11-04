@@ -2992,56 +2992,63 @@ function inicializarBotones() {
                 padding: 20mm;
             }
             .header {
+                position: relative;
                 border-bottom: 2px solid #000;
-                padding-bottom: 10px;
+                padding-bottom: 15px;
                 margin-bottom: 15px;
+                padding-top: 10px;
+                min-height: 140px;
             }
-            .header-top {
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-                margin-bottom: 12px;
+            .fecha-header {
+                position: absolute;
+                top: 0;
+                left: 0;
+                font-size: 10pt;
+                color: #000;
+                font-weight: 600;
+                text-align: left;
             }
-                        .header-left {
-                  display: flex;
-                  align-items: flex-start;
-                  gap: 15px;
-                  flex: 1;
-              }
-            .header-right {
-                  display: flex;
-                  align-items: flex-start;
-                  justify-content: flex-end;
-              }
+            .logo-header {
+                position: absolute;
+                top: 0;
+                right: 0;
+                z-index: 1;
+            }
             .logo-pdf {
-                  width: 120px;
-                  height: 120px;
-                  object-fit: contain;
-                  flex-shrink: 0;
-              }
-              @media (max-width: 600px) {
-                .logo-pdf {
-                      width: 100px;
-                      height: 100px;
-                  }
-                  .nombre-profesional {
-                      font-size: 18pt;
-                  }
-              }
+                width: 110px;
+                height: 110px;
+                object-fit: contain;
+                flex-shrink: 0;
+            }
+            .header-content {
+                text-align: center;
+                padding: 0 130px;
+                margin-top: 0;
+            }
             .nombre-profesional {
-                font-size: 24pt;
+                font-size: 22pt;
                 font-weight: 900;
                 letter-spacing: 2px;
                 text-transform: uppercase;
-                margin: 0 0 8px 0;
+                margin: 0 0 6px 0;
                 color: #000;
                 line-height: 1.2;
             }
+            .especialidades {
+                font-size: 9pt;
+                color: #000;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin: 0 0 10px 0;
+                line-height: 1.4;
+            }
             .contacto {
-                font-size: 13pt;
+                font-size: 11pt;
                 color: #000;
                 display: flex;
                 gap: 20px;
+                justify-content: center;
                 font-weight: 600;
                 margin-top: 8px;
             }
@@ -3049,13 +3056,21 @@ function inicializarBotones() {
                 display: inline-block;
                 white-space: nowrap;
             }
-                        .fecha-pdf {
-                  font-size: 10pt;
-                  color: #666;
-                  font-weight: 500;
-                  margin-top: 8px;
-                  text-align: right;
-              }
+            @media (max-width: 600px) {
+                .logo-pdf {
+                    width: 80px;
+                    height: 80px;
+                }
+                .header-content {
+                    padding: 0 90px;
+                }
+                .nombre-profesional {
+                    font-size: 18pt;
+                }
+                .especialidades {
+                    font-size: 8pt;
+                }
+            }
             .cliente-info {
                 margin-top: 14px;
             }
@@ -3170,26 +3185,21 @@ function inicializarBotones() {
           
           return `
               <div class="header">
-                  <div class="header-top">
-                      <div class="header-left">
-                          <div style="flex: 1;">
-                              <div class="nombre-profesional">MAIKA PORCUNA</div>
-                              <div class="contacto">
-                                  <span>Maikafit1977@gmail.com</span>
-                                  <span>+34 650 229 987</span>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="header-right">
-                          ${logoHTML}
+                  <div class="fecha-header">${fecha}</div>
+                  ${logoHTML ? `<div class="logo-header">${logoHTML}</div>` : ''}
+                  <div class="header-content">
+                      <div class="nombre-profesional">MAIKA PORCUNA</div>
+                      <div class="especialidades">NUTRICIÓN / DIETÉTICA / SUPLEMENTACIÓN / NUTRICIÓN DEPORTIVA</div>
+                      <div class="contacto">
+                          <span>Maikafit1977@gmail.com</span>
+                          <span>+34 650 229 987</span>
                       </div>
                   </div>
-                <div class="cliente-info">
-                    <div class="cliente-nombre">${nombreCliente}</div>
-                    <div class="cliente-datos">${subtags.join(' · ')}</div>
-                    <div class="fecha-pdf">${fecha}</div>
-                </div>
-            </div>
+                  <div class="cliente-info">
+                      <div class="cliente-nombre">${nombreCliente}</div>
+                      <div class="cliente-datos">${subtags.join(' · ')}</div>
+                  </div>
+              </div>
         `;
     }
     
@@ -3681,16 +3691,103 @@ function inicializarBotones() {
         await generarArchivoPDF(htmlPDF, nombreCliente);
     };
     
-    // Botón descargar PDF
-    const btnDescargar = document.getElementById('btnDescargar');
-    if (btnDescargar) {
-        btnDescargar.replaceWith(btnDescargar.cloneNode(true));
-        const nuevoBtn = document.getElementById('btnDescargar');
-        
-        nuevoBtn.addEventListener('click', function() {
-            window.generarPDFProfesional('principal');
-        });
-    }
+      // Botón descargar PDF
+      const btnDescargar = document.getElementById('btnDescargar');
+      if (btnDescargar) {
+          btnDescargar.replaceWith(btnDescargar.cloneNode(true));
+          const nuevoBtn = document.getElementById('btnDescargar');
+          
+          nuevoBtn.addEventListener('click', function() {
+              window.generarPDFProfesional('principal');
+          });
+      }
+
+      // Botón compartir por WhatsApp (solo móvil)
+      const btnCompartirWhatsApp = document.getElementById('btnCompartirWhatsApp');
+      if (btnCompartirWhatsApp) {
+          // Detectar si es dispositivo móvil
+          const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          
+          if (esMovil) {
+              btnCompartirWhatsApp.style.display = 'block';
+              
+              btnCompartirWhatsApp.replaceWith(btnCompartirWhatsApp.cloneNode(true));
+              const nuevoBtnWhatsApp = document.getElementById('btnCompartirWhatsApp');
+              
+                            nuevoBtnWhatsApp.addEventListener('click', async function() {
+                  try {
+                      mostrarNotificacion('🔄 Generando PDF para compartir...', 'info');
+                      
+                      // Obtener el contenido del PDF
+                      const pdfContent = document.getElementById('pdf-content');
+                      if (!pdfContent) {
+                          throw new Error('No se encontró el contenido del PDF');
+                      }
+
+                      // Usar html2pdf para generar el blob directamente
+                      const opt = {
+                          margin: 0.5,
+                          filename: `Plan_Alimentacion_${datosUsuario.nombre || 'Cliente'}.pdf`,
+                          image: { type: 'jpeg', quality: 0.98 },
+                          html2canvas: { scale: 2, useCORS: true },
+                          jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                      };
+
+                      // Generar PDF como blob
+                      const pdfBlob = await html2pdf().set(opt).from(pdfContent).outputPdf('blob');
+                      
+                      // Crear archivo desde el blob
+                      const filename = `Plan_Alimentacion_${(datosUsuario.nombre || 'Cliente').replace(/\s+/g, '_')}.pdf`;
+                      const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+                      
+                      // Intentar usar Web Share API (soporta WhatsApp en móviles)
+                      if (navigator.share && navigator.canShare) {
+                          try {
+                              if (navigator.canShare({ files: [file] })) {
+                                  await navigator.share({
+                                      files: [file],
+                                      title: 'Plan de Alimentación Personalizado',
+                                      text: `Plan de alimentación personalizado para ${datosUsuario.nombre || 'cliente'}`
+                                  });
+                                  mostrarNotificacion('✅ PDF compartido exitosamente', 'success');
+                                  return;
+                              }
+                          } catch (shareError) {
+                              console.log('Web Share API no disponible, usando método alternativo');
+                          }
+                      }
+                      
+                      // Método alternativo: descargar y abrir WhatsApp
+                      const url = URL.createObjectURL(pdfBlob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = filename;
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      
+                      // Abrir WhatsApp con mensaje
+                      setTimeout(() => {
+                          const mensaje = encodeURIComponent(`Te comparto tu plan de alimentación personalizado. El archivo PDF se ha descargado en tu dispositivo.`);
+                          const urlWhatsApp = `https://wa.me/?text=${mensaje}`;
+                          window.open(urlWhatsApp, '_blank');
+                          
+                          mostrarNotificacion('📥 PDF descargado. Selecciona WhatsApp y adjunta el archivo descargado', 'info');
+                          
+                          // Limpiar URL después de un tiempo
+                          setTimeout(() => URL.revokeObjectURL(url), 1000);
+                      }, 500);
+                      
+                  } catch (error) {
+                      console.error('Error al compartir por WhatsApp:', error);
+                      mostrarNotificacion('⚠️ Error al compartir. Descarga el PDF y compártelo manualmente.', 'error');
+                      
+                      // Fallback: descargar el PDF normalmente
+                      window.generarPDFProfesional('principal');
+                  }
+              });
+          }
+      }
     
     const btnNuevo = document.getElementById('btnNuevo');
     if (btnNuevo) {

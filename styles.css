@@ -437,6 +437,26 @@ h3 {
     margin-bottom: 30px;
 }
 
+.btn-whatsapp {
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    margin: 0;
+}
+
+.btn-whatsapp:hover {
+    background: linear-gradient(135deg, #128C7E 0%, #075E54 100%);
+}
+
+/* Ajustar grid cuando aparece el botón de WhatsApp en móvil */
+@media (max-width: 768px) {
+    .btn-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .btn-whatsapp {
+        grid-column: span 2; /* Ocupa todo el ancho en móviles */
+    }
+}
+
 .oculto {
     display: none !important;
 }
