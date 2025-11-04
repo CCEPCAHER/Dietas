@@ -26,6 +26,30 @@ body {
     margin-bottom: 40px;
     padding-bottom: 20px;
     border-bottom: 3px solid #4c51bf;
+    position: relative;
+}
+
+.header-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    text-align: center;
+}
+
+.header-logo {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    flex-shrink: 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+    flex: 1;
+    min-width: 300px;
 }
 
 .main-header h1 {
@@ -445,6 +469,32 @@ h3 {
     border-radius: 10px;
     margin-bottom: 30px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.pdf-header-logo-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.pdf-header-logo {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    flex-shrink: 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px;
+}
+
+.pdf-header-content {
+    flex: 1;
+    min-width: 300px;
+    text-align: center;
 }
 
 .nombre-nutricionista-header {
@@ -1201,6 +1251,16 @@ table tbody tr:hover {
         padding-bottom: 15px;
     }
     
+    .header-logo {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .header-logo-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
     .main-header h1 {
         font-size: 2em;
         letter-spacing: 1px;
@@ -1549,6 +1609,21 @@ table tbody tr:hover {
     }
     
     /* PDF header mobile */
+    .pdf-header-logo {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .pdf-header-logo-container {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    .pdf-header-content {
+        text-align: center;
+    }
+    
     .pdf-header h1 {
         font-size: 1.5em;
     }
