@@ -3464,21 +3464,98 @@ function inicializarBotones() {
             try {
                 await esperarImagenes();
                 
+                // Convertir todas las imágenes del iframe a base64 para evitar problemas CORS
+                const imagenesEnIframe = bodyElement.querySelectorAll('img');
+                for (const img of imagenesEnIframe) {
+                    if (img.src && !img.src.startsWith('data:') && !img.src.startsWith('http')) {
+                        try {
+                            // Intentar convertir a base64
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            canvas.width = img.naturalWidth || img.width || 100;
+                            canvas.height = img.naturalHeight || img.height || 100;
+                            
+                            // Si la imagen está cargada, dibujarla
+                            if (img.complete && img.naturalWidth > 0) {
+                                ctx.drawImage(img, 0, 0);
+                                try {
+                                    img.src = canvas.toDataURL('image/png');
+                                } catch (e) {
+                                    // Si falla, intentar con la función de conversión
+                                    const base64 = await convertirImagenABase64(img.getAttribute('src') || img.src);
+                                    if (base64 && base64.startsWith('data:')) {
+                                        img.src = base64;
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.warn('No se pudo convertir imagen a base64:', img.src, e);
+                            // Si falla, intentar remover la imagen o usar un placeholder
+                            if (img.getAttribute('src')) {
+                                try {
+                                    const base64 = await convertirImagenABase64(img.getAttribute('src'));
+                                    if (base64 && base64.startsWith('data:')) {
+                                        img.src = base64;
+                                    }
+                                } catch (e2) {
+                                    console.warn('Error en conversión alternativa:', e2);
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Esperar un momento para que las imágenes base64 se carguen
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
                 // Ajustar escala según dispositivo
                 const scale = esMovil ? 2.5 : 2; // Mayor escala en móviles para mejor calidad
                 
                 html2canvas(bodyElement, {
                     scale: scale,
                     useCORS: true,
-                    allowTaint: false,
+                    allowTaint: true, // Permitir taint para evitar el error
                     logging: false,
                     backgroundColor: '#ffffff',
                     width: bodyElement.scrollWidth,
                     height: bodyElement.scrollHeight,
                     windowWidth: bodyElement.scrollWidth,
-                    windowHeight: bodyElement.scrollHeight
+                    windowHeight: bodyElement.scrollHeight,
+                    foreignObjectRendering: false, // Evitar problemas con objetos foráneos
+                    removeContainer: false,
+                    imageTimeout: 15000,
+                    onclone: function(clonedDoc) {
+                        // Asegurar que todas las imágenes en el clon tengan crossOrigin
+                        const images = clonedDoc.querySelectorAll('img');
+                        images.forEach(img => {
+                            if (img.src && !img.src.startsWith('data:')) {
+                                img.crossOrigin = 'anonymous';
+                            }
+                        });
+                    }
                 }).then(canvas => {
-                    const imgData = canvas.toDataURL('image/png', 0.95);
+                    // Usar toBlob en lugar de toDataURL para evitar problemas de CORS
+                    return new Promise((resolve, reject) => {
+                        canvas.toBlob((blob) => {
+                            if (blob) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                    resolve(reader.result); // Base64 string
+                                };
+                                reader.onerror = reject;
+                                reader.readAsDataURL(blob);
+                            } else {
+                                // Fallback a toDataURL si toBlob falla
+                                try {
+                                    const imgData = canvas.toDataURL('image/png', 0.95);
+                                    resolve(imgData);
+                                } catch (e) {
+                                    reject(e);
+                                }
+                            }
+                        }, 'image/png', 0.95);
+                    });
+                }).then(imgData => {
                     const { jsPDF } = window.jspdf;
                     const pdf = new jsPDF('p', 'mm', 'a4');
                     
@@ -3610,14 +3687,106 @@ function inicializarBotones() {
                     }
                 }).catch(error => {
                     console.error('Error generando PDF:', error);
-                    mostrarNotificacion('❌ Error al generar el PDF: ' + error.message, 'error');
-                    if (container && container.parentNode) {
-                        document.body.removeChild(container);
+                    
+                    // Si es error de Tainted canvas, intentar sin imágenes problemáticas
+                    if (error.message && error.message.includes('Tainted')) {
+                        console.log('Error de Tainted canvas detectado, intentando sin imágenes problemáticas...');
+                        
+                        // Ocultar todas las imágenes y reintentar
+                        const imagenes = bodyElement.querySelectorAll('img');
+                        imagenes.forEach(img => {
+                            img.style.display = 'none';
+                        });
+                        
+                        // Reintentar después de un breve delay
+                        setTimeout(() => {
+                            html2canvas(bodyElement, {
+                                scale: esMovil ? 2.5 : 2,
+                                useCORS: false,
+                                allowTaint: true,
+                                logging: false,
+                                backgroundColor: '#ffffff',
+                                width: bodyElement.scrollWidth,
+                                height: bodyElement.scrollHeight,
+                                windowWidth: bodyElement.scrollWidth,
+                                windowHeight: bodyElement.scrollHeight
+                            }).then(canvas => {
+                                canvas.toBlob((blob) => {
+                                    if (blob) {
+                                        const reader = new FileReader();
+                                        reader.onloadend = () => {
+                                            const imgData = reader.result;
+                                            const { jsPDF } = window.jspdf;
+                                            const pdf = new jsPDF('p', 'mm', 'a4');
+                                            const imgWidth = 210;
+                                            const pageHeight = 297;
+                                            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                                            
+                                            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
+                                            
+                                            if (imgHeight > pageHeight) {
+                                                let heightLeft = imgHeight - pageHeight;
+                                                let position = -pageHeight;
+                                                while (heightLeft > 0) {
+                                                    pdf.addPage();
+                                                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+                                                    heightLeft -= pageHeight;
+                                                    position -= pageHeight;
+                                                }
+                                            }
+                                            
+                                            const pdfBlob = pdf.output('blob');
+                                            const pdfUrl = URL.createObjectURL(pdfBlob);
+                                            const filename = `Dieta_${nombreCliente.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+                                            
+                                                                                         // Usar la misma lógica de descarga
+                                             const esIOSRetry = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                                             if (esMovil && esIOSRetry && navigator.share && navigator.canShare) {
+                                                const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+                                                if (navigator.canShare({ files: [file] })) {
+                                                    navigator.share({ files: [file], title: 'Plan de Alimentación Personalizado', text: `Plan de alimentación para ${nombreCliente}` })
+                                                        .catch(() => window.open(pdfUrl, '_blank'));
+                                                } else {
+                                                    window.open(pdfUrl, '_blank');
+                                                }
+                                            } else {
+                                                const a = document.createElement('a');
+                                                a.href = pdfUrl;
+                                                a.download = filename;
+                                                document.body.appendChild(a);
+                                                a.click();
+                                                document.body.removeChild(a);
+                                            }
+                                            
+                                            mostrarNotificacion('✅ PDF generado correctamente (sin imágenes por restricciones de seguridad)', 'success');
+                                            if (container && container.parentNode) {
+                                                document.body.removeChild(container);
+                                            }
+                                        };
+                                        reader.readAsDataURL(blob);
+                                    }
+                                }, 'image/png', 0.95);
+                            }).catch(e => {
+                                mostrarNotificacion('❌ Error: No se pudo generar el PDF. Por favor, prueba desde un servidor web (no desde archivos locales).', 'error');
+                                if (container && container.parentNode) {
+                                    document.body.removeChild(container);
+                                }
+                            });
+                        }, 500);
+                    } else {
+                        mostrarNotificacion('❌ Error al generar el PDF: ' + error.message, 'error');
+                        if (container && container.parentNode) {
+                            document.body.removeChild(container);
+                        }
                     }
                 });
             } catch (error) {
                 console.error('Error:', error);
-                mostrarNotificacion('❌ Error al generar el PDF: ' + error.message, 'error');
+                let mensajeError = '❌ Error al generar el PDF: ' + error.message;
+                if (error.message && error.message.includes('Tainted')) {
+                    mensajeError = '❌ Error de seguridad: Por favor, ejecuta la aplicación desde un servidor web (no desde archivos locales) para generar PDFs con imágenes.';
+                }
+                mostrarNotificacion(mensajeError, 'error');
                 if (container && container.parentNode) {
                     document.body.removeChild(container);
                 }
