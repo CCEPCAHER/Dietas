@@ -3519,37 +3519,50 @@ function inicializarBotones() {
                     
                     // Descargar PDF - método mejorado para móviles e iOS
                     if (esMovil) {
-                        // Para iOS, usar Web Share API o abrir directamente
+                        // Para iOS, usar Web Share API para descargar y compartir
                         if (esIOS) {
-                            let iosManejado = false;
-                            
-                            // Intentar usar Web Share API primero (iOS 13+)
+                            // Intentar usar Web Share API primero (iOS 13+) - Muestra menú de compartir automáticamente
                             if (navigator.share && navigator.canShare) {
-                                const file = new File([pdfBlob], filename, { type: 'application/pdf' });
-                                
-                                if (navigator.canShare({ files: [file] })) {
-                                    iosManejado = true;
-                                    navigator.share({
-                                        files: [file],
-                                        title: 'Plan de Alimentación Personalizado',
-                                        text: `Plan de alimentación para ${nombreCliente}`
-                                    }).then(() => {
-                                        mostrarNotificacion('✅ PDF compartido exitosamente', 'success');
-                                        setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
-                                    }).catch((error) => {
-                                        // Si el usuario cancela o falla, abrir en nueva pestaña
-                                        console.log('Web Share cancelado o falló, abriendo en nueva pestaña:', error);
-                                        window.open(pdfUrl, '_blank');
-                                        mostrarNotificacion('📄 PDF generado. Usa el botón de compartir (⫶) en la parte superior para descargarlo o compartirlo.', 'info');
-                                        setTimeout(() => URL.revokeObjectURL(pdfUrl), 5000);
-                                    });
+                                try {
+                                    const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+                                    
+                                    if (navigator.canShare({ files: [file] })) {
+                                        // Usar Web Share API - Esto abre automáticamente el menú de compartir
+                                        navigator.share({
+                                            files: [file],
+                                            title: 'Plan de Alimentación Personalizado',
+                                            text: `Plan de alimentación para ${nombreCliente}`
+                                        }).then(() => {
+                                            mostrarNotificacion('✅ PDF compartido exitosamente', 'success');
+                                            setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
+                                        }).catch((error) => {
+                                            // Si el usuario cancela, mostrar mensaje
+                                            if (error.name !== 'AbortError') {
+                                                console.log('Error al compartir:', error);
+                                                // Fallback: abrir en nueva pestaña
+                                                window.open(pdfUrl, '_blank');
+                                                mostrarNotificacion('📄 PDF listo. Usa el botón de compartir (⫶) para descargarlo o compartirlo.', 'info');
+                                                setTimeout(() => URL.revokeObjectURL(pdfUrl), 5000);
+                                            } else {
+                                                mostrarNotificacion('❌ Compartir cancelado', 'info');
+                                                setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
+                                            }
+                                        });
+                                    } else {
+                                        // Si no puede compartir archivos, abrir en nueva pestaña
+                                        throw new Error('No se puede compartir archivos');
+                                    }
+                                } catch (error) {
+                                    // Fallback: abrir en nueva pestaña para compartir manualmente
+                                    console.log('Web Share no disponible, abriendo en nueva pestaña:', error);
+                                    window.open(pdfUrl, '_blank');
+                                    mostrarNotificacion('📄 PDF listo. Usa el botón de compartir (⫶) en la parte superior derecha para descargarlo o compartirlo.', 'info');
+                                    setTimeout(() => URL.revokeObjectURL(pdfUrl), 5000);
                                 }
-                            }
-                            
-                            // Si Web Share no está disponible o no se usó, abrir directamente en nueva pestaña
-                            if (!iosManejado) {
+                            } else {
+                                // Si Web Share API no está disponible, abrir directamente en nueva pestaña
                                 window.open(pdfUrl, '_blank');
-                                mostrarNotificacion('📄 PDF generado. Usa el botón de compartir (⫶) en la parte superior derecha para descargarlo o compartirlo.', 'info');
+                                mostrarNotificacion('📄 PDF listo. Usa el botón de compartir (⫶) en la parte superior derecha para descargarlo o compartirlo.', 'info');
                                 setTimeout(() => URL.revokeObjectURL(pdfUrl), 5000);
                             }
                             
