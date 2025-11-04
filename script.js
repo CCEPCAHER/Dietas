@@ -3534,13 +3534,21 @@ function inicializarBotones() {
                         });
                     }
                 }).then(canvas => {
+                    // Guardar dimensiones del canvas antes de convertir
+                    const canvasWidth = canvas.width;
+                    const canvasHeight = canvas.height;
+                    
                     // Usar toBlob en lugar de toDataURL para evitar problemas de CORS
                     return new Promise((resolve, reject) => {
                         canvas.toBlob((blob) => {
                             if (blob) {
                                 const reader = new FileReader();
                                 reader.onloadend = () => {
-                                    resolve(reader.result); // Base64 string
+                                    resolve({
+                                        imgData: reader.result, // Base64 string
+                                        width: canvasWidth,
+                                        height: canvasHeight
+                                    });
                                 };
                                 reader.onerror = reject;
                                 reader.readAsDataURL(blob);
@@ -3548,20 +3556,24 @@ function inicializarBotones() {
                                 // Fallback a toDataURL si toBlob falla
                                 try {
                                     const imgData = canvas.toDataURL('image/png', 0.95);
-                                    resolve(imgData);
+                                    resolve({
+                                        imgData: imgData,
+                                        width: canvasWidth,
+                                        height: canvasHeight
+                                    });
                                 } catch (e) {
                                     reject(e);
                                 }
                             }
                         }, 'image/png', 0.95);
                     });
-                }).then(imgData => {
+                }).then(({ imgData, width, height }) => {
                     const { jsPDF } = window.jspdf;
                     const pdf = new jsPDF('p', 'mm', 'a4');
                     
                     const imgWidth = 210;
                     const pageHeight = 297;
-                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    const imgHeight = (height * imgWidth) / width;
                     
                     pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
                     
@@ -3711,6 +3723,10 @@ function inicializarBotones() {
                                 windowWidth: bodyElement.scrollWidth,
                                 windowHeight: bodyElement.scrollHeight
                             }).then(canvas => {
+                                // Guardar dimensiones del canvas antes de convertir
+                                const canvasWidth = canvas.width;
+                                const canvasHeight = canvas.height;
+                                
                                 canvas.toBlob((blob) => {
                                     if (blob) {
                                         const reader = new FileReader();
@@ -3720,7 +3736,7 @@ function inicializarBotones() {
                                             const pdf = new jsPDF('p', 'mm', 'a4');
                                             const imgWidth = 210;
                                             const pageHeight = 297;
-                                            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                                            const imgHeight = (canvasHeight * imgWidth) / canvasWidth;
                                             
                                             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
                                             
