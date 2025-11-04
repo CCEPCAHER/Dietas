@@ -868,8 +868,8 @@ function balancearMacrosComida(alimentos, distribucionObjetivo, objetivo) {
         grasas: 0
     };
     
-    // Calcular macros actuales
-    alimentos.forEach(alimento => {
+    // Calcular macros actuales con información nutricional por alimento
+    const alimentosConInfo = alimentos.map(alimento => {
         const info = obtenerInfoNutricional(alimento.nombre, alimento.cantidad);
         if (info) {
             totalMacros.calorias += info.calorias;
@@ -877,10 +877,11 @@ function balancearMacrosComida(alimentos, distribucionObjetivo, objetivo) {
             totalMacros.carbohidratos += info.carbohidratos;
             totalMacros.grasas += info.grasas;
         }
+        return { ...alimento, info };
     });
     
-    // Tolerancia para ajustes (10% de diferencia)
-    const tolerancia = 0.10;
+    // Tolerancia para ajustes (15% de diferencia)
+    const tolerancia = 0.15;
     
     // Calcular diferencias porcentuales
     const diffCal = Math.abs(totalMacros.calorias - distribucionObjetivo.calorias) / distribucionObjetivo.calorias;
@@ -893,25 +894,47 @@ function balancearMacrosComida(alimentos, distribucionObjetivo, objetivo) {
         return alimentos;
     }
     
-    // Calcular factor de ajuste basado en las calorías (principalmente) y otros macros
-    // Si estamos por encima, reducir proporcionalmente
-    let factorAjuste = 1.0;
-    if (totalMacros.calorias > distribucionObjetivo.calorias) {
-        // Reducir proporcionalmente para acercarse al objetivo
-        factorAjuste = distribucionObjetivo.calorias / totalMacros.calorias;
-        // Aplicar un límite mínimo (no reducir más del 50% de una vez)
-        factorAjuste = Math.max(factorAjuste, 0.5);
-    } else if (totalMacros.calorias < distribucionObjetivo.calorias) {
-        // Aumentar ligeramente si estamos por debajo
-        factorAjuste = Math.min(distribucionObjetivo.calorias / totalMacros.calorias, 1.2);
-    }
+    // Calcular necesidades de ajuste
+    const necesitaMenosGrasas = totalMacros.grasas > distribucionObjetivo.grasas * 1.1;
+    const necesitaMasCarbos = totalMacros.carbohidratos < distribucionObjetivo.carbohidratos * 0.9;
+    const necesitaMenosCalorias = totalMacros.calorias > distribucionObjetivo.calorias * 1.05;
+    const necesitaMasCalorias = totalMacros.calorias < distribucionObjetivo.calorias * 0.95;
     
-    // Ajustar cantidades de todos los alimentos proporcionalmente
-    const alimentosAjustados = alimentos.map(alimento => {
-        const info = obtenerInfoNutricional(alimento.nombre, alimento.cantidad);
-        if (!info) return alimento;
+    // Ajustar alimentos de forma selectiva
+    const alimentosAjustados = alimentosConInfo.map(alimento => {
+        if (!alimento.info) return alimento;
         
-        let cantidad = Math.round(alimento.cantidad * factorAjuste);
+        let cantidad = alimento.cantidad;
+        const info = alimento.info;
+        
+        // Calcular ratio de grasas y carbohidratos por 100g
+        const ratioGrasas = info.grasas / info.calorias * 100 || 0;
+        const ratioCarbos = info.carbohidratos / info.calorias * 100 || 0;
+        const ratioProteinas = info.proteinas / info.calorias * 100 || 0;
+        
+        // Reducir alimentos altos en grasas si las grasas están por encima
+        if (necesitaMenosGrasas && ratioGrasas > 0.5) {
+            // Reducir más agresivamente los alimentos muy altos en grasas
+            const factorReduccion = ratioGrasas > 1.0 ? 0.7 : 0.85;
+            cantidad = Math.round(cantidad * factorReduccion);
+        }
+        // Aumentar alimentos altos en carbohidratos si los carbos están por debajo
+        else if (necesitaMasCarbos && ratioCarbos > 0.3) {
+            // Aumentar alimentos con buena proporción de carbohidratos
+            const factorAumento = ratioCarbos > 0.6 ? 1.3 : 1.15;
+            cantidad = Math.round(cantidad * factorAumento);
+        }
+        // Ajuste general por calorías si es necesario
+        else if (necesitaMenosCalorias) {
+            cantidad = Math.round(cantidad * 0.9);
+        } else if (necesitaMasCalorias) {
+            // Preferir aumentar alimentos con carbohidratos si faltan
+            if (necesitaMasCarbos && ratioCarbos > 0.3) {
+                cantidad = Math.round(cantidad * 1.2);
+            } else {
+                cantidad = Math.round(cantidad * 1.1);
+            }
+        }
         
         // Asegurar un mínimo de 10g para que el alimento tenga sentido
         if (cantidad < 10 && alimento.cantidad > 0) {
@@ -921,8 +944,8 @@ function balancearMacrosComida(alimentos, distribucionObjetivo, objetivo) {
         return { ...alimento, cantidad };
     });
     
-    // Verificar si el ajuste mejoró la situación
-    const nuevosMacros = {
+    // Calcular nuevos macros después del ajuste selectivo
+    let nuevosMacros = {
         calorias: 0,
         proteinas: 0,
         carbohidratos: 0,
@@ -939,14 +962,32 @@ function balancearMacrosComida(alimentos, distribucionObjetivo, objetivo) {
         }
     });
     
-    // Si aún estamos muy por encima, hacer un segundo ajuste más agresivo
-    if (nuevosMacros.calorias > distribucionObjetivo.calorias * 1.15) {
-        const factorAjuste2 = distribucionObjetivo.calorias / nuevosMacros.calorias;
+    // Ajuste final proporcional si aún hay diferencias significativas
+    const diffCalFinal = Math.abs(nuevosMacros.calorias - distribucionObjetivo.calorias) / distribucionObjetivo.calorias;
+    const diffCarbFinal = Math.abs(nuevosMacros.carbohidratos - distribucionObjetivo.carbohidratos) / distribucionObjetivo.carbohidratos;
+    const diffGrasFinal = Math.abs(nuevosMacros.grasas - distribucionObjetivo.grasas) / distribucionObjetivo.grasas;
+    
+    // Si aún hay diferencias grandes, hacer un ajuste proporcional final
+    if (diffCalFinal > 0.15 || diffCarbFinal > 0.25 || diffGrasFinal > 0.25) {
+        // Calcular factor de ajuste basado en el macro más desbalanceado
+        let factorAjuste = 1.0;
+        
+        if (nuevosMacros.calorias > distribucionObjetivo.calorias * 1.15) {
+            factorAjuste = distribucionObjetivo.calorias / nuevosMacros.calorias;
+        } else if (nuevosMacros.calorias < distribucionObjetivo.calorias * 0.85) {
+            factorAjuste = distribucionObjetivo.calorias / nuevosMacros.calorias;
+        }
+        
+        // Aplicar ajuste proporcional, pero con menos agresividad para alimentos con proteínas
         return alimentosAjustados.map(alimento => {
             const info = obtenerInfoNutricional(alimento.nombre, alimento.cantidad);
             if (!info) return alimento;
             
-            let cantidad = Math.round(alimento.cantidad * factorAjuste2);
+            const ratioProteinas = info.proteinas / info.calorias * 100 || 0;
+            // Proteger alimentos altos en proteínas del ajuste excesivo
+            const factorProtegido = ratioProteinas > 0.5 ? Math.max(factorAjuste, 0.7) : factorAjuste;
+            
+            let cantidad = Math.round(alimento.cantidad * factorProtegido);
             if (cantidad < 10 && alimento.cantidad > 0) {
                 cantidad = 10;
             }
@@ -954,7 +995,7 @@ function balancearMacrosComida(alimentos, distribucionObjetivo, objetivo) {
         });
     }
     
-    return alimentosAjustados;
+    return alimentosAjustados.map(({ info, ...rest }) => rest);
 }
 
 // Función para obtener alimentos según macronutriente
