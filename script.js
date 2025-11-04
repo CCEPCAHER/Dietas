@@ -3402,41 +3402,30 @@ function inicializarBotones() {
     }
     
     async function generarArchivoPDF(htmlPDF, nombreCliente) {
-        // Detectar si es dispositivo móvil
-        const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        // Detectar si es dispositivo móvil (mejorado para detectar todos los casos)
+        const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent) || 
+                        (window.innerWidth <= 768) || 
+                        ('ontouchstart' in window || navigator.maxTouchPoints > 0);
         
-        // Para móviles, usar un iframe oculto en lugar de window.open (más compatible)
+        // Usar iframe para todos los casos (más compatible, evita problemas de ventanas emergentes)
         let container, bodyElement;
         
-        if (esMovil) {
-            // En móviles, crear un iframe oculto
-            container = document.createElement('iframe');
-            container.style.position = 'fixed';
-            container.style.top = '-9999px';
-            container.style.left = '-9999px';
-            container.style.width = '210mm';
-            container.style.height = '297mm';
-            container.style.border = 'none';
-            document.body.appendChild(container);
-            
-            const iframeDoc = container.contentDocument || container.contentWindow.document;
-            iframeDoc.open();
-            iframeDoc.write(htmlPDF);
-            iframeDoc.close();
-            
-            bodyElement = iframeDoc.body;
-        } else {
-            // En desktop, usar window.open como antes
-            const win = window.open('', '_blank');
-            if (!win) {
-                alert('Por favor, permite las ventanas emergentes para generar el PDF.');
-                return;
-            }
-            
-            win.document.write(htmlPDF);
-            win.document.close();
-            bodyElement = win.document.body;
-        }
+        // Siempre usar iframe oculto para evitar problemas de ventanas emergentes
+        container = document.createElement('iframe');
+        container.style.position = 'fixed';
+        container.style.top = '-9999px';
+        container.style.left = '-9999px';
+        container.style.width = '210mm';
+        container.style.height = '297mm';
+        container.style.border = 'none';
+        document.body.appendChild(container);
+        
+        const iframeDoc = container.contentDocument || container.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(htmlPDF);
+        iframeDoc.close();
+        
+        bodyElement = iframeDoc.body;
         
         // Esperar a que todas las imágenes se carguen antes de generar el canvas
         const esperarImagenes = () => {
