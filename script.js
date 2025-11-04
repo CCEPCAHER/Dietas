@@ -1938,6 +1938,367 @@ function mostrarTablaEditable() {
     intentarInicializar();
 }
 
+// Función para generar estadísticas del plan con gráficos visuales
+function generarEstadisticasPlan(planSemana) {
+    if (!planSemana || planSemana.length === 0) return '';
+    
+    // Calcular totales por día de entreno y descanso
+    let totalEntreno = { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0, dias: 0 };
+    let totalDescanso = { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0, dias: 0 };
+    
+    planSemana.forEach(dia => {
+        const esDescanso = esDiaDescanso(dia.dia);
+        const comidas = dia.comidas;
+        
+        let diaTotal = { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0 };
+        
+        // Sumar todas las comidas del día
+        Object.values(comidas).forEach(comida => {
+            if (comida) {
+                diaTotal.calorias += comida.calorias || 0;
+                diaTotal.proteinas += comida.proteinas || 0;
+                diaTotal.grasas += comida.grasas || 0;
+                diaTotal.carbohidratos += comida.carbohidratos || 0;
+            }
+        });
+        
+        // Agregar a totales según tipo de día
+        if (esDescanso) {
+            totalDescanso.calorias += diaTotal.calorias;
+            totalDescanso.proteinas += diaTotal.proteinas;
+            totalDescanso.grasas += diaTotal.grasas;
+            totalDescanso.carbohidratos += diaTotal.carbohidratos;
+            totalDescanso.dias++;
+        } else {
+            totalEntreno.calorias += diaTotal.calorias;
+            totalEntreno.proteinas += diaTotal.proteinas;
+            totalEntreno.grasas += diaTotal.grasas;
+            totalEntreno.carbohidratos += diaTotal.carbohidratos;
+            totalEntreno.dias++;
+        }
+    });
+    
+    // Calcular promedios
+    const promedioEntreno = {
+        calorias: totalEntreno.dias > 0 ? Math.round(totalEntreno.calorias / totalEntreno.dias) : 0,
+        proteinas: totalEntreno.dias > 0 ? Math.round(totalEntreno.proteinas / totalEntreno.dias) : 0,
+        grasas: totalEntreno.dias > 0 ? Math.round(totalEntreno.grasas / totalEntreno.dias) : 0,
+        carbohidratos: totalEntreno.dias > 0 ? Math.round(totalEntreno.carbohidratos / totalEntreno.dias) : 0
+    };
+    
+    const promedioDescanso = {
+        calorias: totalDescanso.dias > 0 ? Math.round(totalDescanso.calorias / totalDescanso.dias) : 0,
+        proteinas: totalDescanso.dias > 0 ? Math.round(totalDescanso.proteinas / totalDescanso.dias) : 0,
+        grasas: totalDescanso.dias > 0 ? Math.round(totalDescanso.grasas / totalDescanso.dias) : 0,
+        carbohidratos: totalDescanso.dias > 0 ? Math.round(totalDescanso.carbohidratos / totalDescanso.dias) : 0
+    };
+    
+    // Total combinado semanal
+    const totalCombinado = {
+        calorias: totalEntreno.calorias + totalDescanso.calorias,
+        proteinas: totalEntreno.proteinas + totalDescanso.proteinas,
+        grasas: totalEntreno.grasas + totalDescanso.grasas,
+        carbohidratos: totalEntreno.carbohidratos + totalDescanso.carbohidratos
+    };
+    
+    const promedioSemanal = {
+        calorias: Math.round(totalCombinado.calorias / 7),
+        proteinas: Math.round(totalCombinado.proteinas / 7),
+        grasas: Math.round(totalCombinado.grasas / 7),
+        carbohidratos: Math.round(totalCombinado.carbohidratos / 7)
+    };
+    
+    // Generar consejos automáticos
+    const consejos = generarConsejosAutomaticos(promedioEntreno, promedioDescanso, promedioSemanal);
+    
+    // Calcular porcentajes para gráficos
+    const maxCalorias = Math.max(promedioEntreno.calorias, promedioDescanso.calorias, promedioSemanal.calorias);
+    const porcentajeCalEntreno = maxCalorias > 0 ? (promedioEntreno.calorias / maxCalorias) * 100 : 0;
+    const porcentajeCalDescanso = maxCalorias > 0 ? (promedioDescanso.calorias / maxCalorias) * 100 : 0;
+    const porcentajeCalSemanal = maxCalorias > 0 ? (promedioSemanal.calorias / maxCalorias) * 100 : 0;
+    
+    return `
+        <div class="estadisticas-plan-container" style="margin: 30px 0; padding: 25px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid #dee2e6;">
+            <h3 style="color: #495057; text-align: center; margin-bottom: 25px; font-size: 1.4em; font-weight: 700; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">
+                📊 ESTADÍSTICAS DEL PLAN
+            </h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 25px;">
+                <!-- Día de Entreno -->
+                <div class="stat-card" style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); padding: 20px; border-radius: 12px; border: 2px solid #28a745; box-shadow: 0 3px 10px rgba(40,167,69,0.2);">
+                    <h4 style="color: #155724; margin: 0 0 15px 0; font-size: 1.1em; font-weight: 700; text-align: center;">
+                        💪 DÍA DE ENTRENO
+                        <span style="display: block; font-size: 0.85em; font-weight: 500; margin-top: 5px;">(${totalEntreno.dias} días)</span>
+                    </h4>
+                    <div class="stat-item" style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #155724; font-weight: 600;">🔥 Calorías:</span>
+                            <span style="color: #155724; font-weight: 700;">${promedioEntreno.calorias} kcal</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.6); height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #28a745, #20c997); height: 100%; width: ${porcentajeCalEntreno}%; transition: width 0.5s ease;"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item" style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #155724; font-weight: 600;">💪 Proteínas:</span>
+                            <span style="color: #155724; font-weight: 700;">${promedioEntreno.proteinas}g</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.6); height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #059669, #10b981); height: 100%; width: ${Math.min((promedioEntreno.proteinas / 200) * 100, 100)}%; transition: width 0.5s ease;"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item" style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #155724; font-weight: 600;">🥑 Grasas:</span>
+                            <span style="color: #155724; font-weight: 700;">${promedioEntreno.grasas}g</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.6); height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #dc2626, #ef4444); height: 100%; width: ${Math.min((promedioEntreno.grasas / 100) * 100, 100)}%; transition: width 0.5s ease;"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #155724; font-weight: 600;">🍚 Hidratos:</span>
+                            <span style="color: #155724; font-weight: 700;">${promedioEntreno.carbohidratos}g</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.6); height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #1e40af, #3b82f6); height: 100%; width: ${Math.min((promedioEntreno.carbohidratos / 300) * 100, 100)}%; transition: width 0.5s ease;"></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid rgba(21,87,36,0.3); text-align: center;">
+                        <span style="color: #155724; font-weight: 700; font-size: 0.95em;">Total semanal: ${totalEntreno.calorias} kcal</span>
+                    </div>
+                </div>
+                
+                <!-- Día de Descanso -->
+                <div class="stat-card" style="background: linear-gradient(135deg, #cfe2ff 0%, #b6d4fe 100%); padding: 20px; border-radius: 12px; border: 2px solid #2196f3; box-shadow: 0 3px 10px rgba(33,150,243,0.2);">
+                    <h4 style="color: #0d47a1; margin: 0 0 15px 0; font-size: 1.1em; font-weight: 700; text-align: center;">
+                        😴 DÍA DE DESCANSO
+                        <span style="display: block; font-size: 0.85em; font-weight: 500; margin-top: 5px;">(${totalDescanso.dias} días)</span>
+                    </h4>
+                    <div class="stat-item" style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #0d47a1; font-weight: 600;">🔥 Calorías:</span>
+                            <span style="color: #0d47a1; font-weight: 700;">${promedioDescanso.calorias} kcal</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.6); height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #2196f3, #42a5f5); height: 100%; width: ${porcentajeCalDescanso}%; transition: width 0.5s ease;"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item" style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #0d47a1; font-weight: 600;">💪 Proteínas:</span>
+                            <span style="color: #0d47a1; font-weight: 700;">${promedioDescanso.proteinas}g</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.6); height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #059669, #10b981); height: 100%; width: ${Math.min((promedioDescanso.proteinas / 200) * 100, 100)}%; transition: width 0.5s ease;"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item" style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #0d47a1; font-weight: 600;">🥑 Grasas:</span>
+                            <span style="color: #0d47a1; font-weight: 700;">${promedioDescanso.grasas}g</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.6); height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #dc2626, #ef4444); height: 100%; width: ${Math.min((promedioDescanso.grasas / 100) * 100, 100)}%; transition: width 0.5s ease;"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #0d47a1; font-weight: 600;">🍚 Hidratos:</span>
+                            <span style="color: #0d47a1; font-weight: 700;">${promedioDescanso.carbohidratos}g</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.6); height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #1e40af, #3b82f6); height: 100%; width: ${Math.min((promedioDescanso.carbohidratos / 300) * 100, 100)}%; transition: width 0.5s ease;"></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid rgba(13,71,161,0.3); text-align: center;">
+                        <span style="color: #0d47a1; font-weight: 700; font-size: 0.95em;">Total semanal: ${totalDescanso.calorias} kcal</span>
+                    </div>
+                </div>
+                
+                <!-- Total Combinado -->
+                <div class="stat-card" style="background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%); padding: 20px; border-radius: 12px; border: 2px solid #ffc107; box-shadow: 0 3px 10px rgba(255,193,7,0.2);">
+                    <h4 style="color: #856404; margin: 0 0 15px 0; font-size: 1.1em; font-weight: 700; text-align: center;">
+                        📈 PROMEDIO SEMANAL
+                        <span style="display: block; font-size: 0.85em; font-weight: 500; margin-top: 5px;">(7 días)</span>
+                    </h4>
+                    <div class="stat-item" style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #856404; font-weight: 600;">🔥 Calorías:</span>
+                            <span style="color: #856404; font-weight: 700;">${promedioSemanal.calorias} kcal</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.6); height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #ffc107, #ffca28); height: 100%; width: ${porcentajeCalSemanal}%; transition: width 0.5s ease;"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item" style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #856404; font-weight: 600;">💪 Proteínas:</span>
+                            <span style="color: #856404; font-weight: 700;">${promedioSemanal.proteinas}g</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.6); height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #059669, #10b981); height: 100%; width: ${Math.min((promedioSemanal.proteinas / 200) * 100, 100)}%; transition: width 0.5s ease;"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item" style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #856404; font-weight: 600;">🥑 Grasas:</span>
+                            <span style="color: #856404; font-weight: 700;">${promedioSemanal.grasas}g</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.6); height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #dc2626, #ef4444); height: 100%; width: ${Math.min((promedioSemanal.grasas / 100) * 100, 100)}%; transition: width 0.5s ease;"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #856404; font-weight: 600;">🍚 Hidratos:</span>
+                            <span style="color: #856404; font-weight: 700;">${promedioSemanal.carbohidratos}g</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.6); height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #1e40af, #3b82f6); height: 100%; width: ${Math.min((promedioSemanal.carbohidratos / 300) * 100, 100)}%; transition: width 0.5s ease;"></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid rgba(133,100,4,0.3); text-align: center;">
+                        <span style="color: #856404; font-weight: 700; font-size: 0.95em;">Total semanal: ${totalCombinado.calorias} kcal</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Consejos Automáticos -->
+            ${consejos}
+        </div>
+    `;
+}
+
+// Función para generar consejos automáticos basados en las estadísticas
+function generarConsejosAutomaticos(promedioEntreno, promedioDescanso, promedioSemanal) {
+    const consejos = [];
+    
+    // Analizar diferencias entre días de entreno y descanso
+    const diferenciaCalorias = promedioEntreno.calorias - promedioDescanso.calorias;
+    const diferenciaProteinas = promedioEntreno.proteinas - promedioDescanso.proteinas;
+    
+    // Consejo sobre diferencia calórica
+    if (diferenciaCalorias > 300) {
+        consejos.push({
+            tipo: 'info',
+            icono: '💡',
+            titulo: 'Excelente distribución calórica',
+            texto: `Tus días de entrenamiento tienen ${diferenciaCalorias} kcal más que los de descanso, lo cual es óptimo para mantener energía durante el ejercicio.`
+        });
+    } else if (diferenciaCalorias < 100) {
+        consejos.push({
+            tipo: 'warning',
+            icono: '⚠️',
+            titulo: 'Considera ajustar las calorías',
+            texto: `La diferencia entre días de entreno y descanso es pequeña (${diferenciaCalorias} kcal). Considera aumentar las calorías en días de entrenamiento para mejor rendimiento.`
+        });
+    }
+    
+    // Consejo sobre proteínas
+    const objetivoProteinas = datosUsuario.peso ? Math.round(datosUsuario.peso * 2) : 150;
+    if (promedioSemanal.proteinas >= objetivoProteinas * 0.9) {
+        consejos.push({
+            tipo: 'success',
+            icono: '✅',
+            titulo: 'Proteínas adecuadas',
+            texto: `Tu ingesta promedio de ${promedioSemanal.proteinas}g de proteínas es adecuada para mantener y construir masa muscular.`
+        });
+    } else {
+        consejos.push({
+            tipo: 'warning',
+            icono: '💪',
+            titulo: 'Aumenta la ingesta de proteínas',
+            texto: `Tu ingesta promedio de ${promedioSemanal.proteinas}g es menor a la recomendada (${objetivoProteinas}g). Considera aumentar alimentos ricos en proteínas.`
+        });
+    }
+    
+    // Consejo sobre distribución de macronutrientes
+    const porcentajeProt = (promedioSemanal.proteinas * 4 / promedioSemanal.calorias) * 100;
+    const porcentajeCarb = (promedioSemanal.carbohidratos * 4 / promedioSemanal.calorias) * 100;
+    const porcentajeGras = (promedioSemanal.grasas * 9 / promedioSemanal.calorias) * 100;
+    
+    if (porcentajeProt >= 18 && porcentajeProt <= 25) {
+        consejos.push({
+            tipo: 'success',
+            icono: '🎯',
+            titulo: 'Distribución de macronutrientes equilibrada',
+            texto: `Tu plan tiene una distribución equilibrada: ${porcentajeProt.toFixed(1)}% proteínas, ${porcentajeCarb.toFixed(1)}% carbohidratos, ${porcentajeGras.toFixed(1)}% grasas.`
+        });
+    }
+    
+    // Consejo sobre hidratos en días de entreno
+    if (promedioEntreno.carbohidratos > promedioDescanso.carbohidratos * 1.2) {
+        consejos.push({
+            tipo: 'info',
+            icono: '⚡',
+            titulo: 'Buena estrategia de carbohidratos',
+            texto: `Los días de entrenamiento tienen más carbohidratos, lo cual ayuda a reponer glucógeno muscular y mejorar el rendimiento.`
+        });
+    }
+    
+    // Consejo sobre objetivo
+    const objetivo = datosUsuario.objetivo;
+    if (objetivo === 'aumentar' && promedioSemanal.calorias < 2500) {
+        consejos.push({
+            tipo: 'warning',
+            icono: '📈',
+            titulo: 'Atención para ganancia de peso',
+            texto: 'Para aumentar masa muscular, asegúrate de tener un superávit calórico adecuado. Considera aumentar las calorías si no ves progreso.'
+        });
+    } else if (objetivo === 'adelgazar' && promedioSemanal.calorias > 2500) {
+        consejos.push({
+            tipo: 'info',
+            icono: '🔥',
+            titulo: 'Déficit calórico moderado',
+            texto: 'Tu plan tiene un déficit calórico adecuado. Recuerda que la pérdida de peso debe ser gradual (0.5-1kg por semana).'
+        });
+    }
+    
+    // Si no hay consejos, añadir uno genérico positivo
+    if (consejos.length === 0) {
+        consejos.push({
+            tipo: 'success',
+            icono: '🌟',
+            titulo: 'Plan bien estructurado',
+            texto: 'Tu plan nutricional está bien balanceado. Mantén la consistencia y ajusta según tu progreso y sensaciones.'
+        });
+    }
+    
+    // Generar HTML de consejos
+    let htmlConsejos = '<div style="margin-top: 25px; padding: 20px; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border-radius: 12px; border: 2px solid #dee2e6;">';
+    htmlConsejos += '<h4 style="color: #495057; margin: 0 0 15px 0; font-size: 1.1em; font-weight: 700; text-align: center;">💡 CONSEJOS Y RECOMENDACIONES</h4>';
+    
+    consejos.forEach(consejo => {
+        const colorFondo = consejo.tipo === 'success' ? 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)' :
+                          consejo.tipo === 'warning' ? 'linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%)' :
+                          'linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%)';
+        const colorBorde = consejo.tipo === 'success' ? '#28a745' :
+                          consejo.tipo === 'warning' ? '#ffc107' :
+                          '#17a2b8';
+        const colorTexto = consejo.tipo === 'success' ? '#155724' :
+                          consejo.tipo === 'warning' ? '#856404' :
+                          '#0c5460';
+        
+        htmlConsejos += `
+            <div style="margin-bottom: 15px; padding: 15px; background: ${colorFondo}; border-radius: 10px; border-left: 4px solid ${colorBorde}; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="display: flex; align-items: start; gap: 12px;">
+                    <span style="font-size: 1.5em; flex-shrink: 0;">${consejo.icono}</span>
+                    <div style="flex: 1;">
+                        <h5 style="color: ${colorTexto}; margin: 0 0 8px 0; font-size: 1em; font-weight: 700;">${consejo.titulo}</h5>
+                        <p style="color: ${colorTexto}; margin: 0; font-size: 0.9em; line-height: 1.5; opacity: 0.9;">${consejo.texto}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    htmlConsejos += '</div>';
+    return htmlConsejos;
+}
+
 function mostrarPlanAlimentacion() {
     const planDiv = document.getElementById('plan-alimentacion');
     const { objetivo, duracion, modoGeneracion } = datosUsuario;
@@ -2018,6 +2379,9 @@ function mostrarPlanAlimentacion() {
             htmlPlan += generarDiaHTML(dia, false);
         });
     }
+    
+    // Generar estadísticas del plan
+    htmlPlan += generarEstadisticasPlan(planSemana);
     
     // Calcular hidratación recomendada
     const hidratacionRecomendada = Math.round((datosUsuario.peso * 0.033 + 0.5) * 10) / 10;
@@ -2638,6 +3002,27 @@ function inicializarBotones() {
                 align-items: flex-start;
                 margin-bottom: 12px;
             }
+            .header-left {
+                display: flex;
+                align-items: flex-start;
+                gap: 15px;
+                flex: 1;
+            }
+            .logo-pdf {
+                width: 60px;
+                height: 60px;
+                object-fit: contain;
+                flex-shrink: 0;
+            }
+            @media (max-width: 600px) {
+                .logo-pdf {
+                    width: 50px;
+                    height: 50px;
+                }
+                .nombre-profesional {
+                    font-size: 18pt;
+                }
+            }
             .nombre-profesional {
                 font-size: 24pt;
                 font-weight: 900;
@@ -2753,9 +3138,9 @@ function inicializarBotones() {
      * Genera el header del PDF con información profesional y del cliente
      * @param {object} datos - Datos del cliente
      * @param {string} fecha - Fecha formateada
-     * @returns {string}
+     * @returns {Promise<string>}
      */
-    function generarHeaderPDF(datos, fecha) {
+    async function generarHeaderPDF(datos, fecha) {
         const nombreCliente = datos.nombre || 'Cliente';
         const subtags = [];
         if (datos.edad) subtags.push(`Edad: ${datos.edad}`);
@@ -2766,14 +3151,27 @@ function inicializarBotones() {
         if (datos.tipoPersona) subtags.push(`Tipo: ${datos.tipoPersona}`);
         if (datos.objetivo) subtags.push(`Objetivo: ${datos.objetivo}`);
         
+        // Convertir logo a base64
+        let logoBase64 = '';
+        try {
+            logoBase64 = await convertirImagenABase64('iconofit.png');
+        } catch (e) {
+            console.warn('No se pudo cargar el logo:', e);
+        }
+        
+        const logoHTML = logoBase64 ? `<img src="${logoBase64}" alt="Logo" class="logo-pdf">` : '';
+        
         return `
             <div class="header">
                 <div class="header-top">
-                    <div style="flex: 1;">
-                        <div class="nombre-profesional">MAIKA PORCUNA</div>
-                        <div class="contacto">
-                            <span>Maikafit1977@gmail.com</span>
-                            <span>+34 650 229 987</span>
+                    <div class="header-left">
+                        ${logoHTML}
+                        <div style="flex: 1;">
+                            <div class="nombre-profesional">MAIKA PORCUNA</div>
+                            <div class="contacto">
+                                <span>Maikafit1977@gmail.com</span>
+                                <span>+34 650 229 987</span>
+                            </div>
                         </div>
                     </div>
                     <div class="fecha">${fecha}</div>
@@ -2979,19 +3377,46 @@ function inicializarBotones() {
     }
     
     async function generarArchivoPDF(htmlPDF, nombreCliente) {
-        const win = window.open('', '_blank');
-        if (!win) {
-            alert('Por favor, permite las ventanas emergentes para generar el PDF.');
-            return;
-        }
+        // Detectar si es dispositivo móvil
+        const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         
-        win.document.write(htmlPDF);
-        win.document.close();
+        // Para móviles, usar un iframe oculto en lugar de window.open (más compatible)
+        let container, bodyElement;
+        
+        if (esMovil) {
+            // En móviles, crear un iframe oculto
+            container = document.createElement('iframe');
+            container.style.position = 'fixed';
+            container.style.top = '-9999px';
+            container.style.left = '-9999px';
+            container.style.width = '210mm';
+            container.style.height = '297mm';
+            container.style.border = 'none';
+            document.body.appendChild(container);
+            
+            const iframeDoc = container.contentDocument || container.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(htmlPDF);
+            iframeDoc.close();
+            
+            bodyElement = iframeDoc.body;
+        } else {
+            // En desktop, usar window.open como antes
+            const win = window.open('', '_blank');
+            if (!win) {
+                alert('Por favor, permite las ventanas emergentes para generar el PDF.');
+                return;
+            }
+            
+            win.document.write(htmlPDF);
+            win.document.close();
+            bodyElement = win.document.body;
+        }
         
         // Esperar a que todas las imágenes se carguen antes de generar el canvas
         const esperarImagenes = () => {
             return new Promise((resolve) => {
-                const imagenes = win.document.querySelectorAll('img');
+                const imagenes = bodyElement.querySelectorAll('img');
                 if (imagenes.length === 0) {
                     resolve();
                     return;
@@ -3008,7 +3433,7 @@ function inicializarBotones() {
                 };
                 
                 imagenes.forEach((img) => {
-                    if (img.complete) {
+                    if (img.complete && img.naturalWidth > 0) {
                         verificarCarga();
                     } else {
                         img.onload = verificarCarga;
@@ -3016,8 +3441,8 @@ function inicializarBotones() {
                     }
                 });
                 
-                // Timeout de seguridad
-                setTimeout(resolve, 3000);
+                // Timeout de seguridad (más tiempo en móviles)
+                setTimeout(resolve, esMovil ? 5000 : 3000);
             });
         };
         
@@ -3025,63 +3450,117 @@ function inicializarBotones() {
             try {
                 await esperarImagenes();
                 
-                const bodyElement = win.document.body;
+                // Ajustar escala según dispositivo
+                const scale = esMovil ? 2.5 : 2; // Mayor escala en móviles para mejor calidad
+                
                 html2canvas(bodyElement, {
-                        scale: 2,
-                        useCORS: true,
-                        allowTaint: false,
-                        logging: false,
-                        backgroundColor: '#ffffff',
+                    scale: scale,
+                    useCORS: true,
+                    allowTaint: false,
+                    logging: false,
+                    backgroundColor: '#ffffff',
                     width: bodyElement.scrollWidth,
-                    height: bodyElement.scrollHeight
+                    height: bodyElement.scrollHeight,
+                    windowWidth: bodyElement.scrollWidth,
+                    windowHeight: bodyElement.scrollHeight
                 }).then(canvas => {
-                        const imgData = canvas.toDataURL('image/png');
-                        const { jsPDF } = window.jspdf;
-                        const pdf = new jsPDF('p', 'mm', 'a4');
-                        
+                    const imgData = canvas.toDataURL('image/png', 0.95);
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    
                     const imgWidth = 210;
                     const pageHeight = 297;
-                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                        
-                        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-                        
-                        if (imgHeight > pageHeight) {
-                            let heightLeft = imgHeight - pageHeight;
-                            let position = -pageHeight;
-                            while (heightLeft > 0) {
-                                pdf.addPage();
-                                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                                heightLeft -= pageHeight;
-                                position -= pageHeight;
-                            }
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
+                    
+                    if (imgHeight > pageHeight) {
+                        let heightLeft = imgHeight - pageHeight;
+                        let position = -pageHeight;
+                        while (heightLeft > 0) {
+                            pdf.addPage();
+                            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+                            heightLeft -= pageHeight;
+                            position -= pageHeight;
                         }
-                        
-                        const pdfBlob = pdf.output('blob');
-                        const pdfUrl = URL.createObjectURL(pdfBlob);
+                    }
+                    
+                    const pdfBlob = pdf.output('blob');
+                    const pdfUrl = URL.createObjectURL(pdfBlob);
                     const filename = `Dieta_${nombreCliente.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
                     
-                    // Descargar PDF
-                    const a = document.createElement('a');
-                    a.href = pdfUrl;
-                    a.download = filename;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    
-                    setTimeout(() => URL.revokeObjectURL(pdfUrl), 100);
-                    win.close();
-                    mostrarNotificacion('✅ PDF generado y descargado', 'success');
+                    // Descargar PDF - método mejorado para móviles
+                    if (esMovil) {
+                        // En móviles, intentar descargar directamente
+                        try {
+                            // Para iOS Safari y algunos navegadores móviles
+                            const a = document.createElement('a');
+                            a.href = pdfUrl;
+                            a.download = filename;
+                            a.style.display = 'none';
+                            document.body.appendChild(a);
+                            
+                            // Crear un evento de toque para móviles
+                            const evento = new MouseEvent('click', {
+                                bubbles: true,
+                                cancelable: true,
+                                view: window
+                            });
+                            a.dispatchEvent(evento);
+                            
+                            // Fallback: abrir en nueva pestaña si la descarga no funciona
+                            setTimeout(() => {
+                                if (document.body.contains(a)) {
+                                    // Si el elemento aún está, abrir en nueva pestaña
+                                    window.open(pdfUrl, '_blank');
+                                    document.body.removeChild(a);
+                                    mostrarNotificacion('✅ PDF generado. Ábrelo en el navegador para compartirlo.', 'info');
+                                } else {
+                                    // Si fue removido, la descarga funcionó
+                                    mostrarNotificacion('✅ PDF generado y descargado', 'success');
+                                }
+                                setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
+                            }, 100);
+                        } catch (e) {
+                            // Si falla, abrir en nueva pestaña para compartir
+                            window.open(pdfUrl, '_blank');
+                            mostrarNotificacion('✅ PDF generado. Ábrelo en el navegador para compartirlo.', 'info');
+                        }
+                        
+                        // Limpiar iframe
+                        setTimeout(() => {
+                            if (container && container.parentNode) {
+                                document.body.removeChild(container);
+                            }
+                        }, 2000);
+                    } else {
+                        // En desktop, usar el método tradicional
+                        const a = document.createElement('a');
+                        a.href = pdfUrl;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        
+                        setTimeout(() => URL.revokeObjectURL(pdfUrl), 100);
+                        
+                        mostrarNotificacion('✅ PDF generado y descargado', 'success');
+                    }
                 }).catch(error => {
                     console.error('Error generando PDF:', error);
-                    mostrarNotificacion('❌ Error al generar el PDF', 'error');
-                    win.close();
+                    mostrarNotificacion('❌ Error al generar el PDF: ' + error.message, 'error');
+                    if (container && container.parentNode) {
+                        document.body.removeChild(container);
+                    }
                 });
             } catch (error) {
                 console.error('Error:', error);
-                mostrarNotificacion('❌ Error al generar el PDF', 'error');
-                win.close();
+                mostrarNotificacion('❌ Error al generar el PDF: ' + error.message, 'error');
+                if (container && container.parentNode) {
+                    document.body.removeChild(container);
+                }
             }
-        }, 500);
+        }, esMovil ? 1000 : 500); // Más tiempo de espera en móviles
     }
     
     /**
@@ -3108,7 +3587,7 @@ function inicializarBotones() {
         // Construir HTML del PDF
         const fecha = new Date().toLocaleDateString('es-ES');
         const nombreCliente = datos.nombre || 'Cliente';
-        const headerHTML = generarHeaderPDF(datos, fecha);
+        const headerHTML = await generarHeaderPDF(datos, fecha);
         const cssHTML = generarCSSPDF();
         
         let htmlPDF = `

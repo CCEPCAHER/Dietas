@@ -228,12 +228,15 @@ class TablaEditable {
     
     // Función helper para detectar si un día es de descanso
     esDiaDescanso(nombreDia) {
+        // Si no hay datos de usuario o no hay días de entreno configurados, todos los días son de descanso por defecto
         if (!window.datosUsuario || !window.datosUsuario.diasEntreno || window.datosUsuario.diasEntreno.length === 0) {
-            return false;
+            return true;
         }
         
         // Normalizar el nombre del día: quitar tildes para coincidir con los valores del formulario
         const normalizarDia = (dia) => {
+            if (!dia) return '';
+            
             const mapaNormalizado = {
                 'Lunes': 'lunes',
                 'Martes': 'martes',
@@ -261,7 +264,23 @@ class TablaEditable {
         };
         
         const valorDia = normalizarDia(nombreDia);
-        return !window.datosUsuario.diasEntreno.includes(valorDia);
+        const diasEntreno = window.datosUsuario.diasEntreno || [];
+        
+        // Normalizar también los días en el array de días de entreno
+        const diasEntrenoNormalizados = diasEntreno.map(d => normalizarDia(d));
+        
+        // Si el día NO está en la lista de días de entreno, entonces es día de descanso
+        const esDescanso = !diasEntrenoNormalizados.includes(valorDia);
+        
+        // Debug: log para verificar el comportamiento
+        console.log(`🔍 esDiaDescanso('${nombreDia}'):`, {
+            valorDia,
+            diasEntreno: diasEntreno,
+            diasEntrenoNormalizados: diasEntrenoNormalizados,
+            esDescanso
+        });
+        
+        return esDescanso;
     }
 
     // Agregar una nueva fila vacía a una comida
@@ -1285,55 +1304,65 @@ class TablaEditable {
         this.actualizarTotalesDiarios();
     }
     
-    // Actualizar estilos visuales del contenedor según tipo de día
-    actualizarEstilosDia() {
-        const esDescanso = this.esDiaDescanso(this.diaActual);
-        const contenedor = document.querySelector('.tabla-editable-container');
-        const badgeDia = document.getElementById('badge-dia-actual');
-        const totalesDiv = document.querySelector('.totales-diarios');
-        
-        if (contenedor) {
-            // Remover clases anteriores
-            contenedor.classList.remove('dia-descanso', 'dia-entreno');
-            // Agregar clase según tipo de día
-            if (esDescanso) {
-                contenedor.classList.add('dia-descanso');
-            } else {
-                contenedor.classList.add('dia-entreno');
-            }
-        }
-        
-        // Actualizar badge visual
-        if (badgeDia) {
-            if (esDescanso) {
-                badgeDia.innerHTML = '<span class="badge-descanso">😴 DESCANSO</span>';
-            } else {
-                badgeDia.innerHTML = '<span class="badge-entreno">💪 ENTRENO</span>';
-            }
-        }
-        
-        // Actualizar estilos de totales
-        if (totalesDiv) {
-            totalesDiv.classList.remove('totales-descanso', 'totales-entreno');
-            if (esDescanso) {
-                totalesDiv.classList.add('totales-descanso');
-            } else {
-                totalesDiv.classList.add('totales-entreno');
-            }
-            
-            // Actualizar objetivos mostrados
-            const objetivos = this.obtenerObjetivosNutricionales();
-            const objetivoCal = document.getElementById('objetivo-calorias');
-            const objetivoProt = document.getElementById('objetivo-proteinas');
-            const objetivoGras = document.getElementById('objetivo-grasas');
-            const objetivoHidr = document.getElementById('objetivo-hidratos');
-            
-            if (objetivoCal) objetivoCal.textContent = `${objetivos.calorias} kcal`;
-            if (objetivoProt) objetivoProt.textContent = `${objetivos.proteinas}g`;
-            if (objetivoGras) objetivoGras.textContent = `${objetivos.grasas}g`;
-            if (objetivoHidr) objetivoHidr.textContent = `${objetivos.carbohidratos}g`;
-        }
-    }
+         // Actualizar estilos visuales del contenedor según tipo de día
+     actualizarEstilosDia() {
+         const esDescanso = this.esDiaDescanso(this.diaActual);
+         const contenedor = document.querySelector('.tabla-editable-container');
+         const badgeDia = document.getElementById('badge-dia-actual');
+         const totalesDiv = document.querySelector('.totales-diarios');
+         
+         if (contenedor) {
+             // Remover clases anteriores
+             contenedor.classList.remove('dia-descanso', 'dia-entreno');
+             // Agregar clase según tipo de día
+             if (esDescanso) {
+                 contenedor.classList.add('dia-descanso');
+             } else {
+                 contenedor.classList.add('dia-entreno');
+             }
+         }
+         
+         // Actualizar badge visual del selector de día
+         if (badgeDia) {
+             if (esDescanso) {
+                 badgeDia.innerHTML = '<span class="badge-descanso">😴 DESCANSO</span>';
+             } else {
+                 badgeDia.innerHTML = '<span class="badge-entreno">💪 ENTRENO</span>';
+             }
+         }
+         
+         // Actualizar estilos de totales
+         if (totalesDiv) {
+             totalesDiv.classList.remove('totales-descanso', 'totales-entreno');
+             if (esDescanso) {
+                 totalesDiv.classList.add('totales-descanso');
+             } else {
+                 totalesDiv.classList.add('totales-entreno');
+             }
+             
+             // Actualizar badge en el título de "Totales Diarios vs Objetivos"
+             const h3Totales = totalesDiv.querySelector('h3');
+             if (h3Totales) {
+                 const nuevoBadge = esDescanso 
+                     ? '<span class="badge-descanso" style="font-size: 0.85em; margin-left: 10px;">😴 DÍA DE DESCANSO</span>'
+                     : '<span class="badge-entreno" style="font-size: 0.85em; margin-left: 10px;">💪 DÍA DE ENTRENO</span>';
+                 // Reemplazar el badge existente manteniendo el texto "📊 Totales Diarios vs Objetivos"
+                 h3Totales.innerHTML = `📊 Totales Diarios vs Objetivos ${nuevoBadge}`;
+             }
+             
+             // Actualizar objetivos mostrados
+             const objetivos = this.obtenerObjetivosNutricionales();
+             const objetivoCal = document.getElementById('objetivo-calorias');
+             const objetivoProt = document.getElementById('objetivo-proteinas');
+             const objetivoGras = document.getElementById('objetivo-grasas');
+             const objetivoHidr = document.getElementById('objetivo-hidratos');
+             
+             if (objetivoCal) objetivoCal.textContent = `${objetivos.calorias} kcal`;
+             if (objetivoProt) objetivoProt.textContent = `${objetivos.proteinas}g`;
+             if (objetivoGras) objetivoGras.textContent = `${objetivos.grasas}g`;
+             if (objetivoHidr) objetivoHidr.textContent = `${objetivos.carbohidratos}g`;
+         }
+     }
 
     // Replicar día actual a toda la semana
     replicarDiaActualATodaLaSemana() {
