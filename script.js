@@ -3025,6 +3025,15 @@ function inicializarBotones() {
                 padding: 0 130px;
                 margin-top: 0;
             }
+            .titulo-principal {
+                font-size: 28pt;
+                font-weight: 900;
+                letter-spacing: 3px;
+                text-transform: uppercase;
+                margin: 0 0 12px 0;
+                color: #000;
+                line-height: 1.2;
+            }
             .nombre-profesional {
                 font-size: 22pt;
                 font-weight: 900;
@@ -3042,6 +3051,8 @@ function inicializarBotones() {
                 letter-spacing: 0.5px;
                 margin: 0 0 10px 0;
                 line-height: 1.4;
+                white-space: nowrap;
+                overflow: hidden;
             }
             .contacto {
                 font-size: 11pt;
@@ -3064,11 +3075,16 @@ function inicializarBotones() {
                 .header-content {
                     padding: 0 90px;
                 }
+                .titulo-principal {
+                    font-size: 20pt;
+                    letter-spacing: 2px;
+                }
                 .nombre-profesional {
                     font-size: 18pt;
                 }
                 .especialidades {
-                    font-size: 8pt;
+                    font-size: 7pt;
+                    letter-spacing: 0.3px;
                 }
             }
             .cliente-info {
@@ -3188,8 +3204,9 @@ function inicializarBotones() {
                   <div class="fecha-header">${fecha}</div>
                   ${logoHTML ? `<div class="logo-header">${logoHTML}</div>` : ''}
                   <div class="header-content">
+                      <div class="titulo-principal">PLAN DE ALIMENTACIÓN PERSONALIZADO</div>
                       <div class="nombre-profesional">MAIKA PORCUNA</div>
-                      <div class="especialidades">NUTRICIÓN / DIETÉTICA / SUPLEMENTACIÓN / NUTRICIÓN DEPORTIVA</div>
+                      <div class="especialidades">NUTRICIÓN/DIETÉTICA/SUPLEMENTACIÓN/NUTRICIÓN DEPORTIVA</div>
                       <div class="contacto">
                           <span>Maikafit1977@gmail.com</span>
                           <span>+34 650 229 987</span>
