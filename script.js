@@ -2480,7 +2480,117 @@ function inicializarBotones() {
      * @param {string} htmlPDF - HTML completo del documento
      * @param {string} nombreCliente - Nombre del cliente para el archivo
      */
-    function generarArchivoPDF(htmlPDF, nombreCliente) {
+    /**
+     * Convierte una imagen a base64
+     * @param {string} src - Ruta de la imagen
+     * @returns {Promise<string>} - Base64 de la imagen
+     */
+    function convertirImagenABase64(src) {
+        return new Promise((resolve) => {
+            // Si ya es base64, retornar directamente
+            if (src.startsWith('data:')) {
+                resolve(src);
+                return;
+            }
+            
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            
+            // Función para convertir a base64 cuando la imagen se carga
+            const convertir = function() {
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    const base64 = canvas.toDataURL('image/png');
+                    resolve(base64);
+                } catch (e) {
+                    console.warn('Error convirtiendo imagen a base64:', e);
+                    resolve(src); // Retornar la ruta original como fallback
+                }
+            };
+            
+            img.onload = convertir;
+            
+            // Si falla, intentar con diferentes rutas
+            let intentoActual = 0;
+            const rutas = [
+                src, // Ruta original
+                '/' + src, // Ruta absoluta desde raíz
+                window.location.origin + '/' + src, // Ruta completa
+                window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + src // Ruta relativa al directorio actual
+            ];
+            
+            img.onerror = function() {
+                intentoActual++;
+                if (intentoActual < rutas.length) {
+                    // Intentar siguiente ruta
+                    img.src = rutas[intentoActual];
+                } else {
+                    // Si todos fallan, retornar la ruta original
+                    console.warn('No se pudo cargar la imagen después de intentar todas las rutas:', src);
+                    resolve(src);
+                }
+            };
+            
+            // Intentar cargar la imagen
+            if (src.startsWith('http')) {
+                img.src = src;
+            } else {
+                // Probar con la primera ruta
+                img.src = rutas[0];
+            }
+        });
+    }
+    
+    /**
+     * Reemplaza todas las imágenes en el HTML con sus versiones base64
+     * @param {string} html - HTML original
+     * @returns {Promise<string>} - HTML con imágenes en base64
+     */
+    async function procesarImagenesParaPDF(html) {
+        // Buscar todas las imágenes en el HTML usando regex
+        const regexImg = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+        const matches = [];
+        let match;
+        
+        while ((match = regexImg.exec(html)) !== null) {
+            matches.push({
+                fullMatch: match[0],
+                src: match[1]
+            });
+        }
+        
+        // Convertir cada imagen a base64
+        const promesas = matches.map(async (match) => {
+            const src = match.src;
+            if (src && !src.startsWith('data:') && !src.startsWith('http')) {
+                try {
+                    // Intentar diferentes rutas
+                    let rutaAbsoluta = src;
+                    if (!src.startsWith('/')) {
+                        rutaAbsoluta = window.location.origin + '/' + src;
+                    }
+                    
+                    const base64 = await convertirImagenABase64(rutaAbsoluta);
+                    if (base64 && base64.startsWith('data:')) {
+                        // Reemplazar en el HTML
+                        const nuevoTag = match.fullMatch.replace(src, base64);
+                        html = html.replace(match.fullMatch, nuevoTag);
+                    }
+                } catch (e) {
+                    console.warn('Error procesando imagen:', src, e);
+                }
+            }
+        });
+        
+        await Promise.all(promesas);
+        return html;
+    }
+    
+    async function generarArchivoPDF(htmlPDF, nombreCliente) {
         const win = window.open('', '_blank');
         if (!win) {
             alert('Por favor, permite las ventanas emergentes para generar el PDF.');
@@ -2490,12 +2600,48 @@ function inicializarBotones() {
         win.document.write(htmlPDF);
         win.document.close();
         
-            setTimeout(() => {
-                try {
+        // Esperar a que todas las imágenes se carguen antes de generar el canvas
+        const esperarImagenes = () => {
+            return new Promise((resolve) => {
+                const imagenes = win.document.querySelectorAll('img');
+                if (imagenes.length === 0) {
+                    resolve();
+                    return;
+                }
+                
+                let cargadas = 0;
+                const total = imagenes.length;
+                
+                const verificarCarga = () => {
+                    cargadas++;
+                    if (cargadas >= total) {
+                        resolve();
+                    }
+                };
+                
+                imagenes.forEach((img) => {
+                    if (img.complete) {
+                        verificarCarga();
+                    } else {
+                        img.onload = verificarCarga;
+                        img.onerror = verificarCarga; // Continuar aunque haya error
+                    }
+                });
+                
+                // Timeout de seguridad
+                setTimeout(resolve, 3000);
+            });
+        };
+        
+        setTimeout(async () => {
+            try {
+                await esperarImagenes();
+                
                 const bodyElement = win.document.body;
                 html2canvas(bodyElement, {
                         scale: 2,
                         useCORS: true,
+                        allowTaint: false,
                         logging: false,
                         backgroundColor: '#ffffff',
                     width: bodyElement.scrollWidth,
@@ -2554,12 +2700,15 @@ function inicializarBotones() {
      * Función unificada para generar PDF profesional (blanco y negro, minimalista)
      * @param {string} fuente - 'principal' o 'tabla-editable'
      */
-    window.generarPDFProfesional = function(fuente = 'principal') {
+    window.generarPDFProfesional = async function(fuente = 'principal') {
         // Validar librerías
         if (typeof html2pdf === 'undefined' || typeof html2canvas === 'undefined') {
             alert('Error: Las librerías PDF no están cargadas. Por favor, recarga la página.');
             return;
         }
+        
+        // Mostrar notificación de carga
+        mostrarNotificacion('⏳ Generando PDF...', 'info');
         
         // Obtener datos según la fuente
         const { datos, contenidoOriginal, error } = obtenerDatosPDF(fuente);
@@ -2588,7 +2737,53 @@ function inicializarBotones() {
         
         // Agregar contenido según la fuente
         if (fuente === 'principal' && contenidoOriginal) {
+            // Procesar imágenes en el DOM real primero (para obtener imágenes ya cargadas)
+            const imagenesReales = contenidoOriginal.querySelectorAll('img[src]');
+            const imagenesBase64 = new Map();
+            
+            for (const img of imagenesReales) {
+                const src = img.getAttribute('src');
+                if (src && !src.startsWith('data:') && !src.startsWith('http')) {
+                    try {
+                        // Intentar obtener la imagen directamente del DOM si ya está cargada
+                        let base64 = null;
+                        if (img.complete && img.naturalWidth > 0) {
+                            // La imagen ya está cargada, convertirla directamente
+                            try {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = img.naturalWidth;
+                                canvas.height = img.naturalHeight;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(img, 0, 0);
+                                base64 = canvas.toDataURL('image/png');
+                            } catch (e) {
+                                // Si falla, intentar con la función de conversión
+                                base64 = await convertirImagenABase64(src);
+                            }
+                        } else {
+                            // Intentar cargar la imagen
+                            base64 = await convertirImagenABase64(src);
+                        }
+                        
+                        if (base64 && base64.startsWith('data:')) {
+                            imagenesBase64.set(src, base64);
+                        }
+                    } catch (e) {
+                        console.warn('Error procesando imagen:', src, e);
+                    }
+                }
+            }
+            
+            // Ahora clonar y reemplazar las imágenes en el clone
             const clone = contenidoOriginal.cloneNode(true);
+            const imagenesClone = clone.querySelectorAll('img[src]');
+            for (const img of imagenesClone) {
+                const src = img.getAttribute('src');
+                if (imagenesBase64.has(src)) {
+                    img.setAttribute('src', imagenesBase64.get(src));
+                }
+            }
+            
             procesarContenidoParaPDF(clone);
             htmlPDF += clone.innerHTML;
         } else if (fuente === 'tabla-editable') {
@@ -2600,8 +2795,8 @@ function inicializarBotones() {
             </html>
         `;
         
-        // Generar y descargar PDF
-        generarArchivoPDF(htmlPDF, nombreCliente);
+        // Generar y descargar PDF (ahora es async)
+        await generarArchivoPDF(htmlPDF, nombreCliente);
     };
     
     // Botón descargar PDF
