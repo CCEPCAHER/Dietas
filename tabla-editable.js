@@ -800,6 +800,9 @@ class TablaEditable {
 
     // Seleccionar un alimento del autocompletado
     seleccionarAlimento(rowId, comida, alimentoData) {
+        // Si se está editando un plan automático, resetear estadísticas primero
+        this.resetearEstadisticasPlanAutomatico();
+        
         const row = document.getElementById(rowId);
         if (!row) {
             console.error('Fila no encontrada:', rowId);
@@ -944,8 +947,39 @@ class TablaEditable {
         }
     }
 
+    // Resetear estadísticas del plan cuando se edita manualmente un plan automático
+    resetearEstadisticasPlanAutomatico() {
+        if (this.planGeneradoAutomatico && this.planSemana) {
+            console.log('🔄 Reseteando estadísticas del plan automático al editar manualmente...');
+            
+            // Resetear todos los días del planSemana a valores vacíos
+            Object.keys(this.planSemana).forEach(dia => {
+                this.planSemana[dia] = {
+                    Desayuno: { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0 },
+                    'Media Mañana': { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0 },
+                    Comida: { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0 },
+                    Merienda: { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0 },
+                    Cena: { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0 }
+                };
+            });
+            
+            // Marcar que ya se resetearon para no hacerlo de nuevo
+            this.planGeneradoAutomatico = false;
+            
+            // Actualizar estadísticas visuales
+            if (typeof window.mostrarEstadisticasPlanManual === 'function') {
+                setTimeout(() => {
+                    window.mostrarEstadisticasPlanManual();
+                }, 300);
+            }
+        }
+    }
+
     // Calcular macros basado en gramos (valores de base-datos-alimentos.js)
     calcularMacros(rowId, comida) {
+        // Si se está editando un plan automático, resetear estadísticas primero
+        this.resetearEstadisticasPlanAutomatico();
+        
         const row = document.getElementById(rowId);
         if (!row) {
             console.error('Fila no encontrada para calcular macros:', rowId);
@@ -1218,6 +1252,9 @@ class TablaEditable {
 
     // Eliminar una fila
     eliminarFila(rowId, comida) {
+        // Si se está editando un plan automático, resetear estadísticas primero
+        this.resetearEstadisticasPlanAutomatico();
+        
         const row = document.getElementById(rowId);
         if (row) {
             row.remove();

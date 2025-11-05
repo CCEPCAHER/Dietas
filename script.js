@@ -1876,6 +1876,9 @@ function mostrarTablaEditable() {
                     // Cargar datos guardados en TablaEditable
                     console.log('📋 Cargando dieta generada automáticamente para edición...', datosUsuario.planSemana);
                     
+                    // Marcar que este plan fue generado automáticamente y puede necesitar resetear estadísticas
+                    window.tablaEditable.planGeneradoAutomatico = true;
+                    
                     // Cargar planSemana en tablaEditable
                     window.tablaEditable.planSemana = datosUsuario.planSemana;
                     
