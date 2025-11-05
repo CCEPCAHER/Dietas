@@ -38,6 +38,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
+    <!-- Botón de modo oscuro -->
+    <button id="darkModeToggle" class="dark-mode-toggle" title="Cambiar modo oscuro/claro">
+        <span class="dark-mode-icon">🌙</span>
+    </button>
+    
     <div class="container">
         <div id="userInfo" class="user-info">
             <!-- Se llenará dinámicamente con auth.js -->
@@ -602,6 +607,42 @@
     <!-- Scripts en orden de dependencia -->
     <script src="firebase-config.js"></script>
     <script src="auth.js"></script>
+    <!-- Script para modo oscuro -->
+    <script>
+        // Gestor de modo oscuro
+        (function() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+            
+            // Cargar preferencia guardada
+            const savedTheme = localStorage.getItem('darkMode');
+            if (savedTheme === 'true') {
+                body.classList.add('dark-mode');
+                updateIcon();
+            }
+            
+            // Toggle del modo oscuro
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener('click', () => {
+                    body.classList.toggle('dark-mode');
+                    const isDark = body.classList.contains('dark-mode');
+                    localStorage.setItem('darkMode', isDark);
+                    updateIcon();
+                });
+            }
+            
+            function updateIcon() {
+                const icon = darkModeToggle?.querySelector('.dark-mode-icon');
+                if (icon) {
+                    if (body.classList.contains('dark-mode')) {
+                        icon.textContent = '☀️';
+                    } else {
+                        icon.textContent = '🌙';
+                    }
+                }
+            }
+        })();
+    </script>
     <script src="dietaService.js"></script>
     <script src="clienteService.js"></script>
     <script src="base-datos-alimentos.js"></script>

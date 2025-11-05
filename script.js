@@ -4582,19 +4582,34 @@ window.mostrarPreviewPDF = function(pdfUrl, pdfBlob, filename) {
     const closeBtn = document.createElement('button');
     closeBtn.innerHTML = '✕';
     closeBtn.style.cssText = `
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.95);
         border: none;
-        color: white;
-        font-size: 24px;
-        width: 40px;
-        height: 40px;
+        color: #dc3545;
+        font-size: 36px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all 0.3s ease;
         font-weight: bold;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
     `;
-    closeBtn.onmouseover = () => closeBtn.style.background = 'rgba(255, 255, 255, 0.3)';
-    closeBtn.onmouseout = () => closeBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+    closeBtn.onmouseover = () => {
+        closeBtn.style.background = 'rgba(255, 255, 255, 1)';
+        closeBtn.style.color = '#c82333';
+        closeBtn.style.transform = 'scale(1.1)';
+        closeBtn.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
+    };
+    closeBtn.onmouseout = () => {
+        closeBtn.style.background = 'rgba(255, 255, 255, 0.95)';
+        closeBtn.style.color = '#dc3545';
+        closeBtn.style.transform = 'scale(1)';
+        closeBtn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+    };
     closeBtn.onclick = () => {
         URL.revokeObjectURL(pdfUrl);
         document.body.removeChild(modal);

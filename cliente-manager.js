@@ -1170,7 +1170,7 @@ class ClienteManager {
             <div class="modal-content" style="max-width: 700px;">
                 <div class="modal-header">
                     <h2>📏 Registrar Nuevas Medidas Corporales</h2>
-                    <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                    <span class="close-modal" onclick="this.closest('.modal').remove()">&times;</span>
                 </div>
                 <form id="formAgregarMedidas" class="form-medidas">
                     <div class="form-group">
@@ -1340,7 +1340,7 @@ class ClienteManager {
             <div class="modal-content" style="max-width: 600px;">
                 <div class="modal-header">
                     <h2>➕ Agregar Registro de Progreso</h2>
-                    <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                    <span class="close-modal" onclick="this.closest('.modal').remove()">&times;</span>
                 </div>
                 <form id="formAgregarProgreso" class="form-progreso">
                     <div class="form-group">
@@ -1444,7 +1444,7 @@ class ClienteManager {
             <div class="modal-content" style="max-width: 700px;">
                 <div class="modal-header">
                     <h2>➕ Nueva Consulta</h2>
-                    <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                    <span class="close-modal" onclick="this.closest('.modal').remove()">&times;</span>
                 </div>
                 <form id="formAgregarConsulta" class="form-consulta">
                     <div class="form-group">
@@ -1523,7 +1523,7 @@ class ClienteManager {
             <div class="modal-content" style="max-width: 700px;">
                 <div class="modal-header">
                     <h2>✏️ Editar Cliente: ${cliente.nombre || 'Sin nombre'}</h2>
-                    <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                    <span class="close-modal" onclick="this.closest('.modal').remove()">&times;</span>
                 </div>
                 <form id="formEditarCliente" class="form-editar-cliente">
                     <div class="form-row">
