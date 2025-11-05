@@ -10,9 +10,10 @@
     --bg-secondary: rgba(255, 255, 255, 0.98);
     --bg-card: white;
     --bg-section: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 50%, #e1bee7 100%);
-    --text-primary: #333;
-    --text-secondary: #666;
-    --text-heading: #a855f7;
+    --text-primary: #1a1a1a;
+    --text-secondary: #4a4a4a;
+    --text-heading: #7c3aed;
+    --text-strong: #5b21b6;
     --border-color: rgba(212, 165, 247, 0.3);
     --shadow-color: rgba(248, 178, 211, 0.4);
     --shadow-hover: rgba(248, 178, 211, 0.5);
@@ -23,9 +24,10 @@ body.dark-mode {
     --bg-secondary: rgba(30, 30, 46, 0.95);
     --bg-card: #1e1e2e;
     --bg-section: linear-gradient(135deg, #2d1b3d 0%, #3d1f4d 50%, #4d2a5d 100%);
-    --text-primary: #e0e0e0;
-    --text-secondary: #b0b0b0;
-    --text-heading: #d4a5f7;
+    --text-primary: #f5f5f5;
+    --text-secondary: #d4d4d4;
+    --text-heading: #e9d5ff;
+    --text-strong: #f3e8ff;
     --border-color: rgba(212, 165, 247, 0.2);
     --shadow-color: rgba(0, 0, 0, 0.5);
     --shadow-hover: rgba(212, 165, 247, 0.3);
@@ -41,6 +43,9 @@ body {
     background-size: 200% 200%;
     color: var(--text-primary);
     transition: background 0.5s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 @keyframes gradientShift {
@@ -120,12 +125,18 @@ body {
 }
 
 .subtitle-header {
-    color: #a855f7;
+    color: #7c3aed;
     font-size: 1.1em;
-    font-weight: 600;
+    font-weight: 700;
     margin: 10px 0;
     border-bottom: none !important;
     padding-bottom: 0 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .subtitle-header {
+    color: #e9d5ff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 .plan-title {
@@ -141,10 +152,16 @@ body {
 
 h1 {
     text-align: center;
-    color: var(--text-primary);
+    color: var(--text-strong);
     margin-bottom: 30px;
     font-size: 2.5em;
+    font-weight: 800;
     transition: color 0.3s ease;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode h1 {
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 h2 {
@@ -164,8 +181,13 @@ h3 {
     color: var(--text-heading);
     margin: 20px 0 15px 0;
     font-size: 1.3em;
-    font-weight: 600;
+    font-weight: 700;
     transition: color 0.3s ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode h3 {
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 .form-container {
@@ -186,8 +208,8 @@ h3 {
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    color: var(--text-secondary);
-    font-weight: 600;
+    color: var(--text-strong);
+    font-weight: 700;
     font-size: 1em;
     transition: color 0.3s ease;
 }
@@ -337,9 +359,11 @@ h3 {
 }
 
 .tmb-description {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 0.95em;
     margin: 0;
+    font-weight: 500;
+    line-height: 1.5;
 }
 
 .gasto-calorico h4 {
@@ -380,10 +404,12 @@ h3 {
 }
 
 .actividad-desc {
-    font-size: 0.85em;
-    color: #666;
+    font-size: 0.9em;
+    color: var(--text-secondary);
     margin-bottom: 12px;
     min-height: 40px;
+    font-weight: 500;
+    line-height: 1.5;
 }
 
 .actividad-tdee {
@@ -470,9 +496,10 @@ body.dark-mode .checkbox-label:hover {
 
 .macro-item label {
     display: block;
-    color: #a855f7;
-    font-weight: 600;
+    color: var(--text-heading);
+    font-weight: 700;
     margin-bottom: 8px;
+    font-size: 1em;
 }
 
 .macro-item input {
@@ -587,12 +614,52 @@ body.dark-mode .checkbox-label:hover {
 
 /* Ajustar grid cuando aparece el botón de WhatsApp en móvil */
 @media (max-width: 768px) {
+    body {
+        padding: 15px;
+        font-size: 16px;
+    }
+    
+    .container {
+        padding: 20px;
+        border-radius: 20px;
+    }
+    
     .btn-container {
         grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
     }
     
     .btn-whatsapp {
         grid-column: span 2; /* Ocupa todo el ancho en móviles */
+    }
+    
+    /* Mejorar contraste general en tablets y móviles */
+    h1, h2, h3 {
+        font-weight: 700;
+    }
+    
+    .main-header h1 {
+        font-size: 2.2em;
+    }
+    
+    /* Tabs más grandes y visibles */
+    .tab {
+        padding: 14px 20px;
+        font-size: 0.9em;
+        font-weight: 700;
+        min-height: 48px;
+    }
+    
+    /* Botones más grandes */
+    .btn-submit,
+    .btn-download,
+    .btn-new,
+    .btn-save,
+    .btn-edit {
+        padding: 14px;
+        font-size: 1.1em;
+        font-weight: 700;
+        min-height: 48px;
     }
 }
 
@@ -1038,8 +1105,10 @@ table th,
 table td {
     padding: 12px;
     text-align: center;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     font-size: 0.95em;
+    color: var(--text-primary);
+    font-weight: 500;
 }
 
 table th {
@@ -1061,14 +1130,18 @@ table tbody tr:hover {
 }
 
 .tabla-macros th {
-    background: #90ee90;
-    color: #333;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
     font-size: 0.85em;
     white-space: nowrap;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .tabla-macros td {
-    background: #e0ffe0;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-weight: 500;
 }
 
 /* Estilos para columnas de seguimiento */
@@ -1102,12 +1175,16 @@ table tbody tr:hover {
 }
 
 .tabla-info th {
-    background: #87ceeb;
-    color: #333;
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    color: white;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .tabla-info td {
-    background: #d4f1f9;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-weight: 500;
 }
 
 /* Centrar contenedores de tablas */
@@ -1136,12 +1213,16 @@ table tbody tr:hover {
 }
 
 .tabla-horarios th {
-    background: #ffd700;
-    color: #333;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .tabla-horarios td {
-    background: #fffacd;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-weight: 500;
 }
 
 /* Plan de alimentación */
@@ -1267,21 +1348,25 @@ table tbody tr:hover {
 }
 
 .tabla-comidas th {
-    background: #90ee90;
-    color: #333;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
     font-size: 0.9em;
     padding: 10px;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .tabla-comidas td {
-    background: white;
+    background: var(--bg-card);
     padding: 15px;
     vertical-align: top;
+    color: var(--text-primary);
+    font-weight: 500;
 }
 
 .comida-header {
-    font-weight: 600;
-    color: #667eea;
+    font-weight: 700;
+    color: var(--text-heading);
     font-size: 1.1em;
     margin-bottom: 10px;
 }
@@ -1445,11 +1530,24 @@ table tbody tr:hover {
 @media (max-width: 480px) {
     body {
         padding: 10px;
+        font-size: 16px;
     }
     
     .container {
         padding: 15px;
         border-radius: 15px;
+        margin: 0;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    /* Botón modo oscuro más pequeño en móvil */
+    .dark-mode-toggle {
+        width: 45px;
+        height: 45px;
+        top: 10px;
+        right: 10px;
+        font-size: 20px;
     }
     
     .main-header {
@@ -1468,40 +1566,51 @@ table tbody tr:hover {
     }
     
     .main-header h1 {
-        font-size: 2em;
+        font-size: 1.8em;
         letter-spacing: 1px;
+        font-weight: 900;
+        line-height: 1.2;
     }
     
     .subtitle-header {
-        font-size: 0.85em;
+        font-size: 0.9em;
+        font-weight: 700;
+        line-height: 1.3;
     }
     
     .plan-title {
-        font-size: 1.2em;
+        font-size: 1.1em;
+        font-weight: 700;
     }
     
     h1 {
-        font-size: 1.5em;
+        font-size: 1.8em;
         margin-bottom: 20px;
+        font-weight: 800;
+        line-height: 1.2;
     }
     
     h2 {
-        font-size: 1.2em;
+        font-size: 1.3em;
         margin: 20px 0 10px 0;
+        font-weight: 700;
+        line-height: 1.3;
     }
     
     h3 {
-        font-size: 1.1em;
+        font-size: 1.15em;
+        font-weight: 700;
     }
     
     .form-row {
         grid-template-columns: 1fr;
-        gap: 10px;
+        gap: 12px;
     }
     
     .macro-info {
         grid-template-columns: 1fr;
         padding: 15px;
+        gap: 12px;
     }
     
     .btn-submit,
@@ -1509,20 +1618,43 @@ table tbody tr:hover {
     .btn-new,
     .btn-save,
     .btn-edit {
+        font-size: 1.1em;
+        padding: 14px;
+        font-weight: 700;
+        min-height: 48px;
+    }
+    
+    .btn-container {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    
+    .btn-container button {
+        width: 100%;
+        padding: 14px;
         font-size: 1em;
-        padding: 12px;
+        font-weight: 700;
+        min-height: 48px;
     }
     
     .tabs {
-        gap: 5px;
+        gap: 8px;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        padding: 5px 0;
+        margin: 15px 0;
     }
     
     .tab {
-        padding: 8px 10px;
-        font-size: 0.7em;
+        padding: 12px 16px;
+        font-size: 0.85em;
         white-space: nowrap;
+        font-weight: 700;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .user-menu {
@@ -1546,13 +1678,16 @@ table tbody tr:hover {
     
     .modal-content {
         margin: 5% auto;
-        padding: 15px;
+        padding: 20px;
         width: 95%;
+        max-width: 95%;
+        border-radius: 15px;
     }
     
     .modal-extra-large {
         width: 95%;
         max-width: 95%;
+        padding: 20px;
     }
     
     /* Botones de cierre más grandes en móviles */
@@ -1567,14 +1702,42 @@ table tbody tr:hover {
         min-height: 55px !important;
     }
     
+    /* Mejorar legibilidad en modales móviles */
+    .modal-content h2 {
+        font-size: 1.4em;
+        font-weight: 800;
+        margin-bottom: 15px;
+        line-height: 1.3;
+    }
+    
+    .modal-content p,
+    .modal-content label {
+        font-size: 1em;
+        font-weight: 600;
+        line-height: 1.5;
+    }
+    
     .tabla-comidas {
         display: block;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        margin: 15px 0;
     }
     
     .tabla-comidas table {
         min-width: 700px;
+    }
+    
+    .tabla-comidas th {
+        font-size: 0.85em;
+        padding: 10px 8px;
+        font-weight: 700;
+    }
+    
+    .tabla-comidas td {
+        font-size: 0.85em;
+        padding: 12px 8px;
+        font-weight: 500;
     }
     
     /* Tablas responsive */
@@ -1582,6 +1745,20 @@ table tbody tr:hover {
         display: block;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        font-size: 0.9em;
+    }
+    
+    table th {
+        font-size: 0.85em;
+        padding: 10px 8px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    
+    table td {
+        font-size: 0.85em;
+        padding: 10px 8px;
+        font-weight: 500;
     }
     
     .macro-table table,
@@ -1593,9 +1770,52 @@ table tbody tr:hover {
         min-width: 300px;
     }
     
+    /* Mejorar contraste en tablas móviles */
+    table th {
+        font-weight: 700;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    
+    table td {
+        font-weight: 600;
+    }
+    
     .dia-plan {
         padding: 15px !important;
         margin-bottom: 20px !important;
+    }
+    
+    .dia-plan h3,
+    .dia-titulo-header {
+        font-size: 1.1em;
+        font-weight: 700;
+        padding: 12px;
+    }
+    
+    /* Mejorar legibilidad de textos en móviles */
+    p, span, div, li {
+        font-size: 1em;
+        line-height: 1.6;
+        color: var(--text-primary);
+        font-weight: 500;
+    }
+    
+    /* Labels y textos importantes más visibles */
+    .form-group label,
+    label {
+        font-size: 1em;
+        font-weight: 700;
+        color: var(--text-strong);
+        margin-bottom: 10px;
+    }
+    
+    /* Inputs más grandes para mejor usabilidad táctil */
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 16px !important;
+        padding: 14px;
+        min-height: 48px;
     }
     
     .boton-flotante {
@@ -1612,25 +1832,45 @@ table tbody tr:hover {
     /* Checkboxes responsivos */
     .checkbox-group {
         grid-template-columns: 1fr;
-        gap: 8px;
+        gap: 10px;
+        padding: 15px;
     }
     
     .checkbox-label {
-        padding: 8px;
-        font-size: 0.9em;
+        padding: 12px;
+        font-size: 1em;
+        font-weight: 600;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .checkbox-label input[type="checkbox"] {
+        width: 24px;
+        height: 24px;
+        margin-right: 12px;
     }
     
     /* TMB section mobile */
     .tmb-section {
-        padding: 15px;
+        padding: 20px;
+        margin: 20px 0;
     }
     
     .tmb-section h3 {
-        font-size: 1.2em;
+        font-size: 1.3em;
+        font-weight: 700;
+        margin-bottom: 15px;
     }
     
     .tmb-number {
-        font-size: 1.8em;
+        font-size: 2em;
+        font-weight: 800;
+    }
+    
+    .tmb-label {
+        font-size: 1em;
+        font-weight: 700;
     }
     
     .actividad-grid {
@@ -1638,7 +1878,18 @@ table tbody tr:hover {
     }
     
     .actividad-card {
-        padding: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .actividad-nivel {
+        font-size: 1em;
+        font-weight: 700;
+    }
+    
+    .actividad-tdee {
+        font-size: 1.3em;
+        font-weight: 800;
     }
     
     /* Tooltips mobile */
@@ -2163,10 +2414,38 @@ button, .btn-login, .btn-logout, .btn-dietas, .btn-clientes, .btn-gestor-aliment
     -webkit-tap-highlight-color: rgba(102, 126, 234, 0.2);
 }
 
-/* Prevenir zoom en inputs en iOS */
+/* Prevenir zoom en inputs en iOS - pero mantener tamaño legible */
 @media (max-width: 768px) {
     input, select, textarea {
         font-size: 16px !important;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+    
+    /* Mejorar accesibilidad táctil */
+    button, a, .tab, .checkbox-label {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Espaciado mejorado en móviles */
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        margin-bottom: 10px;
+    }
+    
+    /* Headers más visibles */
+    .main-header {
+        margin-bottom: 30px;
+    }
+    
+    /* Contenedor principal más ancho en móviles */
+    .container {
+        width: calc(100% - 20px);
+        margin: 0 auto;
     }
 }
 
@@ -3187,7 +3466,9 @@ body.dark-mode .dark-mode-icon {
 
 .comida-header h3 {
     margin: 0;
-    color: #667eea;
+    color: var(--text-heading);
+    font-weight: 700;
+    font-size: 1.2em;
 }
 
 .btn-add-alimento {
