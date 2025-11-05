@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gestión de Alimentos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.9em;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 800px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 2em;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card h3 {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍎 Gestión de Base de Datos de Alimentos</h1>
+            <p>Administra, agrega, edita y elimina alimentos</p>
+        </div>
+
+        <div class="content">
+            <div class="stats" id="stats">
+                <div class="stat-card">
+                    <h3 id="totalAlimentos">0</h3>
+                    <p>Total Alimentos</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalCategorias">0</h3>
+                    <p>Categorías</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalSubcategorias">0</h3>
+                    <p>Subcategorías</p>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-success" onclick="abrirModalAgregar()">➕ Agregar Alimento</button>
+                <button class="btn btn-primary" onclick="exportarBaseDatos()">📥 Exportar Base de Datos</button>
+                <button class="btn btn-primary" onclick="importarBaseDatos()">📤 Importar Base de Datos</button>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Buscar por nombre, categoría, marca..." oninput="filtrarAlimentos()">
+                </div>
+            </div>
+
+            <div class="filters">
+                <select class="filter-select" id="filterCategoria" onchange="filtrarAlimentos()">
+                    <option value="">Todas las categorías</option>
+                </select>
+                <select class="filter-select" id="filterSubcategoria" onchange="filtrarAlimentos()">
+                    <option value="">Todas las subcategorías</option>
+                </select>
+            </div>
+
+            <div class="table-container">
+                <table id="alimentosTable">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Subcategoría</th>
+                            <th>Proteínas</th>
+                            <th>Carbohidratos</th>
+                            <th>Grasas</th>
+                            <th>Calorías</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alimentosBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar/editar alimento -->
+    <div id="modalAlimento" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <h2 id="modalTitle">Agregar Nuevo Alimento</h2>
+            
+            <form id="formAlimento" onsubmit="guardarAlimento(event)">
+                <div class="form-group">
+                    <label>Nombre del alimento *</label>
+                    <input type="text" id="nombre" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Categoría principal *</label>
+                        <select id="categoria_principal" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="Proteínas">Proteínas</option>
+                            <option value="Hidratos de carbono">Hidratos de carbono</option>
+                            <option value="Grasas">Grasas</option>
+                            <option value="Verduras">Verduras</option>
+                            <option value="Fruta">Fruta</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Subcategoría *</label>
+                        <select id="subcategoria" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="Carne blanca">Carne blanca</option>
+                            <option value="Carne roja">Carne roja</option>
+                            <option value="Pescado azul">Pescado azul</option>
+                            <option value="Pescado blanco">Pescado blanco</option>
+                            <option value="Marisco">Marisco</option>
+                            <option value="Cereal">Cereal</option>
+                            <option value="Pan">Pan</option>
+                            <option value="Pasta">Pasta</option>
+                            <option value="Tubérculo">Tubérculo</option>
+                            <option value="Legumbres">Legumbres</option>
+                            <option value="Fruto seco">Fruto seco</option>
+                            <option value="Semilla">Semilla</option>
+                            <option value="Postre">Postre</option>
+                            <option value="Bebida">Bebida</option>
+                            <option value="Otros">Otros</option>
+                            <option value="Plato preparado">Plato preparado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Presentación</label>
+                        <input type="text" id="presentacion" placeholder="Ej: Envase individual, Cucharada sopera">
+                    </div>
+                    <div class="form-group">
+                        <label>Peso</label>
+                        <input type="text" id="peso" placeholder="Ej: 200 g, 125 g">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Marca</label>
+                        <input type="text" id="marca" placeholder="Nombre de la marca">
+                    </div>
+                    <div class="form-group">
+                        <label>Producto</label>
+                        <input type="text" id="producto" placeholder="Nombre comercial del producto">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Notas</label>
+                    <textarea id="notas" rows="2" placeholder="Información adicional, disponibilidad, etc."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Proteínas (g por 100g) *</label>
+                        <input type="number" id="proteínas" step="0.1" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Carbohidratos (g por 100g) *</label>
+                        <input type="number" id="carbohidratos" step="0.1" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Grasas (g por 100g) *</label>
+                        <input type="number" id="grasas" step="0.1" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Fibra (g por 100g)</label>
+                        <input type="number" id="fibra" step="0.1" min="0" placeholder="Opcional">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Azúcares (g por 100g)</label>
+                        <input type="number" id="azucar" step="0.1" min="0" placeholder="Opcional">
+                    </div>
+                    <div class="form-group">
+                        <label>Calorías</label>
+                        <input type="number" id="calorias" step="1" min="0" placeholder="Auto-calculado" readonly>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn" onclick="cerrarModal()" style="background: #6c757d; color: white;">Cancelar</button>
+                    <button type="submit" class="btn btn-success">💾 Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="base-datos-alimentos.js"></script>
+    <script>
+        let baseDatosCompleta = [];
+        let baseDatosFiltrada = [];
+        let indiceEdicion = -1;
+
+        // Inicializar
+        window.addEventListener('DOMContentLoaded', () => {
+            cargarBaseDatos();
+            actualizarCalorias();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Auto-cálculo de calorías
+            document.getElementById('proteínas').addEventListener('input', actualizarCalorias);
+            document.getElementById('carbohidratos').addEventListener('input', actualizarCalorias);
+            document.getElementById('grasas').addEventListener('input', actualizarCalorias);
+        }
+
+        function actualizarCalorias() {
+            const proteinas = parseFloat(document.getElementById('proteínas').value) || 0;
+            const carbohidratos = parseFloat(document.getElementById('carbohidratos').value) || 0;
+            const grasas = parseFloat(document.getElementById('grasas').value) || 0;
+            
+            const calorias = (proteinas * 4) + (carbohidratos * 4) + (grasas * 9);
+            document.getElementById('calorias').value = Math.round(calorias);
+        }
+
+        function cargarBaseDatos() {
+            baseDatosCompleta = JSON.parse(JSON.stringify(baseDatosAlimentos));
+            baseDatosFiltrada = baseDatosCompleta;
+            
+            actualizarEstadisticas();
+            poblarFiltros();
+            renderizarTabla();
+        }
+
+        function actualizarEstadisticas() {
+            document.getElementById('totalAlimentos').textContent = baseDatosCompleta.length;
+            
+            const categorias = new Set(baseDatosCompleta.map(a => a.categoria_principal || a['CATEGORÍA PRINCIPAL']));
+            document.getElementById('totalCategorias').textContent = categorias.size;
+            
+            const subcategorias = new Set(baseDatosCompleta.map(a => a.subcategoria || a.CLASIFICACIÓN));
+            document.getElementById('totalSubcategorias').textContent = subcategorias.size;
+        }
+
+        function poblarFiltros() {
+            const categorias = [...new Set(baseDatosCompleta.map(a => a.categoria_principal || a['CATEGORÍA PRINCIPAL']))].sort();
+            const selectCategoria = document.getElementById('filterCategoria');
+            
+            categorias.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                selectCategoria.appendChild(option);
+            });
+        }
+
+        function renderizarTabla() {
+            const tbody = document.getElementById('alimentosBody');
+            tbody.innerHTML = '';
+
+            baseDatosFiltrada.forEach((alimento, index) => {
+                const nombre = alimento.nombre || alimento.ALIMENTO;
+                const categoria = alimento.categoria_principal || alimento['CATEGORÍA PRINCIPAL'] || '';
+                const subcategoria = alimento.subcategoria || alimento.CLASIFICACIÓN || '';
+                const proteinas = parseFloat(alimento.proteínas || alimento.PROTEÍNAS || 0);
+                const carbohidratos = parseFloat(alimento.carbohidratos || alimento.HIDRATOS || 0);
+                const grasas = parseFloat(alimento.grasas || alimento.GRASAS || 0);
+                const calorias = parseFloat(alimento.calorias || alimento.CALORÍAS || 0) || 
+                                Math.round((proteinas * 4) + (carbohidratos * 4) + (grasas * 9));
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${nombre}</strong></td>
+                    <td>${categoria}</td>
+                    <td>${subcategoria}</td>
+                    <td>${proteinas.toFixed(1)}g</td>
+                    <td>${carbohidratos.toFixed(1)}g</td>
+                    <td>${grasas.toFixed(1)}g</td>
+                    <td>${calorias} kcal</td>
+                    <td>
+                        <button class="btn btn-sm" style="background: #667eea; color: white; margin-right: 5px;" onclick="editarAlimento(${index})">✏️ Editar</button>
+                        <button class="btn btn-sm btn-danger" onclick="eliminarAlimento(${index})">🗑️ Eliminar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filtrarAlimentos() {
+            const busqueda = document.getElementById('searchInput').value.toLowerCase();
+            const categoria = document.getElementById('filterCategoria').value;
+            
+            baseDatosFiltrada = baseDatosCompleta.filter(alimento => {
+                const nombre = (alimento.nombre || alimento.ALIMENTO || '').toLowerCase();
+                const cat = alimento.categoria_principal || alimento['CATEGORÍA PRINCIPAL'] || '';
+                const marca = (alimento.marca || alimento['MARCA REGISTRADA'] || '').toLowerCase();
+                const producto = (alimento.producto || alimento['NOMBRE DEL PRODUCTO'] || '').toLowerCase();
+                
+                const coincideBusqueda = !busqueda || 
+                    nombre.includes(busqueda) || 
+                    marca.includes(busqueda) || 
+                    producto.includes(busqueda);
+                
+                const coincideCategoria = !categoria || cat === categoria;
+                
+                return coincideBusqueda && coincideCategoria;
+            });
+            
+            renderizarTabla();
+        }
+
+        function abrirModalAgregar() {
+            document.getElementById('modalTitle').textContent = 'Agregar Nuevo Alimento';
+            document.getElementById('formAlimento').reset();
+            document.getElementById('calorias').value = 0;
+            indiceEdicion = -1;
+            document.getElementById('modalAlimento').style.display = 'block';
+        }
+
+        function editarAlimento(index) {
+            const alimento = baseDatosFiltrada[index];
+            const indiceOriginal = baseDatosCompleta.indexOf(alimento);
+            
+            document.getElementById('modalTitle').textContent = 'Editar Alimento';
+            
+            document.getElementById('nombre').value = alimento.nombre || alimento.ALIMENTO || '';
+            document.getElementById('categoria_principal').value = alimento.categoria_principal || alimento['CATEGORÍA PRINCIPAL'] || '';
+            document.getElementById('subcategoria').value = alimento.subcategoria || alimento.CLASIFICACIÓN || '';
+            document.getElementById('presentacion').value = alimento.presentacion || alimento.UNIDAD || '';
+            document.getElementById('peso').value = alimento.peso || alimento['PESO POR UNIDAD'] || '';
+            document.getElementById('marca').value = alimento.marca || alimento['MARCA REGISTRADA'] || '';
+            document.getElementById('producto').value = alimento.producto || alimento['NOMBRE DEL PRODUCTO'] || '';
+            document.getElementById('notas').value = alimento.notas || alimento['OTRAS NOTAS'] || '';
+            document.getElementById('proteínas').value = alimento.proteínas || alimento.PROTEÍNAS || 0;
+            document.getElementById('carbohidratos').value = alimento.carbohidratos || alimento.HIDRATOS || 0;
+            document.getElementById('grasas').value = alimento.grasas || alimento.GRASAS || 0;
+            document.getElementById('fibra').value = alimento.fibra || alimento.FIBRA || '';
+            document.getElementById('azucar').value = alimento.azucar || alimento.AZÚCARES || '';
+            
+            actualizarCalorias();
+            indiceEdicion = indiceOriginal;
+            
+            document.getElementById('modalAlimento').style.display = 'block';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalAlimento').style.display = 'none';
+        }
+
+        function guardarAlimento(event) {
+            event.preventDefault();
+            
+            const nuevoAlimento = {
+                nombre: document.getElementById('nombre').value,
+                categoria_principal: document.getElementById('categoria_principal').value,
+                subcategoria: document.getElementById('subcategoria').value,
+                presentacion: document.getElementById('presentacion').value,
+                peso: document.getElementById('peso').value,
+                marca: document.getElementById('marca').value,
+                producto: document.getElementById('producto').value,
+                notas: document.getElementById('notas').value,
+                proteínas: parseFloat(document.getElementById('proteínas').value),
+                carbohidratos: parseFloat(document.getElementById('carbohidratos').value),
+                grasas: parseFloat(document.getElementById('grasas').value),
+                fibra: document.getElementById('fibra').value ? parseFloat(document.getElementById('fibra').value) : undefined,
+                azucar: document.getElementById('azucar').value ? parseFloat(document.getElementById('azucar').value) : undefined
+            };
+            
+            if (indiceEdicion >= 0) {
+                baseDatosCompleta[indiceEdicion] = nuevoAlimento;
+            } else {
+                baseDatosCompleta.push(nuevoAlimento);
+            }
+            
+            cargarBaseDatos();
+            cerrarModal();
+        }
+
+        function eliminarAlimento(index) {
+            if (!confirm('¿Estás seguro de eliminar este alimento?')) return;
+            
+            const alimento = baseDatosFiltrada[index];
+            const indiceOriginal = baseDatosCompleta.indexOf(alimento);
+            
+            baseDatosCompleta.splice(indiceOriginal, 1);
+            cargarBaseDatos();
+        }
+
+        function exportarBaseDatos() {
+            const dataStr = JSON.stringify(baseDatosCompleta, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'base-datos-alimentos-export.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importarBaseDatos() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        if (Array.isArray(data)) {
+                            baseDatosCompleta = data;
+                            cargarBaseDatos();
+                            alert('✅ Base de datos importada correctamente');
+                        } else {
+                            alert('❌ El archivo no es válido');
+                        }
+                    } catch (error) {
+                        alert('❌ Error al leer el archivo: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = (event) => {
+            const modal = document.getElementById('modalAlimento');
+            if (event.target === modal) {
+                cerrarModal();
+            }
+        }
+    </script>
+</body>
+</html>
+
