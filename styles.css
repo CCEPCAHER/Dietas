@@ -3811,19 +3811,23 @@ body.dark-mode .comida-header h3 {
 /* Cuando hay un dropdown abierto, ocultar visualmente los campos de búsqueda de otras filas */
 body:has(.autocomplete-list:not(.autocomplete-list-hidden)) .autocomplete-container:not(:has(.autocomplete-list:not(.autocomplete-list-hidden))) {
     position: relative;
-    z-index: 1; /* Menor z-index que el dropdown */
+    z-index: 1 !important; /* Menor z-index que el dropdown */
+    pointer-events: none !important;
 }
 
 /* Ocultar visualmente los campos de búsqueda que están debajo de un dropdown abierto */
 body:has(.autocomplete-list:not(.autocomplete-list-hidden)) .autocomplete-container:not(:has(.autocomplete-list:not(.autocomplete-list-hidden))) .input-alimento {
     position: relative;
-    z-index: 1;
+    z-index: 1 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
 
 /* Asegurar que el dropdown esté siempre por encima */
 .autocomplete-list:not(.autocomplete-list-hidden) {
     position: absolute !important;
-    z-index: 10000 !important;
+    z-index: 99999 !important;
     background: white !important;
 }
 
@@ -3839,18 +3843,22 @@ body:has(.autocomplete-list:not(.autocomplete-list-hidden)) .autocomplete-contai
     max-height: 360px; /* lista más larga */
     overflow-y: auto;
     overflow-x: hidden; /* Prevenir scroll horizontal */
-    z-index: 10000 !important; /* z-index muy alto para estar por encima de todo */
+    z-index: 99999 !important; /* z-index muy alto para estar por encima de todo */
     margin-top: 2px;
     overscroll-behavior: contain;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     pointer-events: auto; /* Asegurar que el dropdown reciba eventos del mouse */
     /* Asegurar que el fondo sea opaco */
     opacity: 1 !important;
+    visibility: visible !important;
     /* Prevenir que elementos de abajo se vean a través */
     isolation: isolate;
     /* Asegurar que el fondo cubra completamente los elementos de abajo */
     will-change: transform;
     transform: translateZ(0); /* Forzar capa de composición para mejor rendimiento */
+    /* Asegurar que el fondo sea completamente opaco */
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
 }
 
 /* Asegurar que no se muestren campos de búsqueda dentro del dropdown */
@@ -3897,7 +3905,7 @@ body:has(.autocomplete-list:not(.autocomplete-list-hidden)) .autocomplete-contai
 
 /* Asegurar que cuando el mouse está sobre el dropdown, los campos de otras filas permanezcan ocultos */
 .autocomplete-list:hover {
-    z-index: 10000 !important;
+    z-index: 99999 !important;
     background: white !important;
     position: absolute !important;
 }

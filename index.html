@@ -646,6 +646,7 @@
     <script src="dietaService.js"></script>
     <script src="clienteService.js"></script>
     <script src="base-datos-alimentos.js"></script>
+    <script src="alimentoService.js"></script>
     <script src="generador-dietas.js"></script>
     <!-- editor-dietas.js REMOVIDO: Sistema antiguo reemplazado por tabla-editable.js -->
     <script src="verificar-firestore.js"></script>
@@ -725,6 +726,26 @@
         
         // La persistencia de Firebase Auth ya está configurada en firebase-config.js
         // La sesión se mantendrá incluso después de actualizar la PWA
+    </script>
+    
+    <!-- Verificación de carga de scripts -->
+    <script>
+        // Verificar que todos los scripts necesarios se hayan cargado
+        window.addEventListener('load', function() {
+            console.log('🔍 Verificando scripts cargados...');
+            console.log('GestorAlimentosManager:', typeof window.GestorAlimentosManager);
+            console.log('gestorAlimentosManager:', typeof window.gestorAlimentosManager);
+            console.log('AlimentoService:', typeof window.alimentoService);
+            console.log('baseDatosAlimentos:', typeof window.baseDatosAlimentos);
+            
+            // Si GestorAlimentosManager no está disponible, intentar cargarlo manualmente
+            if (typeof window.GestorAlimentosManager === 'undefined') {
+                console.error('❌ GestorAlimentosManager no está disponible después de cargar todos los scripts');
+                console.log('Scripts cargados:', Array.from(document.querySelectorAll('script[src]')).map(s => s.src));
+            } else {
+                console.log('✅ GestorAlimentosManager está disponible');
+            }
+        });
     </script>
 </body>
 </html>

@@ -12,22 +12,42 @@ class TablaEditable {
         this.init();
     }
 
-    init() {
+    async init() {
         // Inicializar estructura de datos
         this.comidas.forEach(comida => {
             this.planDatos[comida] = [];
         });
         
-        // Cargar base de datos de alimentos
-        this.cargarBaseAlimentos();
+        // Cargar base de datos de alimentos (async)
+        await this.cargarBaseAlimentos();
     }
 
-    cargarBaseAlimentos() {
+    async cargarBaseAlimentos() {
+        // Intentar cargar desde Firebase primero (a través de AlimentoService)
+        if (window.alimentoService) {
+            try {
+                this.alimentos = await window.alimentoService.obtenerAlimentos();
+                if (this.alimentos && this.alimentos.length > 0) {
+                    console.log(`📦 Base de datos cargada desde Firebase: ${this.alimentos.length} alimentos disponibles`);
+                    
+                    // Agregar listener para recargar cuando haya cambios
+                    window.alimentoService.agregarListener(() => {
+                        this.recargarAlimentos();
+                    });
+                    
+                    return true;
+                }
+            } catch (e) {
+                console.error('Error al cargar base de alimentos desde Firebase:', e);
+            }
+        }
+        
+        // Fallback a base-datos-alimentos.js si Firebase no está disponible
         if (typeof window.obtenerTodosLosAlimentos === 'function') {
             try {
                 this.alimentos = window.obtenerTodosLosAlimentos();
                 if (this.alimentos && this.alimentos.length > 0) {
-                    console.log(`📦 Base de datos cargada: ${this.alimentos.length} alimentos disponibles`);
+                    console.log(`📦 Base de datos cargada desde base-datos-alimentos.js: ${this.alimentos.length} alimentos disponibles`);
                     return true;
                 }
             } catch (e) {
@@ -37,6 +57,20 @@ class TablaEditable {
         
         console.warn('⚠️ Base de datos de alimentos no disponible aún');
         return false;
+    }
+
+    /**
+     * Recarga los alimentos desde Firebase
+     */
+    async recargarAlimentos() {
+        if (window.alimentoService) {
+            try {
+                this.alimentos = await window.alimentoService.recargar();
+                console.log(`🔄 Alimentos recargados: ${this.alimentos.length} alimentos disponibles`);
+            } catch (e) {
+                console.error('Error al recargar alimentos:', e);
+            }
+        }
     }
 
     // Generar HTML de la tabla editable
@@ -71,10 +105,8 @@ class TablaEditable {
         html += this.generarTotalesDiarios();
         html += '</div>';
         
-        // Inicializar estilos del día actual después de que el HTML se inserte
-        setTimeout(() => {
-            this.actualizarEstilosDia();
-        }, 100);
+        // NOTA: No llamar a actualizarEstilosDia() aquí porque el HTML aún no se ha insertado en el DOM
+        // Se llamará después de que se inserte el HTML en mostrarTablaEditable()
 
         return html;
     }
@@ -375,7 +407,7 @@ class TablaEditable {
     }
 
     // Buscar alimentos con búsqueda inteligente mejorada
-    buscarAlimento(input) {
+    async buscarAlimento(input) {
         const query = input.value.toLowerCase().trim();
         const rowId = input.dataset.rowId;
         const autocompleteDiv = document.getElementById(`autocomplete-${rowId}`);
@@ -501,7 +533,8 @@ class TablaEditable {
         // Verificar si la base de datos está cargada
         if (!this.alimentos || this.alimentos.length === 0) {
             console.log('Intentando recargar base de datos...');
-            if (!this.cargarBaseAlimentos()) {
+            const cargado = await this.cargarBaseAlimentos();
+            if (!cargado) {
                 autocompleteDiv.innerHTML = '<div class="autocomplete-item" style="color: #ff0000;">⚠️ Error: Base de datos no disponible. Recarga la página.</div>';
                 autocompleteDiv.classList.remove('autocomplete-list-hidden');
                 autocompleteDiv.style.display = '';
@@ -1310,22 +1343,53 @@ class TablaEditable {
         }
     }
 
-    // Actualizar totales diarios (suma de todas las comidas)
+    // Actualizar totales diarios (suma de todas las comidas del día actual)
     actualizarTotalesDiarios() {
         let totalCal = 0, totalProt = 0, totalGras = 0, totalHidr = 0;
 
+        // Sumar los totales de todas las comidas del día actual
         this.comidas.forEach(comida => {
             const comidaId = comida.toLowerCase().replace(/\s+/g, '-');
-            totalCal += parseFloat(document.getElementById(`total-cal-${comidaId}`).textContent) || 0;
-            totalProt += parseFloat(document.getElementById(`total-prot-${comidaId}`).textContent) || 0;
-            totalGras += parseFloat(document.getElementById(`total-gras-${comidaId}`).textContent) || 0;
-            totalHidr += parseFloat(document.getElementById(`total-hidr-${comidaId}`).textContent) || 0;
+            const totalCalElem = document.getElementById(`total-cal-${comidaId}`);
+            const totalProtElem = document.getElementById(`total-prot-${comidaId}`);
+            const totalGrasElem = document.getElementById(`total-gras-${comidaId}`);
+            const totalHidrElem = document.getElementById(`total-hidr-${comidaId}`);
+            
+            // Sumar solo si los elementos existen y tienen valores válidos
+            if (totalCalElem) {
+                const cal = parseFloat(totalCalElem.textContent) || 0;
+                totalCal += isNaN(cal) ? 0 : cal;
+            }
+            if (totalProtElem) {
+                const prot = parseFloat(totalProtElem.textContent) || 0;
+                totalProt += isNaN(prot) ? 0 : prot;
+            }
+            if (totalGrasElem) {
+                const gras = parseFloat(totalGrasElem.textContent) || 0;
+                totalGras += isNaN(gras) ? 0 : gras;
+            }
+            if (totalHidrElem) {
+                const hidr = parseFloat(totalHidrElem.textContent) || 0;
+                totalHidr += isNaN(hidr) ? 0 : hidr;
+            }
         });
 
-        document.getElementById('total-diario-calorias').textContent = Math.round(totalCal);
-        document.getElementById('total-diario-proteinas').textContent = totalProt.toFixed(1) + 'g';
-        document.getElementById('total-diario-grasas').textContent = totalGras.toFixed(1) + 'g';
-        document.getElementById('total-diario-hidratos').textContent = totalHidr.toFixed(1) + 'g';
+        // Asegurar que los valores sean números válidos (no NaN)
+        totalCal = isNaN(totalCal) ? 0 : Math.round(totalCal);
+        totalProt = isNaN(totalProt) ? 0 : totalProt;
+        totalGras = isNaN(totalGras) ? 0 : totalGras;
+        totalHidr = isNaN(totalHidr) ? 0 : totalHidr;
+
+        // Actualizar los elementos del DOM solo si existen
+        const totalCalElem = document.getElementById('total-diario-calorias');
+        const totalProtElem = document.getElementById('total-diario-proteinas');
+        const totalGrasElem = document.getElementById('total-diario-grasas');
+        const totalHidrElem = document.getElementById('total-diario-hidratos');
+        
+        if (totalCalElem) totalCalElem.textContent = totalCal;
+        if (totalProtElem) totalProtElem.textContent = totalProt.toFixed(1) + 'g';
+        if (totalGrasElem) totalGrasElem.textContent = totalGras.toFixed(1) + 'g';
+        if (totalHidrElem) totalHidrElem.textContent = totalHidr.toFixed(1) + 'g';
 
         // Actualizar barras de progreso y alertas
         this.actualizarProgresoMacros(totalCal, totalProt, totalGras, totalHidr);
@@ -1479,22 +1543,25 @@ class TablaEditable {
     }
 
     // Cargar datos en la tabla (para edición)
-    cargarDatos(datos) {
+    cargarDatos(datos, actualizarTotales = true) {
         // Limpiar cuerpos
         this.comidas.forEach(comida => {
             const comidaId = comida.toLowerCase().replace(/\s+/g, '-');
             const tbody = document.getElementById(`tbody-${comidaId}`);
-            tbody.innerHTML = '';
+            if (tbody) {
+                tbody.innerHTML = '';
+            }
         });
 
         // Rellenar
         this.comidas.forEach(comida => {
             const lista = (datos && datos[comida]) ? datos[comida] : [];
+            const comidaId = comida.toLowerCase().replace(/\s+/g, '-');
+            
             if (lista.length === 0) {
                 // Tres filas vacías si no hay datos
                 for (let i = 0; i < 3; i++) this.agregarFila(comida);
                 // Resetear totales de esta comida a 0
-                const comidaId = comida.toLowerCase().replace(/\s+/g, '-');
                 const totalCalElem = document.getElementById(`total-cal-${comidaId}`);
                 const totalProtElem = document.getElementById(`total-prot-${comidaId}`);
                 const totalGrasElem = document.getElementById(`total-gras-${comidaId}`);
@@ -1544,88 +1611,120 @@ class TablaEditable {
                 });
             }
         });
-        this.actualizarTotalesDiarios();
+        
+        // Solo actualizar totales si se solicita (por defecto sí)
+        if (actualizarTotales) {
+            this.actualizarTotalesDiarios();
+        }
     }
 
     // Cambiar de día guardando el actual
     cambiarDia(nuevoDia) {
+        console.log(`🔄 Cambiando de día: ${this.diaActual} → ${nuevoDia}`);
+        
         // Guardar lo que hay en pantalla en el día actual
         this.planSemana[this.diaActual] = this.obtenerDatos();
         this.diaActual = nuevoDia;
         const datos = this.planSemana[this.diaActual] || null;
-        this.cargarDatos(datos);
         
-        // Actualizar estilos visuales y objetivos según el tipo de día
-        this.actualizarEstilosDia();
-        this.actualizarTotalesDiarios();
+        // Cargar datos del nuevo día SIN actualizar totales todavía
+        // (los actualizaremos después de actualizar los estilos y objetivos)
+        this.cargarDatos(datos, false);
         
-        // Actualizar panel de estadísticas después de cambiar de día
-        if (typeof window.mostrarEstadisticasPlanManual === 'function') {
-            setTimeout(() => {
-                window.mostrarEstadisticasPlanManual();
-            }, 300);
-        }
+        // IMPORTANTE: Esperar un momento para que el DOM se actualice antes de actualizar estilos
+        // Esto asegura que los elementos existan cuando se actualicen
+        setTimeout(() => {
+            // Actualizar estilos visuales y objetivos según el tipo de día
+            // IMPORTANTE: actualizarEstilosDia() debe llamarse antes de actualizarTotalesDiarios()
+            // para que los objetivos se actualicen correctamente antes de calcular el progreso
+            this.actualizarEstilosDia();
+            
+            // Actualizar totales diarios después de actualizar los objetivos
+            // Esto asegura que el progreso se calcule con los objetivos correctos del tipo de día
+            this.actualizarTotalesDiarios();
+            
+            // Actualizar panel de estadísticas después de cambiar de día
+            if (typeof window.mostrarEstadisticasPlanManual === 'function') {
+                setTimeout(() => {
+                    window.mostrarEstadisticasPlanManual();
+                }, 300);
+            }
+        }, 50);
     }
     
-         // Actualizar estilos visuales del contenedor según tipo de día
-     actualizarEstilosDia() {
-         const esDescanso = this.esDiaDescanso(this.diaActual);
-         const contenedor = document.querySelector('.tabla-editable-container');
-         const badgeDia = document.getElementById('badge-dia-actual');
-         const totalesDiv = document.querySelector('.totales-diarios');
-         
-         if (contenedor) {
-             // Remover clases anteriores
-             contenedor.classList.remove('dia-descanso', 'dia-entreno');
-             // Agregar clase según tipo de día
-             if (esDescanso) {
-                 contenedor.classList.add('dia-descanso');
-             } else {
-                 contenedor.classList.add('dia-entreno');
-             }
-         }
-         
-         // Actualizar badge visual del selector de día
-         if (badgeDia) {
-             if (esDescanso) {
-                 badgeDia.innerHTML = '<span class="badge-descanso">😴 DESCANSO</span>';
-             } else {
-                 badgeDia.innerHTML = '<span class="badge-entreno">💪 ENTRENO</span>';
-             }
-         }
-         
-         // Actualizar estilos de totales
-         if (totalesDiv) {
-             totalesDiv.classList.remove('totales-descanso', 'totales-entreno');
-             if (esDescanso) {
-                 totalesDiv.classList.add('totales-descanso');
-             } else {
-                 totalesDiv.classList.add('totales-entreno');
-             }
-             
-             // Actualizar badge en el título de "Totales Diarios vs Objetivos"
-             const h3Totales = totalesDiv.querySelector('h3');
-             if (h3Totales) {
-                 const nuevoBadge = esDescanso 
-                     ? '<span class="badge-descanso" style="font-size: 0.85em; margin-left: 10px;">😴 DÍA DE DESCANSO</span>'
-                     : '<span class="badge-entreno" style="font-size: 0.85em; margin-left: 10px;">💪 DÍA DE ENTRENO</span>';
-                 // Reemplazar el badge existente manteniendo el texto "📊 Totales Diarios vs Objetivos"
-                 h3Totales.innerHTML = `📊 Totales Diarios vs Objetivos ${nuevoBadge}`;
-             }
-             
-             // Actualizar objetivos mostrados
-             const objetivos = this.obtenerObjetivosNutricionales();
-             const objetivoCal = document.getElementById('objetivo-calorias');
-             const objetivoProt = document.getElementById('objetivo-proteinas');
-             const objetivoGras = document.getElementById('objetivo-grasas');
-             const objetivoHidr = document.getElementById('objetivo-hidratos');
-             
-             if (objetivoCal) objetivoCal.textContent = `${objetivos.calorias} kcal`;
-             if (objetivoProt) objetivoProt.textContent = `${objetivos.proteinas}g`;
-             if (objetivoGras) objetivoGras.textContent = `${objetivos.grasas}g`;
-             if (objetivoHidr) objetivoHidr.textContent = `${objetivos.carbohidratos}g`;
-         }
-     }
+    // Actualizar estilos visuales del contenedor según tipo de día
+    actualizarEstilosDia() {
+        const esDescanso = this.esDiaDescanso(this.diaActual);
+        console.log(`🎨 Actualizando estilos del día: ${this.diaActual}, esDescanso: ${esDescanso}`);
+        
+        const contenedor = document.querySelector('.tabla-editable-container');
+        const badgeDia = document.getElementById('badge-dia-actual');
+        const totalesDiv = document.querySelector('.totales-diarios');
+        
+        if (contenedor) {
+            // Remover clases anteriores
+            contenedor.classList.remove('dia-descanso', 'dia-entreno');
+            // Agregar clase según tipo de día
+            if (esDescanso) {
+                contenedor.classList.add('dia-descanso');
+            } else {
+                contenedor.classList.add('dia-entreno');
+            }
+        }
+        
+        // Actualizar badge visual del selector de día
+        if (badgeDia) {
+            if (esDescanso) {
+                badgeDia.innerHTML = '<span class="badge-descanso">😴 DESCANSO</span>';
+            } else {
+                badgeDia.innerHTML = '<span class="badge-entreno">💪 ENTRENO</span>';
+            }
+        }
+        
+        // Actualizar estilos de totales
+        if (totalesDiv) {
+            totalesDiv.classList.remove('totales-descanso', 'totales-entreno');
+            if (esDescanso) {
+                totalesDiv.classList.add('totales-descanso');
+            } else {
+                totalesDiv.classList.add('totales-entreno');
+            }
+            
+            // Actualizar badge en el título de "Totales Diarios vs Objetivos"
+            const h3Totales = totalesDiv.querySelector('h3');
+            if (h3Totales) {
+                const nuevoBadge = esDescanso 
+                    ? '<span class="badge-descanso" style="font-size: 0.85em; margin-left: 10px;">😴 DÍA DE DESCANSO</span>'
+                    : '<span class="badge-entreno" style="font-size: 0.85em; margin-left: 10px;">💪 DÍA DE ENTRENO</span>';
+                // Reemplazar el badge existente manteniendo el texto "📊 Totales Diarios vs Objetivos"
+                h3Totales.innerHTML = `📊 Totales Diarios vs Objetivos ${nuevoBadge}`;
+                console.log(`✅ Badge actualizado: ${esDescanso ? 'DÍA DE DESCANSO' : 'DÍA DE ENTRENO'}`);
+            } else {
+                console.warn('⚠️ No se encontró el elemento h3 en totalesDiv');
+            }
+            
+            // Actualizar los objetivos nutricionales mostrados según el tipo de día
+            const objetivos = this.obtenerObjetivosNutricionales();
+            console.log(`📊 Objetivos para ${esDescanso ? 'descanso' : 'entreno'}:`, objetivos);
+            
+            const objetivoCal = document.getElementById('objetivo-calorias');
+            const objetivoProt = document.getElementById('objetivo-proteinas');
+            const objetivoGras = document.getElementById('objetivo-grasas');
+            const objetivoHidr = document.getElementById('objetivo-hidratos');
+            
+            if (objetivoCal) {
+                objetivoCal.textContent = `${objetivos.calorias} kcal`;
+                console.log(`✅ Objetivo calorías actualizado: ${objetivos.calorias} kcal`);
+            } else {
+                console.warn('⚠️ No se encontró el elemento objetivo-calorias');
+            }
+            if (objetivoProt) objetivoProt.textContent = `${objetivos.proteinas}g`;
+            if (objetivoGras) objetivoGras.textContent = `${objetivos.grasas}g`;
+            if (objetivoHidr) objetivoHidr.textContent = `${objetivos.carbohidratos}g`;
+        } else {
+            console.warn('⚠️ No se encontró el elemento .totales-diarios');
+        }
+    }
 
     // Replicar día actual a toda la semana
     replicarDiaActualATodaLaSemana() {
@@ -1734,10 +1833,12 @@ document.addEventListener('click', function(e) {
 let tablaEditable = null;
 
 // Función para inicializar la tabla editable
-function inicializarTablaEditable() {
+async function inicializarTablaEditable() {
     if (!tablaEditable) {
         tablaEditable = new TablaEditable();
         window.tablaEditable = tablaEditable; // Exportar a window para acceso global
+        // Esperar a que se inicialice completamente (cargar alimentos)
+        await tablaEditable.init();
         console.log('✅ TablaEditable inicializada correctamente');
         console.log('✅ Instancia disponible en window.tablaEditable');
     }

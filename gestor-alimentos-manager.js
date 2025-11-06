@@ -4,36 +4,117 @@ class GestorAlimentosManager {
         this.baseDatosCompleta = [];
         this.baseDatosFiltrada = [];
         this.indiceEdicion = -1;
-        this.init();
+        this.inicializado = false;
+        this.inicializando = false;
+        
+        // Escuchar cuando el usuario se autentica para recargar desde Firestore
+        window.addEventListener('userLoggedIn', () => {
+            console.log('🔄 Usuario autenticado, recargando alimentos desde Firestore...');
+            this.recargarDesdeFirestore();
+        });
+        
+        // Inicializar de forma asíncrona sin bloquear
+        this.init().catch(error => {
+            console.error('Error al inicializar GestorAlimentosManager:', error);
+        });
+    }
+    
+    // Método para recargar desde Firestore cuando el usuario se autentica
+    async recargarDesdeFirestore() {
+        try {
+            console.log('🔄 Recargando alimentos desde Firestore...');
+            const cargado = await this.cargarDesdeFirestore();
+            if (cargado && this.baseDatosCompleta.length > 0) {
+                this.baseDatosFiltrada = this.baseDatosCompleta;
+                window.baseDatosAlimentos = this.baseDatosCompleta;
+                console.log(`✅ ${this.baseDatosCompleta.length} alimentos recargados desde Firestore`);
+                
+                // Recargar la interfaz si está visible
+                const contenido = document.getElementById('gestorAlimentosContent');
+                if (contenido && contenido.innerHTML.includes('gestor-table-container')) {
+                    this.mostrarInterfaz();
+                }
+                
+                // Recargar en alimentosDB
+                this.recargarAlimentosDB();
+            } else {
+                console.log('📦 No hay datos en Firestore para recargar');
+            }
+        } catch (error) {
+            console.error('❌ Error al recargar desde Firestore:', error);
+        }
     }
 
     async init() {
-        // Intentar cargar desde Firestore primero
-        await this.cargarDesdeFirestore();
+        // Evitar múltiples inicializaciones simultáneas
+        if (this.inicializando) {
+            return;
+        }
         
-        // Si no hay datos en Firestore, cargar desde localStorage o base-datos-alimentos.js
-        if (!this.baseDatosCompleta || this.baseDatosCompleta.length === 0) {
-            const datosGuardados = localStorage.getItem('baseDatosAlimentosPersonalizada');
-            if (datosGuardados) {
-                try {
-                    const datosPersonalizados = JSON.parse(datosGuardados);
-                    // Solo usar localStorage si baseDatosAlimentos no está definida
-                    if (!window.baseDatosAlimentos) {
-                        window.baseDatosAlimentos = datosPersonalizados;
-                        console.log('📦 Base de datos personalizada cargada desde localStorage');
-                    } else {
-                        console.log('📦 Base de datos cargada desde base-datos-alimentos.js (localStorage ignorado para preservar campos nuevos)');
-                    }
-                } catch (e) {
-                    console.error('Error al cargar base de datos desde localStorage:', e);
+        if (this.inicializado) {
+            return;
+        }
+        
+        this.inicializando = true;
+        
+        try {
+            // Intentar cargar desde Firestore primero
+            await this.cargarDesdeFirestore();
+            
+            // Si no hay datos en Firestore, cargar desde localStorage o base-datos-alimentos.js
+            if (!this.baseDatosCompleta || this.baseDatosCompleta.length === 0) {
+                console.log('📦 No hay datos en Firestore, intentando cargar desde otras fuentes...');
+                
+                // Intentar cargar desde base-datos-alimentos.js primero
+                if (window.baseDatosAlimentos && Array.isArray(window.baseDatosAlimentos) && window.baseDatosAlimentos.length > 0) {
+                    this.cargarBaseDatos();
+                    console.log(`📦 ${this.baseDatosCompleta.length} alimentos cargados desde base-datos-alimentos.js`);
+                    
+                    // Guardar la base inicial en Firestore para sincronizar
+                    await this.guardarEnFirestore();
+                    this.inicializado = true;
+                    this.inicializando = false;
+                    return;
                 }
+                
+                // Si no hay base-datos-alimentos.js, intentar localStorage
+                const datosGuardados = localStorage.getItem('baseDatosAlimentosPersonalizada');
+                if (datosGuardados) {
+                    try {
+                        const datosPersonalizados = JSON.parse(datosGuardados);
+                        if (Array.isArray(datosPersonalizados) && datosPersonalizados.length > 0) {
+                            this.baseDatosCompleta = datosPersonalizados;
+                            this.baseDatosFiltrada = this.baseDatosCompleta;
+                            window.baseDatosAlimentos = this.baseDatosCompleta;
+                            console.log(`📦 ${this.baseDatosCompleta.length} alimentos cargados desde localStorage`);
+                            
+                            // Guardar en Firestore para sincronizar
+                            await this.guardarEnFirestore();
+                            this.inicializado = true;
+                            this.inicializando = false;
+                            return;
+                        }
+                    } catch (e) {
+                        console.error('Error al cargar base de datos desde localStorage:', e);
+                    }
+                }
+                
+                console.warn('⚠️ No se encontraron alimentos en ninguna fuente');
+            } else {
+                console.log(`✅ ${this.baseDatosCompleta.length} alimentos cargados desde Firestore`);
             }
             
-            if (window.baseDatosAlimentos) {
+            this.inicializado = true;
+        } catch (error) {
+            console.error('Error en init():', error);
+            // Fallback a base-datos-alimentos.js si hay error
+            if (window.baseDatosAlimentos && Array.isArray(window.baseDatosAlimentos) && window.baseDatosAlimentos.length > 0) {
                 this.cargarBaseDatos();
-                // Guardar la base inicial en Firestore para sincronizar
-                await this.guardarEnFirestore();
+                console.log(`📦 ${this.baseDatosCompleta.length} alimentos cargados desde base-datos-alimentos.js (fallback)`);
+                this.inicializado = true;
             }
+        } finally {
+            this.inicializando = false;
         }
     }
 
@@ -53,65 +134,197 @@ class GestorAlimentosManager {
 
     async cargarDesdeFirestore() {
         try {
+            // Verificar si Firebase está disponible
+            if (typeof firebase === 'undefined' || !firebase.firestore) {
+                console.log('📦 Firebase no está disponible');
+                return false;
+            }
+
             const user = window.authManager?.getCurrentUser();
             if (!user) {
                 console.log('📦 Usuario no autenticado, saltando carga desde Firestore');
-                return;
+                return false;
             }
 
-            const db = window.dietaService?.db || firebase.firestore();
+            // Intentar obtener la referencia de Firestore de múltiples formas
+            let db = null;
+            
+            if (window.firebaseDb) {
+                db = window.firebaseDb;
+            } else if (window.dietaService && window.dietaService.db) {
+                db = window.dietaService.db;
+            } else if (typeof firebase !== 'undefined' && firebase.firestore) {
+                db = firebase.firestore();
+            }
+            
+            if (!db) {
+                console.log('📦 Firestore no está inicializado');
+                return false;
+            }
+
+            console.log('📦 Cargando alimentos desde Firestore...');
             const docRef = db.collection('alimentos').doc('base-datos');
             const doc = await docRef.get();
 
             if (doc.exists) {
                 const data = doc.data();
-                if (data.alimentos && Array.isArray(data.alimentos)) {
-                    this.baseDatosCompleta = data.alimentos;
+                if (data.alimentos && Array.isArray(data.alimentos) && data.alimentos.length > 0) {
+                    // Normalizar los alimentos al formato estándar
+                    this.baseDatosCompleta = data.alimentos.map(alimento => {
+                        return this.normalizarAlimentoParaMostrar(alimento);
+                    });
                     this.baseDatosFiltrada = this.baseDatosCompleta;
                     window.baseDatosAlimentos = this.baseDatosCompleta;
-                    this.cargarBaseDatos();
-                    console.log('📦 Base de datos cargada desde Firestore');
+                    console.log(`✅ ${this.baseDatosCompleta.length} alimentos cargados desde Firestore`);
+                    return true;
+                } else {
+                    console.log('📦 Documento existe pero no tiene alimentos');
                 }
+            } else {
+                console.log('📦 Documento "base-datos" no existe en Firestore');
             }
+            return false;
         } catch (e) {
-            console.error('Error al cargar desde Firestore:', e);
+            console.error('❌ Error al cargar desde Firestore:', e);
+            console.error('Stack trace:', e.stack);
+            return false;
         }
     }
 
     async guardarEnFirestore() {
         try {
-            const user = window.authManager?.getCurrentUser();
-            if (!user) {
-                console.log('💾 Usuario no autenticado, saltando guardado en Firestore');
-                return;
+            // Verificar si Firebase está disponible
+            if (typeof firebase === 'undefined' || !firebase.firestore) {
+                console.error('❌ Firebase no está disponible');
+                window.mostrarNotificacion?.('❌ Error: Firebase no está disponible', 'error');
+                return false;
             }
 
-            // Limpiar datos: eliminar campos undefined
+            const user = window.authManager?.getCurrentUser();
+            if (!user) {
+                console.warn('⚠️ Usuario no autenticado, saltando guardado en Firestore');
+                window.mostrarNotificacion?.('⚠️ Debes iniciar sesión para guardar en Firebase', 'warning');
+                return false;
+            }
+
+            if (!this.baseDatosCompleta || this.baseDatosCompleta.length === 0) {
+                console.warn('⚠️ No hay datos para guardar en Firestore');
+                return false;
+            }
+
+            // Normalizar y limpiar datos: eliminar campos undefined y asegurar formato correcto
             const baseDatosLimpia = this.baseDatosCompleta.map(alimento => {
+                const normalizado = this.normalizarAlimentoParaMostrar(alimento);
                 const limpio = {};
-                for (const key in alimento) {
-                    if (alimento[key] !== undefined) {
-                        limpio[key] = alimento[key];
+                for (const key in normalizado) {
+                    if (normalizado[key] !== undefined && normalizado[key] !== null) {
+                        limpio[key] = normalizado[key];
                     }
                 }
                 return limpio;
             });
 
-            const db = window.dietaService?.db || firebase.firestore();
-            await db.collection('alimentos').doc('base-datos').set({
-                alimentos: baseDatosLimpia,
-                fechaActualizacion: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            // Intentar obtener la referencia de Firestore de múltiples formas
+            let db = null;
+            
+            // Primero intentar con window.firebaseDb (la forma más común)
+            if (window.firebaseDb) {
+                db = window.firebaseDb;
+                console.log('✅ Usando window.firebaseDb');
+            } 
+            // Si no está disponible, intentar con window.dietaService?.db
+            else if (window.dietaService && window.dietaService.db) {
+                db = window.dietaService.db;
+                console.log('✅ Usando window.dietaService.db');
+            }
+            // Si no está disponible, intentar con firebase.firestore() directamente
+            else if (typeof firebase !== 'undefined' && firebase.firestore) {
+                db = firebase.firestore();
+                console.log('✅ Usando firebase.firestore() directamente');
+            }
+            
+            if (!db) {
+                console.error('❌ Firestore no está inicializado');
+                console.log('Opciones disponibles:', {
+                    'window.firebaseDb': typeof window.firebaseDb,
+                    'window.dietaService?.db': typeof window.dietaService?.db,
+                    'firebase.firestore()': typeof firebase !== 'undefined' ? typeof firebase.firestore() : 'undefined'
+                });
+                window.mostrarNotificacion?.('❌ Error: Firestore no está inicializado. Por favor, recarga la página.', 'error');
+                return false;
+            }
 
-            console.log('💾 Base de datos guardada en Firestore');
+            console.log(`💾 Guardando ${baseDatosLimpia.length} alimentos en Firestore...`);
+            console.log('Usuario autenticado:', user.email);
+            console.log('Base de datos:', db);
+            
+            // Guardar en Firestore
+            const docRef = db.collection('alimentos').doc('base-datos');
+            await docRef.set({
+                alimentos: baseDatosLimpia,
+                fechaActualizacion: firebase.firestore.FieldValue.serverTimestamp(),
+                totalAlimentos: baseDatosLimpia.length,
+                actualizadoPor: user.uid,
+                actualizadoPorEmail: user.email
+            }, { merge: true });
+
+            console.log(`✅ ${baseDatosLimpia.length} alimentos guardados en Firestore correctamente`);
+            console.log('Documento guardado en:', 'alimentos/base-datos');
+            
+            // Verificar que se guardó correctamente leyendo el documento
+            const docVerificado = await docRef.get();
+            if (docVerificado.exists) {
+                const datosVerificados = docVerificado.data();
+                console.log('✅ Verificación: Documento existe en Firestore');
+                console.log('Total de alimentos en Firestore:', datosVerificados.totalAlimentos);
+            } else {
+                console.warn('⚠️ Advertencia: El documento no se encontró después de guardar');
+            }
+            
+            return true;
         } catch (e) {
-            console.error('Error al guardar en Firestore:', e);
+            console.error('❌ Error al guardar en Firestore:', e);
+            console.error('Stack trace:', e.stack);
+            console.error('Detalles del error:', {
+                message: e.message,
+                code: e.code,
+                name: e.name
+            });
+            window.mostrarNotificacion?.(`❌ Error al guardar en Firebase: ${e.message}`, 'error');
+            return false;
         }
     }
 
-    mostrarInterfaz() {
+    async mostrarInterfaz() {
         const contenido = document.getElementById('gestorAlimentosContent');
-        if (!contenido) return;
+        if (!contenido) {
+            console.error('⚠️ No se encontró el elemento gestorAlimentosContent');
+            return;
+        }
+        
+        // Asegurar que los datos estén cargados antes de mostrar la interfaz
+        if (!this.inicializado || this.inicializando) {
+            contenido.innerHTML = `
+                <h2 style="text-align: center; margin-bottom: 20px; color: #667eea;">🍎 Gestión de Base de Datos de Alimentos</h2>
+                <p style="text-align: center; color: #666; margin-bottom: 30px;">Cargando datos...</p>
+            `;
+            // Esperar a que termine la inicialización
+            await this.init();
+        }
+        
+        // Si aún no hay datos después de inicializar, intentar cargar desde base-datos-alimentos.js
+        if (!this.baseDatosCompleta || this.baseDatosCompleta.length === 0) {
+            if (window.baseDatosAlimentos && Array.isArray(window.baseDatosAlimentos) && window.baseDatosAlimentos.length > 0) {
+                this.cargarBaseDatos();
+                console.log(`📦 ${this.baseDatosCompleta.length} alimentos cargados desde base-datos-alimentos.js`);
+            } else {
+                contenido.innerHTML = `
+                    <h2 style="text-align: center; margin-bottom: 20px; color: #667eea;">🍎 Gestión de Base de Datos de Alimentos</h2>
+                    <p style="text-align: center; color: #dc3545; margin-bottom: 30px;">⚠️ No se encontraron alimentos. Por favor, recarga la página.</p>
+                `;
+                return;
+            }
+        }
 
         contenido.innerHTML = `
             <div class="gestor-alimentos-container">
@@ -455,6 +668,7 @@ class GestorAlimentosManager {
         const normalizarValor = (valor) => {
             if (typeof valor === 'number') return valor;
             if (typeof valor === 'string' && valor.trim() === '') return 0;
+            if (valor === 'Irrelevante' || valor === null || valor === undefined) return 0;
             const parsed = parseFloat(valor);
             return isNaN(parsed) ? 0 : parsed;
         };
@@ -464,27 +678,36 @@ class GestorAlimentosManager {
             return Math.round((prot * 4) + (hid * 4) + (grasa * 9));
         };
         
-        const proteinas = normalizarValor(alimento.proteínas);
-        const hidratos = normalizarValor(alimento.hidratos);
-        const grasas = normalizarValor(alimento.grasas);
-        const calorias = calcularCalorias(proteinas, hidratos, grasas);
+        const proteinas = normalizarValor(alimento.proteínas || alimento.PROTEÍNAS);
+        const hidratos = normalizarValor(alimento.hidratos || alimento.HIDRATOS || alimento.carbohidratos);
+        const grasas = normalizarValor(alimento.grasas || alimento.GRASAS);
+        const calorias = normalizarValor(alimento.calorias || alimento.CALORÍAS) || calcularCalorias(proteinas, hidratos, grasas);
         
         return {
             ALIMENTO: alimento.nombre || alimento.ALIMENTO,
-            MACRONUTRIENTE_PRINCIPAL: alimento.categoria_principal || alimento.MACRONUTRIENTE_PRINCIPAL,
+            MACRONUTRIENTE_PRINCIPAL: alimento.categoria_principal || alimento.MACRONUTRIENTE_PRINCIPAL || alimento['MACRONUTRIENTE PRINCIPAL'],
             CLASIFICACIÓN: alimento.subcategoria || alimento.CLASIFICACIÓN,
             UNIDAD: alimento.presentacion || alimento.UNIDAD || '',
-            PESO_POR_UNIDAD: alimento.peso || alimento.PESO_POR_UNIDAD || '',
-            MARCA_REGISTRADA: alimento.marca || alimento.MARCA_REGISTRADA || '',
-            NOMBRE_DEL_PRODUCTO: alimento.producto || alimento.NOMBRE_DEL_PRODUCTO || '',
-            OTRAS_NOTAS: alimento.notas || alimento.OTRAS_NOTAS || '',
+            PESO_POR_UNIDAD: alimento.peso || alimento.PESO_POR_UNIDAD || alimento['PESO POR UNIDAD'] || '',
+            MARCA_REGISTRADA: alimento.marca || alimento.MARCA_REGISTRADA || alimento['MARCA REGISTRADA'] || '',
+            NOMBRE_DEL_PRODUCTO: alimento.producto || alimento.NOMBRE_DEL_PRODUCTO || alimento['NOMBRE DEL PRODUCTO'] || '',
+            OTRAS_NOTAS: alimento.notas || alimento.descripcion || alimento.OTRAS_NOTAS || alimento['OTRAS NOTAS'] || '',
             CALORÍAS: calorias,
             PROTEÍNAS: proteinas,
             GRASAS: grasas,
-            GRASAS_SATURADAS: normalizarValor(alimento.grasas_saturadas),
+            GRASAS_SATURADAS: normalizarValor(alimento.grasas_saturadas || alimento.GRASAS_SATURADAS || alimento['GRASAS SATURADAS']),
             HIDRATOS: hidratos,
-            AZÚCARES: normalizarValor(alimento.azucares)
+            AZÚCARES: normalizarValor(alimento.azucares || alimento.azucar || alimento.AZÚCARES)
         };
+    }
+
+    normalizarAlimentoParaMostrar(alimento) {
+        // Si ya está en formato estándar, devolverlo tal cual
+        if (alimento.ALIMENTO && alimento.PROTEÍNAS !== undefined) {
+            return alimento;
+        }
+        // Si no, normalizarlo
+        return this.normalizarAlimento(alimento);
     }
 
     recargarAlimentosDB() {
@@ -494,7 +717,7 @@ class GestorAlimentosManager {
         }
     }
 
-    guardarAlimento(event) {
+    async guardarAlimento(event) {
         event.preventDefault();
         
         const nuevoAlimento = {
@@ -535,10 +758,40 @@ class GestorAlimentosManager {
         this.mostrarInterfaz();
         
         // Guardar en Firestore de forma asíncrona (sin bloquear la UI)
-        this.guardarEnFirestore();
+        try {
+            console.log('💾 Iniciando guardado en Firestore...');
+            const guardadoExitoso = await this.guardarEnFirestore();
+            if (guardadoExitoso) {
+                console.log('✅ Datos guardados en Firestore correctamente');
+                window.mostrarNotificacion?.('✅ Alimento guardado en Firebase correctamente', 'success');
+            } else {
+                console.warn('⚠️ No se pudo guardar en Firestore');
+                window.mostrarNotificacion?.('⚠️ No se pudo guardar en Firebase. Los datos se guardaron localmente.', 'warning');
+            }
+        } catch (error) {
+            console.error('❌ Error al guardar en Firestore:', error);
+            window.mostrarNotificacion?.('⚠️ Error al guardar en Firebase. Los datos se guardaron localmente.', 'warning');
+        }
+        
+        // Notificar al servicio de alimentos para que actualice su cache
+        if (window.alimentoService) {
+            try {
+                console.log('💾 Actualizando AlimentoService...');
+                const guardadoService = await window.alimentoService.guardarEnFirestore(this.baseDatosCompleta);
+                if (guardadoService) {
+                    console.log('✅ Datos actualizados en AlimentoService correctamente');
+                } else {
+                    console.warn('⚠️ No se pudo actualizar AlimentoService');
+                }
+            } catch (error) {
+                console.error('❌ Error al actualizar AlimentoService:', error);
+            }
+        } else {
+            console.warn('⚠️ AlimentoService no está disponible');
+        }
     }
 
-    eliminarAlimento(index) {
+    async eliminarAlimento(index) {
         if (!confirm('¿Estás seguro de eliminar este alimento?')) return;
         
         const alimento = this.baseDatosFiltrada[index];
@@ -552,7 +805,33 @@ class GestorAlimentosManager {
         this.mostrarInterfaz();
         
         // Guardar en Firestore de forma asíncrona (sin bloquear la UI)
-        this.guardarEnFirestore();
+        try {
+            const guardadoExitoso = await this.guardarEnFirestore();
+            if (guardadoExitoso) {
+                console.log('✅ Alimento eliminado de Firestore correctamente');
+            } else {
+                console.warn('⚠️ No se pudo eliminar de Firestore (puede ser que el usuario no esté autenticado)');
+            }
+        } catch (error) {
+            console.error('❌ Error al eliminar de Firestore:', error);
+            window.mostrarNotificacion?.('⚠️ Error al eliminar de Firestore. Los datos se eliminaron localmente.', 'warning');
+        }
+        
+        // Notificar al servicio de alimentos para que actualice su cache
+        if (window.alimentoService) {
+            try {
+                const guardadoService = await window.alimentoService.guardarEnFirestore(this.baseDatosCompleta);
+                if (guardadoService) {
+                    console.log('✅ Datos actualizados en AlimentoService después de eliminar');
+                } else {
+                    console.warn('⚠️ No se pudo actualizar AlimentoService después de eliminar');
+                }
+            } catch (error) {
+                console.error('❌ Error al actualizar AlimentoService después de eliminar:', error);
+            }
+        } else {
+            console.warn('⚠️ AlimentoService no está disponible');
+        }
     }
 
     exportarBaseDatos() {
@@ -610,6 +889,39 @@ class GestorAlimentosManager {
     }
 }
 
-// Instancia global
-window.gestorAlimentosManager = new GestorAlimentosManager();
+// Exportar la clase globalmente INMEDIATAMENTE después de definirla
+// Esto asegura que la clase esté disponible incluso si hay errores en la inicialización
+(function() {
+    'use strict';
+    try {
+        // Exportar la clase a window
+        if (typeof window !== 'undefined') {
+            window.GestorAlimentosManager = GestorAlimentosManager;
+            console.log('✅ Clase GestorAlimentosManager exportada globalmente');
+        }
+        
+        // Inicializar la instancia global
+        if (typeof window !== 'undefined' && !window.gestorAlimentosManager) {
+            try {
+                window.gestorAlimentosManager = new GestorAlimentosManager();
+                console.log('✅ GestorAlimentosManager inicializado');
+            } catch (initError) {
+                console.error('❌ Error al inicializar GestorAlimentosManager:', initError);
+                console.error('Stack trace:', initError.stack);
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error al exportar GestorAlimentosManager:', error);
+        console.error('Stack trace:', error.stack);
+        // Intentar exportar la clase de todas formas
+        if (typeof window !== 'undefined' && typeof GestorAlimentosManager !== 'undefined') {
+            try {
+                window.GestorAlimentosManager = GestorAlimentosManager;
+                console.log('✅ Clase GestorAlimentosManager exportada después del error');
+            } catch (e) {
+                console.error('❌ Error crítico: No se pudo exportar GestorAlimentosManager:', e);
+            }
+        }
+    }
+})();
 

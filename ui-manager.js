@@ -361,17 +361,84 @@ class UIManager {
                 modal.style.display = 'none';
             });
             
-            // Cargar contenido del admin
+            // Cargar contenido del admin después de un pequeño delay para asegurar que los scripts estén cargados
+            setTimeout(() => {
+                this.cargarContenidoGestorAlimentos();
+            }, 100);
+        } else {
+            // Si el modal ya existe, asegurar que el contenido se cargue
             this.cargarContenidoGestorAlimentos();
         }
         
         modal.style.display = 'block';
     }
 
-    cargarContenidoGestorAlimentos() {
+    async cargarContenidoGestorAlimentos() {
+        const contenido = document.getElementById('gestorAlimentosContent');
+        if (!contenido) {
+            console.error('⚠️ No se encontró el elemento gestorAlimentosContent');
+            return;
+        }
+        
+        // Esperar un momento para asegurar que gestorAlimentosManager esté disponible
+        let intentos = 0;
+        while (!window.gestorAlimentosManager && intentos < 20) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            intentos++;
+        }
+        
+        // Si aún no está disponible, intentar inicializarlo manualmente
+        if (!window.gestorAlimentosManager) {
+            // Intentar obtener la clase desde window o desde el scope global
+            const GestorClass = window.GestorAlimentosManager || (typeof GestorAlimentosManager !== 'undefined' ? GestorAlimentosManager : null);
+            
+            if (GestorClass) {
+                console.log('🔧 Inicializando GestorAlimentosManager manualmente...');
+                try {
+                    window.gestorAlimentosManager = new GestorClass();
+                    // Esperar un momento para que se inicialice
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                } catch (error) {
+                    console.error('Error al inicializar GestorAlimentosManager manualmente:', error);
+                    contenido.innerHTML = `
+                        <h2 style="text-align: center; margin-bottom: 20px; color: #667eea;">🍎 Gestión de Base de Datos de Alimentos</h2>
+                        <p style="text-align: center; color: #dc3545; margin-bottom: 30px;">⚠️ Error al inicializar: ${error.message}</p>
+                    `;
+                    return;
+                }
+            } else {
+                console.error('❌ GestorAlimentosManager no está definido');
+                console.log('Scripts disponibles:', {
+                    'window.GestorAlimentosManager': typeof window.GestorAlimentosManager,
+                    'GestorAlimentosManager': typeof GestorAlimentosManager,
+                    'window.gestorAlimentosManager': typeof window.gestorAlimentosManager
+                });
+                contenido.innerHTML = `
+                    <h2 style="text-align: center; margin-bottom: 20px; color: #667eea;">🍎 Gestión de Base de Datos de Alimentos</h2>
+                    <p style="text-align: center; color: #dc3545; margin-bottom: 30px;">⚠️ Error: Gestor de alimentos no está disponible. Por favor, recarga la página.</p>
+                    <p style="text-align: center; color: #666; font-size: 0.9em;">Asegúrate de que todos los scripts se hayan cargado correctamente.</p>
+                    <p style="text-align: center; color: #666; font-size: 0.8em; margin-top: 10px;">Abre la consola del navegador (F12) para ver más detalles del error.</p>
+                `;
+                return;
+            }
+        }
+        
         // Usar el gestor de alimentos integrado
         if (window.gestorAlimentosManager) {
-            window.gestorAlimentosManager.mostrarInterfaz();
+            try {
+                await window.gestorAlimentosManager.mostrarInterfaz();
+            } catch (error) {
+                console.error('Error al mostrar interfaz de gestor de alimentos:', error);
+                contenido.innerHTML = `
+                    <h2 style="text-align: center; margin-bottom: 20px; color: #667eea;">🍎 Gestión de Base de Datos de Alimentos</h2>
+                    <p style="text-align: center; color: #dc3545; margin-bottom: 30px;">⚠️ Error al cargar la interfaz: ${error.message}</p>
+                `;
+            }
+        } else {
+            contenido.innerHTML = `
+                <h2 style="text-align: center; margin-bottom: 20px; color: #667eea;">🍎 Gestión de Base de Datos de Alimentos</h2>
+                <p style="text-align: center; color: #dc3545; margin-bottom: 30px;">⚠️ Error: Gestor de alimentos no está disponible. Por favor, recarga la página.</p>
+            `;
         }
     }
 

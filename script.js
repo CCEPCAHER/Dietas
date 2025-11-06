@@ -1901,22 +1901,48 @@ function mostrarTablaEditable() {
                         if (datosDia && typeof window.tablaEditable.cargarDatos === 'function') {
                             // Esperar un poco más para asegurar que los elementos del DOM estén listos
                             setTimeout(() => {
-                                window.tablaEditable.cargarDatos(datosDia);
+                                // Cargar datos SIN actualizar totales todavía
+                                // (los actualizaremos después de actualizar los estilos y objetivos)
+                                window.tablaEditable.cargarDatos(datosDia, false);
                                 
-                                // Actualizar totales y estilos del día después de un pequeño delay
+                                // IMPORTANTE: Actualizar estilos del día ANTES de actualizar totales
+                                // Esto asegura que los objetivos se actualicen correctamente antes de calcular el progreso
                                 setTimeout(() => {
-                                    if (typeof window.tablaEditable.actualizarTotalesDiarios === 'function') {
-                                        window.tablaEditable.actualizarTotalesDiarios();
-                                    }
+                                    // Actualizar estilos del día primero (badge, objetivos, etc.)
                                     if (typeof window.tablaEditable.actualizarEstilosDia === 'function') {
                                         window.tablaEditable.actualizarEstilosDia();
+                                        console.log('✅ Estilos del día actualizados');
                                     }
+                                    
+                                    // Luego actualizar totales diarios (con los objetivos correctos)
+                                    if (typeof window.tablaEditable.actualizarTotalesDiarios === 'function') {
+                                        window.tablaEditable.actualizarTotalesDiarios();
+                                        console.log('✅ Totales diarios actualizados');
+                                    }
+                                    
                                     console.log('✅ Dieta cargada correctamente para edición');
                                     
                                     // Mostrar estadísticas después de cargar los datos
                                     setTimeout(() => {
                                         mostrarEstadisticasPlanManual();
-                                    }, 500);
+                                    }, 300);
+                                }, 100);
+                            }, 50);
+                        } else {
+                            // Si no hay datos para el primer día, inicializar tablas vacías y actualizar estilos
+                            setTimeout(() => {
+                                if (typeof window.tablaEditable.inicializarTablasVacias === 'function') {
+                                    window.tablaEditable.inicializarTablasVacias(3);
+                                }
+                                
+                                // Actualizar estilos y totales
+                                setTimeout(() => {
+                                    if (typeof window.tablaEditable.actualizarEstilosDia === 'function') {
+                                        window.tablaEditable.actualizarEstilosDia();
+                                    }
+                                    if (typeof window.tablaEditable.actualizarTotalesDiarios === 'function') {
+                                        window.tablaEditable.actualizarTotalesDiarios();
+                                    }
                                 }, 100);
                             }, 50);
                         }
@@ -1935,10 +1961,26 @@ function mostrarTablaEditable() {
                         window.tablaEditable.inicializarTablasVacias(3); // 3 filas vacías por comida
                         console.log('✅ Tabla editable inicializada correctamente');
                         
-                        // Mostrar estadísticas después de inicializar (aunque estén vacías)
+                        // IMPORTANTE: Actualizar estilos y totales después de inicializar
+                        // Esto asegura que los objetivos y el badge se muestren correctamente desde el inicio
                         setTimeout(() => {
-                            mostrarEstadisticasPlanManual();
-                        }, 500);
+                            // Actualizar estilos del día (badge, objetivos, etc.)
+                            if (typeof window.tablaEditable.actualizarEstilosDia === 'function') {
+                                window.tablaEditable.actualizarEstilosDia();
+                                console.log('✅ Estilos del día actualizados');
+                            }
+                            
+                            // Actualizar totales diarios (asegura que se muestren como 0 si no hay datos)
+                            if (typeof window.tablaEditable.actualizarTotalesDiarios === 'function') {
+                                window.tablaEditable.actualizarTotalesDiarios();
+                                console.log('✅ Totales diarios actualizados');
+                            }
+                            
+                            // Mostrar estadísticas después de inicializar (aunque estén vacías)
+                            setTimeout(() => {
+                                mostrarEstadisticasPlanManual();
+                            }, 300);
+                        }, 150);
                     } else {
                         console.error('❌ Método inicializarTablasVacias no disponible');
                     }
@@ -2136,12 +2178,51 @@ function mostrarEstadisticasPlanManual() {
 function generarEstadisticasPlan(planSemana) {
     if (!planSemana || planSemana.length === 0) return '';
     
+    // Función helper para detectar si un día es de descanso
+    // Usar window.datosUsuario en lugar de datosUsuario global
+    const esDiaDescansoHelper = (nombreDia) => {
+        if (!window.datosUsuario || !window.datosUsuario.diasEntreno || window.datosUsuario.diasEntreno.length === 0) {
+            return true; // Por defecto, todos los días son de descanso si no hay días de entrenamiento definidos
+        }
+        
+        // Normalizar el nombre del día
+        const normalizarDia = (dia) => {
+            if (!dia) return '';
+            const mapaNormalizado = {
+                'LUNES': 'lunes',
+                'MARTES': 'martes',
+                'MIÉRCOLES': 'miercoles',
+                'MIERCOLES': 'miercoles',
+                'JUEVES': 'jueves',
+                'VIERNES': 'viernes',
+                'SÁBADO': 'sabado',
+                'SABADO': 'sabado',
+                'DOMINGO': 'domingo'
+            };
+            if (mapaNormalizado[dia]) {
+                return mapaNormalizado[dia];
+            }
+            return dia.toLowerCase()
+                .replace(/á/g, 'a')
+                .replace(/é/g, 'e')
+                .replace(/í/g, 'i')
+                .replace(/ó/g, 'o')
+                .replace(/ú/g, 'u');
+        };
+        
+        const valorDia = normalizarDia(nombreDia);
+        const diasEntreno = window.datosUsuario.diasEntreno || [];
+        const diasEntrenoNormalizados = diasEntreno.map(d => normalizarDia(d));
+        
+        return !diasEntrenoNormalizados.includes(valorDia);
+    };
+    
     // Calcular totales por día de entreno y descanso
     let totalEntreno = { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0, dias: 0 };
     let totalDescanso = { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0, dias: 0 };
     
     planSemana.forEach(dia => {
-        const esDescanso = esDiaDescanso(dia.dia);
+        const esDescanso = esDiaDescansoHelper(dia.dia);
         const comidas = dia.comidas;
         
         let diaTotal = { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0 };
