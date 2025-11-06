@@ -306,9 +306,10 @@ class TablaEditable {
                         autocomplete="off"
                         aria-label="Buscar alimento"
                         oninput="tablaEditable.buscarAlimento(this)"
-                        onfocus="tablaEditable.buscarAlimento(this)"
+                        onfocus="tablaEditable.manejarFocusBusqueda(this)"
                         onchange="tablaEditable.marcarFilaUsada('${rowId}')"
                         onkeydown="tablaEditable.manejarTeclado(event, this)"
+                        onmouseenter="tablaEditable.manejarMouseEnterBusqueda(this)"
                     >
                     <div class="autocomplete-list autocomplete-list-hidden" id="autocomplete-${rowId}"></div>
                 </div>
@@ -342,6 +343,37 @@ class TablaEditable {
         tbody.appendChild(row);
     }
 
+    // Variable para rastrear si hay un dropdown abierto
+    dropdownAbierto = false;
+
+    // Manejar el evento focus para evitar activar otros campos cuando hay un dropdown abierto
+    manejarFocusBusqueda(input) {
+        // Si hay un dropdown abierto, no activar este campo
+        if (this.dropdownAbierto) {
+            // Verificar si el mouse está sobre un dropdown
+            const mouseOverDropdown = document.querySelector('.autocomplete-list:not(.autocomplete-list-hidden)');
+            if (mouseOverDropdown) {
+                // Prevenir el focus si hay un dropdown visible
+                input.blur();
+                return;
+            }
+        }
+        // Si no hay dropdown abierto, proceder normalmente
+        this.buscarAlimento(input);
+    }
+
+    // Manejar el mouse enter para evitar activar el focus cuando se pasa sobre otros campos
+    manejarMouseEnterBusqueda(input) {
+        // Si hay un dropdown abierto, no activar este campo
+        if (this.dropdownAbierto) {
+            const mouseOverDropdown = document.querySelector('.autocomplete-list:not(.autocomplete-list-hidden)');
+            if (mouseOverDropdown) {
+                // Prevenir el focus
+                return;
+            }
+        }
+    }
+
     // Buscar alimentos con búsqueda inteligente mejorada
     buscarAlimento(input) {
         const query = input.value.toLowerCase().trim();
@@ -350,16 +382,121 @@ class TablaEditable {
 
         if (!autocompleteDiv) return;
 
-        // Mostrar sugerencias iniciales si el campo está vacío o tiene menos de 2 caracteres
+        // Limpiar cualquier contenido previo que pueda contener campos de búsqueda
+        autocompleteDiv.innerHTML = '';
+
+        // Ocultar todos los demás dropdowns primero
+        document.querySelectorAll('.autocomplete-list').forEach(list => {
+            if (list.id !== `autocomplete-${rowId}`) {
+                list.classList.add('autocomplete-list-hidden');
+                list.style.display = '';
+                list.innerHTML = ''; // Limpiar contenido de otros dropdowns
+            }
+        });
+
+        // Si el campo está vacío, ocultar el dropdown completamente
         if (query.length < 1) {
             autocompleteDiv.classList.add('autocomplete-list-hidden');
+            autocompleteDiv.innerHTML = ''; // Limpiar contenido
+            autocompleteDiv.style.display = '';
+            this.dropdownAbierto = false;
+            // Restaurar eventos de otros campos
+            document.querySelectorAll('.input-alimento').forEach(input => {
+                input.style.pointerEvents = '';
+            });
+            // Restaurar estilos de los contenedores
+            document.querySelectorAll('.autocomplete-container').forEach(container => {
+                container.style.zIndex = '';
+                container.style.position = '';
+            });
             return;
         }
         
-        // Mostrar lista si hay query
+        // Mostrar lista solo si hay query válida
         autocompleteDiv.classList.remove('autocomplete-list-hidden');
         // Asegurar que no quede un display:none residual por manejadores globales
         autocompleteDiv.style.display = '';
+        
+        // Marcar que hay un dropdown abierto
+        this.dropdownAbierto = true;
+        
+        // Deshabilitar temporalmente otros campos de búsqueda para evitar que reciban eventos
+        // También ocultar visualmente los campos de otras filas para evitar que se vean a través del dropdown
+        document.querySelectorAll('.input-alimento').forEach(input => {
+            if (input.dataset.rowId !== rowId) {
+                input.style.pointerEvents = 'none';
+                // Ocultar visualmente los campos de otras filas cuando hay un dropdown abierto
+                const inputContainer = input.closest('.autocomplete-container');
+                if (inputContainer) {
+                    inputContainer.style.zIndex = '1';
+                    inputContainer.style.position = 'relative';
+                }
+            }
+        });
+        
+        // Asegurar que el dropdown tenga el z-index más alto
+        autocompleteDiv.style.zIndex = '10000';
+        autocompleteDiv.style.position = 'absolute';
+        autocompleteDiv.style.background = 'white';
+        
+        // Agregar eventos al dropdown para rastrear cuando se cierra
+        const restaurarPointerEvents = () => {
+            document.querySelectorAll('.input-alimento').forEach(input => {
+                input.style.pointerEvents = '';
+                input.style.opacity = '';
+                input.style.visibility = '';
+            });
+            // Restaurar estilos de los contenedores
+            document.querySelectorAll('.autocomplete-container').forEach(container => {
+                container.style.zIndex = '';
+                container.style.position = '';
+            });
+            // Remover clases
+            autocompleteDiv.classList.remove('dropdown-hover');
+            document.body.classList.remove('dropdown-abierto');
+            this.dropdownAbierto = false;
+        };
+        
+        autocompleteDiv.addEventListener('mouseenter', () => {
+            this.dropdownAbierto = true;
+            // Agregar clase para indicar que el mouse está sobre el dropdown
+            autocompleteDiv.classList.add('dropdown-hover');
+            document.body.classList.add('dropdown-abierto');
+            
+            // Asegurar que los campos de otras filas permanezcan ocultos cuando el mouse está sobre el dropdown
+            document.querySelectorAll('.input-alimento').forEach(input => {
+                if (input.dataset.rowId !== rowId) {
+                    input.style.pointerEvents = 'none';
+                    input.style.opacity = '0';
+                    input.style.visibility = 'hidden';
+                    const inputContainer = input.closest('.autocomplete-container');
+                    if (inputContainer) {
+                        inputContainer.style.zIndex = '1';
+                        inputContainer.style.position = 'relative';
+                    }
+                }
+            });
+            // Asegurar que el dropdown tenga el z-index más alto
+            autocompleteDiv.style.zIndex = '10000';
+            autocompleteDiv.style.position = 'absolute';
+            autocompleteDiv.style.background = 'white';
+        });
+        
+        autocompleteDiv.addEventListener('mouseleave', () => {
+            // Remover clase cuando el mouse sale del dropdown
+            autocompleteDiv.classList.remove('dropdown-hover');
+            document.body.classList.remove('dropdown-abierto');
+            
+            // Solo marcar como cerrado si realmente está oculto
+            setTimeout(() => {
+                if (autocompleteDiv.classList.contains('autocomplete-list-hidden')) {
+                    restaurarPointerEvents();
+                }
+            }, 100);
+        });
+        
+        // Guardar la función para restaurar eventos cuando se cierre el dropdown
+        autocompleteDiv._restaurarPointerEvents = restaurarPointerEvents;
 
         // Verificar si la base de datos está cargada
         if (!this.alimentos || this.alimentos.length === 0) {
@@ -432,6 +569,9 @@ class TablaEditable {
         autocompleteDiv.innerHTML = html;
         autocompleteDiv.classList.remove('autocomplete-list-hidden');
         autocompleteDiv.style.display = '';
+        
+        // Marcar que hay un dropdown abierto
+        this.dropdownAbierto = true;
     }
 
     // Normalizar texto (quitar acentos, convertir a minúsculas)
@@ -576,6 +716,36 @@ class TablaEditable {
         }
 
         return [termino]; // Si no hay sinónimos, retornar solo el término original
+    }
+
+    // Buscar un alimento por nombre exacto o similar
+    buscarAlimentoPorNombre(nombreAlimento) {
+        if (!nombreAlimento || !this.alimentos || this.alimentos.length === 0) {
+            return null;
+        }
+        
+        const nombreNormalizado = this.normalizarTexto(nombreAlimento.toLowerCase());
+        
+        // Primero buscar coincidencia exacta
+        for (const alimento of this.alimentos) {
+            const alimentoNombre = this.normalizarTexto((alimento.ALIMENTO || '').toLowerCase());
+            if (alimentoNombre === nombreNormalizado) {
+                return alimento;
+            }
+        }
+        
+        // Si no hay coincidencia exacta, buscar la mejor coincidencia usando buscarConScoring
+        const resultados = this.buscarConScoring(nombreAlimento);
+        if (resultados && resultados.length > 0) {
+            // Verificar si el primer resultado es suficientemente similar
+            const primerResultado = resultados[0];
+            const primerNombre = this.normalizarTexto((primerResultado.ALIMENTO || '').toLowerCase());
+            if (primerNombre.includes(nombreNormalizado) || nombreNormalizado.includes(primerNombre)) {
+                return primerResultado;
+            }
+        }
+        
+        return null;
     }
 
     // Búsqueda inteligente mejorada con sinónimos, fonética y ranking avanzado
@@ -852,6 +1022,20 @@ class TablaEditable {
         if (autocompleteDiv) {
             autocompleteDiv.classList.add('autocomplete-list-hidden');
             autocompleteDiv.style.display = '';
+            // Restaurar eventos de otros campos
+            if (autocompleteDiv._restaurarPointerEvents) {
+                autocompleteDiv._restaurarPointerEvents();
+            } else {
+                document.querySelectorAll('.input-alimento').forEach(input => {
+                    input.style.pointerEvents = '';
+                });
+                // Restaurar estilos de los contenedores
+                document.querySelectorAll('.autocomplete-container').forEach(container => {
+                    container.style.zIndex = '';
+                    container.style.position = '';
+                });
+            }
+            this.dropdownAbierto = false;
         }
 
         // Marcar fila como usada
@@ -1309,21 +1493,56 @@ class TablaEditable {
             if (lista.length === 0) {
                 // Tres filas vacías si no hay datos
                 for (let i = 0; i < 3; i++) this.agregarFila(comida);
-                return;
-            }
-            lista.forEach(item => {
-                this.agregarFila(comida);
+                // Resetear totales de esta comida a 0
                 const comidaId = comida.toLowerCase().replace(/\s+/g, '-');
-                const tbody = document.getElementById(`tbody-${comidaId}`);
-                const fila = tbody.lastElementChild;
-                const rowId = fila.id;
-                const inputAlimento = fila.querySelector('.input-alimento');
-                const inputGramos = fila.querySelector('.input-gramos');
-                inputAlimento.value = item.alimento || '';
-                inputGramos.value = item.gramos != null ? String(item.gramos) : '';
-                // Forzar recálculo si el alimento está en la BD (se recalculará al escribir gramos)
-                this.calcularMacros(rowId, comida);
-            });
+                const totalCalElem = document.getElementById(`total-cal-${comidaId}`);
+                const totalProtElem = document.getElementById(`total-prot-${comidaId}`);
+                const totalGrasElem = document.getElementById(`total-gras-${comidaId}`);
+                const totalHidrElem = document.getElementById(`total-hidr-${comidaId}`);
+                if (totalCalElem) totalCalElem.textContent = '0';
+                if (totalProtElem) totalProtElem.textContent = '0.0';
+                if (totalGrasElem) totalGrasElem.textContent = '0.0';
+                if (totalHidrElem) totalHidrElem.textContent = '0.0';
+                // Resetear barras de progreso de esta comida
+                this.actualizarProgresoComida(comidaId, 0, 0, 0, 0);
+            } else {
+                lista.forEach(item => {
+                    this.agregarFila(comida);
+                    const comidaId = comida.toLowerCase().replace(/\s+/g, '-');
+                    const tbody = document.getElementById(`tbody-${comidaId}`);
+                    const fila = tbody.lastElementChild;
+                    const rowId = fila.id;
+                    const inputAlimento = fila.querySelector('.input-alimento');
+                    const inputGramos = fila.querySelector('.input-gramos');
+                    inputAlimento.value = item.alimento || '';
+                    inputGramos.value = item.gramos != null ? String(item.gramos) : '';
+                    
+                    // Intentar buscar el alimento en la base de datos
+                    const alimentoEncontrado = this.buscarAlimentoPorNombre(item.alimento);
+                    
+                    if (alimentoEncontrado) {
+                        // Si el alimento está en la BD, usar seleccionarAlimento para configurarlo correctamente
+                        this.seleccionarAlimento(rowId, comida, alimentoEncontrado);
+                    } else if (item.calorias !== undefined || item.proteinas !== undefined || item.grasas !== undefined || item.hidratos !== undefined) {
+                        // Si el alimento no está en la BD pero tenemos valores guardados, usarlos directamente
+                        const calElem = document.getElementById(`cal-${rowId}`);
+                        const protElem = document.getElementById(`prot-${rowId}`);
+                        const grasElem = document.getElementById(`gras-${rowId}`);
+                        const hidrElem = document.getElementById(`hidr-${rowId}`);
+                        
+                        if (calElem) calElem.textContent = item.calorias || 0;
+                        if (protElem) protElem.textContent = item.proteinas ? item.proteinas.toFixed(1) : '0.0';
+                        if (grasElem) grasElem.textContent = item.grasas ? item.grasas.toFixed(1) : '0.0';
+                        if (hidrElem) hidrElem.textContent = item.hidratos ? item.hidratos.toFixed(1) : '0.0';
+                        
+                        // Marcar fila como usada
+                        this.marcarFilaUsada(rowId);
+                    } else {
+                        // Si no hay valores guardados, intentar calcular
+                        this.calcularMacros(rowId, comida);
+                    }
+                });
+            }
         });
         this.actualizarTotalesDiarios();
     }
@@ -1339,6 +1558,13 @@ class TablaEditable {
         // Actualizar estilos visuales y objetivos según el tipo de día
         this.actualizarEstilosDia();
         this.actualizarTotalesDiarios();
+        
+        // Actualizar panel de estadísticas después de cambiar de día
+        if (typeof window.mostrarEstadisticasPlanManual === 'function') {
+            setTimeout(() => {
+                window.mostrarEstadisticasPlanManual();
+            }, 300);
+        }
     }
     
          // Actualizar estilos visuales del contenedor según tipo de día
@@ -1478,12 +1704,29 @@ class TablaEditable {
 
 // Cerrar autocompletado al hacer clic fuera
 document.addEventListener('click', function(e) {
-    if (!e.target.closest('.autocomplete-container')) {
+    if (!e.target.closest('.autocomplete-container') && !e.target.closest('.autocomplete-list')) {
         document.querySelectorAll('.autocomplete-list').forEach(list => {
             // Usar clase para ocultar, no dejar display:none persistente
             list.classList.add('autocomplete-list-hidden');
             list.style.display = '';
+            // Restaurar eventos si había una función guardada
+            if (list._restaurarPointerEvents) {
+                list._restaurarPointerEvents();
+            }
         });
+        // Restaurar eventos de todos los campos
+        document.querySelectorAll('.input-alimento').forEach(input => {
+            input.style.pointerEvents = '';
+        });
+        // Restaurar estilos de los contenedores
+        document.querySelectorAll('.autocomplete-container').forEach(container => {
+            container.style.zIndex = '';
+            container.style.position = '';
+        });
+        // Marcar que no hay dropdown abierto
+        if (window.tablaEditable) {
+            window.tablaEditable.dropdownAbierto = false;
+        }
     }
 });
 

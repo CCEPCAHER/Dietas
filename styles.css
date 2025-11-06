@@ -3808,21 +3808,79 @@ body.dark-mode .comida-header h3 {
     position: relative;
 }
 
+/* Cuando hay un dropdown abierto, ocultar visualmente los campos de búsqueda de otras filas */
+body:has(.autocomplete-list:not(.autocomplete-list-hidden)) .autocomplete-container:not(:has(.autocomplete-list:not(.autocomplete-list-hidden))) {
+    position: relative;
+    z-index: 1; /* Menor z-index que el dropdown */
+}
+
+/* Ocultar visualmente los campos de búsqueda que están debajo de un dropdown abierto */
+body:has(.autocomplete-list:not(.autocomplete-list-hidden)) .autocomplete-container:not(:has(.autocomplete-list:not(.autocomplete-list-hidden))) .input-alimento {
+    position: relative;
+    z-index: 1;
+}
+
+/* Asegurar que el dropdown esté siempre por encima */
+.autocomplete-list:not(.autocomplete-list-hidden) {
+    position: absolute !important;
+    z-index: 10000 !important;
+    background: white !important;
+}
+
 .autocomplete-list {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
-    background: white;
+    background: white !important; /* Fondo sólido para ocultar campos de abajo */
     border: 2px solid #667eea;
     border-top: none;
     border-radius: 0 0 5px 5px;
     max-height: 360px; /* lista más larga */
     overflow-y: auto;
-    z-index: 3000; /* por encima de tarjetas/modales livianos */
+    overflow-x: hidden; /* Prevenir scroll horizontal */
+    z-index: 10000 !important; /* z-index muy alto para estar por encima de todo */
     margin-top: 2px;
     overscroll-behavior: contain;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    pointer-events: auto; /* Asegurar que el dropdown reciba eventos del mouse */
+    /* Asegurar que el fondo sea opaco */
+    opacity: 1 !important;
+    /* Prevenir que elementos de abajo se vean a través */
+    isolation: isolate;
+    /* Asegurar que el fondo cubra completamente los elementos de abajo */
+    will-change: transform;
+    transform: translateZ(0); /* Forzar capa de composición para mejor rendimiento */
+}
+
+/* Asegurar que no se muestren campos de búsqueda dentro del dropdown */
+.autocomplete-list input,
+.autocomplete-list .input-alimento,
+.autocomplete-list .autocomplete-container,
+.autocomplete-list input[type="text"],
+.autocomplete-list input[type="search"],
+.autocomplete-list input[type="number"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+/* Asegurar que solo se muestren los items de autocompletado */
+.autocomplete-list > *:not(.autocomplete-item):not(.autocomplete-header) {
+    display: none !important;
+}
+
+/* Asegurar que el dropdown no contenga ningún input visible */
+.autocomplete-list * input {
+    display: none !important;
+    visibility: hidden !important;
 }
 
 .autocomplete-item {
@@ -3835,6 +3893,35 @@ body.dark-mode .comida-header h3 {
 .autocomplete-item:hover {
     background: #667eea;
     color: white;
+}
+
+/* Asegurar que cuando el mouse está sobre el dropdown, los campos de otras filas permanezcan ocultos */
+.autocomplete-list:hover {
+    z-index: 10000 !important;
+    background: white !important;
+    position: absolute !important;
+}
+
+/* Cuando el mouse está sobre el dropdown, asegurar que los campos de otras filas no se vean */
+.autocomplete-list:hover ~ .input-alimento,
+body:has(.autocomplete-list:hover) .autocomplete-container:not(:has(.autocomplete-list:hover)) .input-alimento,
+body.dropdown-abierto .autocomplete-container:not(:has(.dropdown-hover)) .input-alimento {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+}
+
+/* Cuando hay un dropdown con hover, ocultar campos de otras filas */
+body.dropdown-abierto .autocomplete-container:not(:has(.dropdown-hover)) {
+    z-index: 1 !important;
+    position: relative !important;
+}
+
+body.dropdown-abierto .autocomplete-container:not(:has(.dropdown-hover)) .input-alimento {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
 
 .autocomplete-item:last-child {

@@ -3481,9 +3481,51 @@ function inicializarBotones() {
         const comidas = window.tablaEditable.comidas || ['Desayuno', 'Media Mañana', 'Comida', 'Merienda', 'Cena'];
         let html = '';
         
+        // Función helper para detectar si un día es de descanso
+        const esDiaDescanso = (nombreDia) => {
+            if (!window.datosUsuario || !window.datosUsuario.diasEntreno || window.datosUsuario.diasEntreno.length === 0) {
+                return true; // Por defecto, todos los días son de descanso
+            }
+            
+            // Normalizar el nombre del día
+            const normalizarDia = (dia) => {
+                if (!dia) return '';
+                const mapaNormalizado = {
+                    'Lunes': 'lunes',
+                    'Martes': 'martes',
+                    'Miércoles': 'miercoles',
+                    'Miercoles': 'miercoles',
+                    'Jueves': 'jueves',
+                    'Viernes': 'viernes',
+                    'Sábado': 'sabado',
+                    'Sabado': 'sabado',
+                    'Domingo': 'domingo'
+                };
+                if (mapaNormalizado[dia]) {
+                    return mapaNormalizado[dia];
+                }
+                return dia.toLowerCase()
+                    .replace(/á/g, 'a')
+                    .replace(/é/g, 'e')
+                    .replace(/í/g, 'i')
+                    .replace(/ó/g, 'o')
+                    .replace(/ú/g, 'u');
+            };
+            
+            const valorDia = normalizarDia(nombreDia);
+            const diasEntreno = window.datosUsuario.diasEntreno || [];
+            const diasEntrenoNormalizados = diasEntreno.map(d => normalizarDia(d));
+            
+            return !diasEntrenoNormalizados.includes(valorDia);
+        };
+        
         dias.forEach(dia => {
             const datosDia = plan[dia] || {};
-            html += `<div class="dia-plan"><div class="dia-titulo">${dia}</div>`;
+            const esDescanso = esDiaDescanso(dia);
+            const tipoDia = esDescanso ? 'DÍA DE DESCANSO' : 'DÍA DE ENTRENO';
+            const iconoDia = esDescanso ? '😴' : '💪';
+            
+            html += `<div class="dia-plan"><div class="dia-titulo">${dia} - ${iconoDia} ${tipoDia}</div>`;
             comidas.forEach(comida => {
                 const items = datosDia[comida] || [];
                 if (items.length > 0) {
