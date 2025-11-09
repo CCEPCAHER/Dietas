@@ -288,27 +288,53 @@ class UIManager {
             return;
         }
 
-        const dieta = result.dieta;
-        window.datosUsuario = dieta;
+        const dieta = result.dieta || {};
+        
+        // Normalizar campos que pueden venir como Timestamp u otros formatos
+        const dietaNormalizada = { ...dieta };
+        if (dietaNormalizada.fechaRegistro && typeof dietaNormalizada.fechaRegistro.toDate === 'function') {
+            const fecha = dietaNormalizada.fechaRegistro.toDate();
+            dietaNormalizada.fechaRegistro = fecha.toISOString().split('T')[0];
+        }
+        if (dietaNormalizada.fechaCreacion && typeof dietaNormalizada.fechaCreacion.toDate === 'function') {
+            dietaNormalizada.fechaCreacion = dietaNormalizada.fechaCreacion.toDate();
+        }
+        if (dietaNormalizada.fechaModificacion && typeof dietaNormalizada.fechaModificacion.toDate === 'function') {
+            dietaNormalizada.fechaModificacion = dietaNormalizada.fechaModificacion.toDate();
+        }
+        
+        if (typeof window.actualizarDatosUsuarioGlobal === 'function') {
+            window.actualizarDatosUsuarioGlobal(dietaNormalizada);
+        } else {
+            window.datosUsuario = dietaNormalizada;
+        }
         
         // Rellenar el formulario
-        document.getElementById('nombre').value = dieta.nombre || '';
-        document.getElementById('fechaRegistro').value = dieta.fechaRegistro || '';
-        document.getElementById('sexo').value = dieta.sexo || '';
-        document.getElementById('edad').value = dieta.edad || '';
-        document.getElementById('altura').value = dieta.altura || '';
-        document.getElementById('peso').value = dieta.peso || '';
-        document.getElementById('tipoPersona').value = dieta.tipoPersona || '';
-        document.getElementById('objetivo').value = dieta.objetivo || '';
-        document.getElementById('prohibiciones').value = dieta.prohibiciones || '';
-        document.getElementById('duracion').value = dieta.duracion || 'semana';
+        document.getElementById('nombre').value = dietaNormalizada.nombre || '';
+        document.getElementById('fechaRegistro').value = dietaNormalizada.fechaRegistro || '';
+        document.getElementById('sexo').value = dietaNormalizada.sexo || '';
+        document.getElementById('edad').value = dietaNormalizada.edad || '';
+        document.getElementById('altura').value = dietaNormalizada.altura || '';
+        document.getElementById('peso').value = dietaNormalizada.peso || '';
+        document.getElementById('tipoPersona').value = dietaNormalizada.tipoPersona || '';
+        document.getElementById('objetivo').value = dietaNormalizada.objetivo || '';
+        document.getElementById('prohibiciones').value = dietaNormalizada.prohibiciones || '';
+        document.getElementById('duracion').value = dietaNormalizada.duracion || 'semana';
+        
+        // Marcar días de entrenamiento previamente guardados
+        if (Array.isArray(dietaNormalizada.diasEntreno)) {
+            const diasEntreno = dietaNormalizada.diasEntreno.map(d => d.toLowerCase());
+            document.querySelectorAll('input[name="diaEntreno"]').forEach(checkbox => {
+                checkbox.checked = diasEntreno.includes(checkbox.value.toLowerCase());
+            });
+        }
 
         // Actualizar macros si existen
-        if (dieta.calorias) {
-            document.getElementById('calorias').value = dieta.calorias;
-            document.getElementById('proteinas').value = dieta.proteinas || '';
-            document.getElementById('grasas').value = dieta.grasas || '';
-            document.getElementById('carbohidratos').value = dieta.carbohidratos || '';
+        if (dietaNormalizada.calorias) {
+            document.getElementById('calorias').value = dietaNormalizada.calorias;
+            document.getElementById('proteinas').value = dietaNormalizada.proteinas || '';
+            document.getElementById('grasas').value = dietaNormalizada.grasas || '';
+            document.getElementById('carbohidratos').value = dietaNormalizada.carbohidratos || '';
         }
 
         // Mostrar resultados

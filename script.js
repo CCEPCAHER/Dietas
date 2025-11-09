@@ -858,6 +858,52 @@ const alimentosPorObjetivo = {
 let datosUsuario = {};
 window.datosUsuario = datosUsuario; // Exportar para uso en otros módulos
 
+/**
+ * Actualiza la referencia global de datos del usuario asegurando que
+ * tanto la variable local `datosUsuario` como `window.datosUsuario`
+ * apunten al mismo objeto. Se usa cuando los datos provienen de otras
+ * fuentes (por ejemplo, al cargar una dieta guardada).
+ * @param {object} nuevosDatos
+ */
+window.actualizarDatosUsuarioGlobal = function(nuevosDatos = {}) {
+    datosUsuario = { ...nuevosDatos };
+    window.datosUsuario = datosUsuario;
+    return datosUsuario;
+};
+
+/**
+ * Sincroniza el plan semanal que se está editando en la tabla manual con
+ * el objeto `datosUsuario`, asegurando que al guardar o exportar se
+ * persistan los cambios realizados en cada día.
+ */
+function sincronizarPlanManualConDatosUsuario() {
+    if (!window.tablaEditable) {
+        return;
+    }
+    
+    try {
+        // Asegurar que existe la estructura planSemana
+        if (!window.tablaEditable.planSemana) {
+            window.tablaEditable.planSemana = {};
+        }
+        
+        // Guardar el día actualmente visible antes de clonar datos
+        if (typeof window.tablaEditable.obtenerDatos === 'function' && window.tablaEditable.diaActual) {
+            window.tablaEditable.planSemana[window.tablaEditable.diaActual] = window.tablaEditable.obtenerDatos();
+        }
+        
+        // Clonar en profundidad para evitar referencias compartidas
+        const planClonado = JSON.parse(JSON.stringify(window.tablaEditable.planSemana));
+        datosUsuario.planSemana = planClonado;
+        datosUsuario.modoGeneracion = 'manual';
+        window.datosUsuario = datosUsuario;
+    } catch (error) {
+        console.error('⚠️ Error al sincronizar el plan manual con datosUsuario:', error);
+    }
+}
+
+window.sincronizarPlanManualConDatosUsuario = sincronizarPlanManualConDatosUsuario;
+
 function calcularMacronutrientes() {
     // Obtener valores del formulario o datosUsuario (prioridad al formulario)
     const edad = parseInt(document.getElementById('edad')?.value) || datosUsuario.edad;
@@ -3165,6 +3211,11 @@ function inicializarBotones() {
             boton.disabled = true;
             
             try {
+                // Sincronizar plan manual antes de guardar (si aplica)
+                if (datosUsuario.modoGeneracion === 'manual' && window.tablaEditable) {
+                    sincronizarPlanManualConDatosUsuario();
+                }
+                
                 // Si hay un cliente asociado, guardar en su historial
                 if (window.clienteIdDieta && window.clienteService) {
                     await window.clienteService.agregarDieta(window.clienteIdDieta, datosUsuario);

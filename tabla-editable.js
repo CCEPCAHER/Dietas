@@ -1611,17 +1611,33 @@ class TablaEditable {
                 this.actualizarProgresoComida(comidaId, 0, 0, 0, 0);
             } else {
                 lista.forEach(item => {
+                    const nombreAlimento = item.alimento || item.nombre || item.descripcion || item.producto || '';
+
+                    // Si no hay nombre ni identificador del alimento, ignorar el registro para evitar datos fantasma
+                    if (!nombreAlimento || nombreAlimento.trim() === '') {
+                        const tieneMacros = (item.calorias && item.calorias !== 0) ||
+                            (item.proteinas && item.proteinas !== 0) ||
+                            (item.grasas && item.grasas !== 0) ||
+                            (item.hidratos && item.hidratos !== 0) ||
+                            (item.carbohidratos && item.carbohidratos !== 0);
+                        if (tieneMacros) {
+                            console.warn(`⚠️ Registro de alimento sin nombre detectado en "${comida}". Se omitirá para mantener los totales en 0.`, item);
+                        }
+                        return; // omitir
+                    }
+
                     this.agregarFila(comida);
                     const tbody = document.getElementById(`tbody-${comidaId}`);
                     const fila = tbody.lastElementChild;
                     const rowId = fila.id;
                     const inputAlimento = fila.querySelector('.input-alimento');
                     const inputGramos = fila.querySelector('.input-gramos');
-                    inputAlimento.value = item.alimento || '';
-                    inputGramos.value = item.gramos != null ? String(item.gramos) : '';
+                    inputAlimento.value = nombreAlimento;
+                    const gramosItem = item.gramos != null ? item.gramos : (item.cantidad != null ? item.cantidad : item.porcion);
+                    inputGramos.value = gramosItem != null ? String(gramosItem) : '';
 
                     // Intentar buscar el alimento en la base de datos
-                    const alimentoEncontrado = this.buscarAlimentoPorNombre(item.alimento);
+                    const alimentoEncontrado = this.buscarAlimentoPorNombre(nombreAlimento);
 
                     if (alimentoEncontrado) {
                         // Si el alimento está en la BD, usar seleccionarAlimento para configurarlo correctamente
