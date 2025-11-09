@@ -1869,6 +1869,12 @@ function mostrarTablaEditable() {
             
             planDiv.innerHTML = html;
             
+            if (window.tablaEditable && typeof window.tablaEditable.actualizarSelectoresDia === 'function') {
+                setTimeout(() => {
+                    window.tablaEditable.actualizarSelectoresDia();
+                }, 0);
+            }
+            
             // Inicializar tablas después de insertar el HTML
             setTimeout(() => {
                 // Verificar si hay datos guardados de una dieta generada automáticamente
@@ -1890,8 +1896,12 @@ function mostrarTablaEditable() {
                         
                         // Actualizar selector de día
                         const selectorDia = document.getElementById('selector-dia');
+                        const selectorDiaBottom = document.getElementById('selector-dia-bottom');
                         if (selectorDia) {
                             selectorDia.value = primerDia;
+                        }
+                        if (selectorDiaBottom) {
+                            selectorDiaBottom.value = primerDia;
                         }
                         
                         // Cargar datos del primer día
@@ -3266,115 +3276,96 @@ function inicializarBotones() {
                 background: #fff;
                 padding: 20mm;
             }
-            .header {
-                position: relative;
-                border-bottom: 2px solid #000;
-                padding-bottom: 15px;
-                margin-bottom: 15px;
-                padding-top: 10px;
-                min-height: 140px;
+            body.layout-landscape {
+                padding: 15mm;
             }
-            .fecha-header {
-                position: absolute;
-                top: 0;
-                left: 0;
-                font-size: 10pt;
+            .header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                border-bottom: 1px solid #000;
+                padding: 6mm 0;
+                margin-bottom: 8mm;
+            }
+            .header-left {
+                display: flex;
+                flex-direction: column;
+                gap: 2mm;
+                font-size: 8.5pt;
                 color: #000;
                 font-weight: 600;
-                text-align: left;
             }
-            .logo-header {
-                position: absolute;
-                top: 0;
-                right: 0;
-                z-index: 1;
+            .header-left .fecha-header {
+                font-size: 8pt;
+                font-weight: 600;
             }
-            .logo-pdf {
-                width: 110px;
-                height: 110px;
-                object-fit: contain;
-                flex-shrink: 0;
-            }
-            .header-content {
+            .header-center {
+                flex: 1;
                 text-align: center;
-                padding: 0 120px;
-                margin-top: 0;
+                padding: 0 10mm;
             }
             .titulo-principal {
-                font-size: 28pt;
-                font-weight: 900;
-                letter-spacing: 3px;
+                font-size: 16pt;
+                font-weight: 800;
+                letter-spacing: 1px;
                 text-transform: uppercase;
-                margin: 0 0 12px 0;
+                margin: 0;
                 color: #000;
-                line-height: 1.2;
             }
             .nombre-profesional {
-                font-size: 22pt;
-                font-weight: 900;
-                letter-spacing: 2px;
-                text-transform: uppercase;
-                margin: 0 0 6px 0;
+                font-size: 13pt;
+                font-weight: 700;
+                margin: 2mm 0 0 0;
                 color: #000;
-                line-height: 1.2;
             }
             .especialidades {
-                font-size: 7.5pt;
+                font-size: 7pt;
                 color: #000;
-                font-weight: 700;
+                font-weight: 600;
                 text-transform: uppercase;
-                letter-spacing: 0.3px;
-                margin: 0 0 10px 0;
-                line-height: 1.4;
-                white-space: nowrap;
-                overflow: visible;
-                word-spacing: 0;
+                margin-top: 1mm;
             }
             .contacto {
-                font-size: 11pt;
+                font-size: 8pt;
                 color: #000;
-                display: flex;
-                gap: 20px;
-                justify-content: center;
                 font-weight: 600;
-                margin-top: 8px;
+                display: flex;
+                gap: 6mm;
+                justify-content: center;
+                margin-top: 2mm;
             }
-            .contacto span {
-                display: inline-block;
-                white-space: nowrap;
+            .contacto span { white-space: nowrap; }
+            .logo-header {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                min-width: 28mm;
+            }
+            .logo-pdf {
+                width: 28mm;
+                height: 28mm;
+                object-fit: contain;
             }
             @media (max-width: 600px) {
-                .logo-pdf {
-                    width: 80px;
-                    height: 80px;
-                }
-                .header-content {
-                    padding: 0 85px;
-                }
-                .titulo-principal {
-                    font-size: 20pt;
-                    letter-spacing: 2px;
-                }
-                .nombre-profesional {
-                    font-size: 18pt;
-                }
-                .especialidades {
-                    font-size: 6.5pt;
-                    letter-spacing: 0.2px;
-                }
+                .logo-pdf { width: 80px; height: 80px; }
+                .header-content { padding: 0 85px; }
+                .titulo-principal { font-size: 20pt; letter-spacing: 2px; }
+                .nombre-profesional { font-size: 18pt; }
+                .especialidades { font-size: 6.5pt; letter-spacing: 0.2px; }
             }
             .cliente-info {
-                margin-top: 14px;
+                margin-top: 6mm;
+                font-size: 9pt;
             }
             .cliente-nombre {
                 font-weight: 700;
-                font-size: 16pt;
-                margin-bottom: 6px;
+                font-size: 12pt;
+                margin-bottom: 2mm;
                 color: #000;
                 line-height: 1.3;
             }
             .cliente-datos {
-                font-size: 11pt;
+                font-size: 8.5pt;
                 color: #000;
                 font-weight: 500;
                 line-height: 1.5;
@@ -3382,27 +3373,99 @@ function inicializarBotones() {
             table {
                 width: 100%;
                 border-collapse: collapse;
-                margin: 15px 0;
-                font-size: 10pt;
+                margin: 12px 0;
+                font-size: 9pt;
             }
             th {
                 border: 1px solid #000;
-                padding: 10px;
+                padding: 8px;
                 text-align: left;
                 font-weight: 700;
                 background: #fff;
                 color: #000;
-                font-size: 10.5pt;
+                font-size: 9.5pt;
             }
             td {
                 border: 1px solid #666;
-                padding: 8px;
+                padding: 6px;
                 text-align: left;
                 background: #fff;
                 color: #000;
-                font-size: 10pt;
-                line-height: 1.4;
+                font-size: 8.8pt;
+                line-height: 1.3;
             }
+            .plan-tabla-editable { width: 100%; margin-top: 10px; }
+            .pdf-semana {
+                margin-bottom: 18px;
+                page-break-after: always;
+            }
+            .pdf-semana:last-of-type { page-break-after: auto; }
+            .titulo-semana {
+                font-size: 14pt;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 8px;
+            }
+            .tabla-plan-semanal {
+                width: 100%;
+                border-collapse: collapse;
+                table-layout: fixed;
+                margin-bottom: 12px;
+            }
+            .tabla-plan-semanal th,
+            .tabla-plan-semanal td {
+                border: 1px solid #666;
+                padding: 6px;
+                font-size: 9.5pt;
+                vertical-align: top;
+            }
+            .tabla-plan-semanal th {
+                background: #fff;
+                font-weight: 700;
+                text-align: center;
+            }
+            .tabla-plan-semanal th.columna-comida,
+            .tabla-plan-semanal td.columna-comida {
+                width: 12%;
+                font-weight: 700;
+                text-align: left;
+            }
+            .tabla-plan-semanal th:not(.columna-comida),
+            .tabla-plan-semanal td:not(.columna-comida) {
+                width: 12.5%;
+            }
+            .tabla-plan-semanal .subtitulo-dia {
+                display: block;
+                font-size: 8pt;
+                margin-top: 4px;
+                font-weight: 600;
+            }
+            .celda-dia { min-height: 60px; }
+            .celda-dia .item-alimento {
+                display: block;
+                margin-bottom: 4px;
+                line-height: 1.3;
+            }
+            .celda-dia .item-alimento:last-child { margin-bottom: 0; }
+            .celda-vacia {
+                color: #888;
+                font-style: italic;
+            }
+            .nota-importante {
+                margin-top: 14mm;
+                padding: 8mm 10mm;
+                border: 2px solid #000;
+                font-size: 9.5pt;
+                font-weight: 600;
+                line-height: 1.5;
+                page-break-inside: avoid;
+            }
+            .nota-importante strong {
+                display: inline-block;
+                margin-right: 6px;
+            }
+            /* Estilos anteriores mantenidos para compatibilidad */
             .dia-plan {
                 margin: 18px 0;
                 page-break-inside: avoid;
@@ -3418,10 +3481,7 @@ function inicializarBotones() {
                 padding-bottom: 6px;
                 line-height: 1.3;
             }
-            .comida-row {
-                margin: 8px 0;
-                line-height: 1.5;
-            }
+            .comida-row { margin: 8px 0; line-height: 1.5; }
             .comida-nombre {
                 font-weight: 600;
                 font-size: 10.5pt;
@@ -3475,24 +3535,26 @@ function inicializarBotones() {
         
                   const logoHTML = logoBase64 ? `<img src="${logoBase64}" alt="Logo" class="logo-pdf">` : '';
           
-          return `
-              <div class="header">
-                  <div class="fecha-header">${fecha}</div>
-                  ${logoHTML ? `<div class="logo-header">${logoHTML}</div>` : ''}
-                  <div class="header-content">
-                      <div class="titulo-principal">PLAN DE ALIMENTACIÓN PERSONALIZADO</div>
-                      <div class="nombre-profesional">MAIKA PORCUNA</div>
-                      <div class="especialidades">NUTRICIÓN/DIETÉTICA/SUPLEMENTACIÓN/NUTRICIÓN DEPORTIVA</div>
-                      <div class="contacto">
-                          <span>Maikafit1977@gmail.com</span>
-                          <span>+34 650 229 987</span>
-                      </div>
-                  </div>
-                  <div class="cliente-info">
-                      <div class="cliente-nombre">${nombreCliente}</div>
-                      <div class="cliente-datos">${subtags.join(' · ')}</div>
-                  </div>
-              </div>
+        return `
+            <div class="header">
+                <div class="header-left">
+                    <div class="fecha-header">${fecha}</div>
+                    <div class="contacto">
+                        <span>Maikafit1977@gmail.com</span>
+                        <span>+34 650 229 987</span>
+                    </div>
+                </div>
+                <div class="header-center">
+                    <div class="titulo-principal">PLAN DE ALIMENTACIÓN PERSONALIZADO</div>
+                    <div class="nombre-profesional">MAIKA PORCUNA</div>
+                    <div class="especialidades">Nutrición · Dietética · Suplementación · Nutrición Deportiva</div>
+                </div>
+                ${logoHTML ? `<div class="logo-header">${logoHTML}</div>` : '<div class="logo-header"></div>'}
+            </div>
+            <div class="cliente-info">
+                <div class="cliente-nombre">${nombreCliente}</div>
+                <div class="cliente-datos">${subtags.join(' · ')}</div>
+            </div>
         `;
     }
     
@@ -3557,67 +3619,112 @@ function inicializarBotones() {
      * @returns {string}
      */
     function generarHTMLDesdeTablaEditable() {
-        const plan = window.tablaEditable.planSemana;
-        const dias = window.tablaEditable.dias || ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-        const comidas = window.tablaEditable.comidas || ['Desayuno', 'Media Mañana', 'Comida', 'Merienda', 'Cena'];
-        let html = '';
+        const plan = window.tablaEditable?.planSemana || {};
+        const diasBase = window.tablaEditable?.dias || ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+        const comidas = window.tablaEditable?.comidas || ['Desayuno', 'Media Mañana', 'Comida', 'Merienda', 'Cena'];
         
-        // Función helper para detectar si un día es de descanso
+        const normalizar = (texto = '') => texto
+            .toString()
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-zñ ]/g, '')
+            .trim();
+        
         const esDiaDescanso = (nombreDia) => {
-            if (!window.datosUsuario || !window.datosUsuario.diasEntreno || window.datosUsuario.diasEntreno.length === 0) {
-                return true; // Por defecto, todos los días son de descanso
+            if (!window.datosUsuario || !Array.isArray(window.datosUsuario.diasEntreno) || window.datosUsuario.diasEntreno.length === 0) {
+                return true;
             }
-            
-            // Normalizar el nombre del día
-            const normalizarDia = (dia) => {
-                if (!dia) return '';
-                const mapaNormalizado = {
-                    'Lunes': 'lunes',
-                    'Martes': 'martes',
-                    'Miércoles': 'miercoles',
-                    'Miercoles': 'miercoles',
-                    'Jueves': 'jueves',
-                    'Viernes': 'viernes',
-                    'Sábado': 'sabado',
-                    'Sabado': 'sabado',
-                    'Domingo': 'domingo'
-                };
-                if (mapaNormalizado[dia]) {
-                    return mapaNormalizado[dia];
-                }
-                return dia.toLowerCase()
-                    .replace(/á/g, 'a')
-                    .replace(/é/g, 'e')
-                    .replace(/í/g, 'i')
-                    .replace(/ó/g, 'o')
-                    .replace(/ú/g, 'u');
-            };
-            
-            const valorDia = normalizarDia(nombreDia);
-            const diasEntreno = window.datosUsuario.diasEntreno || [];
-            const diasEntrenoNormalizados = diasEntreno.map(d => normalizarDia(d));
-            
+            const valorDia = normalizar(nombreDia);
+            const diasEntrenoNormalizados = window.datosUsuario.diasEntreno.map(d => normalizar(d));
             return !diasEntrenoNormalizados.includes(valorDia);
         };
         
-        dias.forEach(dia => {
-            const datosDia = plan[dia] || {};
-            const esDescanso = esDiaDescanso(dia);
-            const tipoDia = esDescanso ? 'DÍA DE DESCANSO' : 'DÍA DE ENTRENO';
-            const iconoDia = esDescanso ? '😴' : '💪';
+        const escapeHTML = (str = '') => String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+        
+        const formatoAlimento = (item = {}) => {
+            const gramos = item.gramos != null && item.gramos !== '' ? `${item.gramos}g` : '';
+            const nombre = item.alimento || item.nombre || '';
             
-            html += `<div class="dia-plan"><div class="dia-titulo">${dia} - ${iconoDia} ${tipoDia}</div>`;
-            comidas.forEach(comida => {
-                const items = datosDia[comida] || [];
-                if (items.length > 0) {
-                    html += `<div class="comida-row"><span class="comida-nombre">${comida}:</span> `;
-                    html += items.map(i => `${i.gramos || 0}g ${i.alimento || i.nombre || ''}`).join(', ');
-                    html += `</div>`;
-                }
-            });
-            html += `</div>`;
+            if (gramos && nombre) return `${gramos} ${nombre}`;
+            if (nombre) return nombre;
+            if (gramos) return gramos;
+            return '';
+        };
+        
+        // Agrupar datos por día base
+        const agrupados = {};
+        diasBase.forEach(dia => agrupados[normalizar(dia)] = []);
+        
+        Object.entries(plan).forEach(([nombreDiaOriginal, datosDia]) => {
+            const nombreNormalizado = normalizar(nombreDiaOriginal.split('-')[0]);
+            if (!agrupados[nombreNormalizado]) {
+                agrupados[nombreNormalizado] = [];
+            }
+            agrupados[nombreNormalizado].push({ nombre: nombreDiaOriginal, datos: datosDia });
         });
         
+        const semanas = Math.max(1, ...Object.values(agrupados).map(arr => arr.length || 0));
+        let html = '<div class="plan-tabla-editable">';
+        
+        for (let semana = 0; semana < semanas; semana++) {
+            html += '<div class="pdf-semana">';
+            if (semanas > 1) {
+                html += `<h2 class="titulo-semana">Semana ${semana + 1}</h2>`;
+            }
+            html += '<table class="tabla-plan-semanal"><thead><tr><th class="columna-comida">Comida</th>';
+            
+            const columnas = diasBase.map(dia => {
+                const lista = agrupados[normalizar(dia)] || [];
+                const entrada = lista[semana] || (semana === 0 && plan[dia] ? { nombre: dia, datos: plan[dia] } : null);
+                return {
+                    diaBase: dia,
+                    titulo: entrada ? entrada.nombre : dia,
+                    datos: entrada ? entrada.datos : null
+                };
+            });
+            
+            columnas.forEach(col => {
+                const descanso = esDiaDescanso(col.titulo);
+                const icono = descanso ? '😴' : '💪';
+                const subtitulo = `${icono} ${descanso ? 'Descanso' : 'Entreno'}`;
+                html += `<th>${escapeHTML(col.diaBase)}<span class="subtitulo-dia">${escapeHTML(subtitulo)}</span></th>`;
+            });
+            
+            html += '</tr></thead><tbody>';
+            
+            comidas.forEach(comida => {
+                html += `<tr><td class="columna-comida">${escapeHTML(comida)}</td>`;
+                
+                columnas.forEach(col => {
+                    const items = col.datos && Array.isArray(col.datos[comida]) ? col.datos[comida] : [];
+                    if (items.length === 0) {
+                        html += '<td class="celda-dia celda-vacia">-</td>';
+                    } else {
+                        const contenido = items.map(item => `<span class="item-alimento">• ${escapeHTML(formatoAlimento(item))}</span>`).join('');
+                        html += `<td class="celda-dia">${contenido}</td>`;
+                    }
+                });
+                
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table></div>';
+        }
+        
+        html += `
+            <div class="nota-importante">
+                <strong>📝 NOTA IMPORTANTE:</strong>
+                Recuerda beber al menos 2-3 litros de agua al día. Ajusta las porciones según tu nivel de saciedad y energía.
+            </div>
+        `;
+        
+        html += '</div>';
         return html;
     }
     
@@ -3817,7 +3924,13 @@ function inicializarBotones() {
         return html;
     }
     
-    async function generarArchivoPDF(htmlPDF, nombreCliente) {
+    async function generarArchivoPDF(htmlPDF, nombreCliente, opciones = {}) {
+        const orientacion = opciones.orientacion === 'l' || opciones.orientacion === 'landscape' ? 'l' : 'p';
+        const formato = opciones.formato || 'a4';
+        const orientacionNombre = orientacion === 'l' ? 'landscape' : 'portrait';
+        const pageWidth = orientacion === 'l' ? 297 : 210;
+        const pageHeight = orientacion === 'l' ? 210 : 297;
+        
         // Detectar si es dispositivo móvil (mejorado para detectar todos los casos)
         const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent) || 
                         (window.innerWidth <= 768) || 
@@ -3831,8 +3944,8 @@ function inicializarBotones() {
         container.style.position = 'fixed';
         container.style.top = '-9999px';
         container.style.left = '-9999px';
-        container.style.width = '210mm';
-        container.style.height = '297mm';
+        container.style.width = pageWidth + 'mm';
+        container.style.height = pageHeight + 'mm';
         container.style.border = 'none';
         document.body.appendChild(container);
         
@@ -3985,10 +4098,9 @@ function inicializarBotones() {
                     });
                 }).then(async ({ imgData, width, height }) => {
                     const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const pdf = new jsPDF(orientacion, 'mm', formato);
                     
-                    const imgWidth = 210;
-                    const pageHeight = 297;
+                    const imgWidth = pageWidth;
                     const imgHeight = (height * imgWidth) / width;
                     
                     // Detectar posiciones de los días para evitar cortes
@@ -4057,7 +4169,7 @@ function inicializarBotones() {
                         
                         while (currentY < imgHeight) {
                             if (pageNum > 0) {
-                                pdf.addPage();
+                                pdf.addPage(formato, orientacionNombre);
                             }
                             
                             const availableHeight = pageHeight;
@@ -4161,7 +4273,7 @@ function inicializarBotones() {
                             let heightLeft = imgHeight - pageHeight;
                             let position = -pageHeight;
                             while (heightLeft > 0) {
-                                pdf.addPage();
+                                pdf.addPage(formato, orientacionNombre);
                                 pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
                                 heightLeft -= pageHeight;
                                 position -= pageHeight;
@@ -4314,9 +4426,8 @@ function inicializarBotones() {
                                         reader.onloadend = () => {
                                             const imgData = reader.result;
                                             const { jsPDF } = window.jspdf;
-                                            const pdf = new jsPDF('p', 'mm', 'a4');
-                                            const imgWidth = 210;
-                                            const pageHeight = 297;
+                                            const pdf = new jsPDF(orientacion, 'mm', formato);
+                                            const imgWidth = pageWidth;
                                             const imgHeight = (canvasHeight * imgWidth) / canvasWidth;
                                             
                                             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
@@ -4325,7 +4436,7 @@ function inicializarBotones() {
                                                 let heightLeft = imgHeight - pageHeight;
                                                 let position = -pageHeight;
                                                 while (heightLeft > 0) {
-                                                    pdf.addPage();
+                                pdf.addPage(formato, orientacionNombre);
                                                     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
                                                     heightLeft -= pageHeight;
                                                     position -= pageHeight;
@@ -4418,6 +4529,7 @@ function inicializarBotones() {
         const headerHTML = await generarHeaderPDF(datos, fecha);
         const cssHTML = generarCSSPDF();
         
+        const bodyClass = fuente === 'tabla-editable' ? 'layout-landscape' : '';
         let htmlPDF = `
             <!DOCTYPE html>
             <html>
@@ -4426,7 +4538,7 @@ function inicializarBotones() {
                 <title>Plan de Alimentación - ${nombreCliente}</title>
                 <style>${cssHTML}</style>
             </head>
-            <body>
+            <body class="${bodyClass}">
                 ${headerHTML}
         `;
         
@@ -4491,7 +4603,8 @@ function inicializarBotones() {
         `;
         
         // Generar y descargar PDF (ahora es async)
-        await generarArchivoPDF(htmlPDF, nombreCliente);
+        const orientacionPDF = fuente === 'tabla-editable' ? 'l' : 'p';
+        await generarArchivoPDF(htmlPDF, nombreCliente, { orientacion: orientacionPDF });
     };
     
       // Botón descargar PDF

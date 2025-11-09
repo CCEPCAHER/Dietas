@@ -77,30 +77,15 @@ class TablaEditable {
     generarTablaHTML() {
         let html = '<div class="tabla-editable-container">';
 
-        // Barra de acciones de días y exportación
-        html += `
-            <div class="comida-header" style="margin-bottom:20px; gap:10px; flex-wrap:wrap">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <label for="selector-dia" style="font-weight:600;color:#667eea">Día:</label>
-                    <select id="selector-dia" onchange="tablaEditable.cambiarDia(this.value)" title="Selecciona el día a editar" style="padding: 8px; border-radius: 6px; border: 2px solid #667eea; font-weight: 600;">
-                        ${this.dias.map(d => {
-                            const esDescanso = this.esDiaDescanso(d);
-                            const badge = esDescanso ? '😴 DESCANSO' : '💪 ENTRENO';
-                            return `<option value="${d}" ${d === this.diaActual ? 'selected' : ''}>${d} - ${badge}</option>`;
-                        }).join('')}
-                    </select>
-                    <span id="badge-dia-actual" class="badge-dia-selector"></span>
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <button type="button" class="btn-clientes" onclick="tablaEditable.replicarDiaActualATodaLaSemana()" title="Copiar este día a toda la semana">↔️ Replicar a toda la semana</button>
-                    <button type="button" class="btn-clientes" onclick="tablaEditable.exportarPDFMinimalista()" title="Exportar plan semanal en PDF">🧾 Exportar PDF</button>
-                </div>
-            </div>
-        `;
+        // Barra de acciones (superior)
+        html += this.generarBarraAcciones('');
         
         this.comidas.forEach(comida => {
             html += this.generarSeccionComida(comida);
         });
+
+        // Barra de acciones (inferior, antes de totales)
+        html += this.generarBarraAcciones('-bottom');
 
         html += this.generarTotalesDiarios();
         html += '</div>';
@@ -120,6 +105,31 @@ class TablaEditable {
         });
         // Inicializar estructura del día actual en blanco
         this.planSemana[this.diaActual] = this.obtenerDatos();
+    }
+
+    generarBarraAcciones(sufijo = '') {
+        const idSelector = `selector-dia${sufijo}`;
+        const idBadge = `badge-dia-actual${sufijo}`;
+        
+        return `
+            <div class="comida-header" style="margin-bottom:20px; gap:10px; flex-wrap:wrap">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <label for="${idSelector}" style="font-weight:600;color:#667eea">Día:</label>
+                    <select id="${idSelector}" onchange="tablaEditable.cambiarDia(this.value)" title="Selecciona el día a editar" style="padding: 8px; border-radius: 6px; border: 2px solid #667eea; font-weight: 600;">
+                        ${this.dias.map(d => {
+                            const esDescanso = this.esDiaDescanso(d);
+                            const badge = esDescanso ? '😴 DESCANSO' : '💪 ENTRENO';
+                            return `<option value="${d}" ${d === this.diaActual ? 'selected' : ''}>${d} - ${badge}</option>`;
+                        }).join('')}
+                    </select>
+                    <span id="${idBadge}" class="badge-dia-selector"></span>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn-clientes" onclick="tablaEditable.replicarDiaActualATodaLaSemana()" title="Copiar este día a toda la semana">↔️ Replicar a toda la semana</button>
+                    <button type="button" class="btn-clientes" onclick="tablaEditable.exportarPDFMinimalista()" title="Exportar plan semanal en PDF">🧾 Exportar PDF</button>
+                </div>
+            </div>
+        `;
     }
 
     generarSeccionComida(comida) {
@@ -1555,12 +1565,39 @@ class TablaEditable {
 
         // Rellenar
         this.comidas.forEach(comida => {
-            const lista = (datos && datos[comida]) ? datos[comida] : [];
+            let lista = (datos && datos[comida]) ? datos[comida] : [];
+
+            // Normalizar: asegurar que lista sea un array de elementos
+            if (!Array.isArray(lista)) {
+                if (lista && typeof lista === 'object') {
+                    // Caso: objeto con propiedad alimentos/items (formato de planes automáticos antiguos)
+                    if (Array.isArray(lista.alimentos)) {
+                        lista = lista.alimentos;
+                    } else if (Array.isArray(lista.items)) {
+                        lista = lista.items;
+                    } else if (Object.keys(lista).length > 0 && Object.values(lista).every(item => typeof item !== 'object')) {
+                        // Caso: objeto con valores primitivos -> convertir en un solo elemento
+                        lista = [lista];
+                    } else {
+                        // Caso genérico: tomar los valores objeto como elementos
+                        const valores = Object.values(lista).filter(item => item && typeof item === 'object');
+                        lista = valores.length > 0 ? valores : [lista];
+                    }
+                } else if (lista) {
+                    // Caso: valor primitivo -> envolver en array
+                    lista = [lista];
+                } else {
+                    lista = [];
+                }
+            }
+
             const comidaId = comida.toLowerCase().replace(/\s+/g, '-');
-            
+
             if (lista.length === 0) {
                 // Tres filas vacías si no hay datos
-                for (let i = 0; i < 3; i++) this.agregarFila(comida);
+                for (let i = 0; i < 3; i++) {
+                    this.agregarFila(comida);
+                }
                 // Resetear totales de esta comida a 0
                 const totalCalElem = document.getElementById(`total-cal-${comidaId}`);
                 const totalProtElem = document.getElementById(`total-prot-${comidaId}`);
@@ -1575,7 +1612,6 @@ class TablaEditable {
             } else {
                 lista.forEach(item => {
                     this.agregarFila(comida);
-                    const comidaId = comida.toLowerCase().replace(/\s+/g, '-');
                     const tbody = document.getElementById(`tbody-${comidaId}`);
                     const fila = tbody.lastElementChild;
                     const rowId = fila.id;
@@ -1583,10 +1619,10 @@ class TablaEditable {
                     const inputGramos = fila.querySelector('.input-gramos');
                     inputAlimento.value = item.alimento || '';
                     inputGramos.value = item.gramos != null ? String(item.gramos) : '';
-                    
+
                     // Intentar buscar el alimento en la base de datos
                     const alimentoEncontrado = this.buscarAlimentoPorNombre(item.alimento);
-                    
+
                     if (alimentoEncontrado) {
                         // Si el alimento está en la BD, usar seleccionarAlimento para configurarlo correctamente
                         this.seleccionarAlimento(rowId, comida, alimentoEncontrado);
@@ -1596,12 +1632,12 @@ class TablaEditable {
                         const protElem = document.getElementById(`prot-${rowId}`);
                         const grasElem = document.getElementById(`gras-${rowId}`);
                         const hidrElem = document.getElementById(`hidr-${rowId}`);
-                        
+
                         if (calElem) calElem.textContent = item.calorias || 0;
                         if (protElem) protElem.textContent = item.proteinas ? item.proteinas.toFixed(1) : '0.0';
                         if (grasElem) grasElem.textContent = item.grasas ? item.grasas.toFixed(1) : '0.0';
                         if (hidrElem) hidrElem.textContent = item.hidratos ? item.hidratos.toFixed(1) : '0.0';
-                        
+
                         // Marcar fila como usada
                         this.marcarFilaUsada(rowId);
                     } else {
@@ -1611,7 +1647,7 @@ class TablaEditable {
                 });
             }
         });
-        
+
         // Solo actualizar totales si se solicita (por defecto sí)
         if (actualizarTotales) {
             this.actualizarTotalesDiarios();
@@ -1625,6 +1661,7 @@ class TablaEditable {
         // Guardar lo que hay en pantalla en el día actual
         this.planSemana[this.diaActual] = this.obtenerDatos();
         this.diaActual = nuevoDia;
+        this.actualizarSelectoresDia();
         const datos = this.planSemana[this.diaActual] || null;
         
         // Cargar datos del nuevo día SIN actualizar totales todavía
@@ -1651,6 +1688,18 @@ class TablaEditable {
             }
         }, 50);
     }
+
+    actualizarSelectoresDia() {
+        const selectorSuperior = document.getElementById('selector-dia');
+        const selectorInferior = document.getElementById('selector-dia-bottom');
+        
+        if (selectorSuperior && selectorSuperior.value !== this.diaActual) {
+            selectorSuperior.value = this.diaActual;
+        }
+        if (selectorInferior && selectorInferior.value !== this.diaActual) {
+            selectorInferior.value = this.diaActual;
+        }
+    }
     
     // Actualizar estilos visuales del contenedor según tipo de día
     actualizarEstilosDia() {
@@ -1659,6 +1708,7 @@ class TablaEditable {
         
         const contenedor = document.querySelector('.tabla-editable-container');
         const badgeDia = document.getElementById('badge-dia-actual');
+        const badgeDiaBottom = document.getElementById('badge-dia-actual-bottom');
         const totalesDiv = document.querySelector('.totales-diarios');
         
         if (contenedor) {
@@ -1673,12 +1723,15 @@ class TablaEditable {
         }
         
         // Actualizar badge visual del selector de día
+        const badgeHtml = esDescanso
+            ? '<span class="badge-descanso">😴 DESCANSO</span>'
+            : '<span class="badge-entreno">💪 ENTRENO</span>';
+
         if (badgeDia) {
-            if (esDescanso) {
-                badgeDia.innerHTML = '<span class="badge-descanso">😴 DESCANSO</span>';
-            } else {
-                badgeDia.innerHTML = '<span class="badge-entreno">💪 ENTRENO</span>';
-            }
+            badgeDia.innerHTML = badgeHtml;
+        }
+        if (badgeDiaBottom) {
+            badgeDiaBottom.innerHTML = badgeHtml;
         }
         
         // Actualizar estilos de totales
