@@ -950,36 +950,32 @@ function calcularMacronutrientes() {
     // Redondear solo para mostrar
     tmbBase = Math.round(tmbBase);
 
-    // Ajustar TMB según tipo de persona (replica Excel: el TMB se multiplica por un factor)
-    // El factor varía según el peso: pesos mayores tienen factores más altos
-    // Usar tmbBaseExacta para evitar errores de redondeo acumulados
-    let factorTipoPersona;
-    switch (tipoPersona) {
-        case 'sedentaria':
-            factorTipoPersona = 1.0; // Sin ajuste
-            break;
-        case 'activa':
-        case 'no-sedentaria': // Compatibilidad con ambos términos
-            // El factor varía según el peso basado en casos del Excel:
-            // Mujer 58kg: 1.3598, 59kg: 1.365448
-            // Hombre 60kg: 1.1115, 65kg: 1.1454, 70kg: 1.1770, 77kg: 1.2183, 80kg: 1.2350, 85kg: 1.2616
-            // Para mujeres (pesos menores): usar factor base ~1.365
-            // Para hombres (pesos mayores): el factor aumenta con el peso
-            if (sexo === 'Hombre' || sexo === 'masculino') {
-                // Fórmula lineal calibrada con casos reales del Excel:
-                // Casos: 60kg→1.1115, 65kg→1.1454, 70kg→1.1770, 77kg→1.2183, 80kg→1.2350, 85kg→1.2616
-                // Fórmula: factor = 0.75126 + 0.006004 * peso
-                factorTipoPersona = 0.75126 + 0.006004 * peso;
-            } else {
-                // Mujeres: factor más constante, basado en 58-59kg
-                factorTipoPersona = 1.365448; // Calibrado con 59kg mujer
-            }
-            break;
-        case 'muy-activa':
-            factorTipoPersona = 1.55; // Más ajuste para muy activa
-            break;
-        default:
-            factorTipoPersona = 1.15; // Valor conservador si no hay dato
+    const sexoNormalizado = (sexo || '').toString().toLowerCase().includes('mujer') ? 'femenino' : 'masculino';
+
+    const tipoPersonaNormalizado = (tipoPersona || '').toString().toLowerCase();
+
+    const FACTORES_TIPO_PERSONA = {
+        masculino: {
+            sedentaria: 1.0,
+            'no-sedentaria': 1.21,    // Calibrado con plantilla Excel (aprox. 1.209)
+            activa: 1.21,
+            'muy-activa': 1.35
+        },
+        femenino: {
+            sedentaria: 1.0,
+            'no-sedentaria': 1.33,    // Valores más altos en la hoja Excel para mujeres
+            activa: 1.33,
+            'muy-activa': 1.48
+        }
+    };
+
+    let factorTipoPersona = FACTORES_TIPO_PERSONA[sexoNormalizado]?.[tipoPersonaNormalizado] 
+        ?? FACTORES_TIPO_PERSONA[sexoNormalizado]?.['no-sedentaria'] 
+        ?? 1.15;
+
+    // Permitir sobrescribir manualmente desde datosUsuario (calibración avanzada)
+    if (typeof datosUsuario.factorTipoPersonaPersonalizado === 'number') {
+        factorTipoPersona = datosUsuario.factorTipoPersonaPersonalizado;
     }
     // Calcular TMB ajustado sin redondear primero
     const tmbAjustadoExacta = tmbBaseExacta * factorTipoPersona;
@@ -1007,42 +1003,31 @@ function calcularMacronutrientes() {
     // Calcular actividad física del deporte basado en TMB BASE (no ajustado)
     // En Excel: actividad moderada = 904 kcal para TMB base 1204 → factor 0.75
     // Usar tmbBaseExacta para cálculos precisos
-    let factorActividad;
-    switch(actividadFisicaDeporte) {
-        case 'sedentario': 
-            factorActividad = 0; 
-            break;
-        case 'ligera': 
-            // El factor varía según el peso y sexo basado en casos del Excel
-            // Hombre: 60kg→0.4170, 65kg→0.4291, 70kg→0.4417, 77kg→0.4565, 80kg→0.4633, 85kg→0.4729
-            // Mujer 70kg: 0.4927
-            // Fórmula lineal para hombres: factor = 0.28284 + 0.002236 * peso
-            if (sexo === 'Hombre' || sexo === 'masculino') {
-                factorActividad = 0.28284 + 0.002236 * peso;
-            } else {
-                // Mujeres: factor más alto que hombres
-                // Caso real: Mujer 70kg → factor 0.4927 (706/1432.75)
-                // Fórmula: factor = 0.35486 + 0.006892 * (peso - 50)
-                factorActividad = 0.35486 + 0.006892 * (peso - 50);
-            }
-            break;
-        case 'moderada': 
-            // Factor basado en Excel: 904/1204 = 0.75 (exacto)
-            factorActividad = 0.75;
-            break;
-        case 'intensa': 
-            // Factor calibrado: Con 59kg (TMB base 1204) → Actividad 1192: 1192/1204 = 0.990033
-            // Con 58kg (TMB base 1194) → Actividad 1177: 1177/1194 = 0.98576
-            // Promedio para funcionar con ambos pesos: ~0.9879
-            // Usamos factor calibrado con 59kg (estándar): 0.990033
-            factorActividad = 0.990033; // Para actividad intensa (6-7 días)
-            break;
-        case 'muy-intensa': 
-            // Muy intensa por encima de intensa
-            factorActividad = 1.125;
-            break;
-        default: 
-            factorActividad = 0.75;
+    const actividadNormalizada = (actividadFisicaDeporte || '').toString().toLowerCase();
+
+    const FACTORES_ACTIVIDAD = {
+        masculino: {
+            sedentario: 0,
+            ligera: 0.45,
+            moderada: 0.65,
+            intensa: 0.876,       // Calibrado con hoja Excel (≈ 1 412 kcal para el ejemplo dado)
+            'muy-intensa': 1.05
+        },
+        femenino: {
+            sedentario: 0,
+            ligera: 0.52,
+            moderada: 0.70,
+            intensa: 0.92,
+            'muy-intensa': 1.10
+        }
+    };
+
+    let factorActividad = FACTORES_ACTIVIDAD[sexoNormalizado]?.[actividadNormalizada] 
+        ?? FACTORES_ACTIVIDAD[sexoNormalizado]?.moderada 
+        ?? 0.65;
+
+    if (typeof datosUsuario.factorActividadPersonalizado === 'number') {
+        factorActividad = datosUsuario.factorActividadPersonalizado;
     }
     const actividadFisicaDeporteKcalExacta = tmbBaseExacta * factorActividad;
     const actividadFisicaDeporteKcal = Math.round(actividadFisicaDeporteKcalExacta);
@@ -2969,7 +2954,7 @@ function generarDiaHTML(dia, editable = false) {
             </td>
         </tr>
         <tr>
-            <td class="nombre-comida">🥤 MEDIODÍA</td>
+            <td class="nombre-comida">🥤 MEDIA<br/>MAÑANA</td>
             ${comidas.medioDia.alimentos.map(alimento => `<td>${alimento}</td>`).join('')}
             ${Array(maxAlimentos - comidas.medioDia.alimentos.length).fill('<td></td>').join('')}
             <td class="macros-celda">
@@ -3325,18 +3310,18 @@ function inicializarBotones() {
                 line-height: 1.6;
                 color: #000;
                 background: #fff;
-                padding: 20mm;
+                padding: 15mm;
             }
             body.layout-landscape {
-                padding: 15mm;
+                padding: 10mm 12mm;
             }
             .header {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
                 border-bottom: 1px solid #000;
-                padding: 6mm 0;
-                margin-bottom: 8mm;
+                padding: 4mm 0;
+                margin-bottom: 6mm;
             }
             .header-left {
                 display: flex;
@@ -3353,7 +3338,7 @@ function inicializarBotones() {
             .header-center {
                 flex: 1;
                 text-align: center;
-                padding: 0 10mm;
+                padding: 0 6mm;
             }
             .titulo-principal {
                 font-size: 16pt;
@@ -3405,7 +3390,7 @@ function inicializarBotones() {
                 .especialidades { font-size: 6.5pt; letter-spacing: 0.2px; }
             }
             .cliente-info {
-                margin-top: 6mm;
+                margin-top: 4mm;
                 font-size: 9pt;
             }
             .cliente-nombre {
@@ -3424,26 +3409,26 @@ function inicializarBotones() {
             table {
                 width: 100%;
                 border-collapse: collapse;
-                margin: 12px 0;
-                font-size: 9pt;
+                margin: 10px 0;
+                font-size: 8.4pt;
             }
             th {
                 border: 1px solid #000;
-                padding: 8px;
+                padding: 5px;
                 text-align: left;
                 font-weight: 700;
                 background: #fff;
                 color: #000;
-                font-size: 9.5pt;
+                font-size: 9pt;
             }
             td {
                 border: 1px solid #666;
-                padding: 6px;
+                padding: 4px;
                 text-align: left;
                 background: #fff;
                 color: #000;
-                font-size: 8.8pt;
-                line-height: 1.3;
+                font-size: 8.1pt;
+                line-height: 1.2;
             }
             .plan-tabla-editable { width: 100%; margin-top: 10px; }
             .pdf-semana {
@@ -3467,8 +3452,8 @@ function inicializarBotones() {
             .tabla-plan-semanal th,
             .tabla-plan-semanal td {
                 border: 1px solid #666;
-                padding: 6px;
-                font-size: 9.5pt;
+                padding: 4px;
+                font-size: 8.6pt;
                 vertical-align: top;
             }
             .tabla-plan-semanal th {
@@ -3478,13 +3463,13 @@ function inicializarBotones() {
             }
             .tabla-plan-semanal th.columna-comida,
             .tabla-plan-semanal td.columna-comida {
-                width: 12%;
+                width: 8%;
                 font-weight: 700;
-                text-align: left;
+                text-align: center;
             }
             .tabla-plan-semanal th:not(.columna-comida),
             .tabla-plan-semanal td:not(.columna-comida) {
-                width: 12.5%;
+                width: 13.15%;
             }
             .tabla-plan-semanal .subtitulo-dia {
                 display: block;
@@ -3492,24 +3477,48 @@ function inicializarBotones() {
                 margin-top: 4px;
                 font-weight: 600;
             }
-            .celda-dia { min-height: 60px; }
+            .columna-comida {
+                padding: 4px 3px !important;
+            }
+            .etiqueta-comida {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 2px;
+                line-height: 1.2;
+            }
+            .comida-icono {
+                font-size: 16pt;
+            }
+            .comida-texto {
+                display: block;
+                font-size: 8.5pt;
+                font-weight: 600;
+                text-align: center;
+            }
+            .celda-dia {
+                min-height: 48px;
+                line-height: 1.15;
+                word-break: break-word;
+            }
             .celda-dia .item-alimento {
                 display: block;
-                margin-bottom: 4px;
-                line-height: 1.3;
+                margin-bottom: 2px;
             }
-            .celda-dia .item-alimento:last-child { margin-bottom: 0; }
+            .celda-dia .item-alimento:last-child {
+                margin-bottom: 0;
+            }
             .celda-vacia {
                 color: #888;
                 font-style: italic;
             }
             .nota-importante {
-                margin-top: 14mm;
-                padding: 8mm 10mm;
-                border: 2px solid #000;
-                font-size: 9.5pt;
+                margin-top: 6mm;
+                padding: 6mm 8mm;
+                border: 1.5px solid #000;
+                font-size: 8.8pt;
                 font-weight: 600;
-                line-height: 1.5;
+                line-height: 1.35;
                 page-break-inside: avoid;
             }
             .nota-importante strong {
@@ -3757,7 +3766,9 @@ function inicializarBotones() {
                     if (items.length === 0) {
                         html += '<td class="celda-dia celda-vacia">-</td>';
                     } else {
-                        const contenido = items.map(item => `<span class="item-alimento">• ${escapeHTML(formatoAlimento(item))}</span>`).join('');
+                        const contenido = items
+                            .map(item => `<span class="item-alimento">• ${escapeHTML(formatoAlimento(item))}</span>`)
+                            .join('');
                         html += `<td class="celda-dia">${contenido}</td>`;
                     }
                 });

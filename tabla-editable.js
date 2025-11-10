@@ -12,6 +12,14 @@ class TablaEditable {
         this.init();
     }
 
+    formatearEtiquetaComida(comida) {
+        if (!comida) return '';
+        if (comida === 'Media Mañana') {
+            return 'Media<br>Mañana';
+        }
+        return comida;
+    }
+
     async init() {
         // Inicializar estructura de datos
         this.comidas.forEach(comida => {
@@ -134,11 +142,17 @@ class TablaEditable {
 
     generarSeccionComida(comida) {
         const comidaId = comida.toLowerCase().replace(/\s+/g, '-');
+        const etiquetaComida = this.formatearEtiquetaComida(comida);
+        const iconoComida = comida === 'Desayuno' ? '🍳' :
+            comida === 'Media Mañana' ? '🥤' :
+            comida === 'Comida' ? '🍽️' :
+            comida === 'Merienda' ? '🥙' :
+            comida === 'Cena' ? '🌙' : '🍽️';
         
         return `
             <div class="comida-section" data-comida="${comida}">
                 <div class="comida-header">
-                    <h3>🍽️ ${comida}</h3>
+                    <h3>${iconoComida} ${etiquetaComida}</h3>
                     <button type="button" class="btn-add-alimento" onclick="tablaEditable.agregarFila('${comida}')">
                         ➕ Añadir Alimento
                     </button>
