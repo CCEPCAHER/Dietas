@@ -3310,18 +3310,18 @@ function inicializarBotones() {
                 line-height: 1.6;
                 color: #000;
                 background: #fff;
-                padding: 15mm;
+                padding: 13mm;
             }
             body.layout-landscape {
-                padding: 10mm 12mm;
+                padding: 8mm 10mm;
             }
             .header {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
                 border-bottom: 1px solid #000;
-                padding: 4mm 0;
-                margin-bottom: 6mm;
+                padding: 3mm 0;
+                margin-bottom: 4mm;
             }
             .header-left {
                 display: flex;
@@ -3409,26 +3409,26 @@ function inicializarBotones() {
             table {
                 width: 100%;
                 border-collapse: collapse;
-                margin: 10px 0;
-                font-size: 8.4pt;
+                margin: 8px 0;
+                font-size: 7.6pt;
             }
             th {
                 border: 1px solid #000;
-                padding: 5px;
+                padding: 4px;
                 text-align: left;
                 font-weight: 700;
                 background: #fff;
                 color: #000;
-                font-size: 9pt;
+                font-size: 8.4pt;
             }
             td {
                 border: 1px solid #666;
-                padding: 4px;
+                padding: 3px;
                 text-align: left;
                 background: #fff;
                 color: #000;
-                font-size: 8.1pt;
-                line-height: 1.2;
+                font-size: 7.4pt;
+                line-height: 1.15;
             }
             .plan-tabla-editable { width: 100%; margin-top: 10px; }
             .pdf-semana {
@@ -3461,15 +3461,9 @@ function inicializarBotones() {
                 font-weight: 700;
                 text-align: center;
             }
-            .tabla-plan-semanal th.columna-comida,
-            .tabla-plan-semanal td.columna-comida {
-                width: 8%;
-                font-weight: 700;
-                text-align: center;
-            }
-            .tabla-plan-semanal th:not(.columna-comida),
-            .tabla-plan-semanal td:not(.columna-comida) {
-                width: 13.15%;
+            .tabla-plan-semanal th,
+            .tabla-plan-semanal td {
+                width: ${Math.round((100 / 7) * 100) / 100}%;
             }
             .tabla-plan-semanal .subtitulo-dia {
                 display: block;
@@ -3477,33 +3471,21 @@ function inicializarBotones() {
                 margin-top: 4px;
                 font-weight: 600;
             }
-            .columna-comida {
-                padding: 4px 3px !important;
-            }
-            .etiqueta-comida {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 2px;
-                line-height: 1.2;
-            }
-            .comida-icono {
-                font-size: 16pt;
-            }
-            .comida-texto {
-                display: block;
-                font-size: 8.5pt;
-                font-weight: 600;
-                text-align: center;
-            }
             .celda-dia {
-                min-height: 48px;
+                min-height: 40px;
                 line-height: 1.15;
                 word-break: break-word;
             }
             .celda-dia .item-alimento {
                 display: block;
-                margin-bottom: 2px;
+                margin-left: 10px;
+                margin-bottom: 1px;
+                position: relative;
+            }
+            .celda-dia .item-alimento::before {
+                content: '•';
+                position: absolute;
+                left: -8px;
             }
             .celda-dia .item-alimento:last-child {
                 margin-bottom: 0;
@@ -3511,6 +3493,11 @@ function inicializarBotones() {
             .celda-vacia {
                 color: #888;
                 font-style: italic;
+            }
+            .titulo-comida {
+                display: block;
+                font-weight: 700;
+                margin-bottom: 1px;
             }
             .nota-importante {
                 margin-top: 6mm;
@@ -3737,7 +3724,7 @@ function inicializarBotones() {
             if (semanas > 1) {
                 html += `<h2 class="titulo-semana">Semana ${semana + 1}</h2>`;
             }
-            html += '<table class="tabla-plan-semanal"><thead><tr><th class="columna-comida">Comida</th>';
+            html += '<table class="tabla-plan-semanal"><thead><tr>';
             
             const columnas = diasBase.map(dia => {
                 const lista = agrupados[normalizar(dia)] || [];
@@ -3752,14 +3739,14 @@ function inicializarBotones() {
             columnas.forEach(col => {
                 const descanso = esDiaDescanso(col.titulo);
                 const icono = descanso ? '😴' : '💪';
-                const subtitulo = `${icono} ${descanso ? 'Descanso' : 'Entreno'}`;
-                html += `<th>${escapeHTML(col.diaBase)}<span class="subtitulo-dia">${escapeHTML(subtitulo)}</span></th>`;
+                const etiquetaDia = `${col.diaBase} ${icono}`;
+                html += `<th>${escapeHTML(etiquetaDia)}</th>`;
             });
             
             html += '</tr></thead><tbody>';
             
             comidas.forEach(comida => {
-                html += `<tr><td class="columna-comida">${escapeHTML(comida)}</td>`;
+                html += '<tr>';
                 
                 columnas.forEach(col => {
                     const items = col.datos && Array.isArray(col.datos[comida]) ? col.datos[comida] : [];
@@ -3767,9 +3754,9 @@ function inicializarBotones() {
                         html += '<td class="celda-dia celda-vacia">-</td>';
                     } else {
                         const contenido = items
-                            .map(item => `<span class="item-alimento">• ${escapeHTML(formatoAlimento(item))}</span>`)
-                            .join('');
-                        html += `<td class="celda-dia">${contenido}</td>`;
+                            .map(item => `<span class="item-alimento">${escapeHTML(formatoAlimento(item))}</span>`)
+                            .join(' ');
+                        html += `<td class="celda-dia"><span class="titulo-comida">${escapeHTML(comida)}</span>${contenido}</td>`;
                     }
                 });
                 
