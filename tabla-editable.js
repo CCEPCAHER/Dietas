@@ -132,7 +132,9 @@ class TablaEditable {
                     </select>
                     <span id="${idBadge}" class="badge-dia-selector"></span>
                 </div>
-                <div style="display:flex; gap:10px;">
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button type="button" class="btn-clientes" onclick="tablaEditable.replicarDiaActualPorTipo('entreno')" title="Copiar este día a todos los días marcados como entreno">💪 Replicar días de entreno</button>
+                    <button type="button" class="btn-clientes" onclick="tablaEditable.replicarDiaActualPorTipo('descanso')" title="Copiar este día a todos los días de descanso">😴 Replicar días de descanso</button>
                     <button type="button" class="btn-clientes" onclick="tablaEditable.replicarDiaActualATodaLaSemana()" title="Copiar este día a toda la semana">↔️ Replicar a toda la semana</button>
                     <button type="button" class="btn-clientes" onclick="tablaEditable.exportarPDFMinimalista()" title="Exportar plan semanal en PDF">🧾 Exportar PDF</button>
                 </div>
@@ -1807,6 +1809,36 @@ class TablaEditable {
         } else {
             console.warn('⚠️ No se encontró el elemento .totales-diarios');
         }
+    }
+
+    obtenerDiasEntreno() {
+        return this.dias.filter(dia => !this.esDiaDescanso(dia));
+    }
+
+    obtenerDiasDescanso() {
+        return this.dias.filter(dia => this.esDiaDescanso(dia));
+    }
+
+    replicarDiaActualPorTipo(tipo) {
+        const datosActual = this.obtenerDatos();
+        const diasObjetivo = tipo === 'entreno' ? this.obtenerDiasEntreno() : this.obtenerDiasDescanso();
+
+        if (!Array.isArray(diasObjetivo) || diasObjetivo.length === 0) {
+            const mensaje = tipo === 'entreno'
+                ? '⚠️ No hay días de entreno configurados para replicar.'
+                : '⚠️ No hay días de descanso configurados para replicar.';
+            window.mostrarNotificacion?.(mensaje, 'warning');
+            return;
+        }
+
+        diasObjetivo.forEach(dia => {
+            this.planSemana[dia] = JSON.parse(JSON.stringify(datosActual));
+        });
+
+        const mensajeExito = tipo === 'entreno'
+            ? `✅ Día replicado en ${diasObjetivo.length} día(s) de entreno`
+            : `✅ Día replicado en ${diasObjetivo.length} día(s) de descanso`;
+        window.mostrarNotificacion?.(mensajeExito, 'success');
     }
 
     // Replicar día actual a toda la semana

@@ -908,7 +908,7 @@ function calcularMacronutrientes() {
     // Obtener valores del formulario o datosUsuario (prioridad al formulario)
     const edad = parseInt(document.getElementById('edad')?.value) || datosUsuario.edad;
     const sexo = document.getElementById('sexo')?.value || datosUsuario.sexo;
-    const altura = parseInt(document.getElementById('altura')?.value) || datosUsuario.altura;
+    const altura = parseFloat(document.getElementById('altura')?.value) || datosUsuario.altura;
     const peso = parseFloat(document.getElementById('peso')?.value) || datosUsuario.peso;
     const objetivo = document.getElementById('objetivo')?.value || datosUsuario.objetivo;
     const tipoPersona = document.getElementById('tipoPersona')?.value || datosUsuario.tipoPersona;
@@ -3130,7 +3130,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 fechaRegistro: document.getElementById('fechaRegistro').value,
                 sexo: document.getElementById('sexo').value,
                 edad: parseInt(document.getElementById('edad').value),
-                altura: parseInt(document.getElementById('altura').value),
+                altura: parseFloat(document.getElementById('altura').value),
                 peso: parseFloat(document.getElementById('peso').value),
                 tipoPersona: document.getElementById('tipoPersona').value,
                 objetivo: document.getElementById('objetivo').value,
