@@ -3306,42 +3306,26 @@ function inicializarBotones() {
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
                 font-family: 'Arial', 'Helvetica', sans-serif;
-                font-size: 11pt;
+                font-size: 10.2pt;
                 line-height: 1.6;
                 color: #000;
                 background: #fff;
-                padding: 13mm;
+                padding: 11mm;
             }
             body.layout-landscape {
-                padding: 8mm 10mm;
+                padding: 6mm 9mm;
             }
             .header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
                 border-bottom: 1px solid #000;
-                padding: 3mm 0;
-                margin-bottom: 4mm;
+                padding-bottom: 1mm;
+                margin-bottom: 3mm;
             }
-            .header-left {
-                display: flex;
-                flex-direction: column;
-                gap: 2mm;
-                font-size: 8.5pt;
-                color: #000;
-                font-weight: 600;
-            }
-            .header-left .fecha-header {
-                font-size: 8pt;
-                font-weight: 600;
-            }
-            .header-center {
-                flex: 1;
+            .header-content {
                 text-align: center;
-                padding: 0 6mm;
+                position: relative;
             }
             .titulo-principal {
-                font-size: 16pt;
+                font-size: 15pt;
                 font-weight: 800;
                 letter-spacing: 1px;
                 text-transform: uppercase;
@@ -3349,59 +3333,64 @@ function inicializarBotones() {
                 color: #000;
             }
             .nombre-profesional {
-                font-size: 13pt;
+                font-size: 12pt;
                 font-weight: 700;
-                margin: 2mm 0 0 0;
+                margin: 1mm 0 0 0;
                 color: #000;
             }
             .especialidades {
-                font-size: 7pt;
+                font-size: 6.5pt;
                 color: #000;
                 font-weight: 600;
                 text-transform: uppercase;
-                margin-top: 1mm;
+                margin-top: 0.5mm;
             }
             .contacto {
-                font-size: 8pt;
+                font-size: 7.2pt;
                 color: #000;
                 font-weight: 600;
-                display: flex;
+                display: inline-flex;
                 gap: 6mm;
-                justify-content: center;
                 margin-top: 2mm;
             }
             .contacto span { white-space: nowrap; }
+            .header-bottom {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 15mm;
+                margin-top: 2mm;
+            }
             .logo-header {
                 display: flex;
                 align-items: center;
-                justify-content: flex-end;
-                min-width: 28mm;
+                justify-content: center;
             }
             .logo-pdf {
-                width: 28mm;
+                width: 40mm;
                 height: 28mm;
                 object-fit: contain;
             }
-            @media (max-width: 600px) {
-                .logo-pdf { width: 80px; height: 80px; }
-                .header-content { padding: 0 85px; }
-                .titulo-principal { font-size: 20pt; letter-spacing: 2px; }
-                .nombre-profesional { font-size: 18pt; }
-                .especialidades { font-size: 6.5pt; letter-spacing: 0.2px; }
+            .nota-importante {
+                font-size: 7pt;
+                font-weight: 600;
+                line-height: 1.3;
+                color: #0284c7;
+                text-align: center;
             }
-            .cliente-info {
-                margin-top: 4mm;
-                font-size: 9pt;
+            .nota-importante strong {
+                display: inline;
+                margin-right: 4px;
             }
             .cliente-nombre {
                 font-weight: 700;
-                font-size: 12pt;
-                margin-bottom: 2mm;
+                font-size: 11pt;
+                margin-bottom: 1.5mm;
                 color: #000;
                 line-height: 1.3;
             }
             .cliente-datos {
-                font-size: 8.5pt;
+                font-size: 7.8pt;
                 color: #000;
                 font-weight: 500;
                 line-height: 1.5;
@@ -3410,7 +3399,7 @@ function inicializarBotones() {
                 width: 100%;
                 border-collapse: collapse;
                 margin: 8px 0;
-                font-size: 7.6pt;
+                font-size: 7.2pt;
             }
             th {
                 border: 1px solid #000;
@@ -3419,7 +3408,7 @@ function inicializarBotones() {
                 font-weight: 700;
                 background: #fff;
                 color: #000;
-                font-size: 8.4pt;
+                font-size: 8pt;
             }
             td {
                 border: 1px solid #666;
@@ -3427,7 +3416,7 @@ function inicializarBotones() {
                 text-align: left;
                 background: #fff;
                 color: #000;
-                font-size: 7.4pt;
+                font-size: 7pt;
                 line-height: 1.15;
             }
             .plan-tabla-editable { width: 100%; margin-top: 10px; }
@@ -3498,19 +3487,6 @@ function inicializarBotones() {
                 display: block;
                 font-weight: 700;
                 margin-bottom: 1px;
-            }
-            .nota-importante {
-                margin-top: 6mm;
-                padding: 6mm 8mm;
-                border: 1.5px solid #000;
-                font-size: 8.8pt;
-                font-weight: 600;
-                line-height: 1.35;
-                page-break-inside: avoid;
-            }
-            .nota-importante strong {
-                display: inline-block;
-                margin-right: 6px;
             }
             /* Estilos anteriores mantenidos para compatibilidad */
             .dia-plan {
@@ -3584,19 +3560,23 @@ function inicializarBotones() {
           
         return `
             <div class="header">
-                <div class="header-left">
-                    <div class="fecha-header">${fecha}</div>
-                    <div class="contacto">
-                        <span>Maikafit1977@gmail.com</span>
-                        <span>+34 650 229 987</span>
-                    </div>
-                </div>
-                <div class="header-center">
+                <div class="header-content">
                     <div class="titulo-principal">PLAN DE ALIMENTACIÓN PERSONALIZADO</div>
                     <div class="nombre-profesional">MAIKA PORCUNA</div>
                     <div class="especialidades">Nutrición · Dietética · Suplementación · Nutrición Deportiva</div>
                 </div>
-                ${logoHTML ? `<div class="logo-header">${logoHTML}</div>` : '<div class="logo-header"></div>'}
+                <div class="header-bottom">
+                    <div class="contacto">
+                        <span>${fecha}</span>
+                        <span>Maikafit1977@gmail.com</span>
+                        <span>+34 650 229 987</span>
+                    </div>
+                    <div class="nota-importante">
+                        <strong>💧 Nota:</strong>
+                        Recuerda beber 2-3 litros de agua al día y ajustar las porciones según tu saciedad y energía.
+                    </div>
+                    ${logoHTML ? `<div class="logo-header">${logoHTML}</div>` : '<div class="logo-header"></div>'}
+                </div>
             </div>
             <div class="cliente-info">
                 <div class="cliente-nombre">${nombreCliente}</div>
@@ -3765,13 +3745,6 @@ function inicializarBotones() {
             
             html += '</tbody></table></div>';
         }
-        
-        html += `
-            <div class="nota-importante">
-                <strong>📝 NOTA IMPORTANTE:</strong>
-                Recuerda beber al menos 2-3 litros de agua al día. Ajusta las porciones según tu nivel de saciedad y energía.
-            </div>
-        `;
         
         html += '</div>';
         return html;
