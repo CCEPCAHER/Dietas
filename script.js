@@ -3310,95 +3310,109 @@ function inicializarBotones() {
                 line-height: 1.6;
                 color: #000;
                 background: #fff;
-                padding: 11mm;
+                padding: 2mm 8mm 8mm 8mm;
             }
             body.layout-landscape {
-                padding: 6mm 9mm;
+                padding: 1.5mm 7mm 5mm 7mm;
             }
             .header {
-                border-bottom: 1px solid #000;
-                padding-bottom: 1mm;
-                margin-bottom: 3mm;
+                margin-bottom: 0.8mm;
+                position: relative;
+                margin-top: 0;
+            }
+            .titulo-principal {
+                font-size: 14pt;
+                font-weight: 800;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+                margin: 3.5mm 0 0 0;
+                padding: 0;
+                color: #000;
+                text-align: center;
+                line-height: 0.95;
+            }
+            .header-top {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 8mm;
+                margin: 0;
+                padding: 0;
             }
             .header-content {
                 text-align: center;
                 position: relative;
-            }
-            .titulo-principal {
-                font-size: 15pt;
-                font-weight: 800;
-                letter-spacing: 1px;
-                text-transform: uppercase;
                 margin: 0;
-                color: #000;
+                padding: 0;
             }
             .nombre-profesional {
-                font-size: 12pt;
+                font-size: 11pt;
                 font-weight: 700;
-                margin: 1mm 0 0 0;
+                margin: -0.5mm 0 0 0;
+                padding: 0;
                 color: #000;
+                line-height: 0.95;
             }
             .especialidades {
-                font-size: 6.5pt;
+                font-size: 6pt;
                 color: #000;
                 font-weight: 600;
                 text-transform: uppercase;
-                margin-top: 0.5mm;
+                margin: -0.2mm 0 0 0;
+                padding: 0;
+                line-height: 1;
             }
             .contacto {
-                font-size: 7.2pt;
+                font-size: 6.8pt;
                 color: #000;
                 font-weight: 600;
-                display: inline-flex;
-                gap: 6mm;
-                margin-top: 2mm;
+                display: flex;
+                flex-direction: column;
+                gap: 0.4mm;
+                line-height: 1.2;
             }
             .contacto span { white-space: nowrap; }
-            .header-bottom {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                gap: 15mm;
-                margin-top: 2mm;
-            }
             .logo-header {
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                margin-left: auto;
             }
             .logo-pdf {
-                width: 40mm;
-                height: 28mm;
+                width: 32mm;
+                height: 22mm;
                 object-fit: contain;
             }
-            .nota-importante {
-                font-size: 7pt;
-                font-weight: 600;
-                line-height: 1.3;
-                color: #0284c7;
-                text-align: center;
-            }
-            .nota-importante strong {
-                display: inline;
-                margin-right: 4px;
+            .cliente-info {
+                margin-bottom: 1.5mm;
+                padding-bottom: 0.8mm;
+                border-bottom: 1px solid #000;
+                display: flex;
+                align-items: center;
+                gap: 6mm;
             }
             .cliente-nombre {
                 font-weight: 700;
-                font-size: 11pt;
-                margin-bottom: 1.5mm;
+                font-size: 10pt;
                 color: #000;
-                line-height: 1.3;
+                line-height: 1.2;
+                white-space: nowrap;
             }
             .cliente-datos {
-                font-size: 7.8pt;
+                font-size: 7.2pt;
                 color: #000;
                 font-weight: 500;
-                line-height: 1.5;
+                line-height: 1.3;
+                flex: 1;
             }
             table {
                 width: 100%;
                 border-collapse: collapse;
-                margin: 8px 0;
+                margin: 4px 0;
                 font-size: 7.2pt;
             }
             th {
@@ -3419,9 +3433,9 @@ function inicializarBotones() {
                 font-size: 7pt;
                 line-height: 1.15;
             }
-            .plan-tabla-editable { width: 100%; margin-top: 10px; }
+            .plan-tabla-editable { width: 100%; margin-top: 4px; }
             .pdf-semana {
-                margin-bottom: 18px;
+                margin-bottom: 10px;
                 page-break-after: always;
             }
             .pdf-semana:last-of-type { page-break-after: auto; }
@@ -3430,13 +3444,13 @@ function inicializarBotones() {
                 font-weight: 700;
                 text-transform: uppercase;
                 letter-spacing: 1px;
-                margin-bottom: 8px;
+                margin-bottom: 4px;
             }
             .tabla-plan-semanal {
                 width: 100%;
                 border-collapse: collapse;
                 table-layout: fixed;
-                margin-bottom: 12px;
+                margin-bottom: 6px;
             }
             .tabla-plan-semanal th,
             .tabla-plan-semanal td {
@@ -3556,31 +3570,30 @@ function inicializarBotones() {
             console.warn('No se pudo cargar el logo:', e);
         }
         
-                  const logoHTML = logoBase64 ? `<img src="${logoBase64}" alt="Logo" class="logo-pdf">` : '';
-          
+        const logoHTML = logoBase64 ? `<img src="${logoBase64}" alt="Logo" class="logo-pdf">` : '';
+        const infoCliente = subtags.join(' · ');
+        const recordatorioHidratacion = 'Bebe 💧 2–3 L agua/día – Ajustar porciones según energía';
+        const datosCliente = infoCliente ? `${infoCliente} · ${recordatorioHidratacion}` : recordatorioHidratacion;
+        
         return `
             <div class="header">
+                <div class="titulo-principal">PLAN DE ALIMENTACIÓN PERSONALIZADO</div>
                 <div class="header-content">
-                    <div class="titulo-principal">PLAN DE ALIMENTACIÓN PERSONALIZADO</div>
                     <div class="nombre-profesional">MAIKA PORCUNA</div>
                     <div class="especialidades">Nutrición · Dietética · Suplementación · Nutrición Deportiva</div>
                 </div>
-                <div class="header-bottom">
+                <div class="header-top">
                     <div class="contacto">
                         <span>${fecha}</span>
                         <span>Maikafit1977@gmail.com</span>
                         <span>+34 650 229 987</span>
-                    </div>
-                    <div class="nota-importante">
-                        <strong>💧 Nota:</strong>
-                        Recuerda beber 2-3 litros de agua al día y ajustar las porciones según tu saciedad y energía.
                     </div>
                     ${logoHTML ? `<div class="logo-header">${logoHTML}</div>` : '<div class="logo-header"></div>'}
                 </div>
             </div>
             <div class="cliente-info">
                 <div class="cliente-nombre">${nombreCliente}</div>
-                <div class="cliente-datos">${subtags.join(' · ')}</div>
+                <div class="cliente-datos">${datosCliente}</div>
             </div>
         `;
     }
