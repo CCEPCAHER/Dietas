@@ -3311,6 +3311,9 @@ function inicializarBotones() {
                 color: #000;
                 background: #fff;
                 padding: 2mm 8mm 8mm 8mm;
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
             }
             body.layout-landscape {
                 padding: 1.5mm 7mm 5mm 7mm;
@@ -3352,7 +3355,7 @@ function inicializarBotones() {
             .nombre-profesional {
                 font-size: 11pt;
                 font-weight: 700;
-                margin: -0.5mm 0 0 0;
+                margin: 0.5mm 0 0 0;
                 padding: 0;
                 color: #000;
                 line-height: 0.95;
@@ -3362,7 +3365,7 @@ function inicializarBotones() {
                 color: #000;
                 font-weight: 600;
                 text-transform: uppercase;
-                margin: -0.2mm 0 0 0;
+                margin: 1.2mm 0 0 0;
                 padding: 0;
                 line-height: 1;
             }
@@ -3378,9 +3381,10 @@ function inicializarBotones() {
             .contacto span { white-space: nowrap; }
             .logo-header {
                 display: flex;
-                align-items: center;
-                justify-content: center;
+                align-items: flex-start;
+                justify-content: flex-end;
                 margin-left: auto;
+                padding-top: 0;
             }
             .logo-pdf {
                 width: 32mm;
@@ -3409,6 +3413,10 @@ function inicializarBotones() {
                 line-height: 1.3;
                 flex: 1;
             }
+            .recordatorio-agua {
+                color: #4FC3F7;
+                font-weight: 700;
+            }
             table {
                 width: 100%;
                 border-collapse: collapse;
@@ -3433,36 +3441,59 @@ function inicializarBotones() {
                 font-size: 7pt;
                 line-height: 1.15;
             }
-            .plan-tabla-editable { width: 100%; margin-top: 4px; }
+            .plan-tabla-editable { 
+                width: 100%; 
+                margin-top: 4px;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                min-height: 0;
+            }
             .pdf-semana {
                 margin-bottom: 10px;
                 page-break-after: always;
+                page-break-inside: avoid;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                min-height: 0;
             }
-            .pdf-semana:last-of-type { page-break-after: auto; }
+            .pdf-semana:last-of-type { 
+                page-break-after: auto; 
+            }
             .titulo-semana {
                 font-size: 14pt;
                 font-weight: 700;
                 text-transform: uppercase;
                 letter-spacing: 1px;
                 margin-bottom: 4px;
+                flex-shrink: 0;
             }
             .tabla-plan-semanal {
                 width: 100%;
+                max-width: 100%;
                 border-collapse: collapse;
                 table-layout: fixed;
-                margin-bottom: 6px;
+                margin: 0 auto;
+                page-break-inside: avoid;
+                flex-shrink: 0;
             }
             .tabla-plan-semanal th,
             .tabla-plan-semanal td {
                 border: 1px solid #666;
-                padding: 4px;
-                font-size: 8.6pt;
+                padding: 1px 2px;
+                font-size: 7.5pt;
                 vertical-align: top;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
             }
             .tabla-plan-semanal th {
                 background: #fff;
                 font-weight: 700;
                 text-align: center;
+                padding: 2px 1px;
             }
             .tabla-plan-semanal th,
             .tabla-plan-semanal td {
@@ -3470,20 +3501,24 @@ function inicializarBotones() {
             }
             .tabla-plan-semanal .subtitulo-dia {
                 display: block;
-                font-size: 8pt;
-                margin-top: 4px;
+                font-size: 7.5pt;
+                margin-top: 2px;
                 font-weight: 600;
             }
             .celda-dia {
-                min-height: 40px;
-                line-height: 1.15;
+                min-height: 30px;
+                height: auto;
+                line-height: 1.1;
                 word-break: break-word;
+                vertical-align: top;
             }
             .celda-dia .item-alimento {
                 display: block;
-                margin-left: 10px;
-                margin-bottom: 1px;
+                margin-left: 8px;
+                margin-bottom: 0.5px;
                 position: relative;
+                font-size: 7pt;
+                line-height: 1.1;
             }
             .celda-dia .item-alimento::before {
                 content: '•';
@@ -3500,7 +3535,9 @@ function inicializarBotones() {
             .titulo-comida {
                 display: block;
                 font-weight: 700;
-                margin-bottom: 1px;
+                margin-bottom: 0.5px;
+                font-size: 7.2pt;
+                line-height: 1.1;
             }
             /* Estilos anteriores mantenidos para compatibilidad */
             .dia-plan {
@@ -3573,7 +3610,6 @@ function inicializarBotones() {
         const logoHTML = logoBase64 ? `<img src="${logoBase64}" alt="Logo" class="logo-pdf">` : '';
         const infoCliente = subtags.join(' · ');
         const recordatorioHidratacion = 'Bebe 💧 2–3 L agua/día – Ajustar porciones según energía';
-        const datosCliente = infoCliente ? `${infoCliente} · ${recordatorioHidratacion}` : recordatorioHidratacion;
         
         return `
             <div class="header">
@@ -3593,7 +3629,7 @@ function inicializarBotones() {
             </div>
             <div class="cliente-info">
                 <div class="cliente-nombre">${nombreCliente}</div>
-                <div class="cliente-datos">${datosCliente}</div>
+                <div class="cliente-datos">${infoCliente} · <span class="recordatorio-agua">${recordatorioHidratacion}</span></div>
             </div>
         `;
     }
