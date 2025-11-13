@@ -36,6 +36,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Librerías para generar Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body>
     <!-- Botón de modo oscuro -->
@@ -366,6 +369,9 @@
                     </button>
                     <button type="button" id="btnDescargar" class="btn-download" title="Descargar plan en formato PDF">
                         📥 Descargar Plan en PDF
+                    </button>
+                    <button type="button" id="btnDescargarExcel" class="btn-download" title="Descargar plan en formato Excel">
+                        📊 Descargar Plan en Excel
                     </button>
                     <button type="button" id="btnCompartirWhatsApp" class="btn-whatsapp" title="Compartir por WhatsApp (solo móvil)" style="display: none;">
                         💬 Compartir por WhatsApp

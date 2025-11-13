@@ -31,6 +31,7 @@ body.dark-mode {
     --border-color: rgba(102, 126, 234, 0.2);
     --shadow-color: rgba(0, 0, 0, 0.5);
     --shadow-hover: rgba(102, 126, 234, 0.3);
+    font-size: 16px; /* Aumentar tamaño base en modo oscuro */
 }
 
 body {
@@ -349,6 +350,8 @@ body.dark-mode .tmb-label {
 
 body.dark-mode .tmb-number {
     color: var(--text-strong);
+    font-size: 2.7em;
+    font-weight: 900;
 }
 
 .tmb-unit {
@@ -366,6 +369,12 @@ body.dark-mode .tmb-unit {
     margin: 0;
     font-weight: 500;
     line-height: 1.5;
+}
+
+body.dark-mode .tmb-description {
+    color: #e5e5e5;
+    font-size: 1em;
+    font-weight: 600;
 }
 
 .gasto-calorico h4 {
@@ -398,6 +407,12 @@ body.dark-mode .gasto-calorico h4 {
 body.dark-mode .actividad-card {
     background: var(--bg-card);
     box-shadow: 0 2px 6px var(--shadow-color);
+    border: 1px solid rgba(129, 140, 248, 0.2);
+}
+
+body.dark-mode .actividad-card:hover {
+    background: rgba(129, 140, 248, 0.1);
+    box-shadow: 0 4px 12px rgba(129, 140, 248, 0.3);
 }
 
 .actividad-card:hover {
@@ -414,6 +429,8 @@ body.dark-mode .actividad-card {
 
 body.dark-mode .actividad-nivel {
     color: var(--text-heading);
+    font-size: 1.2em;
+    font-weight: 900;
 }
 
 .actividad-desc {
@@ -425,6 +442,12 @@ body.dark-mode .actividad-nivel {
     line-height: 1.5;
 }
 
+body.dark-mode .actividad-desc {
+    font-size: 0.95em;
+    color: #e5e5e5;
+    font-weight: 600;
+}
+
 .actividad-tdee {
     font-size: 1.4em;
     font-weight: bold;
@@ -433,6 +456,8 @@ body.dark-mode .actividad-nivel {
 
 body.dark-mode .actividad-tdee {
     color: var(--text-strong);
+    font-size: 1.5em;
+    font-weight: 900;
 }
 
 .tmb-note {
@@ -867,16 +892,52 @@ body.dark-mode .info-usuario-table h3 {
     letter-spacing: 0.5px;
 }
 
+body.dark-mode .tabla-info th {
+    font-size: 0.95em;
+    font-weight: 700;
+    color: white;
+}
+
 .tabla-info td {
     padding: 12px 8px;
     text-align: center;
     border-bottom: 1px solid #e9ecef;
     font-weight: 500;
     color: #333;
+    background: white;
+    font-size: 14px;
+}
+
+body.dark-mode .tabla-info {
+    background: #1a1a2e !important;
+    border: 2px solid rgba(129, 140, 248, 0.5) !important;
+}
+
+body.dark-mode .tabla-info td {
+    border-bottom: 2px solid rgba(129, 140, 248, 0.4) !important;
+    color: #ffffff !important;
+    background: #1e1e2e !important;
+    font-size: 17px;
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .tabla-info tbody tr:hover {
     background: #f8f9fa;
+}
+
+body.dark-mode .tabla-info tbody tr:hover {
+    background: rgba(129, 140, 248, 0.2);
+}
+
+body.dark-mode .tabla-info tbody tr:nth-child(even) td {
+    background: #252538 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .tabla-info tbody tr:nth-child(odd) td {
+    background: #1e1e2e !important;
+    color: #ffffff !important;
 }
 
 .tabla-info tbody tr:last-child td {
@@ -904,11 +965,48 @@ body.dark-mode .info-usuario-table h3 {
     letter-spacing: 0.5px;
 }
 
+body.dark-mode .tabla-entrenos th {
+    font-size: 1em;
+    font-weight: 700;
+    color: white;
+}
+
 .tabla-entrenos td {
     padding: 10px;
     text-align: center;
     border-bottom: 1px solid #e9ecef;
     font-weight: 500;
+    background: white;
+    color: #333;
+    font-size: 14px;
+}
+
+body.dark-mode .tabla-entrenos {
+    background: #1a1a2e !important;
+    border: 2px solid rgba(129, 140, 248, 0.5) !important;
+}
+
+body.dark-mode .tabla-entrenos td {
+    border-bottom: 2px solid rgba(129, 140, 248, 0.4) !important;
+    color: #ffffff !important;
+    background: #1e1e2e !important;
+    font-size: 17px;
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .tabla-entrenos tbody tr:hover {
+    background: rgba(129, 140, 248, 0.25) !important;
+}
+
+body.dark-mode .tabla-entrenos tbody tr:nth-child(even) td {
+    background: #252538 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .tabla-entrenos tbody tr:nth-child(odd) td {
+    background: #1e1e2e !important;
+    color: #ffffff !important;
 }
 
 .tabla-calculos {
@@ -942,6 +1040,73 @@ body.dark-mode .info-usuario-table h3 {
     border-bottom: none;
 }
 
+/* Estilos modo oscuro para tabla-calculos */
+body.dark-mode .tabla-calculos {
+    background: var(--bg-card);
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+body.dark-mode .tabla-calculos th {
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
+    color: white;
+}
+
+body.dark-mode .tabla-calculos {
+    background: #1a1a2e !important;
+    border: 2px solid rgba(129, 140, 248, 0.5) !important;
+}
+
+body.dark-mode .tabla-calculos td {
+    border-bottom: 2px solid rgba(129, 140, 248, 0.4) !important;
+    color: #ffffff !important;
+    background: #1e1e2e !important;
+    font-size: 17px;
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .tabla-calculos tbody tr:nth-child(even) td {
+    background: #252538 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .tabla-calculos tbody tr:nth-child(odd) td {
+    background: #1e1e2e !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .tabla-calculos tbody tr.highlight-row td {
+    background: #2d2d44 !important;
+    color: #ffffff !important;
+    font-weight: 900;
+}
+
+body.dark-mode .tabla-calculos tbody tr.important-row {
+    background: rgba(129, 140, 248, 0.2);
+}
+
+body.dark-mode .tabla-calculos tbody tr.important-row td {
+    background: transparent;
+    color: #a5b4fc;
+}
+
+body.dark-mode .tabla-calculos tbody tr.important-row td:last-child {
+    color: #818cf8;
+}
+
+body.dark-mode .tabla-calculos tbody tr.rest-row {
+    background: rgba(129, 140, 248, 0.1);
+}
+
+body.dark-mode .tabla-calculos tbody tr.rest-row td {
+    background: transparent;
+    color: var(--text-primary);
+}
+
+body.dark-mode .tabla-calculos tbody tr.rest-row td:last-child {
+    color: var(--text-primary);
+}
+
 .distribucion-entrenos-section,
 .calculos-detallados-section {
     padding: 20px;
@@ -957,6 +1122,150 @@ body.dark-mode .calculos-detallados-section {
     background: var(--bg-section);
     border-left-color: #818cf8;
     box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+body.dark-mode .distribucion-entrenos-section table,
+body.dark-mode .calculos-detallados-section table {
+    background: #1a1a2e !important;
+    border: 2px solid rgba(129, 140, 248, 0.4) !important;
+}
+
+/* Estilos para tabla de cálculos detallados */
+.calculos-detallados-section table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-top: 10px;
+}
+
+body.dark-mode .calculos-detallados-section table {
+    background: var(--bg-card);
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.calculos-detallados-section table th {
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.95em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+body.dark-mode .calculos-detallados-section table th {
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
+    color: white;
+}
+
+.calculos-detallados-section table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: white;
+}
+
+body.dark-mode .calculos-detallados-section table {
+    background: #1a1a2e !important;
+    border: 2px solid rgba(129, 140, 248, 0.5) !important;
+}
+
+body.dark-mode .calculos-detallados-section table td {
+    border-bottom: 2px solid rgba(129, 140, 248, 0.4) !important;
+    color: #ffffff !important;
+    background: #1e1e2e !important;
+    font-size: 17px;
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.calculos-detallados-section table tr:nth-child(even) td {
+    background: #f8f9fa;
+}
+
+body.dark-mode .calculos-detallados-section table tr:nth-child(even) td {
+    background: #252538 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .calculos-detallados-section table tr:nth-child(odd) td {
+    background: #1e1e2e !important;
+    color: #ffffff !important;
+}
+
+.calculos-detallados-section table tr.highlight-row td {
+    background: #f0f9ff !important;
+    font-weight: 600;
+}
+
+body.dark-mode .calculos-detallados-section table tr.highlight-row td {
+    background: #2d2d44 !important;
+    color: #ffffff !important;
+    font-weight: 900;
+}
+
+.calculos-detallados-section table tr.important-row {
+    background: #dbeafe;
+}
+
+body.dark-mode .calculos-detallados-section table tr.important-row {
+    background: rgba(129, 140, 248, 0.2);
+}
+
+.calculos-detallados-section table tr.important-row td {
+    background: transparent;
+    font-weight: 700;
+    font-size: 1.1em;
+    color: #1e40af;
+}
+
+body.dark-mode .calculos-detallados-section table tr.important-row td {
+    color: #a5b4fc;
+}
+
+.calculos-detallados-section table tr.important-row td:last-child {
+    font-size: 1.2em;
+    font-weight: 900;
+    color: #1e40af;
+}
+
+body.dark-mode .calculos-detallados-section table tr.important-row td:last-child {
+    color: #818cf8;
+}
+
+.calculos-detallados-section table tr.rest-row {
+    background: #f3f4f6;
+}
+
+body.dark-mode .calculos-detallados-section table tr.rest-row {
+    background: rgba(129, 140, 248, 0.1);
+}
+
+.calculos-detallados-section table tr.rest-row td {
+    background: transparent;
+    font-weight: 700;
+    font-size: 1.1em;
+    color: #374151;
+}
+
+body.dark-mode .calculos-detallados-section table tr.rest-row td {
+    color: var(--text-primary);
+}
+
+.calculos-detallados-section table tr.rest-row td:last-child {
+    font-size: 1.2em;
+    font-weight: 900;
+    color: #374151;
+}
+
+body.dark-mode .calculos-detallados-section table tr.rest-row td:last-child {
+    color: var(--text-primary);
 }
 
 .distribucion-entrenos-section:hover,
@@ -1256,12 +1565,45 @@ table tbody tr:hover {
     color: white;
     font-weight: 700;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    padding: 12px;
+    font-size: 0.95em;
+}
+
+body.dark-mode .tabla-horarios th {
+    font-size: 1em;
+    font-weight: 900;
+    color: white;
 }
 
 .tabla-horarios td {
     background: var(--bg-card);
     color: var(--text-primary);
     font-weight: 500;
+    font-size: 14px;
+    padding: 12px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+body.dark-mode .tabla-horarios td {
+    color: #ffffff !important;
+    background: var(--bg-card);
+    font-size: 16px;
+    font-weight: 700;
+    border-bottom-color: rgba(129, 140, 248, 0.3);
+}
+
+body.dark-mode .tabla-horarios tbody tr:hover {
+    background: rgba(129, 140, 248, 0.2);
+}
+
+body.dark-mode .tabla-horarios tbody tr:nth-child(even) td {
+    background: rgba(129, 140, 248, 0.15);
+    color: #ffffff !important;
+}
+
+body.dark-mode .tabla-horarios tbody tr:nth-child(odd) td {
+    background: rgba(129, 140, 248, 0.1);
+    color: #ffffff !important;
 }
 
 /* Plan de alimentación */
@@ -1423,7 +1765,7 @@ body.dark-mode .comida-header {
 .lista-alimentos li {
     padding: 6px 0;
     border-bottom: 1px solid #f0f0f0;
-    font-size: 0.95em;
+    font-size: 1.1em;
 }
 
 .lista-alimentos li:last-child {
@@ -3973,6 +4315,8 @@ body.dark-mode .dark-mode-icon {
 
 body.dark-mode .comida-header h3 {
     color: var(--text-heading);
+    font-size: 1.2em;
+    font-weight: 700;
 }
 
 .btn-add-alimento {
@@ -4007,15 +4351,35 @@ body.dark-mode .comida-header h3 {
     text-align: left;
     font-weight: 600;
     font-size: 13px;
+    color: white;
+}
+
+body.dark-mode .tabla-alimentos th {
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
 }
 
 .tabla-alimentos td {
     padding: 8px;
     border-bottom: 1px solid #e0e0e0;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+body.dark-mode .tabla-alimentos td {
+    border-bottom-color: rgba(129, 140, 248, 0.2);
+    color: #f5f5f5;
+    font-size: 15px;
+    font-weight: 500;
 }
 
 .tabla-alimentos tbody tr:hover {
     background: #f8f9fa;
+}
+
+body.dark-mode .tabla-alimentos tbody tr:hover {
+    background: rgba(129, 140, 248, 0.1);
 }
 
 .tabla-alimentos tbody tr.fila-vacia {
@@ -4023,8 +4387,17 @@ body.dark-mode .comida-header h3 {
     border-left: 3px solid #667eea;
 }
 
+body.dark-mode .tabla-alimentos tbody tr.fila-vacia {
+    background: rgba(129, 140, 248, 0.05);
+    border-left-color: #818cf8;
+}
+
 .tabla-alimentos tbody tr.fila-vacia:hover {
     background: #f0f4ff;
+}
+
+body.dark-mode .tabla-alimentos tbody tr.fila-vacia:hover {
+    background: rgba(129, 140, 248, 0.15);
 }
 
 .input-alimento {
@@ -4034,11 +4407,26 @@ body.dark-mode .comida-header h3 {
     border-radius: 5px;
     font-size: 14px;
     transition: border-color 0.3s ease;
+    background: white;
+    color: #333;
+}
+
+body.dark-mode .input-alimento {
+    background: var(--bg-card);
+    border-color: rgba(129, 140, 248, 0.3);
+    color: #f5f5f5;
+    font-size: 15px;
+    font-weight: 500;
 }
 
 .input-alimento:focus {
     outline: none;
     border-color: #667eea;
+}
+
+body.dark-mode .input-alimento:focus {
+    border-color: #818cf8;
+    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
 }
 
 .input-gramos {
@@ -4048,6 +4436,16 @@ body.dark-mode .comida-header h3 {
     border-radius: 5px;
     text-align: center;
     font-size: 14px;
+    background: white;
+    color: #333;
+}
+
+body.dark-mode .input-gramos {
+    background: var(--bg-card);
+    border-color: rgba(129, 140, 248, 0.3);
+    color: #f5f5f5;
+    font-size: 15px;
+    font-weight: 600;
 }
 
 .input-gramos:focus {
@@ -4055,10 +4453,22 @@ body.dark-mode .comida-header h3 {
     border-color: #667eea;
 }
 
+body.dark-mode .input-gramos:focus {
+    border-color: #818cf8;
+    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
+}
+
 .valor-calculado {
     font-weight: 600;
     color: #333;
     text-align: center;
+    font-size: 14px;
+}
+
+body.dark-mode .valor-calculado {
+    color: #f5f5f5;
+    font-size: 15px;
+    font-weight: 700;
 }
 
 .btn-delete-row {
@@ -4086,12 +4496,27 @@ body.dark-mode .comida-header h3 {
     border-radius: 5px;
     margin-top: 10px;
     font-weight: 600;
+    font-size: 14px;
+}
+
+body.dark-mode .totales-comida {
+    background: rgba(129, 140, 248, 0.15);
+    color: #f5f5f5;
+    font-size: 15px;
+    font-weight: 700;
 }
 
 .totales-comida span {
     padding: 5px 10px;
     background: white;
     border-radius: 5px;
+    color: #333;
+}
+
+body.dark-mode .totales-comida span {
+    background: rgba(129, 140, 248, 0.2);
+    color: #f5f5f5;
+    font-weight: 700;
 }
 
 .totales-diarios {
@@ -4151,9 +4576,21 @@ body.dark-mode .comida-header h3 {
     margin-bottom: 5px;
 }
 
+body.dark-mode .total-item-label {
+    font-size: 13px;
+    opacity: 1;
+    font-weight: 600;
+}
+
 .total-item-value {
     font-size: 24px;
     font-weight: 700;
+}
+
+body.dark-mode .total-item-value {
+    font-size: 26px;
+    font-weight: 900;
+    color: white;
 }
 
 .total-item-objetivo {
@@ -4161,6 +4598,12 @@ body.dark-mode .comida-header h3 {
     opacity: 0.8;
     margin-top: 3px;
     font-style: italic;
+}
+
+body.dark-mode .total-item-objetivo {
+    font-size: 12px;
+    opacity: 1;
+    font-weight: 500;
 }
 
 .progress-bar {
@@ -4187,6 +4630,12 @@ body.dark-mode .comida-header h3 {
     color: white;
 }
 
+body.dark-mode .progress-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+}
+
 /* Mini barras de progreso para cada comida */
 .mini-progress-item {
     display: flex;
@@ -4201,12 +4650,32 @@ body.dark-mode .comida-header h3 {
     overflow: hidden;
 }
 
+body.dark-mode .mini-progress-bar {
+    background: rgba(255, 255, 255, 0.2);
+}
+
 .mini-progress-fill {
     height: 100%;
     background: linear-gradient(90deg, #28a745, #20c997);
     border-radius: 10px;
     transition: width 0.3s ease, background 0.3s ease;
     min-width: 0;
+}
+
+/* Estilos para modo oscuro en barras de progreso de comida */
+body.dark-mode .comida-progress-bars {
+    background: rgba(129, 140, 248, 0.1) !important;
+}
+
+body.dark-mode .comida-progress-bars div[style*="font-size: 11px"] {
+    font-size: 13px !important;
+    color: #f5f5f5 !important;
+    font-weight: 600 !important;
+}
+
+body.dark-mode .comida-progress-bars div[style*="color: #667eea"] {
+    color: #a5b4fc !important;
+    font-weight: 600 !important;
 }
 
 .autocomplete-container {

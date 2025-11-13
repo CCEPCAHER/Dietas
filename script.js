@@ -897,6 +897,7 @@ function sincronizarPlanManualConDatosUsuario() {
         datosUsuario.planSemana = planClonado;
         datosUsuario.modoGeneracion = 'manual';
         window.datosUsuario = datosUsuario;
+        actualizarEstructuraPlanExport();
     } catch (error) {
         console.error('⚠️ Error al sincronizar el plan manual con datosUsuario:', error);
     }
@@ -1628,41 +1629,41 @@ function mostrarCalculosDetallados() {
     };
     
     const html = `
-        <tr>
-            <td style="font-weight: 600; padding: 10px; background: #f0f9ff;">Metabolismo basal (TMB)</td>
-            <td style="padding: 10px; font-weight: 700;">${tmb} kcal</td>
+        <tr class="highlight-row">
+            <td style="font-weight: 600;">Metabolismo basal (TMB)</td>
+            <td style="font-weight: 700;">${tmb} kcal</td>
         </tr>
         <tr>
-            <td style="font-weight: 600; padding: 10px;">Efecto termogénico de los alimentos (TEF)</td>
-            <td style="padding: 10px;">${tef} kcal (${porcentajeTEF}% - ${descTermogenico[tipoTermogenico] || 'No sedentaria'})</td>
+            <td style="font-weight: 600;">Efecto termogénico de los alimentos (TEF)</td>
+            <td>${tef} kcal (${porcentajeTEF}% - ${descTermogenico[tipoTermogenico] || 'No sedentaria'})</td>
         </tr>
         <tr>
-            <td style="font-weight: 600; padding: 10px;">Actividad física del deporte</td>
-            <td style="padding: 10px;">${actividadFisicaDeporteKcal} kcal (${descActividad[actividadFisicaDeporte] || 'Moderada'})</td>
+            <td style="font-weight: 600;">Actividad física del deporte</td>
+            <td>${actividadFisicaDeporteKcal} kcal (${descActividad[actividadFisicaDeporte] || 'Moderada'})</td>
+        </tr>
+        <tr class="highlight-row">
+            <td style="font-weight: 600;">Total gasto calórico día de entreno</td>
+            <td style="font-weight: 700;">${gastoBaseEntreno} kcal</td>
+        </tr>
+        <tr class="highlight-row">
+            <td style="font-weight: 600;">Total gasto calórico día de descanso</td>
+            <td style="font-weight: 700;">${gastoBaseDescanso} kcal</td>
         </tr>
         <tr>
-            <td style="font-weight: 600; padding: 10px; background: #f0f9ff;">Total gasto calórico día de entreno</td>
-            <td style="padding: 10px; font-weight: 700;">${gastoBaseEntreno} kcal</td>
+            <td style="font-weight: 600;">${superavitEntreno >= 0 ? 'Superávit' : 'Déficit'} día de entreno</td>
+            <td>${superavitEntreno}% (${superavitEntrenoKcal >= 0 ? '+' : ''}${superavitEntrenoKcal} kcal)</td>
         </tr>
         <tr>
-            <td style="font-weight: 600; padding: 10px; background: #f0f9ff;">Total gasto calórico día de descanso</td>
-            <td style="padding: 10px; font-weight: 700;">${gastoBaseDescanso} kcal</td>
+            <td style="font-weight: 600;">${superavitDescanso >= 0 ? 'Superávit' : 'Déficit'} día de descanso</td>
+            <td>${superavitDescanso}% (${superavitDescansoKcal >= 0 ? '+' : ''}${superavitDescansoKcal} kcal)</td>
         </tr>
-        <tr>
-            <td style="font-weight: 600; padding: 10px;">${superavitEntreno >= 0 ? 'Superávit' : 'Déficit'} día de entreno</td>
-            <td style="padding: 10px;">${superavitEntreno}% (${superavitEntrenoKcal >= 0 ? '+' : ''}${superavitEntrenoKcal} kcal)</td>
+        <tr class="important-row">
+            <td style="font-weight: 700;">Ingesta calórica total día de entreno</td>
+            <td style="font-weight: 900; font-size: 1.2em;">${caloriasEntreno} kcal</td>
         </tr>
-        <tr>
-            <td style="font-weight: 600; padding: 10px;">${superavitDescanso >= 0 ? 'Superávit' : 'Déficit'} día de descanso</td>
-            <td style="padding: 10px;">${superavitDescanso}% (${superavitDescansoKcal >= 0 ? '+' : ''}${superavitDescansoKcal} kcal)</td>
-        </tr>
-        <tr style="background: #dbeafe;">
-            <td style="font-weight: 700; padding: 12px; font-size: 1.1em;">Ingesta calórica total día de entreno</td>
-            <td style="padding: 12px; font-weight: 900; font-size: 1.2em; color: #1e40af;">${caloriasEntreno} kcal</td>
-        </tr>
-        <tr style="background: #f3f4f6;">
-            <td style="font-weight: 700; padding: 12px; font-size: 1.1em;">Ingesta calórica total día de descanso</td>
-            <td style="padding: 12px; font-weight: 900; font-size: 1.2em; color: #374151;">${caloriasDescanso} kcal</td>
+        <tr class="rest-row">
+            <td style="font-weight: 700;">Ingesta calórica total día de descanso</td>
+            <td style="font-weight: 900; font-size: 1.2em;">${caloriasDescanso} kcal</td>
         </tr>
     `;
     
@@ -2297,33 +2298,17 @@ function generarEstadisticasPlan(planSemana) {
         }
         
         // Normalizar el nombre del día
-        const normalizarDia = (dia) => {
-            if (!dia) return '';
-            const mapaNormalizado = {
-                'LUNES': 'lunes',
-                'MARTES': 'martes',
-                'MIÉRCOLES': 'miercoles',
-                'MIERCOLES': 'miercoles',
-                'JUEVES': 'jueves',
-                'VIERNES': 'viernes',
-                'SÁBADO': 'sabado',
-                'SABADO': 'sabado',
-                'DOMINGO': 'domingo'
-            };
-            if (mapaNormalizado[dia]) {
-                return mapaNormalizado[dia];
-            }
-            return dia.toLowerCase()
-                .replace(/á/g, 'a')
-                .replace(/é/g, 'e')
-                .replace(/í/g, 'i')
-                .replace(/ó/g, 'o')
-                .replace(/ú/g, 'u');
-        };
+        const normalizar = (texto = '') => texto
+            .toString()
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-zñ ]/g, '')
+            .trim();
         
-        const valorDia = normalizarDia(nombreDia);
+        const valorDia = normalizar(nombreDia);
         const diasEntreno = window.datosUsuario.diasEntreno || [];
-        const diasEntrenoNormalizados = diasEntreno.map(d => normalizarDia(d));
+        const diasEntrenoNormalizados = diasEntreno.map(d => normalizar(d));
         
         return !diasEntrenoNormalizados.includes(valorDia);
     };
@@ -2836,6 +2821,7 @@ function mostrarPlanAlimentacion() {
         // Guardar en datosUsuario para que pueda ser cargado por TablaEditable
         datosUsuario.planSemana = planSemanaEditable;
         window.datosUsuario = datosUsuario;
+        actualizarEstructuraPlanExport();
     }
 }
 
@@ -2943,38 +2929,15 @@ function esDiaDescanso(nombreDia) {
     
     // Normalizar el nombre del día: convertir a minúsculas y quitar tildes para coincidir con los valores del formulario
     // El formulario guarda: "lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo" (sin tildes)
-    const normalizarDia = (dia) => {
-        const diaUpper = dia.toUpperCase();
-        // Mapeo que normaliza a los valores exactos que se guardan en el formulario
-        const mapaNormalizado = {
-            'LUNES': 'lunes',
-            'MARTES': 'martes',
-            'MIÉRCOLES': 'miercoles',  // Normalizar a sin tilde
-            'MIERCOLES': 'miercoles',  // Ya sin tilde
-            'JUEVES': 'jueves',
-            'VIERNES': 'viernes',
-            'SÁBADO': 'sabado',        // Normalizar a sin tilde
-            'SABADO': 'sabado',        // Ya sin tilde
-            'DOMINGO': 'domingo'
-        };
-        
-        // Primero intentar con el mapeo directo
-        if (mapaNormalizado[diaUpper]) {
-            return mapaNormalizado[diaUpper];
-        }
-        
-        // Si no está en el mapeo, normalizar manualmente quitando tildes
-        let normalizado = dia.toLowerCase()
-            .replace(/á/g, 'a')
-            .replace(/é/g, 'e')
-            .replace(/í/g, 'i')
-            .replace(/ó/g, 'o')
-            .replace(/ú/g, 'u');
-        
-        return normalizado;
-    };
+    const normalizar = (texto = '') => texto
+        .toString()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zñ ]/g, '')
+        .trim();
     
-    const valorDia = normalizarDia(nombreDia);
+    const valorDia = normalizar(nombreDia);
     return !datosUsuario.diasEntreno.includes(valorDia);
 }
 
@@ -3615,7 +3578,7 @@ function inicializarBotones() {
                 width: 100%;
                 border-collapse: collapse;
                 margin: 4px 0;
-                font-size: 7.2pt;
+                font-size: 7.6pt;
             }
             th {
                 border: 1px solid #000;
@@ -3624,7 +3587,7 @@ function inicializarBotones() {
                 font-weight: 700;
                 background: #fff;
                 color: #000;
-                font-size: 8pt;
+                font-size: 8.4pt;
             }
             td {
                 border: 1px solid #666;
@@ -3632,8 +3595,8 @@ function inicializarBotones() {
                 text-align: left;
                 background: #fff;
                 color: #000;
-                font-size: 7pt;
-                line-height: 1.15;
+                font-size: 7.4pt;
+                line-height: 1.2;
             }
             .plan-tabla-editable { 
                 width: 100%; 
@@ -3678,7 +3641,7 @@ function inicializarBotones() {
             .tabla-plan-semanal td {
                 border: 1px solid #666;
                 padding: 1px 2px;
-                font-size: 7.5pt;
+                font-size: 7.9pt;
                 vertical-align: top;
                 word-wrap: break-word;
                 overflow-wrap: break-word;
@@ -3695,24 +3658,24 @@ function inicializarBotones() {
             }
             .tabla-plan-semanal .subtitulo-dia {
                 display: block;
-                font-size: 7.5pt;
+                font-size: 8pt;
                 margin-top: 2px;
                 font-weight: 600;
             }
             .celda-dia {
                 min-height: 30px;
                 height: auto;
-                line-height: 1.1;
+                line-height: 1.2;
                 word-break: break-word;
                 vertical-align: top;
             }
             .celda-dia .item-alimento {
                 display: block;
                 margin-left: 8px;
-                margin-bottom: 0.5px;
+                margin-bottom: 1px;
                 position: relative;
-                font-size: 7pt;
-                line-height: 1.1;
+                font-size: 7.6pt;
+                line-height: 1.25;
             }
             .celda-dia .item-alimento::before {
                 content: '•';
@@ -3729,9 +3692,9 @@ function inicializarBotones() {
             .titulo-comida {
                 display: block;
                 font-weight: 700;
-                margin-bottom: 0.5px;
-                font-size: 7.2pt;
-                line-height: 1.1;
+                margin-bottom: 1px;
+                font-size: 7.8pt;
+                line-height: 1.2;
             }
             /* Estilos anteriores mantenidos para compatibilidad */
             .dia-plan {
@@ -3902,91 +3865,42 @@ function inicializarBotones() {
      * @returns {string}
      */
     function generarHTMLDesdeTablaEditable() {
-        const plan = window.tablaEditable?.planSemana || {};
-        const diasBase = window.tablaEditable?.dias || ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-        const comidas = window.tablaEditable?.comidas || ['Desayuno', 'Media Mañana', 'Comida', 'Merienda', 'Cena'];
-        
-        const normalizar = (texto = '') => texto
-            .toString()
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-zñ ]/g, '')
-            .trim();
-        
-        const esDiaDescanso = (nombreDia) => {
-            if (!window.datosUsuario || !Array.isArray(window.datosUsuario.diasEntreno) || window.datosUsuario.diasEntreno.length === 0) {
-                return true;
-            }
-            const valorDia = normalizar(nombreDia);
-            const diasEntrenoNormalizados = window.datosUsuario.diasEntreno.map(d => normalizar(d));
-            return !diasEntrenoNormalizados.includes(valorDia);
-        };
-        
+        const estructura = construirPlanSemanalEstructurado();
+        if (!estructura) {
+            return '<div class="plan-tabla-editable"><p style="padding:8px;font-size:9pt;">No hay datos disponibles para generar el plan semanal.</p></div>';
+        }
+ 
+        const { diasBase, comidas, semanas, formatoAlimento, esDiaDescanso } = estructura;
+ 
         const escapeHTML = (str = '') => String(str)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
-        
-        const formatoAlimento = (item = {}) => {
-            const gramos = item.gramos != null && item.gramos !== '' ? `${item.gramos}g` : '';
-            const nombre = item.alimento || item.nombre || '';
-            
-            if (gramos && nombre) return `${gramos} ${nombre}`;
-            if (nombre) return nombre;
-            if (gramos) return gramos;
-            return '';
-        };
-        
-        // Agrupar datos por día base
-        const agrupados = {};
-        diasBase.forEach(dia => agrupados[normalizar(dia)] = []);
-        
-        Object.entries(plan).forEach(([nombreDiaOriginal, datosDia]) => {
-            const nombreNormalizado = normalizar(nombreDiaOriginal.split('-')[0]);
-            if (!agrupados[nombreNormalizado]) {
-                agrupados[nombreNormalizado] = [];
-            }
-            agrupados[nombreNormalizado].push({ nombre: nombreDiaOriginal, datos: datosDia });
-        });
-        
-        const semanas = Math.max(1, ...Object.values(agrupados).map(arr => arr.length || 0));
+ 
         let html = '<div class="plan-tabla-editable">';
-        
-        for (let semana = 0; semana < semanas; semana++) {
+ 
+        semanas.forEach((semana, indice) => {
             html += '<div class="pdf-semana">';
-            if (semanas > 1) {
-                html += `<h2 class="titulo-semana">Semana ${semana + 1}</h2>`;
+            if (semanas.length > 1) {
+                html += `<h2 class="titulo-semana">Semana ${indice + 1}</h2>`;
             }
             html += '<table class="tabla-plan-semanal"><thead><tr>';
-            
-            const columnas = diasBase.map(dia => {
-                const lista = agrupados[normalizar(dia)] || [];
-                const entrada = lista[semana] || (semana === 0 && plan[dia] ? { nombre: dia, datos: plan[dia] } : null);
-                return {
-                    diaBase: dia,
-                    titulo: entrada ? entrada.nombre : dia,
-                    datos: entrada ? entrada.datos : null
-                };
-            });
-            
-            columnas.forEach(col => {
-                const descanso = esDiaDescanso(col.titulo);
-                const icono = descanso ? '😴' : '💪';
+ 
+            semana.columnas.forEach(col => {
+                const icono = col.esDescanso ? '😴' : '💪';
                 const etiquetaDia = `${col.diaBase} ${icono}`;
                 html += `<th>${escapeHTML(etiquetaDia)}</th>`;
             });
-            
+ 
             html += '</tr></thead><tbody>';
-            
+ 
             comidas.forEach(comida => {
                 html += '<tr>';
-                
-                columnas.forEach(col => {
-                    const items = col.datos && Array.isArray(col.datos[comida]) ? col.datos[comida] : [];
-                    if (items.length === 0) {
+                semana.columnas.forEach(col => {
+                    const items = col.alimentosPorComida[comida] || [];
+                    if (!items.length) {
                         html += '<td class="celda-dia celda-vacia">-</td>';
                     } else {
                         const contenido = items
@@ -3995,16 +3909,154 @@ function inicializarBotones() {
                         html += `<td class="celda-dia"><span class="titulo-comida">${escapeHTML(comida)}</span>${contenido}</td>`;
                     }
                 });
-                
                 html += '</tr>';
             });
-            
+ 
             html += '</tbody></table></div>';
-        }
-        
+        });
+ 
         html += '</div>';
         return html;
     }
+
+    async function exportarExcelProfesional() {
+        try {
+            if (!window.ExcelJS || typeof window.ExcelJS.Workbook !== 'function') {
+                throw new Error('No se cargó la librería ExcelJS');
+            }
+            if (typeof window.saveAs !== 'function') {
+                throw new Error('No se encontró la función saveAs (FileSaver)');
+            }
+
+            const estructura = actualizarEstructuraPlanExport();
+            if (!estructura) {
+                mostrarNotificacion?.('⚠️ No hay datos suficientes para exportar a Excel', 'warning');
+                return;
+            }
+
+            const ExcelJS = window.ExcelJS;
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'Maika Porcuna';
+            workbook.created = new Date();
+            workbook.modified = new Date();
+
+            const cabecera = typeof window.tablaEditable?.obtenerCabeceraExport === 'function'
+                ? window.tablaEditable.obtenerCabeceraExport()
+                : {};
+
+            const diasBase = estructura.diasBase;
+            const comidas = estructura.comidas;
+
+            estructura.semanas.forEach((semana, indexSemana) => {
+                const sheetName = estructura.semanas.length > 1 ? `Semana ${indexSemana + 1}` : 'Plan Semanal';
+                const sheet = workbook.addWorksheet(sheetName, {
+                    properties: { defaultRowHeight: 20 },
+                    pageSetup: {
+                        orientation: 'landscape',
+                        paperSize: 9,
+                        fitToPage: true,
+                        fitToWidth: 1,
+                        fitToHeight: 0
+                    },
+                    views: [{ state: 'frozen', xSplit: 0, ySplit: 5 }]
+                });
+
+                const totalColumnas = diasBase.length;
+
+                sheet.mergeCells(1, 1, 1, totalColumnas);
+                const tituloCell = sheet.getCell(1, 1);
+                tituloCell.value = 'PLAN DE ALIMENTACIÓN PERSONALIZADO';
+                tituloCell.font = { bold: true, size: 18 };
+                tituloCell.alignment = { horizontal: 'center', vertical: 'middle' };
+                sheet.getRow(1).height = 26;
+
+                sheet.mergeCells(2, 1, 2, totalColumnas);
+                const infoCell = sheet.getCell(2, 1);
+                infoCell.value = `Cliente: ${cabecera.nombre || datosUsuario.nombre || 'Cliente'}    Fecha: ${cabecera.fecha || new Date().toLocaleDateString('es-ES')}`;
+                infoCell.font = { bold: true, size: 12 };
+                infoCell.alignment = { horizontal: 'center', vertical: 'middle' };
+
+                sheet.mergeCells(3, 1, 3, totalColumnas);
+                const metaCell = sheet.getCell(3, 1);
+                metaCell.value = `Objetivo: ${cabecera.objetivo || datosUsuario.objetivo || 'N/D'}    Tipo de persona: ${cabecera.tipoPersona || datosUsuario.tipoPersona || 'N/D'}    Sexo: ${cabecera.sexo || datosUsuario.sexo || 'N/D'}`;
+                metaCell.font = { size: 11 };
+                metaCell.alignment = { horizontal: 'center', vertical: 'middle' };
+                sheet.getRow(3).height = 18;
+
+                sheet.addRow([]);
+
+                const headerRow = sheet.addRow(semana.columnas.map(col => col.titulo));
+                headerRow.font = { bold: true, size: 12 };
+                headerRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+                headerRow.height = 28;
+                headerRow.eachCell((cell, colNumber) => {
+                    const esDescanso = semana.columnas[colNumber - 1]?.esDescanso;
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: esDescanso ? 'FFFDEBD0' : 'FFE8F5E9' }
+                    };
+                    cell.border = {
+                        top: { style: 'thin', color: { argb: 'FF666666' } },
+                        left: { style: 'thin', color: { argb: 'FF666666' } },
+                        bottom: { style: 'thin', color: { argb: 'FF666666' } },
+                        right: { style: 'thin', color: { argb: 'FF666666' } }
+                    };
+                });
+
+                comidas.forEach(comida => {
+                    const rowData = semana.columnas.map(col => {
+                        const items = col.alimentosPorComida[comida] || [];
+                        if (!items.length) {
+                            return `${comida}:
+—`;
+                        }
+                        const lineas = items.map(item => `• ${estructura.formatoAlimento(item)}`);
+                        return `${comida}:
+${lineas.join('\n')}`;
+                    });
+
+                    const row = sheet.addRow(rowData);
+                    row.font = { size: 12 };
+                    row.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+                    row.height = 140;
+                    row.eachCell(cell => {
+                        cell.border = {
+                            top: { style: 'thin', color: { argb: 'FF999999' } },
+                            left: { style: 'thin', color: { argb: 'FF999999' } },
+                            bottom: { style: 'thin', color: { argb: 'FF999999' } },
+                            right: { style: 'thin', color: { argb: 'FF999999' } }
+                        };
+                    });
+                });
+
+                sheet.columns.forEach((col, colIndex) => {
+                    col.width = 28;
+                    const esDescanso = semana.columnas[colIndex]?.esDescanso;
+                    if (esDescanso) {
+                        col.eachCell({ includeEmpty: true }, cell => {
+                            cell.fill = cell.fill || {
+                                type: 'pattern',
+                                pattern: 'solid',
+                                fgColor: { argb: 'FFFDF7E3' }
+                            };
+                        });
+                    }
+                });
+            });
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const nombreArchivo = `Plan_Alimentacion_${(datosUsuario.nombre || cabecera.nombre || 'cliente').replace(/\s+/g, '_')}.xlsx`;
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            window.saveAs(blob, nombreArchivo);
+
+            mostrarNotificacion?.('✅ Excel exportado correctamente', 'success');
+        } catch (error) {
+            console.error('❌ Error al exportar Excel:', error);
+            mostrarNotificacion?.('❌ Error al exportar Excel: ' + error.message, 'error');
+        }
+    }
+    window.exportarExcelProfesional = exportarExcelProfesional;
     
     /**
      * Genera el PDF usando html2canvas y jsPDF
@@ -5065,6 +5117,15 @@ function inicializarBotones() {
             }
         });
     }
+
+    const btnDescargarExcel = document.getElementById('btnDescargarExcel');
+    if (btnDescargarExcel) {
+        btnDescargarExcel.replaceWith(btnDescargarExcel.cloneNode(true));
+        const nuevoBtnExcel = document.getElementById('btnDescargarExcel');
+        nuevoBtnExcel.addEventListener('click', function() {
+            exportarExcelProfesional();
+        });
+    }
 }
 
 // Hacer función global
@@ -5364,52 +5425,7 @@ window.mostrarPreviewPDF = function(pdfUrl, pdfBlob, filename) {
     modalContent.appendChild(header);
     modalContent.appendChild(pdfViewer);
     modalContent.appendChild(footer);
+    
     modal.appendChild(modalContent);
-    
-    // Agregar al body
     document.body.appendChild(modal);
-    
-    // Cerrar con ESC
-    document.addEventListener('keydown', function cerrarConEsc(e) {
-        if (e.key === 'Escape' && document.getElementById('pdfPreviewModal')) {
-            URL.revokeObjectURL(pdfUrl);
-            document.body.removeChild(modal);
-            document.removeEventListener('keydown', cerrarConEsc);
-        }
-    });
-};
-
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-    }
-    
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-`;
-document.head.appendChild(style);
+}
