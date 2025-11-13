@@ -1347,6 +1347,13 @@ body.dark-mode .tabla-macros-distribucion td {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
+/* Asegurar que el texto de la primera columna (nombre del macronutriente) sea visible */
+body.dark-mode .tabla-macros-distribucion td:first-child {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
 body.dark-mode .tabla-macros-distribucion tbody tr:hover {
     background: rgba(129, 140, 248, 0.25) !important;
 }
@@ -1367,21 +1374,57 @@ body.dark-mode .tabla-macros-distribucion tbody tr:last-child td {
 
 /* Asegurar que los inputs y porcentajes sean legibles en modo oscuro */
 body.dark-mode .tabla-macros-distribucion input.ajuste-manual-input {
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.25) !important;
     color: #ffffff !important;
-    border-color: rgba(129, 140, 248, 0.6) !important;
+    border-color: rgba(129, 140, 248, 0.8) !important;
+    border-width: 2px !important;
     font-weight: 700;
     font-size: 16px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    padding: 8px 12px !important;
 }
 
 body.dark-mode .tabla-macros-distribucion input.ajuste-manual-input:focus {
-    background: rgba(255, 255, 255, 0.2) !important;
+    background: rgba(255, 255, 255, 0.35) !important;
     border-color: #818cf8 !important;
     color: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.3) !important;
+    outline: none !important;
+}
+
+body.dark-mode .tabla-macros-distribucion input.ajuste-manual-input::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
 }
 
 body.dark-mode .tabla-macros-distribucion td:has(input) {
     color: #ffffff !important;
+}
+
+/* Sobrescribir estilos inline de los inputs de porcentaje manual en modo oscuro */
+body.dark-mode .tabla-macros-distribucion input[type="number"][id^="porcentaje-"] {
+    background: rgba(255, 255, 255, 0.25) !important;
+    color: #ffffff !important;
+    border-color: rgba(129, 140, 248, 0.8) !important;
+    border-width: 2px !important;
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    padding: 8px 12px !important;
+}
+
+body.dark-mode .tabla-macros-distribucion input[type="number"][id^="porcentaje-"]:focus {
+    background: rgba(255, 255, 255, 0.35) !important;
+    border-color: #818cf8 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.3) !important;
+    outline: none !important;
+}
+
+/* Asegurar que el símbolo de porcentaje (%) sea visible */
+body.dark-mode .tabla-macros-distribucion td span[style*="font-weight"] {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 /* Asegurar que el texto de porcentaje (%) sea visible */
@@ -5018,20 +5061,55 @@ body.dropdown-abierto .autocomplete-container:not(:has(.dropdown-hover)) .input-
     margin-bottom: 20px;
 }
 
+body.dark-mode .banner-modo-manual {
+    background: linear-gradient(135deg, #2d2d44 0%, #3d3d54 100%) !important;
+    border: 2px solid rgba(129, 140, 248, 0.5) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
 .banner-modo-manual h3 {
     margin: 0 0 10px 0;
     color: white;
+    font-weight: 700;
+    font-size: 1.3em;
+}
+
+body.dark-mode .banner-modo-manual h3 {
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    font-weight: 800;
 }
 
 .banner-modo-manual p {
     margin: 5px 0;
     font-size: 14px;
+    color: white;
+}
+
+body.dark-mode .banner-modo-manual p {
+    color: #ffffff !important;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+body.dark-mode .banner-modo-manual p strong {
+    color: #a5b4fc !important;
+    font-weight: 800;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .banner-modo-manual p:last-child {
     margin: 10px 0 0 0;
     font-size: 13px;
     opacity: 0.9;
+}
+
+body.dark-mode .banner-modo-manual p:last-child {
+    opacity: 1 !important;
+    color: #e0e0e0 !important;
+    font-weight: 500;
 }
 
 .autocomplete-list-hidden {
