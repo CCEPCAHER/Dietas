@@ -84,7 +84,17 @@ class AlimentoService {
                     // Normalizar los alimentos al formato esperado
                     const alimentosNormalizados = data.alimentos.map(alimento => {
                         return this.normalizarAlimento(alimento);
+                    }).filter(alimento => {
+                        // Filtrar solo elementos que tienen ALIMENTO definido y no vacío
+                        return alimento && alimento.ALIMENTO && alimento.ALIMENTO.trim() !== '';
                     });
+                    
+                    // Log para debugging
+                    if (data.totalAlimentos && alimentosNormalizados.length !== data.totalAlimentos) {
+                        console.warn(`⚠️ Advertencia: Se esperaban ${data.totalAlimentos} alimentos pero se normalizaron ${alimentosNormalizados.length}`);
+                        console.warn(`   Alimentos filtrados: ${data.totalAlimentos - alimentosNormalizados.length}`);
+                    }
+                    
                     return alimentosNormalizados;
                 }
             }
@@ -209,10 +219,18 @@ class AlimentoService {
         const grasas = normalizarValor(alimento.grasas || alimento.GRASAS);
         const calorias = normalizarValor(alimento.calorias || alimento.CALORÍAS) || calcularCalorias(proteinas, hidratos, grasas);
 
+        // Obtener el nombre del alimento - verificar múltiples campos posibles
+        const nombreAlimento = alimento.nombre || alimento.ALIMENTO || alimento.NOMBRE || alimento.name || '';
+        
+        // Si no hay nombre, loggear advertencia pero no filtrar aquí (se filtrará después)
+        if (!nombreAlimento || nombreAlimento.trim() === '') {
+            console.warn('⚠️ Alimento sin nombre encontrado:', JSON.stringify(alimento).substring(0, 100));
+        }
+
         return {
-            ALIMENTO: alimento.nombre || alimento.ALIMENTO,
-            MACRONUTRIENTE_PRINCIPAL: alimento.categoria_principal || alimento.MACRONUTRIENTE_PRINCIPAL || alimento['MACRONUTRIENTE PRINCIPAL'],
-            CLASIFICACIÓN: alimento.subcategoria || alimento.CLASIFICACIÓN,
+            ALIMENTO: nombreAlimento,
+            MACRONUTRIENTE_PRINCIPAL: alimento.categoria_principal || alimento.MACRONUTRIENTE_PRINCIPAL || alimento['MACRONUTRIENTE PRINCIPAL'] || '',
+            CLASIFICACIÓN: alimento.subcategoria || alimento.CLASIFICACIÓN || '',
             UNIDAD: alimento.presentacion || alimento.UNIDAD || '',
             PESO_POR_UNIDAD: alimento.peso || alimento['PESO POR UNIDAD'] || alimento.PESO_POR_UNIDAD || '',
             MARCA_REGISTRADA: alimento.marca || alimento['MARCA REGISTRADA'] || alimento.MARCA_REGISTRADA || '',
