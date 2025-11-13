@@ -3409,9 +3409,17 @@ function inicializarBotones() {
     
     /**
      * Genera el CSS para el PDF (minimalista, blanco y negro)
+     * @param {Object} tamanosFuente - Tamaños de fuente dinámicos (opcional)
      * @returns {string}
      */
-    function generarCSSPDF() {
+    function generarCSSPDF(tamanosFuente = null) {
+        // Usar tamaños dinámicos si están disponibles, sino usar valores por defecto
+        const tamanos = tamanosFuente || window.tamanosFuentePDF || {
+            tamanoItemAlimento: 7.6,
+            tamanoTituloComida: 7.8,
+            tamanoHeader: 8.4,
+            tamanoSubtitulo: 8.0
+        };
         return `
             * { margin: 0; padding: 0; box-sizing: border-box; }
             html {
@@ -3437,7 +3445,22 @@ function inicializarBotones() {
                 -moz-osx-font-smoothing: grayscale;
             }
             body.layout-landscape {
-                padding: 1.5mm 7mm 5mm 7mm;
+                padding: 0.5mm 5mm 1mm 5mm;
+                max-height: 210mm;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+            }
+            .plan-tabla-editable {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+            }
+            .plan-tabla-editable table {
+                max-height: 200mm;
+                height: auto;
+                flex: 1;
             }
             @media screen and (max-width: 800px) {
                 body {
@@ -3476,7 +3499,7 @@ function inicializarBotones() {
                 }
             }
             .header {
-                margin-bottom: 0.8mm;
+                margin-bottom: 0.3mm;
                 position: relative;
                 margin-top: 0;
             }
@@ -3485,7 +3508,7 @@ function inicializarBotones() {
                 font-weight: 800;
                 letter-spacing: 0.5px;
                 text-transform: uppercase;
-                margin: 3.5mm 0 0 0;
+                margin: 1mm 0 0 0;
                 padding: 0;
                 color: #000;
                 text-align: center;
@@ -3522,7 +3545,7 @@ function inicializarBotones() {
                 color: #000;
                 font-weight: 600;
                 text-transform: uppercase;
-                margin: 1.2mm 0 0 0;
+                margin: 1.2mm 0 4mm 0;
                 padding: 0;
                 line-height: 1;
             }
@@ -3549,8 +3572,8 @@ function inicializarBotones() {
                 object-fit: contain;
             }
             .cliente-info {
-                margin-bottom: 1.5mm;
-                padding-bottom: 0.8mm;
+                margin-bottom: 0.5mm;
+                padding-bottom: 0.3mm;
                 border-bottom: 1px solid #000;
                 display: flex;
                 align-items: center;
@@ -3636,12 +3659,34 @@ function inicializarBotones() {
                 margin: 0 auto;
                 page-break-inside: avoid;
                 flex-shrink: 0;
+                max-height: 200mm;
+                height: auto;
+            }
+            .plan-tabla-editable {
+                width: 100%;
+                max-height: 200mm;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+            }
+            .pdf-semana {
+                width: 100%;
+                max-height: 200mm;
+                overflow: hidden;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+            }
+            .pdf-semana table {
+                flex: 1;
+                height: 100%;
             }
             .tabla-plan-semanal th,
             .tabla-plan-semanal td {
                 border: 1px solid #666;
-                padding: 1px 2px;
-                font-size: 7.9pt;
+                padding: ${Math.max(0.5, tamanos.tamanoItemAlimento * 0.08)}px ${Math.max(1, tamanos.tamanoItemAlimento * 0.12)}px;
+                font-size: ${tamanos.tamanoItemAlimento + 0.3}pt;
                 vertical-align: top;
                 word-wrap: break-word;
                 overflow-wrap: break-word;
@@ -3650,7 +3695,9 @@ function inicializarBotones() {
                 background: #fff;
                 font-weight: 700;
                 text-align: center;
-                padding: 2px 1px;
+                padding: ${Math.max(1, tamanos.tamanoHeader * 0.12)}px ${Math.max(0.5, tamanos.tamanoHeader * 0.08)}px;
+                font-size: ${tamanos.tamanoHeader}pt;
+                line-height: ${Math.max(1.1, Math.min(1.3, 1.0 + (tamanos.tamanoHeader - 8) * 0.015))};
             }
             .tabla-plan-semanal th,
             .tabla-plan-semanal td {
@@ -3658,24 +3705,24 @@ function inicializarBotones() {
             }
             .tabla-plan-semanal .subtitulo-dia {
                 display: block;
-                font-size: 8pt;
+                font-size: ${tamanos.tamanoSubtitulo}pt;
                 margin-top: 2px;
                 font-weight: 600;
             }
             .celda-dia {
-                min-height: 30px;
+                min-height: 15px;
                 height: auto;
-                line-height: 1.2;
                 word-break: break-word;
                 vertical-align: top;
+                padding: ${Math.max(0.5, tamanos.tamanoItemAlimento * 0.08)}px ${Math.max(1, tamanos.tamanoItemAlimento * 0.12)}px;
             }
             .celda-dia .item-alimento {
                 display: block;
                 margin-left: 8px;
-                margin-bottom: 1px;
+                margin-bottom: 0px;
                 position: relative;
-                font-size: 7.6pt;
-                line-height: 1.25;
+                font-size: ${tamanos.tamanoItemAlimento}pt;
+                line-height: ${Math.max(1.05, Math.min(1.25, 1.0 + (tamanos.tamanoItemAlimento - 8) * 0.01))};
             }
             .celda-dia .item-alimento::before {
                 content: '•';
@@ -3692,9 +3739,9 @@ function inicializarBotones() {
             .titulo-comida {
                 display: block;
                 font-weight: 700;
-                margin-bottom: 1px;
-                font-size: 7.8pt;
-                line-height: 1.2;
+                margin-bottom: ${Math.max(0, Math.min(2, tamanos.tamanoTituloComida * 0.15))}px;
+                font-size: ${tamanos.tamanoTituloComida}pt;
+                line-height: ${Math.max(1.05, Math.min(1.2, 1.0 + (tamanos.tamanoTituloComida - 8) * 0.01))};
             }
             /* Estilos anteriores mantenidos para compatibilidad */
             .dia-plan {
@@ -3779,7 +3826,7 @@ function inicializarBotones() {
         
         const logoHTML = logoBase64 ? `<img src="${logoBase64}" alt="Logo" class="logo-pdf">` : '';
         const infoCliente = subtags.join(' · ');
-        const recordatorioHidratacion = 'Bebe 💧 2–3 L agua/día – Ajustar porciones según energía';
+        const recordatorioHidratacion = 'Bebe de 2 a 3 litros de agua al día ajusta según la necesidad de energía';
         
         return `
             <div class="header">
@@ -3790,9 +3837,9 @@ function inicializarBotones() {
                 </div>
                 <div class="header-top">
                     <div class="contacto">
-                        <span>${fecha}</span>
-                        <span>Maikafit1977@gmail.com</span>
-                        <span>+34 650 229 987</span>
+                        <span>📝 ${fecha}</span>
+                        <span>📧 Maikafit1977@gmail.com</span>
+                        <span>📞 +34 650 229 987</span>
                     </div>
                     ${logoHTML ? `<div class="logo-header">${logoHTML}</div>` : '<div class="logo-header"></div>'}
                 </div>
@@ -3986,6 +4033,157 @@ function inicializarBotones() {
     window.actualizarEstructuraPlanExport = actualizarEstructuraPlanExport;
 
     /**
+     * Calcula el tamaño de fuente dinámico basado en la cantidad de contenido
+     * @param {Object} estructura - Estructura del plan semanal
+     * @returns {Object} - Tamaños de fuente calculados
+     */
+    function calcularTamanosFuenteDinamicos(estructura) {
+        const { diasBase, comidas, semanas } = estructura;
+        
+        // Contar total de alimentos en todas las celdas
+        let totalAlimentos = 0;
+        let maxAlimentosPorCelda = 0;
+        
+        semanas.forEach(semana => {
+            semana.columnas.forEach(col => {
+                comidas.forEach(comida => {
+                    const items = col.alimentosPorComida[comida] || [];
+                    totalAlimentos += items.length;
+                    if (items.length > maxAlimentosPorCelda) {
+                        maxAlimentosPorCelda = items.length;
+                    }
+                });
+            });
+        });
+        
+        // Calcular densidad: alimentos por celda promedio
+        const totalCeldas = semanas.length * diasBase.length * comidas.length;
+        const densidadAlimentos = totalCeldas > 0 ? totalAlimentos / totalCeldas : 0;
+        
+        // Tamaños base para A4 horizontal (297mm x 210mm)
+        // Altura disponible aproximada: ~195mm (descontando header y márgenes mínimos)
+        // Ancho disponible: ~287mm
+        
+        // Calcular tamaño de fuente basado en densidad y distribución
+        // Objetivo: ajustar dinámicamente para mejor legibilidad y uso del espacio
+        
+        // Calcular altura promedio de contenido por celda (estimación)
+        const alturaEstimadaPorCelda = (totalAlimentos / totalCeldas) * 4; // ~4mm por alimento
+        
+        // Tamaño base inicial aumentado aún más
+        let tamanoBase = 13.5; // Aumentado para aprovechar mejor el espacio disponible
+        
+        // Calcular espacio disponible estimado por celda (en mm)
+        // Altura disponible: ~200mm / 5 comidas = ~40mm por fila de comida
+        // Ancho disponible: ~287mm / 7 días = ~41mm por columna
+        const alturaDisponiblePorCelda = 200 / 5; // ~40mm
+        const anchoDisponiblePorCelda = 287 / 7; // ~41mm
+        const espacioDisponible = alturaDisponiblePorCelda * anchoDisponiblePorCelda; // mm²
+        
+        // Calcular espacio ocupado estimado
+        const espacioOcupado = alturaEstimadaPorCelda * anchoDisponiblePorCelda;
+        const porcentajeUso = espacioOcupado > 0 ? (espacioOcupado / espacioDisponible) * 100 : 0;
+        
+        // Calcular variabilidad: diferencia entre máximo y promedio de alimentos por celda
+        // Si hay mucha variabilidad, significa que algunas celdas están muy vacías
+        const promedioAlimentosPorCelda = densidadAlimentos;
+        const variabilidad = maxAlimentosPorCelda - promedioAlimentosPorCelda;
+        const hayCeldasVacias = variabilidad > 2; // Si hay celdas con muchos menos alimentos que otras
+        
+        // Ajuste principal según densidad de alimentos (EXTREMADAMENTE agresivo en aumentar)
+        if (densidadAlimentos < 0.8) {
+            // Muy pocos alimentos: aumentar muchísimo más
+            tamanoBase = Math.min(26.0, 17.0 + (0.8 - densidadAlimentos) * 12.0);
+        } else if (densidadAlimentos < 1.5) {
+            // Pocos alimentos: aumentar bastante más
+            tamanoBase = Math.min(24.0, 16.0 + (1.5 - densidadAlimentos) * 6.0);
+        } else if (densidadAlimentos < 2.5) {
+            // Densidad media-baja: aumentar moderadamente más
+            tamanoBase = Math.min(22.0, 15.0 + (2.5 - densidadAlimentos) * 3.5);
+        } else if (densidadAlimentos < 3.5) {
+            // Densidad media: tamaño estándar aumentado
+            tamanoBase = 13.5;
+        } else if (densidadAlimentos < 4.5) {
+            // Densidad media-alta: reducir un poco pero mantener grande
+            tamanoBase = Math.max(11.0, 13.5 - (densidadAlimentos - 3.5) * 0.8);
+        } else {
+            // Muchos alimentos: reducir pero mantener legible
+            tamanoBase = Math.max(9.5, 11.0 - (densidadAlimentos - 4.5) * 0.7);
+        }
+        
+        // Ajuste secundario según máximo de alimentos por celda (MUY agresivo)
+        if (maxAlimentosPorCelda > 8) {
+            // Celda muy llena: reducir pero mantener mínimo más alto
+            tamanoBase = Math.max(9.0, tamanoBase - 1.5);
+        } else if (maxAlimentosPorCelda > 6) {
+            tamanoBase = Math.max(10.5, tamanoBase - 1.0);
+        } else if (maxAlimentosPorCelda <= 2 && densidadAlimentos < 2.5) {
+            // Celda muy vacía con poca densidad: aumentar muchísimo más
+            tamanoBase = Math.min(26.0, tamanoBase + 5.5);
+        } else if (maxAlimentosPorCelda <= 3 && densidadAlimentos < 2.5) {
+            tamanoBase = Math.min(25.0, tamanoBase + 5.0);
+        } else if (maxAlimentosPorCelda <= 4 && densidadAlimentos < 3.0) {
+            tamanoBase = Math.min(24.0, tamanoBase + 4.5);
+        } else if (maxAlimentosPorCelda <= 5 && densidadAlimentos < 3.5) {
+            tamanoBase = Math.min(22.0, tamanoBase + 3.5);
+        } else if (maxAlimentosPorCelda <= 6 && densidadAlimentos < 3.0) {
+            tamanoBase = Math.min(20.0, tamanoBase + 2.5);
+        }
+        
+        // Ajuste según porcentaje de uso del espacio (CRÍTICO - muy agresivo)
+        if (porcentajeUso < 25 && densidadAlimentos < 3.5) {
+            // Muy poco espacio usado: aumentar muchísimo más
+            tamanoBase = Math.min(26.0, tamanoBase + 5.0);
+        } else if (porcentajeUso < 40 && densidadAlimentos < 3.0) {
+            // Poco espacio usado: aumentar bastante más
+            tamanoBase = Math.min(24.0, tamanoBase + 4.0);
+        } else if (porcentajeUso < 55 && densidadAlimentos < 2.5) {
+            // Espacio medio-bajo usado: aumentar bastante
+            tamanoBase = Math.min(22.0, tamanoBase + 3.0);
+        } else if (porcentajeUso < 70 && densidadAlimentos < 2.0) {
+            // Espacio medio usado: aumentar moderadamente
+            tamanoBase = Math.min(20.0, tamanoBase + 2.0);
+        }
+        
+        // Ajuste adicional si hay variabilidad (celdas muy diferentes)
+        if (hayCeldasVacias && densidadAlimentos < 3.0) {
+            // Si hay celdas muy vacías, aumentar más para aprovechar ese espacio
+            tamanoBase = Math.min(25.0, tamanoBase + 2.5);
+        }
+        
+        // Ajuste final según altura estimada (para evitar desbordamiento)
+        if (alturaEstimadaPorCelda > 38) {
+            // Contenido muy alto: reducir un poco pero mantener grande
+            tamanoBase = Math.max(9.0, tamanoBase - 1.2);
+        } else if (alturaEstimadaPorCelda < 10 && densidadAlimentos < 3.5) {
+            // Contenido muy bajo: aumentar muchísimo más agresivamente
+            tamanoBase = Math.min(26.0, tamanoBase + 4.5);
+        } else if (alturaEstimadaPorCelda < 13 && densidadAlimentos < 3.0) {
+            tamanoBase = Math.min(24.0, tamanoBase + 3.5);
+        } else if (alturaEstimadaPorCelda < 18 && densidadAlimentos < 2.5) {
+            tamanoBase = Math.min(22.0, tamanoBase + 2.5);
+        }
+        
+        console.log(`📊 Cálculo dinámico: densidad=${densidadAlimentos.toFixed(2)}, maxPorCelda=${maxAlimentosPorCelda}, alturaEst=${alturaEstimadaPorCelda.toFixed(1)}mm, usoEspacio=${porcentajeUso.toFixed(1)}%, tamañoBase=${tamanoBase.toFixed(1)}pt`);
+        
+        // Redondear a 1 decimal
+        tamanoBase = Math.round(tamanoBase * 10) / 10;
+        
+        // Calcular tamaños relativos con mejor proporción
+        const tamanoItem = tamanoBase;
+        const tamanoTitulo = Math.min(tamanoBase + 1.0, tamanoBase * 1.15); // Máximo 15% más grande
+        const tamanoHeader = Math.min(tamanoBase + 1.5, tamanoBase * 1.25); // Máximo 25% más grande
+        const tamanoSubtitulo = Math.min(tamanoBase + 0.5, tamanoBase * 1.1); // Máximo 10% más grande
+        
+        return {
+            tamanoItemAlimento: tamanoItem,
+            tamanoTituloComida: tamanoTitulo,
+            tamanoHeader: tamanoHeader,
+            tamanoSubtitulo: tamanoSubtitulo
+        };
+    }
+
+    /**
      * Genera el HTML del plan desde tabla editable
      * @returns {string}
      */
@@ -3996,6 +4194,12 @@ function inicializarBotones() {
         }
  
         const { diasBase, comidas, semanas, formatoAlimento, esDiaDescanso } = estructura;
+        
+        // Calcular tamaños dinámicos
+        const tamanos = calcularTamanosFuenteDinamicos(estructura);
+        
+        // Guardar tamaños en window para que el CSS los use
+        window.tamanosFuentePDF = tamanos;
  
         const escapeHTML = (str = '') => String(str)
             .replace(/&/g, '&amp;')
@@ -5026,7 +5230,20 @@ ${lineas.join('\n')}`;
         const fecha = new Date().toLocaleDateString('es-ES');
         const nombreCliente = datos.nombre || 'Cliente';
         const headerHTML = await generarHeaderPDF(datos, fecha);
-        const cssHTML = generarCSSPDF();
+        
+        // Si es tabla editable, calcular tamaños dinámicos ANTES de generar CSS
+        let tamanosFuente = null;
+        if (fuente === 'tabla-editable') {
+            const estructura = construirPlanSemanalEstructurado();
+            if (estructura) {
+                tamanosFuente = calcularTamanosFuenteDinamicos(estructura);
+                // Guardar también en window para que esté disponible
+                window.tamanosFuentePDF = tamanosFuente;
+                console.log('📊 Tamaños de fuente calculados:', tamanosFuente);
+            }
+        }
+        
+        const cssHTML = generarCSSPDF(tamanosFuente);
         
         const bodyClass = fuente === 'tabla-editable' ? 'layout-landscape' : '';
         
