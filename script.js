@@ -1159,37 +1159,107 @@ function calcularMacronutrientes() {
 
 // Hacer función global para uso desde otros módulos
 window.mostrarResultados = function() {
-    const resultadosDiv = document.getElementById('resultados');
-    
-    const fechaHoy = new Date().toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    const fechaGenElem = document.getElementById('fecha-generacion');
-    if (fechaGenElem) {
-        fechaGenElem.textContent = fechaHoy;
+    try {
+        const resultadosDiv = document.getElementById('resultados');
+        
+        if (!resultadosDiv) {
+            console.error('❌ Elemento resultados no encontrado');
+            return;
+        }
+        
+        const fechaHoy = new Date().toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        const fechaGenElem = document.getElementById('fecha-generacion');
+        if (fechaGenElem) {
+            fechaGenElem.textContent = fechaHoy;
+        }
+        
+        // Ejecutar funciones con manejo de errores individual
+        try {
+            mostrarTablaMacros();
+        } catch (error) {
+            console.error('Error en mostrarTablaMacros:', error);
+        }
+        
+        try {
+            mostrarInfoUsuario();
+        } catch (error) {
+            console.error('Error en mostrarInfoUsuario:', error);
+        }
+        
+        try {
+            mostrarDistribucionEntrenos();
+        } catch (error) {
+            console.error('Error en mostrarDistribucionEntrenos:', error);
+        }
+        
+        try {
+            mostrarCalculosDetallados();
+        } catch (error) {
+            console.error('Error en mostrarCalculosDetallados:', error);
+        }
+        
+        try {
+            mostrarMacronutrientesDistribucion();
+        } catch (error) {
+            console.error('Error en mostrarMacronutrientesDistribucion:', error);
+        }
+        
+        try {
+            mostrarPlanAlimentacion();
+        } catch (error) {
+            console.error('Error en mostrarPlanAlimentacion:', error);
+            // Si hay error, mostrar mensaje de error en el div
+            const planDiv = document.getElementById('plan-alimentacion');
+            if (planDiv) {
+                planDiv.innerHTML = `
+                    <div class="mensaje-error-modulo">
+                        <h3>⚠️ Error al mostrar el plan</h3>
+                        <p>Hubo un problema al cargar el plan de alimentación.</p>
+                        <p style="margin-top: 10px; font-size: 12px; color: #666;">
+                            Error: ${error.message}
+                        </p>
+                    </div>
+                `;
+            }
+        }
+        
+        try {
+            mostrarProhibiciones();
+        } catch (error) {
+            console.error('Error en mostrarProhibiciones:', error);
+        }
+        
+        resultadosDiv.classList.remove('oculto');
+        
+        setTimeout(() => {
+            try {
+                inicializarBotones();
+            } catch (error) {
+                console.error('Error en inicializarBotones:', error);
+            }
+        }, 100);
+        
+        setTimeout(() => {
+            try {
+                resultadosDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (error) {
+                console.error('Error al hacer scroll:', error);
+            }
+        }, 200);
+        
+        if (window.mostrarNotificacion) {
+            mostrarNotificacion('✅ Plan de alimentación generado correctamente', 'success');
+        }
+    } catch (error) {
+        console.error('❌ Error crítico en mostrarResultados:', error);
+        if (window.mostrarNotificacion) {
+            mostrarNotificacion('❌ Error al mostrar resultados: ' + error.message, 'error');
+        }
     }
-    
-    mostrarTablaMacros();
-    mostrarInfoUsuario();
-    mostrarDistribucionEntrenos();
-    mostrarCalculosDetallados();
-    mostrarMacronutrientesDistribucion();
-    mostrarPlanAlimentacion();
-    mostrarProhibiciones();
-    
-    resultadosDiv.classList.remove('oculto');
-    
-    setTimeout(() => {
-        inicializarBotones();
-    }, 100);
-    
-    setTimeout(() => {
-        resultadosDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 200);
-    
-    mostrarNotificacion('✅ Plan de alimentación generado correctamente', 'success');
 };
 
 // Alias para compatibilidad
@@ -3070,85 +3140,162 @@ document.addEventListener('DOMContentLoaded', function() {
         dietForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Validar que el usuario esté autenticado
-            if (!window.authManager || !window.authManager.isAuthenticated()) {
-                window.uiManager?.openModal();
-                mostrarNotificacion('⚠️ Debes iniciar sesión para generar dietas', 'error');
-                return;
-            }
-            
-            // Recopilar intolerancias seleccionadas
-            const checkboxesIntolerancias = document.querySelectorAll('input[name="intolerancia"]:checked');
-            const intolerancias = Array.from(checkboxesIntolerancias).map(cb => cb.value);
-            
-            // Recopilar preferencias dietéticas seleccionadas
-            const checkboxesPreferencias = document.querySelectorAll('input[name="preferencia"]:checked');
-            const preferencias = Array.from(checkboxesPreferencias).map(cb => cb.value);
-            
-            // Combinar intolerancias y prohibiciones adicionales
-            const prohibicionesAdicionales = document.getElementById('prohibiciones').value;
-            const todasLasProhibiciones = [...intolerancias, prohibicionesAdicionales].filter(p => p.trim() !== '').join(', ');
-            
-            // Obtener días de entrenamiento seleccionados
-            const diasEntrenoCheckboxes = document.querySelectorAll('input[name="diaEntreno"]:checked');
-            const diasEntreno = Array.from(diasEntrenoCheckboxes).map(cb => cb.value);
-            const numDiasEntreno = diasEntreno.length;
-            
-            // Obtener actividad física del deporte
-            const actividadFisicaDeporte = document.getElementById('actividadFisicaDeporte')?.value || 'moderada';
-            
-            // Validar coherencia entre días de entrenamiento y nivel de actividad
-            const rangosActividad = {
-                'sedentario': { min: 0, max: 2, descripcion: '0-2 días' },
-                'ligera': { min: 1, max: 3, descripcion: '1-3 días' },
-                'moderada': { min: 3, max: 5, descripcion: '3-5 días' },
-                'intensa': { min: 6, max: 7, descripcion: '6-7 días' },
-                'muy-intensa': { min: 6, max: 7, descripcion: '6-7 días' }
-            };
-            
-            const rangoEsperado = rangosActividad[actividadFisicaDeporte];
-            if (rangoEsperado && (numDiasEntreno < rangoEsperado.min || numDiasEntreno > rangoEsperado.max)) {
-                const actividadTexto = {
-                    'sedentario': 'Sedentaria',
-                    'ligera': 'Ligera (1-3 días)',
-                    'moderada': 'Moderada (3-5 días)',
-                    'intensa': 'Intensa (6-7 días)',
-                    'muy-intensa': 'Muy intensa (6-7 días)'
-                }[actividadFisicaDeporte] || actividadFisicaDeporte;
+            try {
+                // Validar que el usuario esté autenticado
+                if (!window.authManager || !window.authManager.isAuthenticated()) {
+                    window.uiManager?.openModal();
+                    mostrarNotificacion('⚠️ Debes iniciar sesión para generar dietas', 'error');
+                    return;
+                }
                 
-                mostrarNotificacion(
-                    `⚠️ Inconsistencia detectada: Has seleccionado "${actividadTexto}" pero has marcado ${numDiasEntreno} día(s) de entrenamiento. ` +
-                    `Para esta actividad, el rango esperado es ${rangoEsperado.descripcion}. ` +
-                    `Por favor, ajusta los días de entrenamiento o cambia el nivel de actividad antes de generar el plan.`,
-                    'error'
-                );
-                return; // Detener la generación de la dieta
+                // Recopilar intolerancias seleccionadas
+                const checkboxesIntolerancias = document.querySelectorAll('input[name="intolerancia"]:checked');
+                const intolerancias = Array.from(checkboxesIntolerancias).map(cb => cb.value);
+                
+                // Recopilar preferencias dietéticas seleccionadas
+                const checkboxesPreferencias = document.querySelectorAll('input[name="preferencia"]:checked');
+                const preferencias = Array.from(checkboxesPreferencias).map(cb => cb.value);
+                
+                // Combinar intolerancias y prohibiciones adicionales
+                const prohibicionesElement = document.getElementById('prohibiciones');
+                const prohibicionesAdicionales = prohibicionesElement ? prohibicionesElement.value : '';
+                const todasLasProhibiciones = [...intolerancias, prohibicionesAdicionales].filter(p => p.trim() !== '').join(', ');
+                
+                // Obtener días de entrenamiento seleccionados
+                const diasEntrenoCheckboxes = document.querySelectorAll('input[name="diaEntreno"]:checked');
+                const diasEntreno = Array.from(diasEntrenoCheckboxes).map(cb => cb.value);
+                const numDiasEntreno = diasEntreno.length;
+                
+                // Obtener actividad física del deporte
+                const actividadFisicaDeporte = document.getElementById('actividadFisicaDeporte')?.value || 'moderada';
+                
+                // Validar coherencia entre días de entrenamiento y nivel de actividad
+                const rangosActividad = {
+                    'sedentario': { min: 0, max: 2, descripcion: '0-2 días' },
+                    'ligera': { min: 1, max: 3, descripcion: '1-3 días' },
+                    'moderada': { min: 3, max: 5, descripcion: '3-5 días' },
+                    'intensa': { min: 6, max: 7, descripcion: '6-7 días' },
+                    'muy-intensa': { min: 6, max: 7, descripcion: '6-7 días' }
+                };
+                
+                const rangoEsperado = rangosActividad[actividadFisicaDeporte];
+                if (rangoEsperado && (numDiasEntreno < rangoEsperado.min || numDiasEntreno > rangoEsperado.max)) {
+                    const actividadTexto = {
+                        'sedentario': 'Sedentaria',
+                        'ligera': 'Ligera (1-3 días)',
+                        'moderada': 'Moderada (3-5 días)',
+                        'intensa': 'Intensa (6-7 días)',
+                        'muy-intensa': 'Muy intensa (6-7 días)'
+                    }[actividadFisicaDeporte] || actividadFisicaDeporte;
+                    
+                    mostrarNotificacion(
+                        `⚠️ Inconsistencia detectada: Has seleccionado "${actividadTexto}" pero has marcado ${numDiasEntreno} día(s) de entrenamiento. ` +
+                        `Para esta actividad, el rango esperado es ${rangoEsperado.descripcion}. ` +
+                        `Por favor, ajusta los días de entrenamiento o cambia el nivel de actividad antes de generar el plan.`,
+                        'error'
+                    );
+                    return; // Detener la generación de la dieta
+                }
+                
+                // Validar que los campos requeridos existan antes de acceder
+                const nombreElem = document.getElementById('nombre');
+                const fechaRegistroElem = document.getElementById('fechaRegistro');
+                const sexoElem = document.getElementById('sexo');
+                const edadElem = document.getElementById('edad');
+                const alturaElem = document.getElementById('altura');
+                const pesoElem = document.getElementById('peso');
+                const tipoPersonaElem = document.getElementById('tipoPersona');
+                const objetivoElem = document.getElementById('objetivo');
+                const modoGeneracionElem = document.getElementById('modoGeneracion');
+                const duracionElem = document.getElementById('duracion');
+                const tipoTermogenicoElem = document.getElementById('tipoTermogenico');
+                const superavitEntrenoElem = document.getElementById('superavitEntreno');
+                const superavitDescansoElem = document.getElementById('superavitDescanso');
+                
+                if (!nombreElem || !fechaRegistroElem || !sexoElem || !edadElem || !alturaElem || !pesoElem || !tipoPersonaElem || !objetivoElem || !duracionElem) {
+                    mostrarNotificacion('❌ Error: Faltan campos requeridos en el formulario', 'error');
+                    console.error('Campos faltantes:', {
+                        nombre: !!nombreElem,
+                        fechaRegistro: !!fechaRegistroElem,
+                        sexo: !!sexoElem,
+                        edad: !!edadElem,
+                        altura: !!alturaElem,
+                        peso: !!pesoElem,
+                        tipoPersona: !!tipoPersonaElem,
+                        objetivo: !!objetivoElem,
+                        duracion: !!duracionElem
+                    });
+                    return;
+                }
+                
+                datosUsuario = {
+                    nombre: nombreElem.value,
+                    fechaRegistro: fechaRegistroElem.value,
+                    sexo: sexoElem.value,
+                    edad: parseInt(edadElem.value) || 0,
+                    altura: parseFloat(alturaElem.value) || 0,
+                    peso: parseFloat(pesoElem.value) || 0,
+                    tipoPersona: tipoPersonaElem.value,
+                    objetivo: objetivoElem.value,
+                    modoGeneracion: modoGeneracionElem ? (modoGeneracionElem.value || 'automatico') : 'automatico',
+                    prohibiciones: todasLasProhibiciones,
+                    intolerancias: intolerancias,
+                    preferencias: preferencias, // Guardar preferencias dietéticas
+                    duracion: duracionElem.value,
+                    diasEntreno: diasEntreno,
+                    actividadFisicaDeporte: actividadFisicaDeporte,
+                    tipoTermogenico: tipoTermogenicoElem ? tipoTermogenicoElem.value : 'no-sedentaria',
+                    superavitEntreno: superavitEntrenoElem ? parseFloat(superavitEntrenoElem.value || 5) : 5,
+                    superavitDescanso: superavitDescansoElem ? parseFloat(superavitDescansoElem.value || 5) : 5
+                };
+                
+                // Calcular macronutrientes con manejo de errores
+                try {
+                    calcularMacronutrientes();
+                } catch (error) {
+                    console.error('❌ Error al calcular macronutrientes:', error);
+                    mostrarNotificacion('❌ Error al calcular macronutrientes: ' + error.message, 'error');
+                    return;
+                }
+                
+                // Actualizar referencia global
+                window.datosUsuario = datosUsuario;
+                
+                // Marcar operación crítica para prevenir reload del Service Worker
+                if (window.marcarOperacionCritica) {
+                    window.marcarOperacionCritica(true);
+                }
+                
+                // Esperar un momento antes de mostrar resultados para asegurar que todo esté listo
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Mostrar resultados con manejo de errores
+                try {
+                    if (window.mostrarResultados) {
+                        window.mostrarResultados();
+                    } else {
+                        console.error('❌ mostrarResultados no está disponible');
+                        mostrarNotificacion('❌ Error: No se puede mostrar el plan de alimentación', 'error');
+                    }
+                } catch (error) {
+                    console.error('❌ Error crítico al mostrar resultados:', error);
+                    mostrarNotificacion('❌ Error al generar el plan: ' + error.message, 'error');
+                } finally {
+                    // Desmarcar operación crítica después de un delay para asegurar que todo se haya renderizado
+                    setTimeout(() => {
+                        if (window.marcarOperacionCritica) {
+                            window.marcarOperacionCritica(false);
+                        }
+                    }, 2000); // Esperar 2 segundos después de mostrar resultados
+                }
+            } catch (error) {
+                console.error('❌ Error crítico al procesar formulario:', error);
+                mostrarNotificacion('❌ Error crítico al generar el plan: ' + error.message, 'error');
+                // Asegurar que se desmarque la operación crítica incluso si hay error
+                if (window.marcarOperacionCritica) {
+                    window.marcarOperacionCritica(false);
+                }
             }
-            
-            datosUsuario = {
-                nombre: document.getElementById('nombre').value,
-                fechaRegistro: document.getElementById('fechaRegistro').value,
-                sexo: document.getElementById('sexo').value,
-                edad: parseInt(document.getElementById('edad').value),
-                altura: parseFloat(document.getElementById('altura').value),
-                peso: parseFloat(document.getElementById('peso').value),
-                tipoPersona: document.getElementById('tipoPersona').value,
-                objetivo: document.getElementById('objetivo').value,
-                modoGeneracion: document.getElementById('modoGeneracion').value || 'automatico',
-                prohibiciones: todasLasProhibiciones,
-                intolerancias: intolerancias,
-                preferencias: preferencias, // Guardar preferencias dietéticas
-                duracion: document.getElementById('duracion').value,
-                diasEntreno: diasEntreno,
-                actividadFisicaDeporte: actividadFisicaDeporte,
-                tipoTermogenico: document.getElementById('tipoTermogenico')?.value || 'no-sedentaria',
-                superavitEntreno: parseFloat(document.getElementById('superavitEntreno')?.value || 5),
-                superavitDescanso: parseFloat(document.getElementById('superavitDescanso')?.value || 5)
-            };
-            
-            calcularMacronutrientes();
-            window.datosUsuario = datosUsuario; // Actualizar referencia global
-            mostrarResultados();
         });
     }
     
@@ -3304,6 +3451,12 @@ function inicializarBotones() {
     function generarCSSPDF() {
         return `
             * { margin: 0; padding: 0; box-sizing: border-box; }
+            html {
+                -webkit-text-size-adjust: 100%;
+                -moz-text-size-adjust: 100%;
+                -ms-text-size-adjust: 100%;
+                text-size-adjust: 100%;
+            }
             body {
                 font-family: 'Arial', 'Helvetica', sans-serif;
                 font-size: 10.2pt;
@@ -3314,9 +3467,50 @@ function inicializarBotones() {
                 display: flex;
                 flex-direction: column;
                 min-height: 100vh;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }
             body.layout-landscape {
                 padding: 1.5mm 7mm 5mm 7mm;
+            }
+            @media screen and (max-width: 800px) {
+                body {
+                    font-size: 9pt;
+                    padding: 1.5mm 6mm 6mm 6mm;
+                }
+                body.layout-landscape {
+                    padding: 1mm 5mm 4mm 5mm;
+                }
+                .titulo-principal {
+                    font-size: 12pt !important;
+                }
+                .nombre-profesional {
+                    font-size: 10pt !important;
+                }
+                .cliente-nombre {
+                    font-size: 9pt !important;
+                }
+                table {
+                    font-size: 6.5pt !important;
+                }
+                th, td {
+                    padding: 2px !important;
+                    font-size: 6.5pt !important;
+                }
+                .tabla-plan-semanal th,
+                .tabla-plan-semanal td {
+                    font-size: 6.5pt !important;
+                    padding: 1px !important;
+                }
+                .celda-dia .item-alimento {
+                    font-size: 6pt !important;
+                }
+                .titulo-comida {
+                    font-size: 6.5pt !important;
+                }
             }
             .header {
                 margin-bottom: 0.8mm;
@@ -4023,22 +4217,50 @@ function inicializarBotones() {
         // Usar iframe para todos los casos (más compatible, evita problemas de ventanas emergentes)
         let container, bodyElement;
         
+        // Calcular dimensiones del iframe optimizadas para móviles
+        // En móviles, usar píxeles para mejor compatibilidad y escalado
+        const mmToPx = 3.779527559; // Conversión aproximada: 1mm = 3.78px a 96 DPI
+        let iframeWidth, iframeHeight;
+        
+        if (esMovil) {
+            // En móviles, usar un ancho fijo en píxeles que se escale bien
+            // A4 portrait: 210mm = ~794px, A4 landscape: 297mm = ~1123px
+            iframeWidth = Math.round(pageWidth * mmToPx);
+            iframeHeight = Math.round(pageHeight * mmToPx);
+        } else {
+            // En desktop, usar milímetros
+            iframeWidth = pageWidth + 'mm';
+            iframeHeight = pageHeight + 'mm';
+        }
+        
         // Siempre usar iframe oculto para evitar problemas de ventanas emergentes
         container = document.createElement('iframe');
         container.style.position = 'fixed';
         container.style.top = '-9999px';
         container.style.left = '-9999px';
-        container.style.width = pageWidth + 'mm';
-        container.style.height = pageHeight + 'mm';
+        container.style.width = typeof iframeWidth === 'number' ? iframeWidth + 'px' : iframeWidth;
+        container.style.height = typeof iframeHeight === 'number' ? iframeHeight + 'px' : iframeHeight;
         container.style.border = 'none';
+        // Asegurar que el iframe tenga un viewport adecuado en móviles
+        if (esMovil) {
+            container.setAttribute('scrolling', 'no');
+        }
         document.body.appendChild(container);
         
         const iframeDoc = container.contentDocument || container.contentWindow.document;
+        
         iframeDoc.open();
         iframeDoc.write(htmlPDF);
         iframeDoc.close();
         
         bodyElement = iframeDoc.body;
+        
+        // Asegurar que el body tenga el ancho correcto en móviles
+        if (esMovil && bodyElement) {
+            bodyElement.style.width = typeof iframeWidth === 'number' ? iframeWidth + 'px' : iframeWidth;
+            bodyElement.style.maxWidth = typeof iframeWidth === 'number' ? iframeWidth + 'px' : iframeWidth;
+            bodyElement.style.overflow = 'hidden';
+        }
         
         // Esperar a que todas las imágenes se carguen antes de generar el canvas
         const esperarImagenes = () => {
@@ -4121,8 +4343,18 @@ function inicializarBotones() {
                 // Esperar un momento para que las imágenes base64 se carguen
                 await new Promise(resolve => setTimeout(resolve, 500));
                 
-                // Ajustar escala según dispositivo
-                const scale = esMovil ? 2.5 : 2; // Mayor escala en móviles para mejor calidad
+                // Ajustar escala según dispositivo - optimizado para móviles
+                // En móviles usar escala más alta pero ajustada al ancho disponible
+                let scale = esMovil ? 3 : 2; // Mayor escala en móviles para mejor calidad
+                
+                // Asegurar que el ancho del contenido sea correcto antes de capturar
+                const contenidoWidth = bodyElement.scrollWidth || (typeof iframeWidth === 'number' ? iframeWidth : parseFloat(iframeWidth) * mmToPx);
+                const contenidoHeight = bodyElement.scrollHeight || bodyElement.offsetHeight;
+                
+                // En móviles, ajustar escala si el contenido es muy ancho
+                if (esMovil && contenidoWidth > 1200) {
+                    scale = Math.max(2, Math.min(3, (1200 / contenidoWidth) * 3));
+                }
                 
                 html2canvas(bodyElement, {
                     scale: scale,
@@ -4130,10 +4362,10 @@ function inicializarBotones() {
                     allowTaint: true, // Permitir taint para evitar el error
                     logging: false,
                     backgroundColor: '#ffffff',
-                    width: bodyElement.scrollWidth,
-                    height: bodyElement.scrollHeight,
-                    windowWidth: bodyElement.scrollWidth,
-                    windowHeight: bodyElement.scrollHeight,
+                    width: contenidoWidth,
+                    height: contenidoHeight,
+                    windowWidth: contenidoWidth,
+                    windowHeight: contenidoHeight,
                     foreignObjectRendering: false, // Evitar problemas con objetos foráneos
                     removeContainer: false,
                     imageTimeout: 15000,
@@ -4145,6 +4377,12 @@ function inicializarBotones() {
                                 img.crossOrigin = 'anonymous';
                             }
                         });
+                        // Asegurar que el body clonado tenga el ancho correcto
+                        const clonedBody = clonedDoc.body;
+                        if (clonedBody && esMovil) {
+                            clonedBody.style.width = contenidoWidth + 'px';
+                            clonedBody.style.maxWidth = contenidoWidth + 'px';
+                        }
                     }
                 }).then(canvas => {
                     // Guardar dimensiones del canvas antes de convertir
@@ -4614,11 +4852,24 @@ function inicializarBotones() {
         const cssHTML = generarCSSPDF();
         
         const bodyClass = fuente === 'tabla-editable' ? 'layout-landscape' : '';
+        
+        // Detectar móvil para agregar viewport optimizado
+        const esMovilPDF = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent) || 
+                          (window.innerWidth <= 768) || 
+                          ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+        
+        // Calcular ancho del viewport para móviles
+        const orientacionPDF = fuente === 'tabla-editable' ? 'l' : 'p';
+        const pageWidthPDF = orientacionPDF === 'l' ? 297 : 210;
+        const mmToPxPDF = 3.779527559;
+        const viewportWidth = esMovilPDF ? Math.round(pageWidthPDF * mmToPxPDF) : 'device-width';
+        
         let htmlPDF = `
             <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="UTF-8">
+                <meta name="viewport" content="width=${viewportWidth}, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
                 <title>Plan de Alimentación - ${nombreCliente}</title>
                 <style>${cssHTML}</style>
             </head>
@@ -4687,7 +4938,7 @@ function inicializarBotones() {
         `;
         
         // Generar y descargar PDF (ahora es async)
-        const orientacionPDF = fuente === 'tabla-editable' ? 'l' : 'p';
+        // orientacionPDF ya está declarada arriba, solo usar su valor
         await generarArchivoPDF(htmlPDF, nombreCliente, { orientacion: orientacionPDF });
     };
     

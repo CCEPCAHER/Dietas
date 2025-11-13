@@ -281,71 +281,140 @@ class UIManager {
     }
 
     async cargarDieta(dietaId) {
-        const result = await window.dietaService.obtenerDietaPorId(dietaId);
-        
-        if (!result.success) {
-            this.showNotification('❌ Error al cargar dieta: ' + result.error, 'error');
-            return;
-        }
+        try {
+            const result = await window.dietaService.obtenerDietaPorId(dietaId);
+            
+            if (!result.success) {
+                this.showNotification('❌ Error al cargar dieta: ' + result.error, 'error');
+                return;
+            }
 
-        const dieta = result.dieta || {};
-        
-        // Normalizar campos que pueden venir como Timestamp u otros formatos
-        const dietaNormalizada = { ...dieta };
-        if (dietaNormalizada.fechaRegistro && typeof dietaNormalizada.fechaRegistro.toDate === 'function') {
-            const fecha = dietaNormalizada.fechaRegistro.toDate();
-            dietaNormalizada.fechaRegistro = fecha.toISOString().split('T')[0];
-        }
-        if (dietaNormalizada.fechaCreacion && typeof dietaNormalizada.fechaCreacion.toDate === 'function') {
-            dietaNormalizada.fechaCreacion = dietaNormalizada.fechaCreacion.toDate();
-        }
-        if (dietaNormalizada.fechaModificacion && typeof dietaNormalizada.fechaModificacion.toDate === 'function') {
-            dietaNormalizada.fechaModificacion = dietaNormalizada.fechaModificacion.toDate();
-        }
-        
-        if (typeof window.actualizarDatosUsuarioGlobal === 'function') {
-            window.actualizarDatosUsuarioGlobal(dietaNormalizada);
-        } else {
-            window.datosUsuario = dietaNormalizada;
-        }
-        
-        // Rellenar el formulario
-        document.getElementById('nombre').value = dietaNormalizada.nombre || '';
-        document.getElementById('fechaRegistro').value = dietaNormalizada.fechaRegistro || '';
-        document.getElementById('sexo').value = dietaNormalizada.sexo || '';
-        document.getElementById('edad').value = dietaNormalizada.edad || '';
-        document.getElementById('altura').value = dietaNormalizada.altura || '';
-        document.getElementById('peso').value = dietaNormalizada.peso || '';
-        document.getElementById('tipoPersona').value = dietaNormalizada.tipoPersona || '';
-        document.getElementById('objetivo').value = dietaNormalizada.objetivo || '';
-        document.getElementById('prohibiciones').value = dietaNormalizada.prohibiciones || '';
-        document.getElementById('duracion').value = dietaNormalizada.duracion || 'semana';
-        
-        // Marcar días de entrenamiento previamente guardados
-        if (Array.isArray(dietaNormalizada.diasEntreno)) {
-            const diasEntreno = dietaNormalizada.diasEntreno.map(d => d.toLowerCase());
-            document.querySelectorAll('input[name="diaEntreno"]').forEach(checkbox => {
-                checkbox.checked = diasEntreno.includes(checkbox.value.toLowerCase());
+            const dieta = result.dieta || {};
+            
+            // Normalizar campos que pueden venir como Timestamp u otros formatos
+            const dietaNormalizada = { ...dieta };
+            if (dietaNormalizada.fechaRegistro && typeof dietaNormalizada.fechaRegistro.toDate === 'function') {
+                const fecha = dietaNormalizada.fechaRegistro.toDate();
+                dietaNormalizada.fechaRegistro = fecha.toISOString().split('T')[0];
+            }
+            if (dietaNormalizada.fechaCreacion && typeof dietaNormalizada.fechaCreacion.toDate === 'function') {
+                dietaNormalizada.fechaCreacion = dietaNormalizada.fechaCreacion.toDate();
+            }
+            if (dietaNormalizada.fechaModificacion && typeof dietaNormalizada.fechaModificacion.toDate === 'function') {
+                dietaNormalizada.fechaModificacion = dietaNormalizada.fechaModificacion.toDate();
+            }
+            
+            // Guardar planSemana si existe antes de actualizar datosUsuario
+            const planSemanaGuardado = dietaNormalizada.planSemana || null;
+            
+            if (typeof window.actualizarDatosUsuarioGlobal === 'function') {
+                window.actualizarDatosUsuarioGlobal(dietaNormalizada);
+            } else {
+                window.datosUsuario = dietaNormalizada;
+            }
+            
+            // Rellenar el formulario con validación de elementos
+            const campos = {
+                'nombre': dietaNormalizada.nombre || '',
+                'fechaRegistro': dietaNormalizada.fechaRegistro || '',
+                'sexo': dietaNormalizada.sexo || '',
+                'edad': dietaNormalizada.edad || '',
+                'altura': dietaNormalizada.altura || '',
+                'peso': dietaNormalizada.peso || '',
+                'tipoPersona': dietaNormalizada.tipoPersona || '',
+                'objetivo': dietaNormalizada.objetivo || '',
+                'prohibiciones': dietaNormalizada.prohibiciones || '',
+                'duracion': dietaNormalizada.duracion || 'semana'
+            };
+            
+            Object.entries(campos).forEach(([id, valor]) => {
+                const elemento = document.getElementById(id);
+                if (elemento) {
+                    elemento.value = valor;
+                } else {
+                    console.warn(`⚠️ Elemento con id "${id}" no encontrado al cargar dieta`);
+                }
             });
-        }
+            
+            // Marcar días de entrenamiento previamente guardados
+            if (Array.isArray(dietaNormalizada.diasEntreno)) {
+                const diasEntreno = dietaNormalizada.diasEntreno.map(d => d.toLowerCase());
+                document.querySelectorAll('input[name="diaEntreno"]').forEach(checkbox => {
+                    checkbox.checked = diasEntreno.includes(checkbox.value.toLowerCase());
+                });
+            }
 
-        // Actualizar macros si existen
-        if (dietaNormalizada.calorias) {
-            document.getElementById('calorias').value = dietaNormalizada.calorias;
-            document.getElementById('proteinas').value = dietaNormalizada.proteinas || '';
-            document.getElementById('grasas').value = dietaNormalizada.grasas || '';
-            document.getElementById('carbohidratos').value = dietaNormalizada.carbohidratos || '';
-        }
+            // Actualizar macros si existen
+            if (dietaNormalizada.calorias) {
+                const macroCampos = {
+                    'calorias': dietaNormalizada.calorias,
+                    'proteinas': dietaNormalizada.proteinas || '',
+                    'grasas': dietaNormalizada.grasas || '',
+                    'carbohidratos': dietaNormalizada.carbohidratos || ''
+                };
+                
+                Object.entries(macroCampos).forEach(([id, valor]) => {
+                    const elemento = document.getElementById(id);
+                    if (elemento) {
+                        elemento.value = valor;
+                    }
+                });
+            }
 
-        // Mostrar resultados
-        if (window.mostrarResultados) {
-            window.mostrarResultados();
-        }
+            // Cerrar modal de mis dietas si está abierto
+            const modalMisDietas = document.getElementById('misDietasModal');
+            if (modalMisDietas) {
+                modalMisDietas.style.display = 'none';
+            }
 
-        this.showNotification('✅ Dieta cargada correctamente', 'success');
-        
-        // Scroll al inicio
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Marcar operación crítica para prevenir reload del Service Worker
+            if (window.marcarOperacionCritica) {
+                window.marcarOperacionCritica(true);
+            }
+            
+            // Esperar un momento antes de mostrar resultados para asegurar que todo esté listo
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
+            // Cargar planSemana en tablaEditable si existe y está en modo manual
+            if (planSemanaGuardado && dietaNormalizada.modoGeneracion === 'manual' && window.tablaEditable) {
+                try {
+                    if (typeof window.tablaEditable.cargarPlanSemana === 'function') {
+                        window.tablaEditable.cargarPlanSemana(planSemanaGuardado);
+                    } else if (window.tablaEditable.planSemana) {
+                        window.tablaEditable.planSemana = planSemanaGuardado;
+                    }
+                } catch (error) {
+                    console.error('Error al cargar planSemana:', error);
+                }
+            }
+
+            // Mostrar resultados con manejo de errores
+            try {
+                if (window.mostrarResultados) {
+                    window.mostrarResultados();
+                } else {
+                    console.warn('⚠️ mostrarResultados no está disponible');
+                }
+            } catch (error) {
+                console.error('❌ Error al mostrar resultados:', error);
+                this.showNotification('⚠️ Dieta cargada pero hubo un error al mostrar los resultados', 'error');
+            } finally {
+                // Desmarcar operación crítica después de un delay
+                setTimeout(() => {
+                    if (window.marcarOperacionCritica) {
+                        window.marcarOperacionCritica(false);
+                    }
+                }, 2000);
+            }
+
+            this.showNotification('✅ Dieta cargada correctamente', 'success');
+            
+            // Scroll al inicio
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (error) {
+            console.error('❌ Error crítico al cargar dieta:', error);
+            this.showNotification('❌ Error crítico al cargar la dieta: ' + error.message, 'error');
+        }
     }
 
     async eliminarDieta(dietaId) {

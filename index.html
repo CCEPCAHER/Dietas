@@ -661,6 +661,26 @@
     <script>
         if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
             let refreshing = false;
+            let operacionCriticaEnCurso = false; // Bandera para prevenir reload durante operaciones críticas
+            
+            // Función para marcar operación crítica (evitar reload durante generación de plan)
+            window.marcarOperacionCritica = function(enCurso) {
+                operacionCriticaEnCurso = enCurso;
+                if (enCurso) {
+                    console.log('🔒 Operación crítica iniciada - reload deshabilitado');
+                } else {
+                    console.log('🔓 Operación crítica finalizada - reload habilitado');
+                }
+            };
+            
+            // Función para verificar si se puede recargar
+            function puedeRecargar() {
+                if (operacionCriticaEnCurso) {
+                    console.log('⚠️ Reload bloqueado - operación crítica en curso');
+                    return false;
+                }
+                return !refreshing;
+            }
             
             // Registrar Service Worker
             navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
@@ -675,35 +695,46 @@
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                                 // Hay una nueva versión instalada
-                                console.log('✨ Nueva versión disponible. Aplicando actualización...');
+                                console.log('✨ Nueva versión disponible. Esperando momento adecuado para aplicar...');
                                 
-                                // Forzar activación inmediata
-                                newWorker.postMessage({ type: 'SKIP_WAITING' });
-                                
-                                // Recargar la página cuando el nuevo worker esté activo
-                                newWorker.addEventListener('controllerchange', () => {
-                                    if (!refreshing) {
-                                        refreshing = true;
-                                        console.log('🔄 Recargando para aplicar actualización...');
-                                        window.location.reload();
-                                    }
-                                });
+                                // NO forzar activación inmediata si hay operación crítica
+                                if (!operacionCriticaEnCurso) {
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                    
+                                    // Recargar la página cuando el nuevo worker esté activo
+                                    newWorker.addEventListener('controllerchange', () => {
+                                        if (puedeRecargar()) {
+                                            refreshing = true;
+                                            console.log('🔄 Recargando para aplicar actualización...');
+                                            window.location.reload();
+                                        } else {
+                                            console.log('⏸️ Recarga pospuesta - operación crítica en curso');
+                                        }
+                                    });
+                                } else {
+                                    console.log('⏸️ Actualización pospuesta - operación crítica en curso');
+                                }
                             }
                         });
                     });
                     
                     // Verificar actualizaciones cada 5 minutos cuando la app está activa
+                    // PERO solo si no hay operación crítica
                     setInterval(() => {
-                        registration.update().then(() => {
-                            console.log('🔍 Verificando actualizaciones...');
-                        }).catch((error) => {
-                            console.log('Verificación de actualizaciones:', error.message);
-                        });
+                        if (!operacionCriticaEnCurso) {
+                            registration.update().then(() => {
+                                console.log('🔍 Verificando actualizaciones...');
+                            }).catch((error) => {
+                                console.log('Verificación de actualizaciones:', error.message);
+                            });
+                        }
                     }, 5 * 60 * 1000); // 5 minutos
                     
-                    // Verificar actualizaciones al recuperar el foco de la ventana
+                    // Verificar actualizaciones al recuperar el foco de la ventana (solo si no hay operación crítica)
                     window.addEventListener('focus', () => {
-                        registration.update().catch(() => {});
+                        if (!operacionCriticaEnCurso) {
+                            registration.update().catch(() => {});
+                        }
                     });
                     
                     // Verificar actualizaciones al cargar la página
@@ -714,12 +745,14 @@
                     console.error('❌ Error al registrar Service Worker:', error);
                 });
             
-            // Escuchar cambios del Service Worker
+            // Escuchar cambios del Service Worker - CON PROTECCIÓN
             navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (!refreshing) {
+                if (puedeRecargar()) {
                     refreshing = true;
                     console.log('🔄 Controller cambió, recargando...');
                     window.location.reload();
+                } else {
+                    console.log('⏸️ Recarga pospuesta - operación crítica en curso');
                 }
             });
         }
