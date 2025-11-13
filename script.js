@@ -3487,7 +3487,7 @@ function inicializarBotones() {
         
         const logoHTML = logoBase64 ? `<img src="${logoBase64}" alt="Logo" class="logo-pdf">` : '';
         const infoCliente = subtags.join(' · ');
-        const recordatorioHidratacion = 'Hidratación: Consumir entre 2-3 litros de agua al día. La ingesta debe adaptarse a la actividad física, temperatura ambiental y estado de salud individual.';
+        const recordatorioHidratacion = 'Hidratación: Consumir entre 2-3 litros de agua al día.';
         
         return `
             <div class="header">
