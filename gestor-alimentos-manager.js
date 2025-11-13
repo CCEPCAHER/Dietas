@@ -328,26 +328,35 @@ class GestorAlimentosManager {
 
         contenido.innerHTML = `
             <div class="gestor-alimentos-container">
+                <div class="gestor-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; border-radius: 18px; margin-bottom: 35px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); text-align: center; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.1); border-radius: 50%;"></div>
+                    <div style="position: absolute; bottom: -30px; left: -30px; width: 150px; height: 150px; background: rgba(255, 255, 255, 0.08); border-radius: 50%;"></div>
+                    <h1 style="color: white; font-size: 2.8em; font-weight: 900; margin: 0 0 10px 0; text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); letter-spacing: -1px; position: relative; z-index: 1; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.2;">🍎 Gestión de Base de Datos de Alimentos</h1>
+                    <p style="color: rgba(255, 255, 255, 0.95); font-size: 1.15em; margin: 0; font-weight: 500; position: relative; z-index: 1; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.5;">Administra, agrega, edita y elimina alimentos</p>
+                </div>
                 <div class="gestor-stats">
                     <div class="gestor-stat-card">
                         <h3>${this.baseDatosCompleta.length}</h3>
                         <p>Total Alimentos</p>
                     </div>
                     <div class="gestor-stat-card">
-                        <h3>${new Set(this.baseDatosCompleta.map(a => a.categoria_principal || a['CATEGORÍA PRINCIPAL'] || 'N/A')).size}</h3>
+                        <h3>${new Set(this.baseDatosCompleta.map(a => {
+                            const cat = (a.categoria_principal || a['CATEGORÍA PRINCIPAL'] || a.MACRONUTRIENTE_PRINCIPAL || a['MACRONUTRIENTE PRINCIPAL'] || '').trim();
+                            return cat || 'N/A';
+                        }).filter(cat => cat !== 'N/A')).size}</h3>
                         <p>Categorías</p>
                     </div>
                     <div class="gestor-stat-card">
-                        <h3>${new Set(this.baseDatosCompleta.map(a => a.subcategoria || a.CLASIFICACIÓN || 'N/A')).size}</h3>
+                        <h3>${new Set(this.baseDatosCompleta.map(a => {
+                            const subcat = (a.subcategoria || a.CLASIFICACIÓN || '').trim();
+                            return subcat || 'N/A';
+                        }).filter(subcat => subcat !== 'N/A')).size}</h3>
                         <p>Subcategorías</p>
                     </div>
                 </div>
 
                 <div class="gestor-controls">
                     <button class="btn btn-success" onclick="window.gestorAlimentosManager.abrirModalAgregar()">➕ Agregar Alimento</button>
-                    <button class="btn btn-primary" onclick="window.gestorAlimentosManager.exportarBaseDatos()">📥 Exportar</button>
-                    <button class="btn btn-primary" onclick="window.gestorAlimentosManager.importarBaseDatos()">📤 Importar</button>
-                    <button class="btn" onclick="window.gestorAlimentosManager.resetearBaseDatos()" style="background: #dc3545; color: white;">🔄 Resetear BD</button>
                     <div class="search-box" style="flex: 1; min-width: 250px;">
                         <input type="text" id="gestorSearchInput" placeholder="🔍 Buscar alimentos..." oninput="window.gestorAlimentosManager.filtrarAlimentos()">
                     </div>
@@ -385,8 +394,73 @@ class GestorAlimentosManager {
     }
 
     generarOpcionesCategoria() {
-        const categorias = [...new Set(this.baseDatosCompleta.map(a => a.categoria_principal || a['CATEGORÍA PRINCIPAL'] || 'N/A'))].sort();
+        // Obtener todas las categorías únicas de la base de datos buscando en todos los campos posibles
+        const categorias = [...new Set(this.baseDatosCompleta.map(a => {
+            const cat = (
+                a.categoria_principal || 
+                a['CATEGORÍA PRINCIPAL'] || 
+                a.MACRONUTRIENTE_PRINCIPAL || 
+                a['MACRONUTRIENTE PRINCIPAL'] ||
+                ''
+            ).trim();
+            return cat || 'N/A';
+        }))].filter(cat => cat !== 'N/A' && cat !== '').sort();
+        
+        // Agregar 'N/A' al final si existe
+        const tieneNA = this.baseDatosCompleta.some(a => {
+            const cat = (
+                a.categoria_principal || 
+                a['CATEGORÍA PRINCIPAL'] || 
+                a.MACRONUTRIENTE_PRINCIPAL || 
+                a['MACRONUTRIENTE PRINCIPAL'] ||
+                ''
+            ).trim();
+            return !cat || cat === 'N/A';
+        });
+        
+        if (tieneNA) {
+            categorias.push('N/A');
+        }
+        
         return categorias.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+    }
+
+    generarOpcionesCategoriaParaModal() {
+        // Obtener todas las categorías únicas de la base de datos buscando en todos los campos posibles
+        const categorias = [...new Set(this.baseDatosCompleta.map(a => {
+            const cat = (
+                a.categoria_principal || 
+                a['CATEGORÍA PRINCIPAL'] || 
+                a.MACRONUTRIENTE_PRINCIPAL || 
+                a['MACRONUTRIENTE PRINCIPAL'] ||
+                ''
+            ).trim();
+            return cat;
+        }))].filter(cat => cat !== '').sort();
+        
+        // Categorías predefinidas comunes
+        const categoriasPredefinidas = [
+            'Proteínas',
+            'Hidratos de carbono',
+            'Grasas',
+            'Grasas y proteínas',
+            'Verduras',
+            'Fruta',
+            'Fruto seco',
+            'Semilla',
+            'Origen animal',
+            'Carne blanca',
+            'Carne roja',
+            'Pescado azul',
+            'Pescado blanco',
+            'Pescado semigraso',
+            'Marisco'
+        ];
+        
+        // Combinar categorías predefinidas con las existentes, sin duplicados
+        const todasCategorias = [...new Set([...categoriasPredefinidas, ...categorias])].sort();
+        
+        return todasCategorias.map(cat => `<option value="${cat}">${cat}</option>`).join('');
     }
 
     generarTabla() {
@@ -410,9 +484,28 @@ class GestorAlimentosManager {
                 <tbody>
         `;
 
+        if (this.baseDatosFiltrada.length === 0) {
+            html += `
+                <tr>
+                    <td colspan="11" style="text-align: center; padding: 60px 20px; color: #999;">
+                        <div style="font-size: 4em; margin-bottom: 20px; opacity: 0.5;">🔍</div>
+                        <div style="font-weight: 700; color: #666; font-size: 1.2em; margin-bottom: 10px;">No se encontraron alimentos</div>
+                        <div style="font-size: 0.95em; color: #999;">Intenta con otros términos de búsqueda o cambia el filtro de categoría</div>
+                    </td>
+                </tr>
+            `;
+        }
+
         this.baseDatosFiltrada.forEach((alimento, index) => {
             const nombre = alimento.nombre || alimento.ALIMENTO || 'Sin nombre';
-            const categoria = alimento.categoria_principal || alimento.MACRONUTRIENTE_PRINCIPAL || alimento['CATEGORÍA PRINCIPAL'] || '';
+            // Buscar categoría en todos los campos posibles
+            const categoria = (
+                alimento.categoria_principal || 
+                alimento.MACRONUTRIENTE_PRINCIPAL || 
+                alimento['CATEGORÍA PRINCIPAL'] || 
+                alimento['MACRONUTRIENTE PRINCIPAL'] ||
+                ''
+            ).trim();
             const subcategoria = alimento.subcategoria || alimento.CLASIFICACIÓN || '';
             const peso = alimento.peso || alimento.PESO_POR_UNIDAD || alimento['PESO POR UNIDAD'] || '';
             
@@ -431,19 +524,19 @@ class GestorAlimentosManager {
 
             html += `
                 <tr>
-                    <td><strong>${nombre}</strong></td>
-                    <td>${categoria}</td>
-                    <td>${subcategoria}</td>
-                    <td>${pesoDisplay}</td>
-                    <td>${proteinas.toFixed(1)}g</td>
-                    <td>${grasasSaturadasDisplay}</td>
-                    <td>${hidratos.toFixed(1)}g</td>
-                    <td>${grasas.toFixed(1)}g</td>
-                    <td>${azucarDisplay}</td>
-                    <td>${calorias} kcal</td>
-                    <td>
-                        <button class="btn btn-sm" style="background: #667eea; color: white; padding: 6px 12px; margin-right: 5px;" onclick="window.gestorAlimentosManager.editarAlimento(${index})">✏️</button>
-                        <button class="btn btn-sm btn-danger" style="padding: 6px 12px;" onclick="window.gestorAlimentosManager.eliminarAlimento(${index})">🗑️</button>
+                    <td><strong style="color: #1a1a1a; font-size: 1.05em; letter-spacing: 0.3px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-weight: 700;">${nombre}</strong></td>
+                    <td><span style="padding: 5px 12px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); color: #1565c0; border-radius: 15px; font-size: 0.85em; font-weight: 700; display: inline-block; box-shadow: 0 2px 4px rgba(21, 101, 192, 0.15);">${categoria}</span></td>
+                    <td><span style="padding: 5px 12px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); color: #6a1b9a; border-radius: 15px; font-size: 0.85em; font-weight: 600; display: inline-block; box-shadow: 0 2px 4px rgba(106, 27, 154, 0.15);">${subcategoria}</span></td>
+                    <td style="color: #757575; font-size: 0.88em; font-weight: 500;">${pesoDisplay === '-' ? '<span style="color: #bdbdbd;">-</span>' : pesoDisplay}</td>
+                    <td style="font-weight: 700; color: #c2185b; font-size: 0.95em;">${proteinas.toFixed(1)}<span style="font-size: 0.85em; font-weight: 500; color: #999;">g</span></td>
+                    <td style="color: #757575; font-size: 0.88em; font-weight: 500;">${grasasSaturadasDisplay === '-' ? '<span style="color: #bdbdbd;">-</span>' : grasasSaturadasDisplay}</td>
+                    <td style="font-weight: 700; color: #f57c00; font-size: 0.95em;">${hidratos.toFixed(1)}<span style="font-size: 0.85em; font-weight: 500; color: #999;">g</span></td>
+                    <td style="font-weight: 700; color: #388e3c; font-size: 0.95em;">${grasas.toFixed(1)}<span style="font-size: 0.85em; font-weight: 500; color: #999;">g</span></td>
+                    <td style="color: #757575; font-size: 0.88em; font-weight: 500;">${azucarDisplay === '-' ? '<span style="color: #bdbdbd;">-</span>' : azucarDisplay}</td>
+                    <td style="font-weight: 800; color: #d32f2f; font-size: 1.1em; letter-spacing: 0.5px;">${calorias}<span style="font-size: 0.75em; font-weight: 600; color: #999; margin-left: 2px;">kcal</span></td>
+                    <td style="white-space: nowrap;">
+                        <button class="btn btn-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 14px; margin-right: 6px; border: none; font-size: 0.85em; border-radius: 8px; transition: all 0.3s ease;" onclick="window.gestorAlimentosManager.editarAlimento(${index})">✏️ Editar</button>
+                        <button class="btn btn-sm btn-danger" style="padding: 8px 14px; border: none; font-size: 0.85em; border-radius: 8px; transition: all 0.3s ease;" onclick="window.gestorAlimentosManager.eliminarAlimento(${index})">🗑️ Eliminar</button>
                     </td>
                 </tr>
             `;
@@ -474,33 +567,8 @@ class GestorAlimentosManager {
                             <div class="form-group">
                                 <label>Categoría principal *</label>
                                 <select id="gestorCategoria" required>
-                                    <option value="">Seleccionar...</option>
-                                    <option value="Proteínas">Proteínas</option>
-                                    <option value="Hidratos de carbono">Hidratos de carbono</option>
-                                    <option value="Grasas">Grasas</option>
-                                    <option value="Verduras">Verduras</option>
-                                    <option value="Fruta">Fruta</option>
-                                    <option value="Fruto seco">Fruto seco</option>
-                                    <option value="Semilla">Semilla</option>
-                                    <option value="Origen animal">Origen animal</option>
-                                    <option value="Carne blanca">Carne blanca</option>
-                                    <option value="Carne roja">Carne roja</option>
-                                    <option value="Pescado azul">Pescado azul</option>
-                                    <option value="Pescado blanco">Pescado blanco</option>
-                                    <option value="Pescado semigraso">Pescado semigraso</option>
-                                    <option value="Marisco">Marisco</option>
-                                    <option value="Embutido">Embutido</option>
-                                    <option value="Víscera">Víscera</option>
-                                    <option value="Cereal">Cereal</option>
-                                    <option value="Pan">Pan</option>
-                                    <option value="Pasta">Pasta</option>
-                                    <option value="Tubérculo">Tubérculo</option>
-                                    <option value="Legumbres">Legumbres</option>
-                                    <option value="Postre">Postre</option>
-                                    <option value="Bebida">Bebida</option>
-                                    <option value="Plato preparado">Plato preparado</option>
-                                    <option value="Apto para veganos y vegetarianos">Apto para veganos y vegetarianos</option>
-                                    <option value="Otros">Otros</option>
+                                    <option value="">Seleccionar categoría...</option>
+                                    ${this.generarOpcionesCategoriaParaModal()}
                                 </select>
                             </div>
                             <div class="form-group">
@@ -614,9 +682,16 @@ class GestorAlimentosManager {
         
         this.baseDatosFiltrada = this.baseDatosCompleta.filter(alimento => {
             const nombre = (alimento.nombre || alimento.ALIMENTO || '').toLowerCase();
-            const cat = (alimento.categoria_principal || alimento['CATEGORÍA PRINCIPAL'] || '').toLowerCase();
-            const marca = (alimento.marca || alimento['MARCA REGISTRADA'] || '').toLowerCase();
-            const producto = (alimento.producto || alimento['NOMBRE DEL PRODUCTO'] || '').toLowerCase();
+            // Buscar categoría en todos los campos posibles
+            const cat = (
+                alimento.categoria_principal || 
+                alimento['CATEGORÍA PRINCIPAL'] || 
+                alimento.MACRONUTRIENTE_PRINCIPAL || 
+                alimento['MACRONUTRIENTE PRINCIPAL'] ||
+                ''
+            ).toLowerCase().trim();
+            const marca = (alimento.marca || alimento['MARCA REGISTRADA'] || alimento.MARCA_REGISTRADA || '').toLowerCase();
+            const producto = (alimento.producto || alimento['NOMBRE DEL PRODUCTO'] || alimento.NOMBRE_DEL_PRODUCTO || '').toLowerCase();
             
             const coincideBusqueda = !busqueda || nombre.includes(busqueda) || marca.includes(busqueda) || producto.includes(busqueda);
             const coincideCategoria = !categoria || cat === categoria;
@@ -635,6 +710,14 @@ class GestorAlimentosManager {
         document.getElementById('gestorFormAlimento').reset();
         document.getElementById('gestorCalorias').value = 0;
         this.indiceEdicion = -1;
+        
+        // Actualizar las opciones del select de categoría con todas las categorías disponibles
+        const categoriaSelect = document.getElementById('gestorCategoria');
+        if (categoriaSelect) {
+            const opcionesActuales = this.generarOpcionesCategoriaParaModal();
+            categoriaSelect.innerHTML = '<option value="">Seleccionar categoría...</option>' + opcionesActuales;
+        }
+        
         document.getElementById('gestorModalAlimento').style.display = 'block';
     }
 
@@ -683,10 +766,15 @@ class GestorAlimentosManager {
         const grasas = normalizarValor(alimento.grasas || alimento.GRASAS);
         const calorias = normalizarValor(alimento.calorias || alimento.CALORÍAS) || calcularCalorias(proteinas, hidratos, grasas);
         
+        const categoriaPrincipal = alimento.categoria_principal || alimento.MACRONUTRIENTE_PRINCIPAL || alimento['MACRONUTRIENTE PRINCIPAL'] || alimento['CATEGORÍA PRINCIPAL'] || '';
+        
         return {
+            nombre: alimento.nombre || alimento.ALIMENTO,
+            categoria_principal: categoriaPrincipal,
             ALIMENTO: alimento.nombre || alimento.ALIMENTO,
-            MACRONUTRIENTE_PRINCIPAL: alimento.categoria_principal || alimento.MACRONUTRIENTE_PRINCIPAL || alimento['MACRONUTRIENTE PRINCIPAL'],
+            MACRONUTRIENTE_PRINCIPAL: categoriaPrincipal,
             CLASIFICACIÓN: alimento.subcategoria || alimento.CLASIFICACIÓN,
+            subcategoria: alimento.subcategoria || alimento.CLASIFICACIÓN,
             UNIDAD: alimento.presentacion || alimento.UNIDAD || '',
             PESO_POR_UNIDAD: alimento.peso || alimento.PESO_POR_UNIDAD || alimento['PESO POR UNIDAD'] || '',
             MARCA_REGISTRADA: alimento.marca || alimento.MARCA_REGISTRADA || alimento['MARCA REGISTRADA'] || '',
@@ -834,59 +922,6 @@ class GestorAlimentosManager {
         }
     }
 
-    exportarBaseDatos() {
-        const dataStr = JSON.stringify(this.baseDatosCompleta, null, 2);
-        const dataBlob = new Blob([dataStr], {type: 'application/json'});
-        const url = URL.createObjectURL(dataBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'base-datos-alimentos-export.json';
-        link.click();
-        URL.revokeObjectURL(url);
-        window.mostrarNotificacion?.('✅ Base de datos exportada correctamente', 'success');
-    }
-
-    importarBaseDatos() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'application/json';
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const data = JSON.parse(event.target.result);
-                    if (Array.isArray(data)) {
-                        this.baseDatosCompleta = data;
-                        window.baseDatosAlimentos = data;
-                        this.guardarEnLocalStorage();
-                        this.mostrarInterfaz();
-                        window.mostrarNotificacion?.('✅ Base de datos importada correctamente', 'success');
-                    } else {
-                        window.mostrarNotificacion?.('❌ El archivo no es válido', 'error');
-                    }
-                } catch (error) {
-                    window.mostrarNotificacion?.('❌ Error al leer el archivo', 'error');
-                }
-            };
-            reader.readAsText(file);
-        };
-        input.click();
-    }
-
-    resetearBaseDatos() {
-        if (!confirm('¿Estás seguro de resetear la base de datos? Se perderán todas las modificaciones guardadas en localStorage.')) return;
-        
-        try {
-            localStorage.removeItem('baseDatosAlimentosPersonalizada');
-            window.location.reload();
-        } catch (error) {
-            console.error('Error al resetear base de datos:', error);
-            window.mostrarNotificacion?.('❌ Error al resetear la base de datos', 'error');
-        }
-    }
 }
 
 // Exportar la clase globalmente INMEDIATAMENTE después de definirla

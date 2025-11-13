@@ -1,6 +1,26 @@
 // Generador de planes de dieta usando la base de datos ampliada
 // Este archivo genera planes variados usando la base de datos de alimentos
 
+// Cargar datos personalizados desde localStorage al inicio
+(function() {
+    try {
+        const datosGuardados = localStorage.getItem('baseDatosAlimentosPersonalizada');
+        if (datosGuardados) {
+            const datos = JSON.parse(datosGuardados);
+            // Actualizar la variable global para uso en dietas
+            if (typeof window !== 'undefined') {
+                window.baseDatosAlimentos = datos;
+                // Si existe alimentosDB, también actualizarlo
+                if (window.alimentosDB && typeof window.alimentosDB.actualizarBaseDatos === 'function') {
+                    window.alimentosDB.actualizarBaseDatos(datos);
+                }
+            }
+        }
+    } catch (e) {
+        console.error('Error al cargar datos personalizados:', e);
+    }
+})();
+
 // Variables globales para tracking de diversidad
 let alimentosUsadosSemana = [];
 let alimentosUsadosHistorial = [];
