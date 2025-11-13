@@ -1714,8 +1714,8 @@ function mostrarMacronutrientesDistribucion() {
                        onchange="actualizarDistribucionMacros('carbs', this.value)">
                 <span style="font-weight: 600;">%</span>
             </td>
-            <td style="padding: 10px; font-weight: 700; color: #1e40af;">${carbsEntrenogkg} g/kg</td>
-            <td style="padding: 10px; font-weight: 700; color: #374151;">${carbsDescansogkg} g/kg</td>
+            <td class="valor-entreno" style="padding: 10px; font-weight: 700; color: #1e40af;">${carbsEntrenogkg} g/kg</td>
+            <td class="valor-descanso" style="padding: 10px; font-weight: 700; color: #374151;">${carbsDescansogkg} g/kg</td>
         </tr>
         <tr>
             <td style="font-weight: 700; padding: 10px;">GRASAS</td>
@@ -1730,8 +1730,8 @@ function mostrarMacronutrientesDistribucion() {
                        onchange="actualizarDistribucionMacros('grasas', this.value)">
                 <span style="font-weight: 600;">%</span>
             </td>
-            <td style="padding: 10px; font-weight: 700; color: #1e40af;">${grasasEntrenogkg} g/kg</td>
-            <td style="padding: 10px; font-weight: 700; color: #374151;">${grasasDescansogkg} g/kg</td>
+            <td class="valor-entreno" style="padding: 10px; font-weight: 700; color: #1e40af;">${grasasEntrenogkg} g/kg</td>
+            <td class="valor-descanso" style="padding: 10px; font-weight: 700; color: #374151;">${grasasDescansogkg} g/kg</td>
         </tr>
         <tr>
             <td style="font-weight: 700; padding: 10px;">PROTEÍNAS</td>
@@ -1746,8 +1746,8 @@ function mostrarMacronutrientesDistribucion() {
                        onchange="actualizarDistribucionMacros('proteinas', this.value)">
                 <span style="font-weight: 600;">%</span>
             </td>
-            <td style="padding: 10px; font-weight: 700; color: #1e40af;">${proteinasEntrenogkg} g/kg</td>
-            <td style="padding: 10px; font-weight: 700; color: #374151;">${proteinasDescansogkg} g/kg</td>
+            <td class="valor-entreno" style="padding: 10px; font-weight: 700; color: #1e40af;">${proteinasEntrenogkg} g/kg</td>
+            <td class="valor-descanso" style="padding: 10px; font-weight: 700; color: #374151;">${proteinasDescansogkg} g/kg</td>
         </tr>
         ${filaAdvertencia}
     `;
