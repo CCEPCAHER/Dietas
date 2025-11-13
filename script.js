@@ -3661,6 +3661,7 @@ function inicializarBotones() {
                 flex-shrink: 0;
                 max-height: 200mm;
                 height: auto;
+                border-bottom: 2px solid #000 !important;
             }
             .plan-tabla-editable {
                 width: 100%;
@@ -3690,6 +3691,12 @@ function inicializarBotones() {
                 vertical-align: top;
                 word-wrap: break-word;
                 overflow-wrap: break-word;
+            }
+            .tabla-plan-semanal tbody tr:last-child td {
+                border-bottom: 2px solid #000 !important;
+            }
+            .tabla-plan-semanal tbody tr:last-child th {
+                border-bottom: 2px solid #000 !important;
             }
             .tabla-plan-semanal th {
                 background: #fff;
