@@ -906,251 +906,37 @@ function sincronizarPlanManualConDatosUsuario() {
 window.sincronizarPlanManualConDatosUsuario = sincronizarPlanManualConDatosUsuario;
 
 function calcularMacronutrientes() {
-    // Obtener valores del formulario o datosUsuario (prioridad al formulario)
-    const edad = parseInt(document.getElementById('edad')?.value) || datosUsuario.edad;
-    const sexo = document.getElementById('sexo')?.value || datosUsuario.sexo;
-    const altura = parseFloat(document.getElementById('altura')?.value) || datosUsuario.altura;
-    const peso = parseFloat(document.getElementById('peso')?.value) || datosUsuario.peso;
-    const objetivo = document.getElementById('objetivo')?.value || datosUsuario.objetivo;
-    const tipoPersona = document.getElementById('tipoPersona')?.value || datosUsuario.tipoPersona;
-    
-    // Obtener valores del formulario (pueden no estar en datosUsuario aún)
-    const actividadFisicaDeporte = document.getElementById('actividadFisicaDeporte')?.value || datosUsuario.actividadFisicaDeporte || 'moderada';
-    // Mapear tipoPersona a tipoTermogenico si no está definido
-    let tipoTermogenico = document.getElementById('tipoTermogenico')?.value || datosUsuario.tipoTermogenico;
-    if (!tipoTermogenico) {
-        // Mapear según tipoPersona (compatibilidad con Excel)
-        if (tipoPersona === 'sedentaria') {
-            tipoTermogenico = 'sedentaria';
-        } else if (tipoPersona === 'activa' || tipoPersona === 'no-sedentaria') {
-            tipoTermogenico = 'no-sedentaria';
-        } else if (tipoPersona === 'muy-activa') {
-            tipoTermogenico = 'culturista';
-        } else {
-            tipoTermogenico = 'no-sedentaria'; // Valor por defecto
-        }
+    // Usar el módulo refactorizado de cálculos de macronutrientes
+    if (!window.MacronutrientesCalculator) {
+        console.error('MacronutrientesCalculator no está disponible');
+        return;
     }
-    const superavitEntreno = parseFloat(document.getElementById('superavitEntreno')?.value || datosUsuario.superavitEntreno || 5);
-    const superavitDescanso = parseFloat(document.getElementById('superavitDescanso')?.value || datosUsuario.superavitDescanso || 5);
     
-    // Obtener días de entrenamiento
-    const diasEntrenoCheckboxes = document.querySelectorAll('input[name="diaEntreno"]:checked');
-    const diasEntreno = Array.from(diasEntrenoCheckboxes).map(cb => cb.value);
-    datosUsuario.diasEntreno = diasEntreno;
-    
-    // Calcular TMB base usando fórmula de Mifflin-St Jeor
-    // NO redondear aquí - el Excel redondea al final
-    let tmbBase;
-    if (sexo === 'Hombre' || sexo === 'masculino') {
-        tmbBase = 10 * peso + 6.25 * altura - 5 * edad + 5;
-    } else {
-        tmbBase = 10 * peso + 6.25 * altura - 5 * edad - 161;
-    }
-    // Guardar tmbBase sin redondear para cálculos intermedios
-    const tmbBaseExacta = tmbBase;
-    // Redondear solo para mostrar
-    tmbBase = Math.round(tmbBase);
-
-    const sexoNormalizado = (sexo || '').toString().toLowerCase().includes('mujer') ? 'femenino' : 'masculino';
-
-    const tipoPersonaNormalizado = (tipoPersona || '').toString().toLowerCase();
-
-    const FACTORES_TIPO_PERSONA = {
-        masculino: {
-            sedentaria: 1.0,
-            'no-sedentaria': 1.21,    // Calibrado con plantilla Excel (aprox. 1.209)
-            activa: 1.21,
-            'muy-activa': 1.35
-        },
-        femenino: {
-            sedentaria: 1.0,
-            'no-sedentaria': 1.33,    // Valores más altos en la hoja Excel para mujeres
-            activa: 1.33,
-            'muy-activa': 1.48
-        }
+    // Obtener referencias a elementos del formulario
+    const formulario = {
+        edad: document.getElementById('edad'),
+        sexo: document.getElementById('sexo'),
+        altura: document.getElementById('altura'),
+        peso: document.getElementById('peso'),
+        objetivo: document.getElementById('objetivo'),
+        tipoPersona: document.getElementById('tipoPersona'),
+        actividadFisicaDeporte: document.getElementById('actividadFisicaDeporte'),
+        tipoTermogenico: document.getElementById('tipoTermogenico'),
+        superavitEntreno: document.getElementById('superavitEntreno'),
+        superavitDescanso: document.getElementById('superavitDescanso')
     };
-
-    let factorTipoPersona = FACTORES_TIPO_PERSONA[sexoNormalizado]?.[tipoPersonaNormalizado] 
-        ?? FACTORES_TIPO_PERSONA[sexoNormalizado]?.['no-sedentaria'] 
-        ?? 1.15;
-
-    // Permitir sobrescribir manualmente desde datosUsuario (calibración avanzada)
-    if (typeof datosUsuario.factorTipoPersonaPersonalizado === 'number') {
-        factorTipoPersona = datosUsuario.factorTipoPersonaPersonalizado;
-    }
-    // Calcular TMB ajustado sin redondear primero
-    const tmbAjustadoExacta = tmbBaseExacta * factorTipoPersona;
-    const tmb = Math.round(tmbAjustadoExacta);
     
-    // Calcular efecto termogénico de alimentos (TEF) como porcentaje del TMB ajustado
-    let porcentajeTEF;
-    switch(tipoTermogenico) {
-        case 'sedentaria': 
-            porcentajeTEF = 0.10; 
-            break;
-        case 'no-sedentaria': 
-            porcentajeTEF = 0.15; 
-            break;
-        case 'culturista': 
-            porcentajeTEF = 0.20; 
-            break;
-        default: 
-            porcentajeTEF = 0.15;
-    }
-    // TEF se calcula como porcentaje del TMB ajustado (usar valor exacto, redondear al final)
-    const tefExacta = tmbAjustadoExacta * porcentajeTEF;
-    const tef = Math.round(tefExacta);
+    // Calcular usando el módulo refactorizado
+    datosUsuario = window.MacronutrientesCalculator.calcularMacronutrientes(datosUsuario, formulario);
     
-    // Calcular actividad física del deporte basado en TMB BASE (no ajustado)
-    // En Excel: actividad moderada = 904 kcal para TMB base 1204 → factor 0.75
-    // Usar tmbBaseExacta para cálculos precisos
-    const actividadNormalizada = (actividadFisicaDeporte || '').toString().toLowerCase();
-
-    const FACTORES_ACTIVIDAD = {
-        masculino: {
-            sedentario: 0,
-            ligera: 0.45,
-            moderada: 0.65,
-            intensa: 0.876,       // Calibrado con hoja Excel (≈ 1 412 kcal para el ejemplo dado)
-            'muy-intensa': 1.05
-        },
-        femenino: {
-            sedentario: 0,
-            ligera: 0.52,
-            moderada: 0.70,
-            intensa: 0.92,
-            'muy-intensa': 1.10
-        }
-    };
-
-    let factorActividad = FACTORES_ACTIVIDAD[sexoNormalizado]?.[actividadNormalizada] 
-        ?? FACTORES_ACTIVIDAD[sexoNormalizado]?.moderada 
-        ?? 0.65;
-
-    if (typeof datosUsuario.factorActividadPersonalizado === 'number') {
-        factorActividad = datosUsuario.factorActividadPersonalizado;
-    }
-    const actividadFisicaDeporteKcalExacta = tmbBaseExacta * factorActividad;
-    const actividadFisicaDeporteKcal = Math.round(actividadFisicaDeporteKcalExacta);
+    // Actualizar referencia global
+    window.datosUsuario = datosUsuario;
     
-    // Calcular gasto calórico base (sin superávit/déficit)
-    // Excel: Total = TMB ajustado + TEF + Actividad física
-    // Usar valores exactos para evitar errores acumulados
-    const gastoBaseEntrenoExacta = tmbAjustadoExacta + tefExacta + actividadFisicaDeporteKcalExacta;
-    const gastoBaseDescansoExacta = tmbAjustadoExacta + tefExacta;
-    const gastoBaseEntreno = Math.round(gastoBaseEntrenoExacta);
-    const gastoBaseDescanso = Math.round(gastoBaseDescansoExacta);
-    
-    // Calcular superávit/déficit (puede ser positivo o negativo)
-    // Usar valores exactos para calcular porcentajes
-    const superavitEntrenoKcalExacta = gastoBaseEntrenoExacta * (superavitEntreno / 100);
-    const superavitDescansoKcalExacta = gastoBaseDescansoExacta * (superavitDescanso / 100);
-    const superavitEntrenoKcal = Math.round(superavitEntrenoKcalExacta);
-    const superavitDescansoKcal = Math.round(superavitDescansoKcalExacta);
-    
-    // Calcular ingesta calórica total
-    // Si es déficit (negativo), se resta; si es superávit (positivo), se suma
-    // Usar valores exactos y redondear al final (como Excel)
-    const caloriasEntrenoExacta = gastoBaseEntrenoExacta + superavitEntrenoKcalExacta;
-    const caloriasDescansoExacta = gastoBaseDescansoExacta + superavitDescansoKcalExacta;
-    const caloriasEntreno = Math.round(caloriasEntrenoExacta);
-    const caloriasDescanso = Math.round(caloriasDescansoExacta);
-    
-    // Guardar todos los cálculos en datosUsuario
-    datosUsuario.tmbBase = tmbBase; // TMB base (Mifflin-St Jeor)
-    datosUsuario.tmb = tmb; // TMB ajustado por tipo de persona
-    datosUsuario.tef = tef;
-    datosUsuario.porcentajeTEF = porcentajeTEF * 100;
-    datosUsuario.actividadFisicaDeporte = actividadFisicaDeporte;
-    datosUsuario.actividadFisicaDeporteKcal = actividadFisicaDeporteKcal;
-    datosUsuario.gastoBaseEntreno = gastoBaseEntreno;
-    datosUsuario.gastoBaseDescanso = gastoBaseDescanso;
-    datosUsuario.superavitEntreno = superavitEntreno;
-    datosUsuario.superavitDescanso = superavitDescanso;
-    datosUsuario.superavitEntrenoKcal = superavitEntrenoKcal;
-    datosUsuario.superavitDescansoKcal = superavitDescansoKcal;
-    datosUsuario.caloriasEntreno = caloriasEntreno;
-    datosUsuario.caloriasDescanso = caloriasDescanso;
-    datosUsuario.tipoTermogenico = tipoTermogenico;
-    
-    // Calcular promedio de calorías según días de entrenamiento
-    const numDiasEntreno = diasEntreno.length || 5;
-    const numDiasDescanso = 7 - numDiasEntreno;
-    const caloriasPromedio = Math.round((caloriasEntreno * numDiasEntreno + caloriasDescanso * numDiasDescanso) / 7);
-    
-    // Usar calorías promedio para el cálculo tradicional (mantener compatibilidad)
-    let calorias = caloriasPromedio;
-    
-    // Calcular macronutrientes basados en promedio
-    let proteinas, grasas, carbohidratos;
-    
-    if (objetivo === 'aumentar') {
-        proteinas = Math.round(peso * 2);
-        grasas = Math.round((calorias * 0.25) / 9);
-        carbohidratos = Math.round((calorias - (proteinas * 4) - (grasas * 9)) / 4);
-    } else if (objetivo === 'adelgazar') {
-        proteinas = Math.round(peso * 2.2);
-        grasas = Math.round((calorias * 0.25) / 9);
-        carbohidratos = Math.round((calorias - (proteinas * 4) - (grasas * 9)) / 4);
-    } else {
-        proteinas = Math.round(peso * 1.8);
-        grasas = Math.round((calorias * 0.30) / 9);
-        carbohidratos = Math.round((calorias - (proteinas * 4) - (grasas * 9)) / 4);
-    }
-    
-    // Calcular macronutrientes diferenciados para días de entreno y descanso
-    // Usar porcentajes guardados manualmente o distribución estándar: 50% carbohidratos, 30% grasas, 20% proteínas
-    const porcentajeCarbs = datosUsuario.porcentajeCarbs !== undefined ? datosUsuario.porcentajeCarbs / 100 : 0.50;
-    const porcentajeGrasas = datosUsuario.porcentajeGrasas !== undefined ? datosUsuario.porcentajeGrasas / 100 : 0.30;
-    const porcentajeProteinas = datosUsuario.porcentajeProteinas !== undefined ? datosUsuario.porcentajeProteinas / 100 : 0.20;
-    
-    // Guardar porcentajes en datosUsuario (en formato porcentaje 0-100)
-    datosUsuario.porcentajeCarbs = porcentajeCarbs * 100;
-    datosUsuario.porcentajeGrasas = porcentajeGrasas * 100;
-    datosUsuario.porcentajeProteinas = porcentajeProteinas * 100;
-    
-    // Macronutrientes día de entreno
-    const carbsEntreno = Math.round((caloriasEntreno * porcentajeCarbs) / 4);
-    const grasasEntreno = Math.round((caloriasEntreno * porcentajeGrasas) / 9);
-    const proteinasEntreno = Math.round((caloriasEntreno * porcentajeProteinas) / 4);
-    
-    // Macronutrientes día de descanso
-    const carbsDescanso = Math.round((caloriasDescanso * porcentajeCarbs) / 4);
-    const grasasDescanso = Math.round((caloriasDescanso * porcentajeGrasas) / 9);
-    const proteinasDescanso = Math.round((caloriasDescanso * porcentajeProteinas) / 4);
-    
-    // Calcular g/kg corporal
-    const carbsEntrenogkg = (carbsEntreno / peso).toFixed(2);
-    const grasasEntrenogkg = (grasasEntreno / peso).toFixed(2);
-    const proteinasEntrenogkg = (proteinasEntreno / peso).toFixed(2);
-    
-    const carbsDescansogkg = (carbsDescanso / peso).toFixed(2);
-    const grasasDescansogkg = (grasasDescanso / peso).toFixed(2);
-    const proteinasDescansogkg = (proteinasDescanso / peso).toFixed(2);
-    
-    // Guardar macronutrientes diferenciados
-    datosUsuario.carbsEntreno = carbsEntreno;
-    datosUsuario.grasasEntreno = grasasEntreno;
-    datosUsuario.proteinasEntreno = proteinasEntreno;
-    datosUsuario.carbsEntrenogkg = carbsEntrenogkg;
-    datosUsuario.grasasEntrenogkg = grasasEntrenogkg;
-    datosUsuario.proteinasEntrenogkg = proteinasEntrenogkg;
-    
-    datosUsuario.carbsDescanso = carbsDescanso;
-    datosUsuario.grasasDescanso = grasasDescanso;
-    datosUsuario.proteinasDescanso = proteinasDescanso;
-    datosUsuario.carbsDescansogkg = carbsDescansogkg;
-    datosUsuario.grasasDescansogkg = grasasDescansogkg;
-    datosUsuario.proteinasDescansogkg = proteinasDescansogkg;
-    
-    datosUsuario.calorias = calorias;
-    datosUsuario.caloriasPromedio = caloriasPromedio;
-    datosUsuario.proteinas = proteinas;
-    datosUsuario.grasas = grasas;
-    datosUsuario.carbohidratos = carbohidratos;
-    datosUsuario.imc = (peso / Math.pow(altura / 100, 2)).toFixed(1);
-    
-    window.datosUsuario = datosUsuario; // Actualizar referencia global
+    // Actualizar campos del formulario
+    const calorias = datosUsuario.calorias || 0;
+    const proteinas = datosUsuario.proteinas || 0;
+    const grasas = datosUsuario.grasas || 0;
+    const carbohidratos = datosUsuario.carbohidratos || 0;
     
     document.getElementById('calorias').value = calorias;
     document.getElementById('proteinas').value = proteinas;
@@ -1266,171 +1052,39 @@ window.mostrarResultados = function() {
 // Alias para compatibilidad
 const mostrarResultados = window.mostrarResultados;
 
+// Funciones de visualización de tablas refactorizadas al módulo UIRenderer
 function mostrarTablaMacros() {
-    const tbody = document.getElementById('tabla-macros-body');
-    const { calorias, proteinas, grasas, carbohidratos } = datosUsuario;
-    
-    // Validar que las variables existan
-    const caloriasVal = calorias || 0;
-    const proteinasVal = proteinas || 0;
-    const grasasVal = grasas || 0;
-    const carbohidratosVal = carbohidratos || 0;
-    
-    const proteinasPercent = caloriasVal > 0 ? Math.round((proteinasVal * 4 / caloriasVal) * 100) : 0;
-    const grasasPercent = caloriasVal > 0 ? Math.round((grasasVal * 9 / caloriasVal) * 100) : 0;
-    const carbohidratosPercent = caloriasVal > 0 ? Math.round((carbohidratosVal * 4 / caloriasVal) * 100) : 0;
-    
-    // Obtener consumo real si existe tablaEditable
-    let consumido = { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0 };
-    if (window.tablaEditable) {
-        consumido = obtenerConsumidoActual();
+    if (window.UIRenderer) {
+        window.UIRenderer.mostrarTablaMacros(datosUsuario);
+    } else {
+        console.error('UIRenderer no está disponible');
     }
-    
-    tbody.innerHTML = `
-        <tr id="macro-calorias">
-            <td>CALORÍAS</td>
-            <td>${caloriasVal} kcal</td>
-            <td><input type="number" class="ajuste-manual-input" id="ajuste-calorias" placeholder="${caloriasVal}" value="${caloriasVal}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('calorias', this.value)"></td>
-            <td id="seleccionado-calorias">${caloriasVal} kcal</td>
-            <td>100%</td>
-            <td id="consumido-calorias" style="font-weight:bold;">${consumido.calorias} kcal</td>
-            <td id="estado-calorias">${obtenerEstadoMacro(consumido.calorias, caloriasVal)}</td>
-        </tr>
-        <tr id="macro-proteinas">
-            <td>PROTEÍNAS</td>
-            <td>${proteinasVal}g</td>
-            <td><input type="number" class="ajuste-manual-input" id="ajuste-proteinas" placeholder="${proteinasVal}" value="${proteinasVal}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('proteinas', this.value)"></td>
-            <td id="seleccionado-proteinas">${proteinasVal}g</td>
-            <td>${proteinasPercent}%</td>
-            <td id="consumido-proteinas" style="font-weight:bold;">${consumido.proteinas}g</td>
-            <td id="estado-proteinas">${obtenerEstadoMacro(consumido.proteinas, proteinasVal)}</td>
-        </tr>
-        <tr id="macro-grasas">
-            <td>GRASAS</td>
-            <td>${grasasVal}g</td>
-            <td><input type="number" class="ajuste-manual-input" id="ajuste-grasas" placeholder="${grasasVal}" value="${grasasVal}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('grasas', this.value)"></td>
-            <td id="seleccionado-grasas">${grasasVal}g</td>
-            <td>${grasasPercent}%</td>
-            <td id="consumido-grasas" style="font-weight:bold;">${consumido.grasas}g</td>
-            <td id="estado-grasas">${obtenerEstadoMacro(consumido.grasas, grasasVal)}</td>
-        </tr>
-        <tr id="macro-carbohidratos">
-            <td>CARBOHIDRATOS</td>
-            <td>${carbohidratosVal}g</td>
-            <td><input type="number" class="ajuste-manual-input" id="ajuste-carbohidratos" placeholder="${carbohidratosVal}" value="${carbohidratosVal}" style="width:80px;padding:4px;border:1px solid #90ee90;border-radius:4px;" onchange="ajustarMacroManual('carbohidratos', this.value)"></td>
-            <td id="seleccionado-carbohidratos">${carbohidratosVal}g</td>
-            <td>${carbohidratosPercent}%</td>
-            <td id="consumido-carbohidratos" style="font-weight:bold;">${consumido.carbohidratos}g</td>
-            <td id="estado-carbohidratos">${obtenerEstadoMacro(consumido.carbohidratos, carbohidratosVal)}</td>
-        </tr>
-    `;
-    
-    // Configurar actualización periódica
-    configurarActualizacionMacros();
 }
 
 function obtenerConsumidoActual() {
-    if (!window.tablaEditable) return { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0 };
-    
-    const caloriasElem = document.getElementById('total-diario-calorias');
-    const proteinasElem = document.getElementById('total-diario-proteinas');
-    const grasasElem = document.getElementById('total-diario-grasas');
-    const hidratosElem = document.getElementById('total-diario-hidratos');
-    
-    return {
-        calorias: caloriasElem ? parseFloat(caloriasElem.textContent) || 0 : 0,
-        proteinas: proteinasElem ? parseFloat(proteinasElem.textContent) || 0 : 0,
-        grasas: grasasElem ? parseFloat(grasasElem.textContent) || 0 : 0,
-        carbohidratos: hidratosElem ? parseFloat(hidratosElem.textContent) || 0 : 0
-    };
+    return window.UIRenderer ? window.UIRenderer.obtenerConsumidoActual() : { calorias: 0, proteinas: 0, grasas: 0, carbohidratos: 0 };
 }
 
 function obtenerEstadoMacro(consumido, objetivo) {
-    if (!objetivo || objetivo === 0) return '<span style="color:#999;">-</span>';
-    
-    const porcentaje = (consumido / objetivo) * 100;
-    
-    if (porcentaje < 80) {
-        return `<span style="color:#ffc107;font-weight:bold;">⚠️ ${porcentaje.toFixed(0)}%</span>`;
-    } else if (porcentaje >= 80 && porcentaje <= 120) {
-        return `<span style="color:#28a745;font-weight:bold;">✅ ${porcentaje.toFixed(0)}%</span>`;
-    } else {
-        return `<span style="color:#dc3545;font-weight:bold;">🔥 ${porcentaje.toFixed(0)}%</span>`;
-    }
+    return window.UIRenderer ? window.UIRenderer.obtenerEstadoMacro(consumido, objetivo) : '<span style="color:#999;">-</span>';
 }
 
 function actualizarConsumidoEnTabla() {
-    const consumido = obtenerConsumidoActual();
-    const { calorias, proteinas, grasas, carbohidratos } = datosUsuario;
-    
-    // Actualizar valores consumidos
-    const calElem = document.getElementById('consumido-calorias');
-    const protElem = document.getElementById('consumido-proteinas');
-    const grasElem = document.getElementById('consumido-grasas');
-    const carbElem = document.getElementById('consumido-carbohidratos');
-    
-    if (calElem) calElem.textContent = Math.round(consumido.calorias) + ' kcal';
-    if (protElem) protElem.textContent = consumido.proteinas.toFixed(1) + 'g';
-    if (grasElem) grasElem.textContent = consumido.grasas.toFixed(1) + 'g';
-    if (carbElem) carbElem.textContent = consumido.carbohidratos.toFixed(1) + 'g';
-    
-    // Actualizar estados
-    const estadoCal = document.getElementById('estado-calorias');
-    const estadoProt = document.getElementById('estado-proteinas');
-    const estadoGras = document.getElementById('estado-grasas');
-    const estadoCarb = document.getElementById('estado-carbohidratos');
-    
-    if (estadoCal) estadoCal.innerHTML = obtenerEstadoMacro(consumido.calorias, calorias);
-    if (estadoProt) estadoProt.innerHTML = obtenerEstadoMacro(consumido.proteinas, proteinas);
-    if (estadoGras) estadoGras.innerHTML = obtenerEstadoMacro(consumido.grasas, grasas);
-    if (estadoCarb) estadoCarb.innerHTML = obtenerEstadoMacro(consumido.carbohidratos, carbohidratos);
-    
-    // Colorear filas según estado
-    colorearFilaMacro('macro-calorias', consumido.calorias, calorias);
-    colorearFilaMacro('macro-proteinas', consumido.proteinas, proteinas);
-    colorearFilaMacro('macro-grasas', consumido.grasas, grasas);
-    colorearFilaMacro('macro-carbohidratos', consumido.carbohidratos, carbohidratos);
+    if (window.UIRenderer) {
+        window.UIRenderer.actualizarConsumidoEnTabla();
+    }
 }
 
 function colorearFilaMacro(rowId, consumido, objetivo) {
-    const row = document.getElementById(rowId);
-    if (!row || !objetivo) return;
-    
-    const porcentaje = (consumido / objetivo) * 100;
-    
-    // Remover colores anteriores
-    row.style.background = '';
-    
-    if (porcentaje < 80) {
-        row.style.background = 'rgba(255, 193, 7, 0.1)';
-    } else if (porcentaje > 120) {
-        row.style.background = 'rgba(220, 53, 69, 0.1)';
-    } else {
-        row.style.background = 'rgba(40, 167, 69, 0.1)';
+    if (window.UIRenderer) {
+        window.UIRenderer.colorearFilaMacro(rowId, consumido, objetivo);
     }
 }
 
 function configurarActualizacionMacros() {
-    // Actualizar cada 2 segundos cuando esté en modo manual
-    if (window.intervalMacros) clearInterval(window.intervalMacros);
-    
-    window.intervalMacros = setInterval(() => {
-        if (window.tablaEditable) {
-            actualizarConsumidoEnTabla();
-            // Actualizar estadísticas del plan manual
-            if (datosUsuario.modoGeneracion === 'manual') {
-                mostrarEstadisticasPlanManual();
-            }
-        }
-    }, 2000);
-    
-    // Actualizar inmediatamente
-    setTimeout(() => {
-        actualizarConsumidoEnTabla();
-        if (datosUsuario.modoGeneracion === 'manual') {
-            mostrarEstadisticasPlanManual();
-        }
-    }, 500);
+    if (window.UIRenderer) {
+        window.UIRenderer.configurarActualizacionMacros();
+    }
 }
 
 function ajustarMacroManual(macro, valor) {
@@ -3833,7 +3487,7 @@ function inicializarBotones() {
         
         const logoHTML = logoBase64 ? `<img src="${logoBase64}" alt="Logo" class="logo-pdf">` : '';
         const infoCliente = subtags.join(' · ');
-        const recordatorioHidratacion = 'Bebe de 2 a 3 litros de agua al día ajusta según la necesidad de energía';
+        const recordatorioHidratacion = 'Hidratación: Consumir entre 2-3 litros de agua al día. La ingesta debe adaptarse a la actividad física, temperatura ambiental y estado de salud individual.';
         
         return `
             <div class="header">

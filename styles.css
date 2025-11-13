@@ -4649,10 +4649,13 @@ body.dark-mode .valor-calculado {
 }
 
 body.dark-mode .totales-comida {
-    background: rgba(129, 140, 248, 0.15);
-    color: #f5f5f5;
-    font-size: 15px;
-    font-weight: 700;
+    background: rgba(45, 45, 68, 0.8) !important;
+    border: 2px solid rgba(129, 140, 248, 0.4) !important;
+    color: #ffffff !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    padding: 12px 15px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .totales-comida span {
@@ -4663,9 +4666,21 @@ body.dark-mode .totales-comida {
 }
 
 body.dark-mode .totales-comida span {
-    background: rgba(129, 140, 248, 0.2);
-    color: #f5f5f5;
-    font-weight: 700;
+    background: rgba(129, 140, 248, 0.3) !important;
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    font-size: 15px !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(129, 140, 248, 0.5) !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .totales-comida span strong {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .totales-diarios {
@@ -4675,6 +4690,29 @@ body.dark-mode .totales-comida span {
     border-radius: 10px;
     margin-top: 20px;
     transition: all 0.3s ease;
+}
+
+body.dark-mode .totales-diarios {
+    background: linear-gradient(135deg, #2d2d44 0%, #3d3d54 100%) !important;
+    border: 2px solid rgba(129, 140, 248, 0.5) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+}
+
+body.dark-mode .totales-diarios h3 {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+    font-size: 1.3em !important;
+}
+
+body.dark-mode .totales-diarios.totales-descanso {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%) !important;
+    border-color: rgba(33, 150, 243, 0.6) !important;
+}
+
+body.dark-mode .totales-diarios.totales-entreno {
+    background: linear-gradient(135deg, #0d5d3f 0%, #1d6d4f 100%) !important;
+    border-color: rgba(16, 185, 129, 0.6) !important;
 }
 
 /* Estilos para totales en días de descanso */
@@ -4726,9 +4764,11 @@ body.dark-mode .totales-comida span {
 }
 
 body.dark-mode .total-item-label {
-    font-size: 13px;
-    opacity: 1;
-    font-weight: 600;
+    font-size: 14px !important;
+    opacity: 1 !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .total-item-value {
@@ -4737,9 +4777,22 @@ body.dark-mode .total-item-label {
 }
 
 body.dark-mode .total-item-value {
-    font-size: 26px;
-    font-weight: 900;
-    color: white;
+    font-size: 28px !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+body.dark-mode .total-item {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+body.dark-mode .total-item:hover {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(129, 140, 248, 0.5) !important;
 }
 
 .total-item-objetivo {
@@ -4750,9 +4803,12 @@ body.dark-mode .total-item-value {
 }
 
 body.dark-mode .total-item-objetivo {
-    font-size: 12px;
-    opacity: 1;
-    font-weight: 500;
+    font-size: 13px !important;
+    opacity: 1 !important;
+    font-weight: 600 !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    font-style: normal !important;
 }
 
 .progress-bar {
@@ -4780,9 +4836,19 @@ body.dark-mode .total-item-objetivo {
 }
 
 body.dark-mode .progress-text {
-    font-size: 13px;
-    font-weight: 700;
-    color: white;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+body.dark-mode .progress-bar {
+    background: rgba(255, 255, 255, 0.2) !important;
+    height: 10px !important;
+}
+
+body.dark-mode .progress-fill {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 /* Mini barras de progreso para cada comida */
@@ -5003,6 +5069,122 @@ body.dropdown-abierto .autocomplete-container:not(:has(.dropdown-hover)) .input-
     border-radius: 3px;
 }
 
+/* Estilos modo oscuro para autocomplete de alimentos */
+body.dark-mode .autocomplete-list {
+    background: #2d2d44 !important;
+    border-color: rgba(129, 140, 248, 0.6) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+}
+
+body.dark-mode .autocomplete-list:not(.autocomplete-list-hidden) {
+    background: #2d2d44 !important;
+}
+
+body.dark-mode .autocomplete-list:hover {
+    background: #2d2d44 !important;
+}
+
+body.dark-mode .autocomplete-item {
+    background: #2d2d44 !important;
+    color: #ffffff !important;
+    border-bottom-color: rgba(129, 140, 248, 0.3) !important;
+}
+
+body.dark-mode .autocomplete-item:hover {
+    background: rgba(129, 140, 248, 0.4) !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .autocomplete-item.seleccionado {
+    background: rgba(129, 140, 248, 0.5) !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .alimento-info {
+    color: #f0f0f0 !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    line-height: 1.6;
+    letter-spacing: 0.3px;
+}
+
+body.dark-mode .autocomplete-item strong {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    font-size: 16px !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    letter-spacing: 0.2px;
+}
+
+body.dark-mode .autocomplete-item {
+    padding: 12px 10px !important;
+    font-size: 15px !important;
+}
+
+body.dark-mode .autocomplete-item:hover .alimento-info {
+    color: #ffffff !important;
+}
+
+body.dark-mode .autocomplete-item.seleccionado .alimento-info {
+    color: #ffffff !important;
+}
+
+body.dark-mode .resultado-destacado {
+    background: linear-gradient(90deg, rgba(129, 140, 248, 0.3) 0%, rgba(129, 140, 248, 0.2) 100%) !important;
+    border-left-color: #818cf8 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .resultado-destacado:hover {
+    background: linear-gradient(90deg, rgba(129, 140, 248, 0.6) 0%, rgba(129, 140, 248, 0.5) 100%) !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .resultado-destacado:hover .alimento-info {
+    color: #ffffff !important;
+}
+
+body.dark-mode .autocomplete-item mark {
+    background: #ffeb3b !important;
+    color: #000 !important;
+    font-weight: 900 !important;
+    padding: 3px 6px !important;
+    border-radius: 4px !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    margin: 0 1px;
+    display: inline-block;
+}
+
+body.dark-mode .autocomplete-header {
+    background: rgba(129, 140, 248, 0.3) !important;
+    color: #ffffff !important;
+    border-bottom-color: rgba(129, 140, 248, 0.5) !important;
+}
+
+body.dark-mode .autocomplete-sin-resultados {
+    color: #d4d4d4 !important;
+}
+
+body.dark-mode .autocomplete-sin-resultados strong {
+    color: #ffffff !important;
+}
+
+body.dark-mode .autocomplete-sugerencia {
+    color: #d4d4d4 !important;
+}
+
+body.dark-mode .autocomplete-sugerencia-rapida {
+    background: rgba(129, 140, 248, 0.2) !important;
+    color: #ffffff !important;
+    border-color: rgba(129, 140, 248, 0.4) !important;
+}
+
+body.dark-mode .autocomplete-sugerencia-rapida:hover {
+    background: rgba(129, 140, 248, 0.4) !important;
+    color: #ffffff !important;
+}
+
 .input-alimento::placeholder {
     color: #999;
     font-style: italic;
@@ -5010,6 +5192,14 @@ body.dropdown-abierto .autocomplete-container:not(:has(.dropdown-hover)) .input-
 
 .input-alimento:focus::placeholder {
     color: #ccc;
+}
+
+body.dark-mode .input-alimento::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+body.dark-mode .input-alimento:focus::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
 }
 
 @media (max-width: 768px) {

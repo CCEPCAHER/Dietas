@@ -954,14 +954,83 @@ class TablaEditable {
 
     // Resaltar el texto coincidente en los resultados
     resaltarTexto(texto, query) {
+        if (!texto || !query) return String(texto || '');
+        
+        // Escapar caracteres especiales HTML primero
+        const textoEscapado = String(texto)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+        
         const palabras = query.split(/\s+/).filter(p => p.length > 0);
-        let resultado = texto;
-
+        if (palabras.length === 0) return textoEscapado;
+        
+        // Encontrar todas las coincidencias sin solapamientos
+        const coincidencias = [];
+        let textoRestante = textoEscapado;
+        let offset = 0;
+        
         palabras.forEach(palabra => {
-            const regex = new RegExp(`(${palabra})`, 'gi');
-            resultado = resultado.replace(regex, '<mark style="background: #ffeb3b; padding: 2px 4px; border-radius: 3px;">$1</mark>');
+            const palabraEscapada = palabra.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            // Buscar todas las ocurrencias de esta palabra usando matchAll o match
+            const regex = new RegExp(palabraEscapada, 'gi');
+            const matches = [];
+            
+            // Buscar todas las ocurrencias de forma segura usando indexOf
+            // Esto evita problemas con regex global y caracteres especiales
+            let indiceBusqueda = 0;
+            const palabraLower = palabra.toLowerCase();
+            const textoLower = textoEscapado.toLowerCase();
+            
+            while (indiceBusqueda < textoEscapado.length) {
+                const indiceEncontrado = textoLower.indexOf(palabraLower, indiceBusqueda);
+                
+                if (indiceEncontrado === -1) break;
+                
+                // Obtener el texto original (con mayúsculas/minúsculas originales)
+                const textoCoincidencia = textoEscapado.substring(indiceEncontrado, indiceEncontrado + palabra.length);
+                
+                matches.push({
+                    inicio: indiceEncontrado,
+                    fin: indiceEncontrado + palabra.length,
+                    texto: textoCoincidencia
+                });
+                
+                // Avanzar después de esta coincidencia
+                indiceBusqueda = indiceEncontrado + palabra.length;
+            }
+            
+            // Agregar solo las coincidencias que no se solapan con las ya encontradas
+            matches.forEach(m => {
+                const solapa = coincidencias.some(c => 
+                    (m.inicio < c.fin && m.fin > c.inicio)
+                );
+                if (!solapa) {
+                    coincidencias.push(m);
+                }
+            });
         });
-
+        
+        // Ordenar por posición
+        coincidencias.sort((a, b) => a.inicio - b.inicio);
+        
+        // Construir resultado final
+        let resultado = '';
+        let ultimoIndice = 0;
+        
+        coincidencias.forEach(c => {
+            // Agregar texto antes de la coincidencia
+            resultado += textoEscapado.substring(ultimoIndice, c.inicio);
+            // Agregar texto resaltado (sin escapar de nuevo, ya está escapado)
+            resultado += '<mark style="background: #ffeb3b; padding: 2px 4px; border-radius: 3px;">' + c.texto + '</mark>';
+            ultimoIndice = c.fin;
+        });
+        
+        // Agregar texto restante
+        resultado += textoEscapado.substring(ultimoIndice);
+        
         return resultado;
     }
 
@@ -1024,7 +1093,13 @@ class TablaEditable {
 
     // Escapar JSON para pasar como parámetro en onclick
     escaparJSON(obj) {
-        return JSON.stringify(obj).replace(/"/g, '&quot;');
+        // Escapar caracteres especiales HTML de forma segura
+        return JSON.stringify(obj)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
 
     // Seleccionar un alimento del autocompletado
@@ -1099,6 +1174,12 @@ class TablaEditable {
 
         // Marcar fila como usada
         this.marcarFilaUsada(rowId);
+
+        // IMPORTANTE: Guardar el día actual en planSemana antes de hacer cambios
+        // Esto evita que se pierdan datos cuando se cambia de día
+        if (this.diaActual) {
+            this.planSemana[this.diaActual] = this.obtenerDatos();
+        }
 
         // Si hay gramos ingresados, calcular macros automáticamente
         const gramosActuales = parseFloat(inputGramos.value) || 0;
@@ -1248,6 +1329,10 @@ class TablaEditable {
             document.getElementById(`hidr-${rowId}`).textContent = '-';
             this.actualizarTotales(comida);
             this.actualizarTotalesDiarios();
+            // Guardar el día actual después de actualizar totales
+            if (this.diaActual) {
+                this.planSemana[this.diaActual] = this.obtenerDatos();
+            }
             return;
         }
 
@@ -1283,6 +1368,12 @@ class TablaEditable {
             // Actualizar totales
             this.actualizarTotales(comida);
             this.actualizarTotalesDiarios();
+            
+            // IMPORTANTE: Guardar el día actual después de actualizar totales
+            // Esto asegura que los cambios se guarden cuando se añade o modifica un alimento
+            if (this.diaActual) {
+                this.planSemana[this.diaActual] = this.obtenerDatos();
+            }
 
         } catch (e) {
             console.error('Error al calcular macros:', e);
@@ -1570,7 +1661,9 @@ class TablaEditable {
 
     // Cargar datos en la tabla (para edición)
     cargarDatos(datos, actualizarTotales = true) {
-        // Limpiar cuerpos
+        // IMPORTANTE: Limpiar solo los tbody del día actual que se está cargando
+        // Todos los días comparten los mismos tbody, así que siempre debemos limpiarlos
+        // pero solo cargar los datos del día que se está editando
         this.comidas.forEach(comida => {
             const comidaId = comida.toLowerCase().replace(/\s+/g, '-');
             const tbody = document.getElementById(`tbody-${comidaId}`);
