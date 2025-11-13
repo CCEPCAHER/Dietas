@@ -2702,7 +2702,7 @@ function mostrarPlanAlimentacion() {
     // Calcular hidratación recomendada
     const hidratacionRecomendada = Math.round((datosUsuario.peso * 0.033 + 0.5) * 10) / 10;
     htmlPlan += `
-        <div class="hidratacion-section" style="margin-top: 12px; padding: 12px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 8px; border-left: 4px solid #2196f3;">
+        <div class="hidratacion-section" style="margin-top: 40px; margin-bottom: 20px; padding: 12px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 8px; border-left: 4px solid #2196f3; page-break-inside: avoid; clear: both;">
             <h3 style="color: #0d47a1; margin-bottom: 6px; font-size: 13pt; font-weight: bold;">
                 💧 HIDRATACIÓN DIARIA
             </h3>
@@ -3578,6 +3578,19 @@ function inicializarBotones() {
             @media print {
                 body { padding: 15mm; }
                 .dia-plan { page-break-inside: avoid; }
+                .hidratacion-section {
+                    margin-top: 50px !important;
+                    margin-bottom: 30px !important;
+                    page-break-inside: avoid;
+                    page-break-before: auto;
+                    clear: both;
+                }
+            }
+            .hidratacion-section {
+                margin-top: 40px;
+                margin-bottom: 20px;
+                page-break-inside: avoid;
+                clear: both;
             }
         `;
     }
