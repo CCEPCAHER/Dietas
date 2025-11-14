@@ -3088,7 +3088,9 @@ function inicializarBotones() {
                 line-height: 1.6;
                 color: #000;
                 background: #fff;
-                padding: 2mm 8mm 8mm 8mm;
+                padding: 2mm 8mm 3mm 8mm;
+                margin-bottom: 0;
+                padding-bottom: 3mm;
                 display: flex;
                 flex-direction: column;
                 min-height: 100vh;
@@ -3099,8 +3101,10 @@ function inicializarBotones() {
                 -moz-osx-font-smoothing: grayscale;
             }
             body.layout-landscape {
-                padding: 0.5mm 5mm 1mm 5mm;
+                padding: 0.5mm 5mm 3mm 5mm;
                 max-height: 210mm;
+                margin-bottom: 0;
+                padding-bottom: 3mm;
                 overflow: hidden;
                 display: flex;
                 flex-direction: column;
@@ -3112,7 +3116,7 @@ function inicializarBotones() {
                 min-height: 0;
             }
             .plan-tabla-editable table {
-                max-height: 200mm;
+                max-height: 182mm;
                 height: auto;
                 flex: 1;
             }
@@ -3313,13 +3317,13 @@ function inicializarBotones() {
                 margin: 0 auto;
                 page-break-inside: avoid;
                 flex-shrink: 0;
-                max-height: 200mm;
+                max-height: 182mm;
                 height: auto;
                 border-bottom: 2px solid #000 !important;
             }
             .plan-tabla-editable {
                 width: 100%;
-                max-height: 200mm;
+                max-height: 182mm;
                 overflow: hidden;
                 display: flex;
                 flex-direction: column;
@@ -3327,7 +3331,7 @@ function inicializarBotones() {
             }
             .pdf-semana {
                 width: 100%;
-                max-height: 200mm;
+                max-height: 182mm;
                 overflow: hidden;
                 flex: 1;
                 display: flex;
@@ -3340,11 +3344,14 @@ function inicializarBotones() {
             .tabla-plan-semanal th,
             .tabla-plan-semanal td {
                 border: 1px solid #666;
-                padding: ${Math.max(0.5, tamanos.tamanoItemAlimento * 0.08)}px ${Math.max(1, tamanos.tamanoItemAlimento * 0.12)}px;
-                font-size: ${tamanos.tamanoItemAlimento + 0.3}pt;
+                padding: ${Math.max(1, tamanos.tamanoItemAlimento * 0.1)}px ${Math.max(1, tamanos.tamanoItemAlimento * 0.08)}px;
+                font-size: ${tamanos.tamanoItemAlimento}pt;
                 vertical-align: top;
                 word-wrap: break-word;
                 overflow-wrap: break-word;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                line-height: ${Math.max(1.1, Math.min(1.3, 1.0 + (tamanos.tamanoItemAlimento - 6) * 0.02))};
             }
             .tabla-plan-semanal tbody tr:last-child td {
                 border-bottom: 2px solid #000 !important;
@@ -3356,9 +3363,12 @@ function inicializarBotones() {
                 background: #fff;
                 font-weight: 700;
                 text-align: center;
-                padding: ${Math.max(1, tamanos.tamanoHeader * 0.12)}px ${Math.max(0.5, tamanos.tamanoHeader * 0.08)}px;
+                padding: ${Math.max(2, tamanos.tamanoHeader * 0.15)}px ${Math.max(1, tamanos.tamanoHeader * 0.1)}px;
                 font-size: ${tamanos.tamanoHeader}pt;
-                line-height: ${Math.max(1.1, Math.min(1.3, 1.0 + (tamanos.tamanoHeader - 8) * 0.015))};
+                line-height: ${Math.max(1.1, Math.min(1.2, 1.0 + (tamanos.tamanoHeader - 6) * 0.015))};
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             .tabla-plan-semanal th,
             .tabla-plan-semanal td {
@@ -3371,19 +3381,22 @@ function inicializarBotones() {
                 font-weight: 600;
             }
             .celda-dia {
-                min-height: 15px;
+                min-height: 12px;
                 height: auto;
                 word-break: break-word;
                 vertical-align: top;
-                padding: ${Math.max(0.5, tamanos.tamanoItemAlimento * 0.08)}px ${Math.max(1, tamanos.tamanoItemAlimento * 0.12)}px;
+                padding: ${Math.max(1, tamanos.tamanoItemAlimento * 0.1)}px ${Math.max(1, tamanos.tamanoItemAlimento * 0.08)}px;
+                overflow: hidden;
             }
             .celda-dia .item-alimento {
                 display: block;
-                margin-left: 8px;
-                margin-bottom: 0px;
+                margin-left: 6px;
+                margin-bottom: 1px;
                 position: relative;
                 font-size: ${tamanos.tamanoItemAlimento}pt;
-                line-height: ${Math.max(1.05, Math.min(1.25, 1.0 + (tamanos.tamanoItemAlimento - 8) * 0.01))};
+                line-height: ${Math.max(1.1, Math.min(1.3, 1.0 + (tamanos.tamanoItemAlimento - 6) * 0.02))};
+                word-wrap: break-word;
+                overflow-wrap: break-word;
             }
             .celda-dia .item-alimento::before {
                 content: '•';
@@ -3400,25 +3413,32 @@ function inicializarBotones() {
             .titulo-comida {
                 display: block;
                 font-weight: 700;
-                margin-bottom: ${Math.max(0, Math.min(2, tamanos.tamanoTituloComida * 0.15))}px;
+                margin-bottom: ${Math.max(1, Math.min(2, tamanos.tamanoTituloComida * 0.12))}px;
                 font-size: ${tamanos.tamanoTituloComida}pt;
-                line-height: ${Math.max(1.05, Math.min(1.2, 1.0 + (tamanos.tamanoTituloComida - 8) * 0.01))};
+                line-height: ${Math.max(1.1, Math.min(1.25, 1.0 + (tamanos.tamanoTituloComida - 6) * 0.02))};
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             /* Estilos anteriores mantenidos para compatibilidad */
             .dia-plan {
-                margin: 18px 0;
+                margin: 8px 0;
                 page-break-inside: avoid;
                 border: 1px solid #000;
-                padding: 12px;
+                padding: 8px;
+                display: block;
+                width: 100%;
             }
-            .dia-titulo {
+            .dia-titulo,
+            .dia-titulo-header {
                 font-weight: 700;
-                font-size: 13pt;
+                font-size: 11pt;
                 text-transform: uppercase;
-                margin-bottom: 10px;
+                margin-bottom: 6px;
                 border-bottom: 1px solid #000;
-                padding-bottom: 6px;
-                line-height: 1.3;
+                padding-bottom: 4px;
+                line-height: 1.2;
+                display: block;
             }
             .comida-row { margin: 8px 0; line-height: 1.5; }
             .comida-nombre {
@@ -3731,98 +3751,53 @@ function inicializarBotones() {
         // Calcular altura promedio de contenido por celda (estimación)
         const alturaEstimadaPorCelda = (totalAlimentos / totalCeldas) * 4; // ~4mm por alimento
         
-        // Tamaño base inicial aumentado aún más
-        let tamanoBase = 13.5; // Aumentado para aprovechar mejor el espacio disponible
+        // Tamaño base inicial - ajustado para que quepa en una sola hoja
+        // Altura disponible: ~182mm (descontando header ~25mm y margen inferior 3mm)
+        // Ancho disponible: ~287mm / 7 días = ~41mm por columna
+        const alturaDisponiblePorCelda = 182 / 5; // ~36.4mm por fila de comida
+        const anchoDisponiblePorCelda = 287 / 7; // ~41mm por columna
         
         // Calcular espacio disponible estimado por celda (en mm)
-        // Altura disponible: ~200mm / 5 comidas = ~40mm por fila de comida
-        // Ancho disponible: ~287mm / 7 días = ~41mm por columna
-        const alturaDisponiblePorCelda = 200 / 5; // ~40mm
-        const anchoDisponiblePorCelda = 287 / 7; // ~41mm
         const espacioDisponible = alturaDisponiblePorCelda * anchoDisponiblePorCelda; // mm²
         
         // Calcular espacio ocupado estimado
         const espacioOcupado = alturaEstimadaPorCelda * anchoDisponiblePorCelda;
         const porcentajeUso = espacioOcupado > 0 ? (espacioOcupado / espacioDisponible) * 100 : 0;
         
-        // Calcular variabilidad: diferencia entre máximo y promedio de alimentos por celda
-        // Si hay mucha variabilidad, significa que algunas celdas están muy vacías
-        const promedioAlimentosPorCelda = densidadAlimentos;
-        const variabilidad = maxAlimentosPorCelda - promedioAlimentosPorCelda;
-        const hayCeldasVacias = variabilidad > 2; // Si hay celdas con muchos menos alimentos que otras
+        // Calcular tamaño base - 10.0pt como tamaño base
+        let tamanoBase = 10.0; // Tamaño base fijado en 10.0pt
         
-        // Ajuste principal según densidad de alimentos (EXTREMADAMENTE agresivo en aumentar)
-        if (densidadAlimentos < 0.8) {
-            // Muy pocos alimentos: aumentar muchísimo más
-            tamanoBase = Math.min(26.0, 17.0 + (0.8 - densidadAlimentos) * 12.0);
-        } else if (densidadAlimentos < 1.5) {
-            // Pocos alimentos: aumentar bastante más
-            tamanoBase = Math.min(24.0, 16.0 + (1.5 - densidadAlimentos) * 6.0);
-        } else if (densidadAlimentos < 2.5) {
-            // Densidad media-baja: aumentar moderadamente más
-            tamanoBase = Math.min(22.0, 15.0 + (2.5 - densidadAlimentos) * 3.5);
-        } else if (densidadAlimentos < 3.5) {
-            // Densidad media: tamaño estándar aumentado
-            tamanoBase = 13.5;
-        } else if (densidadAlimentos < 4.5) {
-            // Densidad media-alta: reducir un poco pero mantener grande
-            tamanoBase = Math.max(11.0, 13.5 - (densidadAlimentos - 3.5) * 0.8);
+        // Ajuste según densidad de alimentos
+        if (densidadAlimentos < 1.0) {
+            tamanoBase = Math.min(12.0, 11.0 + (1.0 - densidadAlimentos) * 1.0);
+        } else if (densidadAlimentos < 2.0) {
+            tamanoBase = Math.min(11.5, 11.0 + (2.0 - densidadAlimentos) * 0.5);
+        } else if (densidadAlimentos < 3.0) {
+            tamanoBase = 10.0;
+        } else if (densidadAlimentos < 4.0) {
+            tamanoBase = Math.max(9.0, 10.0 - (densidadAlimentos - 3.0) * 0.5);
         } else {
-            // Muchos alimentos: reducir pero mantener legible
-            tamanoBase = Math.max(9.5, 11.0 - (densidadAlimentos - 4.5) * 0.7);
+            tamanoBase = Math.max(8.5, 9.0 - (densidadAlimentos - 4.0) * 0.3);
         }
         
-        // Ajuste secundario según máximo de alimentos por celda (MUY agresivo)
+        // Ajuste según máximo de alimentos por celda
         if (maxAlimentosPorCelda > 8) {
-            // Celda muy llena: reducir pero mantener mínimo más alto
-            tamanoBase = Math.max(9.0, tamanoBase - 1.5);
+            tamanoBase = Math.max(8.5, tamanoBase - 0.8);
         } else if (maxAlimentosPorCelda > 6) {
-            tamanoBase = Math.max(10.5, tamanoBase - 1.0);
-        } else if (maxAlimentosPorCelda <= 2 && densidadAlimentos < 2.5) {
-            // Celda muy vacía con poca densidad: aumentar muchísimo más
-            tamanoBase = Math.min(26.0, tamanoBase + 5.5);
+            tamanoBase = Math.max(9.0, tamanoBase - 0.5);
+        } else if (maxAlimentosPorCelda <= 2 && densidadAlimentos < 2.0) {
+            tamanoBase = Math.min(12.0, tamanoBase + 1.0);
         } else if (maxAlimentosPorCelda <= 3 && densidadAlimentos < 2.5) {
-            tamanoBase = Math.min(25.0, tamanoBase + 5.0);
-        } else if (maxAlimentosPorCelda <= 4 && densidadAlimentos < 3.0) {
-            tamanoBase = Math.min(24.0, tamanoBase + 4.5);
-        } else if (maxAlimentosPorCelda <= 5 && densidadAlimentos < 3.5) {
-            tamanoBase = Math.min(22.0, tamanoBase + 3.5);
-        } else if (maxAlimentosPorCelda <= 6 && densidadAlimentos < 3.0) {
-            tamanoBase = Math.min(20.0, tamanoBase + 2.5);
+            tamanoBase = Math.min(11.5, tamanoBase + 0.8);
         }
         
-        // Ajuste según porcentaje de uso del espacio (CRÍTICO - muy agresivo)
-        if (porcentajeUso < 25 && densidadAlimentos < 3.5) {
-            // Muy poco espacio usado: aumentar muchísimo más
-            tamanoBase = Math.min(26.0, tamanoBase + 5.0);
-        } else if (porcentajeUso < 40 && densidadAlimentos < 3.0) {
-            // Poco espacio usado: aumentar bastante más
-            tamanoBase = Math.min(24.0, tamanoBase + 4.0);
-        } else if (porcentajeUso < 55 && densidadAlimentos < 2.5) {
-            // Espacio medio-bajo usado: aumentar bastante
-            tamanoBase = Math.min(22.0, tamanoBase + 3.0);
-        } else if (porcentajeUso < 70 && densidadAlimentos < 2.0) {
-            // Espacio medio usado: aumentar moderadamente
-            tamanoBase = Math.min(20.0, tamanoBase + 2.0);
-        }
-        
-        // Ajuste adicional si hay variabilidad (celdas muy diferentes)
-        if (hayCeldasVacias && densidadAlimentos < 3.0) {
-            // Si hay celdas muy vacías, aumentar más para aprovechar ese espacio
-            tamanoBase = Math.min(25.0, tamanoBase + 2.5);
-        }
-        
-        // Ajuste final según altura estimada (para evitar desbordamiento)
-        if (alturaEstimadaPorCelda > 38) {
-            // Contenido muy alto: reducir un poco pero mantener grande
-            tamanoBase = Math.max(9.0, tamanoBase - 1.2);
-        } else if (alturaEstimadaPorCelda < 10 && densidadAlimentos < 3.5) {
-            // Contenido muy bajo: aumentar muchísimo más agresivamente
-            tamanoBase = Math.min(26.0, tamanoBase + 4.5);
-        } else if (alturaEstimadaPorCelda < 13 && densidadAlimentos < 3.0) {
-            tamanoBase = Math.min(24.0, tamanoBase + 3.5);
-        } else if (alturaEstimadaPorCelda < 18 && densidadAlimentos < 2.5) {
-            tamanoBase = Math.min(22.0, tamanoBase + 2.5);
+        // Ajuste según altura estimada (para evitar desbordamiento)
+        if (alturaEstimadaPorCelda > 35) {
+            tamanoBase = Math.max(8.5, tamanoBase - 0.8);
+        } else if (alturaEstimadaPorCelda > 30) {
+            tamanoBase = Math.max(9.0, tamanoBase - 0.5);
+        } else if (alturaEstimadaPorCelda < 15 && densidadAlimentos < 2.5) {
+            tamanoBase = Math.min(11.5, tamanoBase + 0.8);
         }
         
         console.log(`📊 Cálculo dinámico: densidad=${densidadAlimentos.toFixed(2)}, maxPorCelda=${maxAlimentosPorCelda}, alturaEst=${alturaEstimadaPorCelda.toFixed(1)}mm, usoEspacio=${porcentajeUso.toFixed(1)}%, tamañoBase=${tamanoBase.toFixed(1)}pt`);
@@ -3880,8 +3855,10 @@ function inicializarBotones() {
  
             semana.columnas.forEach(col => {
                 const icono = col.esDescanso ? '😴' : '💪';
-                const etiquetaDia = `${col.diaBase} ${icono}`;
-                html += `<th>${escapeHTML(etiquetaDia)}</th>`;
+                // Asegurar que el día se muestre correctamente
+                const diaNombre = col.diaBase || col.titulo || 'Día';
+                const etiquetaDia = `${diaNombre} ${icono}`;
+                html += `<th title="${escapeHTML(diaNombre)}">${escapeHTML(etiquetaDia)}</th>`;
             });
  
             html += '</tr></thead><tbody>';
@@ -3904,8 +3881,9 @@ function inicializarBotones() {
  
             html += '</tbody></table></div>';
         });
- 
+
         html += '</div>';
+        // Sin línea final, solo el margen inferior
         return html;
     }
 
@@ -4526,6 +4504,9 @@ ${lineas.join('\n')}`;
                     });
                     
                     // Dividir la imagen en páginas
+                    // Margen inferior de 3 mm en todas las páginas
+                    const margenInferior = 3; // 3 mm
+                    
                     if (usarDivisionInteligente && posicionesDias.length > 0) {
                         // Método inteligente: respetar días completos
                         let currentY = 0;
@@ -4536,7 +4517,7 @@ ${lineas.join('\n')}`;
                                 pdf.addPage(formato, orientacionNombre);
                             }
                             
-                            const availableHeight = pageHeight;
+                            const availableHeight = pageHeight - margenInferior;
                             let nextY = currentY + availableHeight;
                             
                             // Buscar todos los días que empiezan en o después de currentY
@@ -4631,16 +4612,23 @@ ${lineas.join('\n')}`;
                         }
                     } else {
                         // Método simple: división normal (fallback)
-                        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
+                        // Margen inferior de 3 mm en todas las páginas
+                        const margenInferior = 3; // 3 mm
+                        const availableHeight = pageHeight - margenInferior;
                         
-                        if (imgHeight > pageHeight) {
-                            let heightLeft = imgHeight - pageHeight;
-                            let position = -pageHeight;
+                        // Primera página
+                        const primeraAltura = Math.min(imgHeight, availableHeight);
+                        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, primeraAltura, undefined, 'FAST');
+                        
+                        if (imgHeight > availableHeight) {
+                            let heightLeft = imgHeight - availableHeight;
+                            let position = -availableHeight;
                             while (heightLeft > 0) {
                                 pdf.addPage(formato, orientacionNombre);
+                                const alturaPagina = Math.min(availableHeight, heightLeft);
                                 pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
-                                heightLeft -= pageHeight;
-                                position -= pageHeight;
+                                heightLeft -= availableHeight;
+                                position -= availableHeight;
                             }
                         }
                     }
@@ -4794,16 +4782,23 @@ ${lineas.join('\n')}`;
                                             const imgWidth = pageWidth;
                                             const imgHeight = (canvasHeight * imgWidth) / canvasWidth;
                                             
-                                            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
+                                            // Margen inferior de 3 mm en todas las páginas
+                                            const margenInferior = 3; // 3 mm
+                                            const availableHeight = pageHeight - margenInferior;
                                             
-                                            if (imgHeight > pageHeight) {
-                                                let heightLeft = imgHeight - pageHeight;
-                                                let position = -pageHeight;
+                                            // Primera página
+                                            const primeraAltura = Math.min(imgHeight, availableHeight);
+                                            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, primeraAltura, undefined, 'FAST');
+                                            
+                                            if (imgHeight > availableHeight) {
+                                                let heightLeft = imgHeight - availableHeight;
+                                                let position = -availableHeight;
                                                 while (heightLeft > 0) {
                                 pdf.addPage(formato, orientacionNombre);
+                                                    const alturaPagina = Math.min(availableHeight, heightLeft);
                                                     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
-                                                    heightLeft -= pageHeight;
-                                                    position -= pageHeight;
+                                                    heightLeft -= availableHeight;
+                                                    position -= availableHeight;
                                                 }
                                             }
                                             
@@ -4983,6 +4978,7 @@ ${lineas.join('\n')}`;
             
             procesarContenidoParaPDF(clone);
             htmlPDF += clone.innerHTML;
+            // Sin línea final, solo el margen inferior
         } else if (fuente === 'tabla-editable') {
             htmlPDF += generarHTMLDesdeTablaEditable();
         }
@@ -5031,8 +5027,10 @@ ${lineas.join('\n')}`;
                       }
 
                       // Usar html2pdf para generar el blob directamente
+                      // Margen inferior de 3 mm - convertir a pulgadas: 3mm = 0.11811 in
+                      const margenInferiorPulgadas = 0.11811; // 3 mm en pulgadas
                       const opt = {
-                          margin: 0.5,
+                          margin: [0, 0, margenInferiorPulgadas, 0], // [top, right, bottom, left] - solo margen inferior
                           filename: `Plan_Alimentacion_${datosUsuario.nombre || 'Cliente'}.pdf`,
                           image: { type: 'jpeg', quality: 0.98 },
                           html2canvas: { scale: 2, useCORS: true },
