@@ -45,6 +45,10 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+    position: relative;
 }
 
 
@@ -56,6 +60,9 @@ body {
     padding: 40px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 body.dark-mode .container {
@@ -99,7 +106,8 @@ body.dark-mode .container {
 
 .header-content {
     flex: 1;
-    min-width: 300px;
+    min-width: 0;
+    width: 100%;
 }
 
 .main-header h1 {
@@ -194,6 +202,7 @@ body.dark-mode h3 {
 .form-group select,
 .form-group textarea {
     width: 100%;
+    max-width: 100%;
     padding: 12px;
     border: 2px solid var(--border-color);
     border-radius: 8px;
@@ -204,6 +213,7 @@ body.dark-mode h3 {
     color: var(--text-primary);
     font-weight: 500;
     line-height: 1.5;
+    box-sizing: border-box;
 }
 
 .form-group select {
@@ -266,13 +276,17 @@ body.dark-mode h3 {
     padding: 8px 12px;
     border-radius: 6px;
     white-space: normal;
-    width: 250px;
+    max-width: 250px;
+    width: max-content;
+    min-width: 150px;
     font-size: 0.85em;
     z-index: 1000;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     line-height: 1.4;
     font-weight: normal;
     margin-bottom: 8px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .tooltip-icon:hover::before {
@@ -472,12 +486,23 @@ body.dark-mode .actividad-tdee {
 /* Estilos para grupo de checkboxes de intolerancias */
 .checkbox-group {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 12px;
     padding: 15px;
     background: #f8f9fa;
     border-radius: 8px;
     border: 2px solid #e9ecef;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+    .checkbox-group {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+        padding: 12px;
+    }
 }
 
 body.dark-mode .checkbox-group {
@@ -653,15 +678,126 @@ body.dark-mode .macro-item label {
 }
 
 /* Ajustar grid cuando aparece el botón de WhatsApp en móvil */
-@media (max-width: 768px) {
+/* Estilos específicos para iOS/iPhone */
+@supports (-webkit-touch-callout: none) {
     body {
-        padding: 15px;
-        font-size: 16px;
+        -webkit-overflow-scrolling: touch;
+        overflow-x: hidden;
+        width: 100%;
+        max-width: 100vw;
+        position: relative;
     }
     
     .container {
-        padding: 20px;
-        border-radius: 20px;
+        -webkit-overflow-scrolling: touch;
+        overflow-x: hidden;
+        width: 100%;
+        max-width: 100%;
+        position: relative;
+    }
+    
+    /* Mejorar renderizado en Safari iOS */
+    * {
+        -webkit-tap-highlight-color: rgba(102, 126, 234, 0.2);
+    }
+    
+    /* Prevenir zoom automático en inputs en iOS (mínimo 16px) */
+    @media (max-width: 480px) {
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus,
+        select:focus,
+        textarea:focus {
+            font-size: 16px;
+        }
+    }
+}
+
+/* Media query específica para iPhone 16 Pro y similares (393px - 428px) */
+@media screen and (max-width: 428px) and (-webkit-min-device-pixel-ratio: 2) {
+    body {
+        padding: 8px;
+        overflow-x: hidden;
+    }
+    
+    .container {
+        padding: 12px;
+        border-radius: 12px;
+        overflow-x: hidden;
+    }
+    
+    .header-content {
+        min-width: 0;
+        width: 100%;
+    }
+    
+    .main-header h1 {
+        font-size: 1.6em;
+        letter-spacing: 0.5px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .checkbox-group {
+        grid-template-columns: repeat(2, 1fr) !important;
+        min-width: 0;
+        gap: 8px;
+        padding: 10px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .macro-info {
+        grid-template-columns: 1fr;
+        padding: 12px;
+        gap: 10px;
+    }
+    
+    /* Tablas más pequeñas y con mejor scroll */
+    .tabla-info,
+    .tabla-entrenos,
+    .tabla-calculos,
+    .tabla-comidas {
+        font-size: 0.8em;
+    }
+    
+    .tabla-info th,
+    .tabla-info td,
+    .tabla-entrenos th,
+    .tabla-entrenos td,
+    .tabla-calculos th,
+    .tabla-calculos td {
+        padding: 6px 4px;
+        font-size: 0.75em;
+    }
+    
+    .modal-content,
+    .modal-extra-large {
+        width: 98%;
+        max-width: 98%;
+        padding: 15px;
+        margin: 2% auto;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+        font-size: 16px;
+        overflow-x: hidden;
+    }
+    
+    .container {
+        padding: 15px;
+        border-radius: 15px;
+        margin: 0;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     .btn-container {
@@ -873,12 +1009,15 @@ body.dark-mode .info-usuario-table h3 {
 
 .tabla-info {
     width: 100%;
+    max-width: 100%;
     border-collapse: collapse;
     background: var(--bg-card);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 4px var(--shadow-color);
     transition: background 0.3s ease;
+    box-sizing: border-box;
+    table-layout: auto;
 }
 
 .tabla-info th {
@@ -946,12 +1085,15 @@ body.dark-mode .tabla-info tbody tr:nth-child(odd) td {
 
 .tabla-entrenos {
     width: 100%;
+    max-width: 100%;
     border-collapse: collapse;
     background: white;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     margin-top: 10px;
+    box-sizing: border-box;
+    table-layout: auto;
 }
 
 .tabla-entrenos th {
@@ -1011,12 +1153,15 @@ body.dark-mode .tabla-entrenos tbody tr:nth-child(odd) td {
 
 .tabla-calculos {
     width: 100%;
+    max-width: 100%;
     border-collapse: collapse;
     background: white;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     margin-top: 10px;
+    box-sizing: border-box;
+    table-layout: auto;
 }
 
 .tabla-calculos th {
@@ -2099,22 +2244,33 @@ body.dark-mode .comida-header {
         gap: 15px;
     }
     
+    .header-content {
+        min-width: 0;
+        width: 100%;
+    }
+    
     .main-header h1 {
         font-size: 1.8em;
         letter-spacing: 1px;
         font-weight: 900;
         line-height: 1.2;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     .subtitle-header {
         font-size: 0.9em;
         font-weight: 700;
         line-height: 1.3;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     .plan-title {
         font-size: 1.1em;
         font-weight: 700;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     h1 {
@@ -2122,6 +2278,8 @@ body.dark-mode .comida-header {
         margin-bottom: 20px;
         font-weight: 800;
         line-height: 1.2;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     h2 {
@@ -2129,11 +2287,15 @@ body.dark-mode .comida-header {
         margin: 20px 0 10px 0;
         font-weight: 700;
         line-height: 1.3;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     h3 {
         font-size: 1.15em;
         font-weight: 700;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     .form-row {
@@ -2145,6 +2307,12 @@ body.dark-mode .comida-header {
         grid-template-columns: 1fr;
         padding: 15px;
         gap: 12px;
+    }
+    
+    .checkbox-group {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px;
+        padding: 12px;
     }
     
     .btn-submit,
@@ -2178,6 +2346,21 @@ body.dark-mode .comida-header {
         -webkit-overflow-scrolling: touch;
         padding: 5px 0;
         margin: 15px 0;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(102, 126, 234, 0.5) transparent;
+    }
+    
+    .tabs::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .tabs::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .tabs::-webkit-scrollbar-thumb {
+        background: rgba(102, 126, 234, 0.5);
+        border-radius: 3px;
     }
     
     .tab {
@@ -2189,6 +2372,7 @@ body.dark-mode .comida-header {
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
     }
     
     .user-menu {
@@ -2216,12 +2400,16 @@ body.dark-mode .comida-header {
         width: 95%;
         max-width: 95%;
         border-radius: 15px;
+        box-sizing: border-box;
+        overflow-x: hidden;
     }
     
     .modal-extra-large {
         width: 95%;
         max-width: 95%;
         padding: 20px;
+        box-sizing: border-box;
+        overflow-x: hidden;
     }
     
     /* Botones de cierre más grandes en móviles */
@@ -2242,6 +2430,8 @@ body.dark-mode .comida-header {
         font-weight: 800;
         margin-bottom: 15px;
         line-height: 1.3;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     .modal-content p,
@@ -2249,6 +2439,8 @@ body.dark-mode .comida-header {
         font-size: 1em;
         font-weight: 600;
         line-height: 1.5;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     .tabla-comidas {
@@ -2256,10 +2448,33 @@ body.dark-mode .comida-header {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         margin: 15px 0;
+        width: 100%;
+        max-width: 100%;
+        position: relative;
     }
     
     .tabla-comidas table {
-        min-width: 700px;
+        min-width: 600px;
+        width: 100%;
+    }
+    
+    /* Mejorar scroll de tablas en iOS */
+    .tabla-comidas::-webkit-scrollbar {
+        height: 8px;
+    }
+    
+    .tabla-comidas::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+    }
+    
+    .tabla-comidas::-webkit-scrollbar-thumb {
+        background: rgba(102, 126, 234, 0.6);
+        border-radius: 4px;
+    }
+    
+    .tabla-comidas::-webkit-scrollbar-thumb:hover {
+        background: rgba(102, 126, 234, 0.8);
     }
     
     .tabla-comidas th {
@@ -2374,6 +2589,62 @@ body.dark-mode .comida-header {
     .checkbox-group[style*="grid-template-columns: repeat(4"] {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 10px;
+    }
+    
+    /* Tablas responsive en móviles */
+    .tabla-info,
+    .tabla-entrenos,
+    .tabla-calculos {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .tabla-info table,
+    .tabla-entrenos table,
+    .tabla-calculos table {
+        width: 100%;
+        min-width: 500px;
+    }
+    
+    .tabla-info th,
+    .tabla-info td,
+    .tabla-entrenos th,
+    .tabla-entrenos td,
+    .tabla-calculos th,
+    .tabla-calculos td {
+        padding: 8px 6px;
+        font-size: 0.85em;
+        white-space: nowrap;
+    }
+    
+    /* Scrollbar personalizado para tablas en iOS */
+    .tabla-info::-webkit-scrollbar,
+    .tabla-entrenos::-webkit-scrollbar,
+    .tabla-calculos::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .tabla-info::-webkit-scrollbar-track,
+    .tabla-entrenos::-webkit-scrollbar-track,
+    .tabla-calculos::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 3px;
+    }
+    
+    .tabla-info::-webkit-scrollbar-thumb,
+    .tabla-entrenos::-webkit-scrollbar-thumb,
+    .tabla-calculos::-webkit-scrollbar-thumb {
+        background: rgba(102, 126, 234, 0.5);
+        border-radius: 3px;
+    }
+    
+    .tabla-info::-webkit-scrollbar-thumb:hover,
+    .tabla-entrenos::-webkit-scrollbar-thumb:hover,
+    .tabla-calculos::-webkit-scrollbar-thumb:hover {
+        background: rgba(102, 126, 234, 0.7);
     }
     
     .checkbox-label {
@@ -2694,6 +2965,37 @@ body.dark-mode .comida-header {
     
     .banner-modo-manual h3 {
         font-size: 1.1em;
+    }
+    
+    /* Asegurar que imágenes y media respeten el ancho del viewport en iPhone */
+    img, video, iframe, canvas, svg {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    /* Mejorar el comportamiento de scroll en iOS */
+    body, html {
+        -webkit-overflow-scrolling: touch;
+        overflow-x: hidden;
+        position: relative;
+        width: 100%;
+        max-width: 100vw;
+    }
+    
+    /* Prevenir overflow en todos los contenedores principales */
+    .container, .form-container, .modal-content, .modal-extra-large, 
+    .form-group, .checkbox-group, .macro-info, .info-usuario-table {
+        overflow-x: hidden;
+        max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    /* Asegurar que los inputs y selects no desborden */
+    input, select, textarea, button {
+        max-width: 100%;
+        box-sizing: border-box;
     }
 }
 
@@ -3133,10 +3435,13 @@ body.dark-mode .checkbox-label:has(input:checked)::after {
     top: 0;
     width: 100%;
     height: 100%;
+    max-width: 100vw;
     overflow: auto;
+    overflow-x: hidden;
     background-color: rgba(0, 0, 0, 0.5);
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal-content {
@@ -3145,10 +3450,14 @@ body.dark-mode .checkbox-label:has(input:checked)::after {
     padding: 30px;
     border-radius: 15px;
     width: 90%;
-    max-width: 500px;
+    max-width: min(500px, 95vw);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     position: relative;
     animation: modalSlideIn 0.3s ease;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 body.dark-mode .modal-content {
@@ -4330,6 +4639,18 @@ body.dark-mode .modal-content {
     justify-content: center;
     transition: all 0.3s ease;
     font-size: 24px;
+    max-width: calc(100vw - 40px);
+    box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+    .dark-mode-toggle {
+        top: 10px;
+        right: 10px;
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
 }
 
 .dark-mode-toggle:hover {
@@ -4359,6 +4680,16 @@ body.dark-mode .dark-mode-icon {
     bottom: 30px;
     right: 30px;
     z-index: 1000;
+    max-width: calc(100vw - 60px);
+    box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+    .boton-flotante {
+        bottom: 20px;
+        right: 20px;
+        max-width: calc(100vw - 40px);
+    }
 }
 
 .btn-flotante {

@@ -99,11 +99,24 @@ const MacronutrientesCalculator = {
         const numDiasDescanso = 7 - numDiasEntreno;
         const caloriasPromedio = Math.round((caloriasEntreno * numDiasEntreno + caloriasDescanso * numDiasDescanso) / 7);
         
-        // Calcular macronutrientes basados en promedio
-        const macrosPromedio = this._calcularMacrosPromedio(objetivo, peso, caloriasPromedio);
+        // Obtener porcentajes de macronutrientes (si no están definidos, usar 50/30/20)
+        const porcentajes = this._obtenerPorcentajesMacros(datosUsuario);
+        
+        // Asegurar que los porcentajes estén guardados en datosUsuario si no estaban definidos
+        if (datosUsuario.porcentajeCarbs === undefined) {
+            datosUsuario.porcentajeCarbs = porcentajes.carbs * 100;
+        }
+        if (datosUsuario.porcentajeGrasas === undefined) {
+            datosUsuario.porcentajeGrasas = porcentajes.grasas * 100;
+        }
+        if (datosUsuario.porcentajeProteinas === undefined) {
+            datosUsuario.porcentajeProteinas = porcentajes.proteinas * 100;
+        }
+        
+        // Calcular macronutrientes promedio usando los porcentajes (no el método antiguo)
+        const macrosPromedio = this._calcularMacrosDesdePorcentajes(caloriasPromedio, porcentajes);
         
         // Calcular macronutrientes diferenciados
-        const porcentajes = this._obtenerPorcentajesMacros(datosUsuario);
         const macrosEntreno = this._calcularMacrosDiferenciados(
             caloriasEntreno, 
             porcentajes, 
@@ -253,7 +266,7 @@ const MacronutrientesCalculator = {
     },
     
     /**
-     * Calcula macronutrientes promedio según objetivo
+     * Calcula macronutrientes promedio según objetivo (método antiguo, mantenido para compatibilidad)
      */
     _calcularMacrosPromedio(objetivo, peso, calorias) {
         let proteinas, grasas, carbohidratos;
@@ -271,6 +284,17 @@ const MacronutrientesCalculator = {
             grasas = Math.round((calorias * 0.30) / 9);
             carbohidratos = Math.round((calorias - (proteinas * 4) - (grasas * 9)) / 4);
         }
+        
+        return { proteinas, grasas, carbohidratos };
+    },
+    
+    /**
+     * Calcula macronutrientes promedio desde porcentajes (para modo manual)
+     */
+    _calcularMacrosDesdePorcentajes(calorias, porcentajes) {
+        const carbohidratos = Math.round((calorias * porcentajes.carbs) / 4);
+        const grasas = Math.round((calorias * porcentajes.grasas) / 9);
+        const proteinas = Math.round((calorias * porcentajes.proteinas) / 4);
         
         return { proteinas, grasas, carbohidratos };
     },
