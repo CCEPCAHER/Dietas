@@ -470,13 +470,13 @@ class GestorAlimentosManager {
                     <tr>
                         <th>Nombre</th>
                         <th>Categoría</th>
-                        <th>Subcategoría</th>
+                        <th>Subcat.</th>
                         <th>Peso</th>
-                        <th>Proteínas</th>
+                        <th>Prot.</th>
                         <th>GS</th>
-                        <th>Hidratos</th>
+                        <th>Hidr.</th>
                         <th>Grasas</th>
-                        <th>Azúcares</th>
+                        <th>Azúc.</th>
                         <th>Kcal</th>
                         <th>Acciones</th>
                     </tr>
@@ -525,8 +525,8 @@ class GestorAlimentosManager {
             html += `
                 <tr>
                     <td><strong style="color: #1a1a1a; font-size: 1.05em; letter-spacing: 0.3px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-weight: 700;">${nombre}</strong></td>
-                    <td><span style="padding: 5px 12px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); color: #1565c0; border-radius: 15px; font-size: 0.85em; font-weight: 700; display: inline-block; box-shadow: 0 2px 4px rgba(21, 101, 192, 0.15);">${categoria}</span></td>
-                    <td><span style="padding: 5px 12px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); color: #6a1b9a; border-radius: 15px; font-size: 0.85em; font-weight: 600; display: inline-block; box-shadow: 0 2px 4px rgba(106, 27, 154, 0.15);">${subcategoria}</span></td>
+                    <td><span style="padding: 2px 6px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); color: #1565c0; border-radius: 8px; font-size: 0.65em; font-weight: 700; display: inline-block; box-shadow: 0 1px 2px rgba(21, 101, 192, 0.15); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${categoria}</span></td>
+                    <td><span style="padding: 2px 6px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); color: #6a1b9a; border-radius: 8px; font-size: 0.65em; font-weight: 600; display: inline-block; box-shadow: 0 1px 2px rgba(106, 27, 154, 0.15); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${subcategoria}</span></td>
                     <td style="color: #757575; font-size: 0.88em; font-weight: 500;">${pesoDisplay === '-' ? '<span style="color: #bdbdbd;">-</span>' : pesoDisplay}</td>
                     <td style="font-weight: 700; color: #c2185b; font-size: 0.95em;">${proteinas.toFixed(1)}<span style="font-size: 0.85em; font-weight: 500; color: #999;">g</span></td>
                     <td style="color: #757575; font-size: 0.88em; font-weight: 500;">${grasasSaturadasDisplay === '-' ? '<span style="color: #bdbdbd;">-</span>' : grasasSaturadasDisplay}</td>

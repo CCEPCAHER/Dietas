@@ -5663,3 +5663,318 @@ body.dark-mode .banner-modo-manual p:last-child {
 .autocomplete-sugerencia-rapida {
     font-size: 12px;
 }
+
+/* ============================================
+   OPTIMIZACIÓN TABLA GESTOR ALIMENTOS
+   Sin scroll horizontal - Ver todas las columnas
+   ============================================ */
+
+/* Optimización para tablets (768px+) y PC */
+@media (min-width: 768px) {
+    /* Forzar que el contenedor principal use todo el ancho disponible */
+    .container {
+        max-width: 100% !important;
+        padding: 20px 15px !important;
+    }
+    
+    /* Eliminar scroll horizontal completamente */
+    .gestor-table-container,
+    .table-container {
+        overflow-x: visible !important;
+        overflow: visible !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    /* Forzar layout fijo en la tabla */
+    .gestor-table,
+    table#alimentosTable {
+        table-layout: fixed !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+    
+    /* HEADERS - Reducir padding y permitir wrap */
+    .gestor-table th,
+    table#alimentosTable th {
+        padding: 8px 4px !important;
+        font-size: 0.7em !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        line-height: 1.2 !important;
+        letter-spacing: 0.3px !important;
+        text-align: center !important;
+    }
+    
+    /* CELDAS - Reducir padding significativamente */
+    .gestor-table td,
+    table#alimentosTable td {
+        padding: 8px 4px !important;
+        font-size: 0.75em !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        text-align: center !important;
+    }
+    
+    /* ANCHOS ESPECÍFICOS DE COLUMNAS - Muy ajustados */
+    .gestor-table th:nth-child(1),
+    .gestor-table td:nth-child(1),
+    table#alimentosTable th:nth-child(1),
+    table#alimentosTable td:nth-child(1) {
+        /* Nombre */
+        width: 15% !important;
+        min-width: 0 !important;
+        max-width: 15% !important;
+    }
+    
+    .gestor-table th:nth-child(2),
+    .gestor-table td:nth-child(2),
+    table#alimentosTable th:nth-child(2),
+    table#alimentosTable td:nth-child(2) {
+        /* Categoría */
+        width: 10% !important;
+        min-width: 0 !important;
+        max-width: 10% !important;
+    }
+    
+    .gestor-table th:nth-child(3),
+    .gestor-table td:nth-child(3),
+    table#alimentosTable th:nth-child(3),
+    table#alimentosTable td:nth-child(3) {
+        /* Subcategoría */
+        width: 9% !important;
+        min-width: 0 !important;
+        max-width: 9% !important;
+    }
+    
+    .gestor-table th:nth-child(4),
+    .gestor-table td:nth-child(4),
+    table#alimentosTable th:nth-child(4),
+    table#alimentosTable td:nth-child(4) {
+        /* Peso */
+        width: 6% !important;
+        min-width: 0 !important;
+        max-width: 6% !important;
+    }
+    
+    .gestor-table th:nth-child(5),
+    .gestor-table td:nth-child(5),
+    table#alimentosTable th:nth-child(5),
+    table#alimentosTable td:nth-child(5) {
+        /* Proteínas */
+        width: 6% !important;
+        min-width: 0 !important;
+        max-width: 6% !important;
+    }
+    
+    .gestor-table th:nth-child(6),
+    .gestor-table td:nth-child(6),
+    table#alimentosTable th:nth-child(6),
+    table#alimentosTable td:nth-child(6) {
+        /* GS */
+        width: 5% !important;
+        min-width: 0 !important;
+        max-width: 5% !important;
+    }
+    
+    .gestor-table th:nth-child(7),
+    .gestor-table td:nth-child(7),
+    table#alimentosTable th:nth-child(7),
+    table#alimentosTable td:nth-child(7) {
+        /* Hidratos */
+        width: 6% !important;
+        min-width: 0 !important;
+        max-width: 6% !important;
+    }
+    
+    .gestor-table th:nth-child(8),
+    .gestor-table td:nth-child(8),
+    table#alimentosTable th:nth-child(8),
+    table#alimentosTable td:nth-child(8) {
+        /* Grasas */
+        width: 6% !important;
+        min-width: 0 !important;
+        max-width: 6% !important;
+    }
+    
+    .gestor-table th:nth-child(9),
+    .gestor-table td:nth-child(9),
+    table#alimentosTable th:nth-child(9),
+    table#alimentosTable td:nth-child(9) {
+        /* Azúcares */
+        width: 6% !important;
+        min-width: 0 !important;
+        max-width: 6% !important;
+    }
+    
+    .gestor-table th:nth-child(10),
+    .gestor-table td:nth-child(10),
+    table#alimentosTable th:nth-child(10),
+    table#alimentosTable td:nth-child(10) {
+        /* Kcal */
+        width: 6% !important;
+        min-width: 0 !important;
+        max-width: 6% !important;
+    }
+    
+    .gestor-table th:nth-child(11),
+    .gestor-table td:nth-child(11),
+    table#alimentosTable th:nth-child(11),
+    table#alimentosTable td:nth-child(11) {
+        /* Acciones */
+        width: 25% !important;
+        min-width: 0 !important;
+        max-width: 25% !important;
+    }
+    
+    /* Optimizar badges de categoría */
+    .gestor-table td span[style*="padding"],
+    table#alimentosTable td span[style*="padding"] {
+        padding: 2px 6px !important;
+        font-size: 0.65em !important;
+        display: inline-block;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+    
+    /* Optimizar botones de acción */
+    .gestor-table .btn-sm,
+    table#alimentosTable .btn-sm {
+        padding: 4px 8px !important;
+        font-size: 0.65em !important;
+        margin-right: 3px !important;
+        white-space: nowrap !important;
+    }
+    
+    /* Asegurar que el nombre del alimento se ajuste */
+    .gestor-table td:first-child strong,
+    table#alimentosTable td:first-child strong {
+        font-size: 0.8em !important;
+        word-break: break-word !important;
+        display: block !important;
+    }
+}
+
+/* Optimización específica para tablets (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .gestor-table th,
+    table#alimentosTable th {
+        font-size: 0.65em !important;
+        padding: 6px 3px !important;
+    }
+    
+    .gestor-table td,
+    table#alimentosTable td {
+        font-size: 0.7em !important;
+        padding: 6px 3px !important;
+    }
+    
+    .gestor-table .btn-sm,
+    table#alimentosTable .btn-sm {
+        padding: 3px 6px !important;
+        font-size: 0.6em !important;
+    }
+    
+    /* Ajustar anchos para tablets */
+    .gestor-table th:nth-child(1),
+    .gestor-table td:nth-child(1),
+    table#alimentosTable th:nth-child(1),
+    table#alimentosTable td:nth-child(1) {
+        width: 18% !important;
+    }
+    
+    .gestor-table th:nth-child(11),
+    .gestor-table td:nth-child(11),
+    table#alimentosTable th:nth-child(11),
+    table#alimentosTable td:nth-child(11) {
+        width: 20% !important;
+    }
+}
+
+/* Optimización para PC (1024px+) */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 98% !important;
+        padding: 30px 20px !important;
+    }
+    
+    .gestor-table th,
+    table#alimentosTable th {
+        font-size: 0.75em !important;
+        padding: 10px 6px !important;
+    }
+    
+    .gestor-table td,
+    table#alimentosTable td {
+        font-size: 0.8em !important;
+        padding: 10px 6px !important;
+    }
+    
+    .gestor-table .btn-sm,
+    table#alimentosTable .btn-sm {
+        padding: 5px 10px !important;
+        font-size: 0.7em !important;
+    }
+}
+
+/* Para pantallas muy grandes (1400px+) */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1600px !important;
+    }
+    
+    .gestor-table th,
+    table#alimentosTable th {
+        font-size: 0.8em !important;
+        padding: 12px 8px !important;
+    }
+    
+    .gestor-table td,
+    table#alimentosTable td {
+        font-size: 0.85em !important;
+        padding: 12px 8px !important;
+    }
+}
+
+/* Asegurar que no haya scroll horizontal en ningún contenedor padre */
+@media (min-width: 768px) {
+    body {
+        overflow-x: hidden !important;
+    }
+    
+    .modal-content {
+        max-width: 98vw !important;
+        overflow-x: hidden !important;
+    }
+    
+    #gestorAlimentosContent {
+        overflow-x: hidden !important;
+        max-width: 100% !important;
+    }
+    
+    /* Aplicar optimizaciones también dentro del modal */
+    #gestorAlimentosContent .gestor-table-container,
+    #gestorAlimentosContent .table-container {
+        overflow-x: visible !important;
+        overflow: visible !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    #gestorAlimentosContent .gestor-table,
+    #gestorAlimentosContent table {
+        table-layout: fixed !important;
+        width: 100% !important;
+    }
+}
+
+/* Mantener scroll solo en móvil */
+@media (max-width: 767px) {
+    .gestor-table-container,
+    .table-container {
+        overflow-x: auto !important;
+    }
+}

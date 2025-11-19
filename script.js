@@ -2750,7 +2750,113 @@ function mostrarProhibiciones() {
         `;
     }
 }
+// Función para recalcular ingestas cuando cambian los superávits
+function recalcularIngestasPorSuperavit() {
+    // Verificar que la dieta ya esté creada (hay resultados visibles)
+    const resultadosDiv = document.getElementById('resultados');
+    if (!resultadosDiv || resultadosDiv.classList.contains('oculto')) {
+        return; // Si no hay dieta creada, no hacer nada
+    }
+    
+    // Verificar que datosUsuario tenga los datos necesarios
+    if (!window.datosUsuario || !window.datosUsuario.tmb) {
+        return; // Si no hay datos calculados, no hacer nada
+    }
+    
+    try {
+        // Obtener los nuevos valores de superávit
+        const superavitEntrenoInput = document.getElementById('superavitEntreno');
+        const superavitDescansoInput = document.getElementById('superavitDescanso');
+        
+        if (!superavitEntrenoInput || !superavitDescansoInput) {
+            return;
+        }
+        
+        const nuevoSuperavitEntreno = parseFloat(superavitEntrenoInput.value || 5);
+        const nuevoSuperavitDescanso = parseFloat(superavitDescansoInput.value || 5);
+        
+        // Recalcular usando el módulo de cálculos
+        if (!window.MacronutrientesCalculator) {
+            console.error('MacronutrientesCalculator no está disponible');
+            return;
+        }
+        
+        // Obtener referencias a elementos del formulario
+        const formulario = {
+            edad: document.getElementById('edad'),
+            sexo: document.getElementById('sexo'),
+            altura: document.getElementById('altura'),
+            peso: document.getElementById('peso'),
+            objetivo: document.getElementById('objetivo'),
+            tipoPersona: document.getElementById('tipoPersona'),
+            actividadFisicaDeporte: document.getElementById('actividadFisicaDeporte'),
+            tipoTermogenico: document.getElementById('tipoTermogenico'),
+            superavitEntreno: superavitEntrenoInput,
+            superavitDescanso: superavitDescansoInput
+        };
+        
+        // Recalcular macronutrientes con los nuevos valores
+        window.datosUsuario = window.MacronutrientesCalculator.calcularMacronutrientes(
+            window.datosUsuario, 
+            formulario
+        );
+        
+        // Actualizar la tabla de cálculos detallados
+        if (typeof mostrarCalculosDetallados === 'function') {
+            mostrarCalculosDetallados();
+        }
+        
+        // Actualizar la tabla de macronutrientes
+        if (typeof mostrarMacronutrientesDistribucion === 'function') {
+            mostrarMacronutrientesDistribucion();
+        }
+        
+        // Actualizar la tabla de macros principal
+        if (typeof mostrarTablaMacros === 'function') {
+            mostrarTablaMacros();
+        }
+        
+        // Si hay tabla editable (modo manual), actualizar los objetivos calóricos y totales
+        if (window.tablaEditable) {
+            // Actualizar estilos del día (esto actualiza los objetivos mostrados)
+            if (typeof window.tablaEditable.actualizarEstilosDia === 'function') {
+                window.tablaEditable.actualizarEstilosDia();
+            }
+            // Actualizar totales diarios para recalcular el progreso con los nuevos objetivos
+            if (typeof window.tablaEditable.actualizarTotalesDiarios === 'function') {
+                window.tablaEditable.actualizarTotalesDiarios();
+            }
+        }
+        
+        console.log('✅ Ingestas recalculadas por cambio de superávit');
+    } catch (error) {
+        console.error('❌ Error al recalcular ingestas por superávit:', error);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Event listeners para los inputs de superávit
+    const superavitEntrenoInput = document.getElementById('superavitEntreno');
+    const superavitDescansoInput = document.getElementById('superavitDescanso');
+    
+    if (superavitEntrenoInput) {
+        superavitEntrenoInput.addEventListener('input', function() {
+            recalcularIngestasPorSuperavit();
+        });
+        superavitEntrenoInput.addEventListener('change', function() {
+            recalcularIngestasPorSuperavit();
+        });
+    }
+    
+    if (superavitDescansoInput) {
+        superavitDescansoInput.addEventListener('input', function() {
+            recalcularIngestasPorSuperavit();
+        });
+        superavitDescansoInput.addEventListener('change', function() {
+            recalcularIngestasPorSuperavit();
+        });
+    }
+    
     // Event listener para el formulario
     const dietForm = document.getElementById('dietForm');
     if (dietForm) {
