@@ -77,24 +77,78 @@ class DietaService {
 
     async obtenerDietaPorId(dietaId) {
         try {
-            const doc = await this.db.collection('dietas').doc(dietaId).get();
-            
-            if (!doc.exists) {
-                throw new Error('Dieta no encontrada');
+            const user = window.authManager?.getCurrentUser();
+            if (!user) {
+                console.error('❌ Usuario no autenticado al intentar obtener dieta');
+                return { 
+                    success: false, 
+                    error: 'Usuario no autenticado. Por favor, inicia sesión.' 
+                };
             }
 
-            const user = window.authManager.getCurrentUser();
-            const dietaData = doc.data();
+            if (!this.db) {
+                console.error('❌ Firestore no está inicializado');
+                return { 
+                    success: false, 
+                    error: 'Error de conexión con la base de datos.' 
+                };
+            }
 
-            // Verificar que la dieta pertenece al usuario
-            if (dietaData.userId !== user.uid) {
-                throw new Error('No tienes permiso para ver esta dieta');
+            // Intentar leer el documento directamente
+            // Las reglas de Firestore verificarán automáticamente que userId == user.uid
+            const docRef = this.db.collection('dietas').doc(dietaId);
+            const doc = await docRef.get();
+            
+            if (!doc.exists) {
+                console.warn(`⚠️ Dieta ${dietaId} no encontrada`);
+                return { 
+                    success: false, 
+                    error: 'Dieta no encontrada' 
+                };
+            }
+
+            const dietaData = doc.data();
+            
+            // Verificación adicional en el cliente (por seguridad)
+            if (!dietaData.userId) {
+                console.warn('⚠️ Dieta sin userId, puede ser una dieta antigua');
+                // Permitir lectura de dietas antiguas sin userId (compatibilidad hacia atrás)
+            } else if (dietaData.userId !== user.uid) {
+                console.error(`❌ Intento de acceso no autorizado: dieta ${dietaId} pertenece a ${dietaData.userId}, usuario actual: ${user.uid}`);
+                return { 
+                    success: false, 
+                    error: 'No tienes permiso para ver esta dieta' 
+                };
             }
 
             return { success: true, dieta: { id: doc.id, ...dietaData } };
         } catch (error) {
-            console.error('Error al obtener dieta:', error);
-            return { success: false, error: error.message };
+            console.error('❌ Error al obtener dieta:', error);
+            console.error('Detalles del error:', {
+                code: error.code,
+                message: error.message,
+                stack: error.stack
+            });
+            
+            // Manejar errores específicos de Firestore
+            if (error.code === 'permission-denied') {
+                return { 
+                    success: false, 
+                    error: 'No tienes permiso para ver esta dieta. Verifica que estés autenticado correctamente y que la dieta te pertenezca.' 
+                };
+            }
+            
+            if (error.code === 'unavailable') {
+                return { 
+                    success: false, 
+                    error: 'Servicio temporalmente no disponible. Por favor, intenta de nuevo más tarde.' 
+                };
+            }
+            
+            return { 
+                success: false, 
+                error: error.message || 'Error desconocido al obtener la dieta' 
+            };
         }
     }
 

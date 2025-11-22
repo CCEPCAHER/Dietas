@@ -29,21 +29,27 @@ service cloud.firestore {
     
     // Reglas para dietas - Solo pueden leer/escribir sus propias dietas
     match /dietas/{dietaId} {
-      // Leer: Solo el usuario propietario
+      // Leer: Usuario autenticado puede leer si es el propietario
+      // Si el documento no tiene userId o es null, permitir lectura (compatibilidad con dietas antiguas)
       allow read: if request.auth != null && 
-        request.auth.uid == resource.data.userId;
+        (resource.data.userId == null || 
+         resource.data.userId == request.auth.uid);
       
       // Crear: Cualquier usuario autenticado puede crear (pero debe incluir su ID)
       allow create: if request.auth != null && 
         request.resource.data.userId == request.auth.uid;
       
       // Actualizar: Solo el usuario propietario
+      // Si el documento no tiene userId o es null, permitir actualización (compatibilidad con dietas antiguas)
       allow update: if request.auth != null && 
-        request.auth.uid == resource.data.userId;
+        (resource.data.userId == null || 
+         resource.data.userId == request.auth.uid);
       
       // Eliminar: Solo el usuario propietario
+      // Si el documento no tiene userId o es null, permitir eliminación (compatibilidad con dietas antiguas)
       allow delete: if request.auth != null && 
-        request.auth.uid == resource.data.userId;
+        (resource.data.userId == null || 
+         resource.data.userId == request.auth.uid);
     }
     
     // Reglas para alimentos - Base de datos compartida, cualquier usuario autenticado puede leer/escribir
