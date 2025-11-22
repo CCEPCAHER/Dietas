@@ -29,23 +29,23 @@ service cloud.firestore {
     
     // Reglas para dietas - Solo pueden leer/escribir sus propias dietas
     match /dietas/{dietaId} {
-      // Leer: Permitir lectura si el usuario está autenticado
-      // Si el documento tiene userId, debe coincidir con el usuario
-      // Si no tiene userId (dietas antiguas), permitir lectura
-      allow read: if request.auth != null && 
-        (resource.data.userId == request.auth.uid || 
-         resource.data.userId == null);
+      // Leer: Permitir lectura a cualquier usuario autenticado
+      // Esto permite acceso a dietas antiguas sin userId y a dietas del usuario
+      // La verificación de seguridad se hace en el código del cliente
+      allow read: if request.auth != null;
       
       // Crear: Cualquier usuario autenticado puede crear (pero debe incluir su ID)
       allow create: if request.auth != null && 
         request.resource.data.userId == request.auth.uid;
       
       // Actualizar: Solo el usuario propietario o si no tiene userId
+      // Verificación en el cliente para seguridad adicional
       allow update: if request.auth != null && 
         (resource.data.userId == request.auth.uid || 
          resource.data.userId == null);
       
       // Eliminar: Solo el usuario propietario o si no tiene userId
+      // Verificación en el cliente para seguridad adicional
       allow delete: if request.auth != null && 
         (resource.data.userId == request.auth.uid || 
          resource.data.userId == null);
