@@ -94,8 +94,28 @@ class DietaService {
                 };
             }
 
-            // Intentar leer el documento directamente
-            // Las reglas de Firestore verificarán automáticamente que userId == user.uid
+            console.log(`🔍 Intentando obtener dieta ${dietaId} para usuario ${user.uid}`);
+            
+            // Usar query con filtro de userId para que las reglas de Firestore funcionen correctamente
+            // Esto asegura que solo se lean dietas que pertenecen al usuario
+            try {
+                const querySnapshot = await this.db
+                    .collection('dietas')
+                    .where(firebase.firestore.FieldPath.documentId(), '==', dietaId)
+                    .where('userId', '==', user.uid)
+                    .limit(1)
+                    .get();
+                
+                if (!querySnapshot.empty) {
+                    const doc = querySnapshot.docs[0];
+                    console.log(`✅ Dieta ${dietaId} encontrada mediante query`);
+                    return { success: true, dieta: { id: doc.id, ...doc.data() } };
+                }
+            } catch (queryError) {
+                console.warn('⚠️ Error con query, intentando lectura directa:', queryError);
+            }
+            
+            // Fallback: Intentar lectura directa (para dietas antiguas sin userId)
             const docRef = this.db.collection('dietas').doc(dietaId);
             const doc = await docRef.get();
             
@@ -108,11 +128,17 @@ class DietaService {
             }
 
             const dietaData = doc.data();
+            console.log(`📄 Datos de la dieta:`, {
+                tieneUserId: !!dietaData.userId,
+                userId: dietaData.userId,
+                usuarioActual: user.uid
+            });
             
             // Verificación adicional en el cliente (por seguridad)
             if (!dietaData.userId) {
-                console.warn('⚠️ Dieta sin userId, puede ser una dieta antigua');
+                console.warn('⚠️ Dieta sin userId, puede ser una dieta antigua - permitiendo acceso');
                 // Permitir lectura de dietas antiguas sin userId (compatibilidad hacia atrás)
+                return { success: true, dieta: { id: doc.id, ...dietaData } };
             } else if (dietaData.userId !== user.uid) {
                 console.error(`❌ Intento de acceso no autorizado: dieta ${dietaId} pertenece a ${dietaData.userId}, usuario actual: ${user.uid}`);
                 return { 
@@ -132,9 +158,13 @@ class DietaService {
             
             // Manejar errores específicos de Firestore
             if (error.code === 'permission-denied') {
+                console.error('🔒 Error de permisos - Verificando estado de autenticación...');
+                const user = window.authManager?.getCurrentUser();
+                console.error('Usuario autenticado:', user ? user.uid : 'NO AUTENTICADO');
+                
                 return { 
                     success: false, 
-                    error: 'No tienes permiso para ver esta dieta. Verifica que estés autenticado correctamente y que la dieta te pertenezca.' 
+                    error: 'No tienes permiso para ver esta dieta. Verifica que estés autenticado correctamente y que la dieta te pertenezca. Si el problema persiste, la dieta puede tener un userId diferente al tuyo.' 
                 };
             }
             
