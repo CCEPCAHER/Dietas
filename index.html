@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <title>Maika Porcuna - Plan de Alimentación Personalizada</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="description"
+        content="Aplicación profesional para la creación de planes de alimentación personalizados - Nutrición, Dietética, Suplementación y Nutrición Deportiva">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="MAIKA PORCUNA">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Manifest y Iconos -->
+    <link rel="manifest" href="manifest.json?v=5">
+
+    <!-- Favicon e iconos Apple -->
+    <link rel="shortcut icon" href="icon-192x192.png?v=4">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png?v=4">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512x512.png?v=4">
+    <link rel="apple-touch-icon" href="icon-180x180.png?v=4">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-180x180.png?v=4">
+    <link rel="apple-touch-icon" sizes="167x167" href="icon-167x167.png?v=4">
+    <link rel="apple-touch-icon" sizes="152x152" href="icon-152x152.png?v=4">
+    <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png?v=4">
+    <link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png?v=4">
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="ui-improvements.css">
+    <link rel="stylesheet" href="toast.css">
+    <link rel="stylesheet" href="shopping-list.css">
+    <link rel="stylesheet" href="ficha-cliente.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <!-- Librerías para generar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Librerías para generar Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+
+<body>
+    <!-- Botón de modo oscuro -->
+    <button id="darkModeToggle" class="dark-mode-toggle" title="Cambiar modo oscuro/claro">
+        <span class="dark-mode-icon">🌙</span>
+    </button>
+
+    <!-- Contenedor para notificaciones Toast -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div style="text-align: center;">
+            <div class="loading-spinner-large"></div>
+            <div class="loading-message" id="loadingMessage">Generando plan de alimentación...</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="userInfo" class="user-info">
+            <!-- Se llenará dinámicamente con auth.js -->
+        </div>
+
+        <!-- Botón flotante para crear cliente (solo cuando estés logueado) -->
+        <div id="botonCrearClienteFlotante" class="boton-flotante oculto">
+            <button class="btn-flotante" title="Nuevo Cliente">
+                ➕
+            </button>
+        </div>
+
+        <div class="main-header">
+            <div class="header-logo-container">
+                <div class="header-content">
+                    <h1>Maika Porcuna</h1>
+                    <h2 class="subtitle-header">NUTRICIÓN/DIETÉTICA/SUPLEMENTACIÓN/NUTRICIÓN DEPORTIVA</h2>
+                    <h3 class="plan-title">PLAN DE ALIMENTACIÓN PERSONALIZADO</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <form id="dietForm">
+                <div class="card-modern fade-in">
+                    <h2>Datos Personales</h2>
+
+                    <div class="form-group">
+                        <label for="nombre">Nombre completo:</label>
+                        <input type="text" id="nombre" name="nombre" title="Ingresa el nombre completo del cliente"
+                            placeholder="Ej: Juan Pérez" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fechaRegistro">Fecha de registro:</label>
+                            <input type="date" id="fechaRegistro" name="fechaRegistro"
+                                title="Fecha de registro del cliente" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sexo">Sexo:</label>
+                            <select id="sexo" name="sexo" title="Sexo del cliente" required>
+                                <option value="">Selecciona...</option>
+                                <option value="Mujer">Mujer</option>
+                                <option value="Hombre">Hombre</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edad">Edad:</label>
+                            <input type="number" id="edad" name="edad" title="Edad del cliente en años"
+                                placeholder="18-100" required min="18" max="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="altura">Altura (cm):</label>
+                            <input type="number" id="altura" name="altura" title="Altura en centímetros"
+                                placeholder="140.0-220.0" required min="140" max="220" step="0.1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="peso">Peso (kg):</label>
+                            <input type="number" id="peso" name="peso" title="Peso en kilogramos"
+                                placeholder="40.000-200.000" required min="40" max="200" step="0.001">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-modern fade-in" style="animation-delay: 0.1s;">
+                    <h2>Perfil y Objetivo</h2>
+                    <div class="form-group">
+                        <label for="tipoPersona">Tipo de persona:</label>
+                        <select id="tipoPersona" name="tipoPersona" title="Selecciona el nivel de actividad física"
+                            required>
+                            <option value="">Selecciona...</option>
+                            <option value="sedentaria">Sedentaria</option>
+                            <option value="activa">Activa</option>
+                            <option value="muy-activa">Muy activa</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="objetivo">
+                            Selecciona tu objetivo:
+                            <span class="tooltip-icon"
+                                data-tooltip="El objetivo determina la distribución de calorías y macronutrientes. Aumentar: superávit calórico, Perder: déficit calórico, Mantener: equilibrio energético.">ℹ️</span>
+                        </label>
+                        <select id="objetivo" name="objetivo" title="Selecciona el objetivo de la dieta" required>
+                            <option value="">Selecciona...</option>
+                            <option value="aumentar">Aumentar masa muscular</option>
+                            <option value="adelgazar">Perder peso</option>
+                            <option value="mantener">Mantener peso</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modoGeneracion">
+                            Modo de generación del plan:
+                            <span class="tooltip-icon"
+                                data-tooltip="Automático: el sistema genera el plan completo. Manual: tú introduces cada alimento y cantidad.">ℹ️</span>
+                        </label>
+                        <select id="modoGeneracion" name="modoGeneracion"
+                            title="Selecciona el modo de generación del plan" required>
+                            <option value="automatico">Generación Automática</option>
+                            <option value="manual">Generación Manual (Editable)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card-modern fade-in" style="animation-delay: 0.2s;">
+                    <h2>Macronutrientes (Auto-calculados)</h2>
+
+                    <div class="macro-info">
+                        <div class="macro-item">
+                            <label for="calorias">Calorías diarias:</label>
+                            <input type="number" id="calorias" name="calorias"
+                                title="Calorías diarias calculadas automáticamente" placeholder="Auto-calculado"
+                                readonly>
+                        </div>
+                        <div class="macro-item">
+                            <label for="proteinas">Proteínas (g):</label>
+                            <input type="number" id="proteinas" name="proteinas"
+                                title="Gramos de proteínas calculados automáticamente" placeholder="Auto-calculado"
+                                readonly>
+                        </div>
+                        <div class="macro-item">
+                            <label for="grasas">Grasas (g):</label>
+                            <input type="number" id="grasas" name="grasas"
+                                title="Gramos de grasas calculados automáticamente" placeholder="Auto-calculado"
+                                readonly>
+                        </div>
+                        <div class="macro-item">
+                            <label for="carbohidratos">Carbohidratos (g):</label>
+                            <input type="number" id="carbohidratos" name="carbohidratos"
+                                title="Gramos de carbohidratos calculados automáticamente" placeholder="Auto-calculado"
+                                readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-modern fade-in" style="animation-delay: 0.3s;">
+                    <h2>Entrenamiento y Actividad Física</h2>
+
+                    <div class="form-group">
+                        <label>
+                            Días de entrenamiento semanal:
+                            <span class="tooltip-icon"
+                                data-tooltip="Selecciona los días de la semana en que entrenas. Esto ajustará las calorías según el día.">ℹ️</span>
+                        </label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="diaEntreno" value="lunes" id="entreno-lunes" checked
+                                    aria-label="Lunes - día de entrenamiento"
+                                    title="Marcar para incluir lunes como día de entrenamiento">
+                                <span>Lunes</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="diaEntreno" value="martes" id="entreno-martes" checked
+                                    aria-label="Martes - día de entrenamiento"
+                                    title="Marcar para incluir martes como día de entrenamiento">
+                                <span>Martes</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="diaEntreno" value="miercoles" id="entreno-miercoles"
+                                    checked aria-label="Miércoles - día de entrenamiento"
+                                    title="Marcar para incluir miércoles como día de entrenamiento">
+                                <span>Miércoles</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="diaEntreno" value="jueves" id="entreno-jueves" checked
+                                    aria-label="Jueves - día de entrenamiento"
+                                    title="Marcar para incluir jueves como día de entrenamiento">
+                                <span>Jueves</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="diaEntreno" value="viernes" id="entreno-viernes" checked
+                                    aria-label="Viernes - día de entrenamiento"
+                                    title="Marcar para incluir viernes como día de entrenamiento">
+                                <span>Viernes</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="diaEntreno" value="sabado" id="entreno-sabado" checked
+                                    aria-label="Sábado - día de entrenamiento"
+                                    title="Marcar para incluir sábado como día de entrenamiento">
+                                <span>Sábado</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="diaEntreno" value="domingo" id="entreno-domingo"
+                                    aria-label="Domingo - día de entrenamiento"
+                                    title="Marcar para incluir domingo como día de entrenamiento">
+                                <span>Domingo</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="actividadFisicaDeporte">
+                            Actividad física del deporte:
+                            <span class="tooltip-icon"
+                                data-tooltip="Nivel de actividad física relacionada con tu entrenamiento deportivo.">ℹ️</span>
+                        </label>
+                        <select id="actividadFisicaDeporte" name="actividadFisicaDeporte"
+                            title="Selecciona tu nivel de actividad física del deporte" required>
+                            <option value="sedentario">Sedentario: trabajo de escritorio sin ejercicio</option>
+                            <option value="ligera">Actividad ligera: 1-3 días de entrenamiento semanal o trabajo físico
+                            </option>
+                            <option value="moderada" selected>Actividad moderada: 3-5 días de entrenamiento semanal
+                            </option>
+                            <option value="intensa">Actividad intensa: 6-7 días de entrenamiento semanal</option>
+                            <option value="muy-intensa">Actividad muy intensa: doble entrenamiento diario + ejercicios
+                                de gran demanda de fuerza</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="superavitEntreno">
+                                Déficit/Superávit día entrenamiento (%):
+                                <span class="tooltip-icon"
+                                    data-tooltip="Porcentaje de déficit o superávit para días de entrenamiento (0-100%). Se actualiza automáticamente según el objetivo seleccionado.">ℹ️</span>
+                            </label>
+                            <select id="superavitEntreno" name="superavitEntreno"
+                                title="Superávit o déficit para días de entrenamiento">
+                                <option value="0" selected>0%</option>
+                                <option value="5">5%</option>
+                                <option value="10">10%</option>
+                                <option value="15">15%</option>
+                                <option value="20">20%</option>
+                                <option value="25">25%</option>
+                                <option value="30">30%</option>
+                                <option value="35">35%</option>
+                                <option value="40">40%</option>
+                                <option value="45">45%</option>
+                                <option value="50">50%</option>
+                                <option value="55">55%</option>
+                                <option value="60">60%</option>
+                                <option value="65">65%</option>
+                                <option value="70">70%</option>
+                                <option value="75">75%</option>
+                                <option value="80">80%</option>
+                                <option value="85">85%</option>
+                                <option value="90">90%</option>
+                                <option value="95">95%</option>
+                                <option value="100">100%</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="superavitDescanso">
+                                Déficit/Superávit día descanso (%):
+                                <span class="tooltip-icon"
+                                    data-tooltip="Porcentaje de déficit o superávit para días de descanso (0-100%). Se actualiza automáticamente según el objetivo seleccionado.">ℹ️</span>
+                            </label>
+                            <select id="superavitDescanso" name="superavitDescanso"
+                                title="Superávit o déficit para días de descanso">
+                                <option value="0" selected>0%</option>
+                                <option value="5">5%</option>
+                                <option value="10">10%</option>
+                                <option value="15">15%</option>
+                                <option value="20">20%</option>
+                                <option value="25">25%</option>
+                                <option value="30">30%</option>
+                                <option value="35">35%</option>
+                                <option value="40">40%</option>
+                                <option value="45">45%</option>
+                                <option value="50">50%</option>
+                                <option value="55">55%</option>
+                                <option value="60">60%</option>
+                                <option value="65">65%</option>
+                                <option value="70">70%</option>
+                                <option value="75">75%</option>
+                                <option value="80">80%</option>
+                                <option value="85">85%</option>
+                                <option value="90">90%</option>
+                                <option value="95">95%</option>
+                                <option value="100">100%</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipoTermogenico">
+                            Tipo de efecto termogénico:
+                            <span class="tooltip-icon"
+                                data-tooltip="El efecto termogénico de los alimentos (TEF) varía según tu nivel de actividad. Persona sedentaria: 10%, No sedentaria: 15%, Culturista en competición: 20%.">ℹ️</span>
+                        </label>
+                        <select id="tipoTermogenico" name="tipoTermogenico"
+                            title="Selecciona el tipo de efecto termogénico" required>
+                            <option value="sedentaria">Persona sedentaria: 10%</option>
+                            <option value="no-sedentaria" selected>Persona no sedentaria: 15%</option>
+                            <option value="culturista">Culturista en estado de competición: 20%</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card-modern fade-in" style="animation-delay: 0.4s;">
+                    <h2>Prohibiciones y Alergias</h2>
+
+                    <div class="form-group">
+                        <label>Selecciona intolerancias comunes (opcional):</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="intolerancia" value="lactosa" id="intol-lactosa"
+                                    title="Marcar si tienes intolerancia a la lactosa"
+                                    aria-label="Intolerancia a la lactosa">
+                                <span>Lactosa</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="intolerancia" value="gluten" id="intol-gluten"
+                                    title="Marcar si tienes intolerancia al gluten" aria-label="Intolerancia al gluten">
+                                <span>Gluten</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="intolerancia" value="frutos-secos" id="intol-frutos-secos"
+                                    title="Marcar si tienes alergia a los frutos secos"
+                                    aria-label="Alergia a los frutos secos">
+                                <span>Frutos Secos</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="intolerancia" value="huevo" id="intol-huevo"
+                                    title="Marcar si tienes alergia al huevo" aria-label="Alergia al huevo">
+                                <span>Huevo</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="intolerancia" value="pescado" id="intol-pescado"
+                                    title="Marcar si tienes alergia al pescado" aria-label="Alergia al pescado">
+                                <span>Pescado</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="intolerancia" value="mariscos" id="intol-mariscos"
+                                    title="Marcar si tienes alergia a los mariscos" aria-label="Alergia a los mariscos">
+                                <span>Mariscos</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="intolerancia" value="soja" id="intol-soja"
+                                    title="Marcar si tienes alergia a la soja" aria-label="Alergia a la soja">
+                                <span>Soja</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="intolerancia" value="cacahuetes" id="intol-cacahuetes"
+                                    title="Marcar si tienes alergia a los cacahuetes"
+                                    aria-label="Alergia a los cacahuetes">
+                                <span>Cacahuetes</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="intolerancia" value="carne-roja" id="intol-carne-roja"
+                                    title="Marcar si no puedes consumir carne roja" aria-label="No consumir carne roja">
+                                <span>Carne Roja</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="intolerancia" value="cerdo" id="intol-cerdo"
+                                    title="Marcar si no puedes consumir cerdo" aria-label="No consumir cerdo">
+                                <span>Cerdo</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="intolerancia" value="azufre" id="intol-azufre"
+                                    title="Marcar si tienes intolerancia a los sulfitos"
+                                    aria-label="Intolerancia a los sulfitos">
+                                <span>Sulfitos</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="intolerancia" value="levadura" id="intol-levadura"
+                                    title="Marcar si tienes intolerancia a la levadura"
+                                    aria-label="Intolerancia a la levadura">
+                                <span>Levadura</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Preferencias dietéticas (opcional):</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="preferencia" value="vegetariano" id="pref-vegetariano"
+                                    title="Marcar si sigues una dieta vegetariana" aria-label="Dieta vegetariana">
+                                <span>Vegetariano</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="preferencia" value="vegano" id="pref-vegano"
+                                    title="Marcar si sigues una dieta vegana" aria-label="Dieta vegana">
+                                <span>Vegano</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="preferencia" value="pescetariano" id="pref-pescetariano"
+                                    title="Marcar si sigues una dieta pescetariana" aria-label="Dieta pescetariana">
+                                <span>Pescetariano</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="preferencia" value="bajo-carbohidratos"
+                                    id="pref-bajo-carbs" title="Marcar si prefieres una dieta baja en carbohidratos"
+                                    aria-label="Dieta baja en carbohidratos">
+                                <span>Bajo en Carbohidratos</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="preferencia" value="cetogenica" id="pref-keto"
+                                    title="Marcar si sigues una dieta cetogénica" aria-label="Dieta cetogénica">
+                                <span>Cetogénica</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prohibiciones">Indica otros alimentos prohibidos o alergias (opcional):</label>
+                        <textarea id="prohibiciones" name="prohibiciones" rows="3"
+                            title="Lista adicional de alimentos prohibidos o alergias"
+                            placeholder="Ej: Cebolla, cilantro, champiñones..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="duracion">Duración del plan:</label>
+                        <select id="duracion" name="duracion" title="Selecciona la duración del plan de alimentación"
+                            required>
+                            <option value="semana">1 Semana</option>
+                            <option value="2semanas">2 Semanas</option>
+                            <option value="3semanas">3 Semanas</option>
+                            <option value="mes">1 Mes (4 Semanas)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card-modern fade-in" style="animation-delay: 0.5s;">
+                    <h2>Hidratación y Finalizar</h2>
+
+                    <div class="form-group">
+                        <label for="hidratacion">Consumo actual de agua (litros/día):</label>
+                        <input type="number" id="hidratacion" name="hidratacion" min="0" max="10" step="0.5" value="2"
+                            placeholder="2.0" title="Indica cuántos litros de agua bebes al día"
+                            aria-label="Consumo actual de agua en litros por día">
+                        <small class="form-help">Recomendación general: 2-3 litros/día. </small>
+                    </div>
+
+                    <button type="submit" class="btn-submit" title="Generar plan de alimentación personalizado">✨
+                        Generar Plan de Alimentación</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="resultados" class="resultados oculto">
+            <div class="print-header">
+                <div class="btn-container">
+                    <button type="button" id="btnGuardar" class="btn-save" title="Guardar dieta en Firebase">
+                        💾 Guardar Dieta
+                    </button>
+                    <button type="button" id="btnEditarDieta" class="btn-edit"
+                        title="Editar la dieta antes de descargar">
+                        ✏️ Editar Dieta
+                    </button>
+                    <button type="button" id="btnActualizarDieta" class="btn-edit"
+                        title="Actualizar dieta con nuevos valores de objetivo o superávit/déficit"
+                        style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        🔄 Actualizar Dieta
+                    </button>
+                    <button type="button" id="btnDescargar" class="btn-download" title="Descargar plan en formato PDF">
+                        📥 Descargar Plan en PDF
+                    </button>
+                    <button type="button" id="btnDescargarExcel" class="btn-download"
+                        title="Descargar plan en formato Excel">
+                        📊 Descargar Plan en Excel
+                    </button>
+                    <button type="button" id="btnShoppingList" class="shopping-list-btn"
+                        title="Generar lista de la compra" onclick="window.shoppingListManager.generarLista()">
+                        🛒 Lista de Compra
+                    </button>
+                    <button type="button" id="btnCompartirWhatsApp" class="btn-whatsapp"
+                        title="Compartir por WhatsApp (solo móvil)" style="display: none;">
+                        💬 Compartir por WhatsApp
+                    </button>
+                    <button type="button" id="btnNuevo" class="btn-new" title="Crear una nueva dieta">
+                        🔄 Nueva Dieta
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenido que se exportará a PDF -->
+            <div id="pdf-content">
+                <div class="pdf-header">
+                    <div class="nutricionista-contacto-header">
+                        <span class="nombre-nutricionista-header"
+                            style="display: inline-block; color: white; font-size: 1.1em; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0;">MAIKA
+                            PORCUNA</span>
+                        <span class="contacto-item-header"
+                            style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 1.1em; margin: 0; color: white;">
+                            <span class="contacto-icon-header">📧</span>
+                            <a href="mailto:Maikafit1977@gmail.com"
+                                style="color: inherit; text-decoration: none;">Maikafit1977@gmail.com</a>
+                        </span>
+                        <span class="contacto-item-header"
+                            style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 1.1em; margin: 0; color: white;">
+                            <span class="contacto-icon-header">📞</span>
+                            <a href="tel:+34650229987" style="color: inherit; text-decoration: none;">+34 650 229
+                                987</a>
+                        </span>
+                    </div>
+                    <div class="separador-header"
+                        style="width: 100%; height: 2px; background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent); margin: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.3);">
+                    </div>
+                    <h2 class="subtitle">NUTRICIÓN/DIETÉTICA/SUPLEMENTACIÓN/NUTRICIÓN DEPORTIVA</h2>
+                    <h3 class="plan-subtitle">PLAN DE ALIMENTACIÓN PERSONALIZADA</h3>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab active" data-tab="dieta" title="Ver plan de comidas semanal">DIETA</button>
+                    <button class="tab" data-tab="alimentos"
+                        title="Ver lista de alimentos recomendados">ALIMENTOS</button>
+                    <button class="tab" data-tab="revisiones" title="Ver revisiones y seguimiento">REVISIONES</button>
+                    <button class="tab" data-tab="calendario" title="Ver calendario de comidas">CALENDARIO</button>
+                    <button class="tab" data-tab="prohibiciones"
+                        title="Ver alimentos prohibidos y alergias">PROHIBICIONES</button>
+                </div>
+
+                <div id="tab-dieta" class="tab-content active">
+                    <!-- Tabla de Macronutrientes -->
+                    <div class="macro-table">
+                        <h3>Macronutrientes</h3>
+                        <table class="tabla-macros">
+                            <thead>
+                                <tr>
+                                    <th>NUTRIENTE</th>
+                                    <th>AUTOMÁTICO</th>
+                                    <th>AJUSTE MANUAL</th>
+                                    <th>SELECCIONADO</th>
+                                    <th>% CALORÍAS</th>
+                                    <th>CONSUMIDO</th>
+                                    <th>ESTADO</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-macros-body">
+                                <!-- Se llenará con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Calculadora TMB -->
+                    <div id="tmb-calculator"></div>
+
+                    <!-- Información del Usuario -->
+                    <div class="info-usuario-table">
+                        <h3>Información del Usuario</h3>
+                        <table class="tabla-info">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Fecha registro</th>
+                                    <th>Sexo</th>
+                                    <th>Edad</th>
+                                    <th>Peso corporal</th>
+                                    <th>Altura</th>
+                                    <th>Tipo persona</th>
+                                    <th>Actividad física del deporte</th>
+                                    <th>Efecto termogénico de los alimentos</th>
+                                    <th>Objetivo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-info-body">
+                                <!-- Se llenará con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Distribución de Entrenamientos -->
+                    <div id="distribucion-entrenos" class="distribucion-entrenos-section" style="margin-top: 25px;">
+                        <h3>📅 Distribución Semanal de Entrenamientos</h3>
+                        <table class="tabla-entrenos">
+                            <thead>
+                                <tr>
+                                    <th>Día</th>
+                                    <th>Actividad</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-entrenos-body">
+                                <!-- Se llenará con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Cálculos Detallados -->
+                    <div id="calculos-detallados" class="calculos-detallados-section" style="margin-top: 25px;">
+                        <h3>📊 Cálculos Nutricionales Detallados</h3>
+                        <table class="tabla-calculos">
+                            <thead>
+                                <tr>
+                                    <th>Concepto</th>
+                                    <th>Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-calculos-body">
+                                <!-- Se llenará con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Distribución de Macronutrientes -->
+                    <div id="macronutrientes-distribucion" class="macronutrientes-section" style="margin-top: 25px;">
+                        <h3>🥗 Distribución de Macronutrientes</h3>
+                        <table class="tabla-macros-distribucion">
+                            <thead>
+                                <tr>
+                                    <th>Macronutriente</th>
+                                    <th>MODO MANUAL</th>
+                                    <th>G/KG CORPORAL (Entreno)</th>
+                                    <th>G/KG CORPORAL (Descanso)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-macros-distribucion-body">
+                                <!-- Se llenará con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Plan de Alimentación Semanal -->
+                    <div id="plan-alimentacion" class="plan-alimentacion">
+                        <!-- Se llenará con JS -->
+                    </div>
+
+                    <!-- Nota sobre agua (solo una vez) -->
+                    <div id="nota-agua" class="notas-agua-section"
+                        style="margin-top: 30px; padding: 15px; background: #d1ecf1; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                        <h4 style="color: #0c5460; margin-bottom: 10px;">📝 NOTA IMPORTANTE</h4>
+                        <p style="margin: 0; color: #0c5460;">Recuerda beber al menos 2-3 litros de agua al día. Ajusta
+                            las porciones según tu nivel de saciedad y energía.</p>
+                    </div>
+                </div>
+
+                <div id="tab-alimentos" class="tab-content">
+                    <h2>Lista de Alimentos Recomendados</h2>
+                    <div class="alimentos-info">
+                        <h3>Proteínas</h3>
+                        <p>Pollo, pavo, pescado, huevos, carne magra, tofu, legumbres, lácteos bajos en grasa.</p>
+
+                        <h3>Carbohidratos</h3>
+                        <p>Arroz integral, avena, quinoa, batata, patatas, pasta integral, pan integral, frutas.</p>
+
+                        <h3>Grasas Saludables</h3>
+                        <p>Aceite de oliva, aguacate, frutos secos, semillas, pescado azul, mantequilla de cacahuete.
+                        </p>
+
+                        <h3>Verduras y Hortalizas</h3>
+                        <p>Brócoli, espinacas, lechuga, tomate, pepino, zanahoria, calabacín, pimientos, espárragos.</p>
+                    </div>
+                </div>
+
+                <div id="tab-revisiones" class="tab-content">
+                    <h2>Revisiones y Seguimiento</h2>
+                    <div class="revisiones-info">
+                        <h3>Recomendaciones de seguimiento</h3>
+                        <ul>
+                            <li>Pesarse una vez por semana, siempre a la misma hora</li>
+                            <li>Tomar medidas corporales cada 2 semanas</li>
+                            <li>Hacer fotos de progreso mensualmente</li>
+                            <li>Revisar sensaciones de energía y saciedad diariamente</li>
+                            <li>Ajustar calorías según resultados cada 3-4 semanas</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="tab-calendario" class="tab-content">
+                    <h2>Calendario de Comidas</h2>
+                    <div class="calendario-info">
+                        <h3>Horarios recomendados</h3>
+                        <table class="tabla-horarios">
+                            <tr>
+                                <th>Comida</th>
+                                <th>Horario sugerido</th>
+                            </tr>
+                            <tr>
+                                <td>🍳 Desayuno</td>
+                                <td>7:00 - 9:00</td>
+                            </tr>
+                            <tr>
+                                <td>🥤 Mediodía</td>
+                                <td>10:30 - 11:30</td>
+                            </tr>
+                            <tr>
+                                <td>🍽️ Comida</td>
+                                <td>13:00 - 15:00</td>
+                            </tr>
+                            <tr>
+                                <td>🥙 Merienda</td>
+                                <td>17:00 - 18:00</td>
+                            </tr>
+                            <tr>
+                                <td>🌙 Cena</td>
+                                <td>20:00 - 22:00</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="tab-prohibiciones" class="tab-content">
+                    <h2>Prohibiciones y Alergias</h2>
+                    <div id="prohibiciones-info" class="prohibiciones-info">
+                        <!-- Se llenará con JS -->
+                    </div>
+                </div>
+
+                <div class="pdf-footer">
+                    <p>© 2025 Maika Porcuna - Nutrición/Dietética/Suplementación Plan generado el <span
+                            id="fecha-generacion"></span></p>
+                    <p style="margin: 10px 0;">Este plan es personalizado y confidencial</p>
+                    <div class="pdf-footer-contacto">
+                        <p class="contacto-item">
+                            <span class="contacto-icon">📞</span>
+                            <a href="tel:+34650229987" style="color: inherit; text-decoration: none;">+34 650 229
+                                987</a>
+                        </p>
+                        <p class="contacto-item">
+                            <span class="contacto-icon">📧</span>
+                            <a href="mailto:Maikafit1977@gmail.com"
+                                style="color: inherit; text-decoration: none;">Maikafit1977@gmail.com</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Librerías externas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Scripts en orden de dependencia -->
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <!-- Script para modo oscuro -->
+    <script>
+        // Gestor de modo oscuro
+        (function () {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+
+            // Cargar preferencia guardada
+            const savedTheme = localStorage.getItem('darkMode');
+            if (savedTheme === 'true') {
+                body.classList.add('dark-mode');
+                updateIcon();
+            }
+
+            // Toggle del modo oscuro
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener('click', () => {
+                    body.classList.toggle('dark-mode');
+                    const isDark = body.classList.contains('dark-mode');
+                    localStorage.setItem('darkMode', isDark);
+                    updateIcon();
+                });
+            }
+
+            function updateIcon() {
+                const icon = darkModeToggle?.querySelector('.dark-mode-icon');
+                if (icon) {
+                    if (body.classList.contains('dark-mode')) {
+                        icon.textContent = '☀️';
+                    } else {
+                        icon.textContent = '🌙';
+                    }
+                }
+            }
+        })();
+    </script>
+    <script src="dietaService.js"></script>
+    <script src="clienteService.js"></script>
+    <script src="base-datos-alimentos.js"></script>
+    <script src="alimentoService.js"></script>
+    <script src="generador-dietas.js"></script>
+    <!-- editor-dietas.js REMOVIDO: Sistema antiguo reemplazado por tabla-editable.js -->
+    <script src="verificar-firestore.js"></script>
+    <script src="cliente-manager.js"></script>
+    <script src="gestor-alimentos-manager.js"></script>
+    <script src="macronutrientes-calculator.js"></script>
+    <script src="ui-renderer.js"></script>
+    <script src="tabla-editable.js"></script>
+    <script src="diagnostico-tabla-editable.js"></script>
+    <script src="ui-manager.js"></script>
+    <script src="statistics-manager.js"></script>
+    <script src="advanced-charts.js"></script>
+    <script src="toast-manager.js"></script>
+    <script src="export-utils.js"></script>
+    <script src="shopping-list-manager.js"></script>
+    <script src="pdf-service.js"></script>
+    <script src="script.js"></script>
+
+    <!-- Service Worker Registration con Auto-actualización -->
+    <script>
+        if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+            let refreshing = false;
+            let operacionCriticaEnCurso = false; // Bandera para prevenir reload durante operaciones críticas
+
+            // Función para marcar operación crítica (evitar reload durante generación de plan)
+            window.marcarOperacionCritica = function (enCurso) {
+                operacionCriticaEnCurso = enCurso;
+                if (enCurso) {
+                    console.log('🔒 Operación crítica iniciada - reload deshabilitado');
+                } else {
+                    console.log('🔓 Operación crítica finalizada - reload habilitado');
+                }
+            };
+
+            // Función para verificar si se puede recargar
+            function puedeRecargar() {
+                if (operacionCriticaEnCurso) {
+                    console.log('⚠️ Reload bloqueado - operación crítica en curso');
+                    return false;
+                }
+                return !refreshing;
+            }
+
+            // Registrar Service Worker
+            navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+                .then((registration) => {
+                    console.log('✅ Service Worker registrado exitosamente:', registration.scope);
+
+                    // Detectar cuando hay una nueva versión disponible
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        console.log('🔄 Nueva versión del Service Worker detectada');
+
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // Hay una nueva versión instalada
+                                console.log('✨ Nueva versión disponible. Esperando momento adecuado para aplicar...');
+
+                                // NO forzar activación inmediata si hay operación crítica
+                                if (!operacionCriticaEnCurso) {
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+
+                                    // Recargar la página cuando el nuevo worker esté activo
+                                    newWorker.addEventListener('controllerchange', () => {
+                                        if (puedeRecargar()) {
+                                            refreshing = true;
+                                            console.log('🔄 Recargando para aplicar actualización...');
+                                            window.location.reload();
+                                        } else {
+                                            console.log('⏸️ Recarga pospuesta - operación crítica en curso');
+                                        }
+                                    });
+                                } else {
+                                    console.log('⏸️ Actualización pospuesta - operación crítica en curso');
+                                }
+                            }
+                        });
+                    });
+
+                    // Verificar actualizaciones cada 5 minutos cuando la app está activa
+                    // PERO solo si no hay operación crítica
+                    setInterval(() => {
+                        if (!operacionCriticaEnCurso) {
+                            registration.update().then(() => {
+                                console.log('🔍 Verificando actualizaciones...');
+                            }).catch((error) => {
+                                console.log('Verificación de actualizaciones:', error.message);
+                            });
+                        }
+                    }, 5 * 60 * 1000); // 5 minutos
+
+                    // Verificar actualizaciones al recuperar el foco de la ventana (solo si no hay operación crítica)
+                    window.addEventListener('focus', () => {
+                        if (!operacionCriticaEnCurso) {
+                            registration.update().catch(() => { });
+                        }
+                    });
+
+                    // Verificar actualizaciones al cargar la página
+                    registration.update().catch(() => { });
+
+                })
+                .catch((error) => {
+                    console.error('❌ Error al registrar Service Worker:', error);
+                });
+
+            // Escuchar cambios del Service Worker - CON PROTECCIÓN
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (puedeRecargar()) {
+                    refreshing = true;
+                    console.log('🔄 Controller cambió, recargando...');
+                    window.location.reload();
+                } else {
+                    console.log('⏸️ Recarga pospuesta - operación crítica en curso');
+                }
+            });
+        }
+
+        // La persistencia de Firebase Auth ya está configurada en firebase-config.js
+        // La sesión se mantendrá incluso después de actualizar la PWA
+    </script>
+
+    <!-- Verificación de carga de scripts -->
+    <script>
+        // Verificar que todos los scripts necesarios se hayan cargado
+        window.addEventListener('load', function () {
+            console.log('🔍 Verificando scripts cargados...');
+            console.log('GestorAlimentosManager:', typeof window.GestorAlimentosManager);
+            console.log('gestorAlimentosManager:', typeof window.gestorAlimentosManager);
+            console.log('AlimentoService:', typeof window.alimentoService);
+            console.log('baseDatosAlimentos:', typeof window.baseDatosAlimentos);
+
+            // Si GestorAlimentosManager no está disponible, intentar cargarlo manualmente
+            if (typeof window.GestorAlimentosManager === 'undefined') {
+                console.error('❌ GestorAlimentosManager no está disponible después de cargar todos los scripts');
+                console.log('Scripts cargados:', Array.from(document.querySelectorAll('script[src]')).map(s => s.src));
+            } else {
+                console.log('✅ GestorAlimentosManager está disponible');
+            }
+        });
+    </script>
+</body>
+
+</html>
