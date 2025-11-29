@@ -20,8 +20,14 @@ class PDFService {
      * @param {Object} options - Opciones de configuración
      */
     async generatePDF(element, filename, options = {}) {
+        const orientationOption = options.orientacion || options.orientation || 'portrait';
+        const isLandscape = orientationOption === 'l' || orientationOption === 'landscape';
+
+        const contenidoAnchoPx = isLandscape ? 920 : 718; // Ajuste para ocupar más ancho sin recortes
+        const windowWidthPx = isLandscape ? 1123 : 794; // Ancho total de la hoja A4 a 96 DPI
+
         const defaultOptions = {
-            margin: [10, 10, 10, 10], // top, right, bottom, left (mm)
+            margin: isLandscape ? [8, 8, 8, 8] : [10, 10, 10, 10], // Márgenes en mm
             filename: filename,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: {
@@ -30,12 +36,12 @@ class PDFService {
                 logging: false,
                 letterRendering: true,
                 scrollY: 0,
-                windowWidth: 794 // A4 width at 96 DPI
+                windowWidth: windowWidthPx
             },
             jsPDF: {
                 unit: 'mm',
                 format: 'a4',
-                orientation: 'portrait',
+                orientation: isLandscape ? 'landscape' : 'portrait',
                 compress: true
             }
         };
@@ -49,10 +55,9 @@ class PDFService {
             const elementToPrint = element.cloneNode(true);
 
             // Asegurar que el elemento tenga el ancho correcto para A4
-            // A4 = 210mm width, con márgenes de 10mm a cada lado = 190mm de contenido
-            // A 96 DPI: 190mm ≈ 718px
+            // A4 = 210mm o 297mm según orientación. Ajustamos el ancho del contenido restando márgenes.
             elementToPrint.style.width = '100%';
-            elementToPrint.style.maxWidth = '718px'; // Ancho del contenido en A4 con márgenes
+            elementToPrint.style.maxWidth = `${contenidoAnchoPx}px`;
             elementToPrint.style.margin = '0 auto';
             elementToPrint.style.background = 'white';
             elementToPrint.style.padding = '0';
@@ -63,8 +68,10 @@ class PDFService {
             container.style.position = 'absolute';
             container.style.left = '-9999px';
             container.style.top = '0';
-            container.style.width = '794px'; // A4 width at 96 DPI
+            container.style.width = `${windowWidthPx}px`; // Ancho total de la hoja a 96 DPI
             container.style.padding = '0';
+            container.style.display = 'flex';
+            container.style.justifyContent = 'center';
             container.appendChild(elementToPrint);
             document.body.appendChild(container);
 

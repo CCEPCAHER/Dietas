@@ -4378,6 +4378,11 @@ function inicializarBotones() {
                 margin-bottom: 0.3mm;
                 position: relative;
                 margin-top: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                width: 100%;
             }
             .titulo-principal {
                 font-size: 14pt;
@@ -4391,16 +4396,14 @@ function inicializarBotones() {
                 line-height: 0.95;
             }
             .header-top {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
+                position: relative;
                 display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-                gap: 8mm;
+                justify-content: center;
+                align-items: center;
+                gap: 12mm;
                 margin: 0;
                 padding: 0;
+                width: 100%;
             }
             .header-content {
                 text-align: center;
@@ -4431,15 +4434,17 @@ function inicializarBotones() {
                 font-weight: 600;
                 display: flex;
                 flex-direction: column;
+                align-items: center;
+                text-align: center;
                 gap: 0.4mm;
                 line-height: 1.2;
             }
             .contacto span { white-space: nowrap; }
             .logo-header {
                 display: flex;
-                align-items: flex-start;
-                justify-content: flex-end;
-                margin-left: auto;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto;
                 padding-top: 0;
             }
             .logo-pdf {
@@ -4453,7 +4458,9 @@ function inicializarBotones() {
                 border-bottom: 1px solid #000;
                 display: flex;
                 align-items: center;
-                gap: 6mm;
+                justify-content: center;
+                gap: 4mm;
+                text-align: center;
             }
             .cliente-nombre {
                 font-weight: 700;
@@ -5565,7 +5572,8 @@ ${lineas.join('\n')}`;
 
         const cssHTML = generarCSSPDF(tamanosFuente);
 
-        const bodyClass = fuente === 'tabla-editable' ? 'layout-landscape' : '';
+        // Siempre usar formato horizontal para maximizar el espacio y evitar recortes
+        const bodyClass = 'layout-landscape';
 
         // Detectar móvil para agregar viewport optimizado
         const esMovilPDF = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent) ||
@@ -5573,8 +5581,8 @@ ${lineas.join('\n')}`;
             ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
         // Calcular ancho del viewport para móviles
-        const orientacionPDF = fuente === 'tabla-editable' ? 'l' : 'p';
-        const pageWidthPDF = orientacionPDF === 'l' ? 297 : 210;
+        const orientacionPDF = 'l';
+        const pageWidthPDF = 297;
         const mmToPxPDF = 3.779527559;
         const viewportWidth = esMovilPDF ? Math.round(pageWidthPDF * mmToPxPDF) : 'device-width';
 
@@ -5764,7 +5772,7 @@ ${lineas.join('\n')}`;
                         filename: `Plan_Alimentacion_${datosUsuario.nombre || 'Cliente'}.pdf`,
                         image: { type: 'jpeg', quality: 0.98 },
                         html2canvas: { scale: 2, useCORS: true },
-                        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
                     };
 
                     // Generar PDF como blob
