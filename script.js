@@ -3230,19 +3230,6 @@ function recalcularIngestasPorSuperavit() {
 
         // Actualizar gráficos después de recalcular
         // COMENTADO: Gráficos eliminados por problemas en móviles/tablets
-        // setTimeout(() => {
-        //     actualizarGraficosMacronutrientes();
-        // }, 200);
-
-        console.log('✅ Ingestas recalculadas por cambio de superávit');
-    } catch (error) {
-        console.error('❌ Error al recalcular ingestas por superávit:', error);
-    }
-    window.actualizarSuperavitPorObjetivo = function () {
-        const objetivoSelect = document.getElementById('objetivo');
-        const superavitEntrenoSelect = document.getElementById('superavitEntreno');
-        const superavitDescansoSelect = document.getElementById('superavitDescanso');
-        const labelEntreno = document.querySelector('label[for="superavitEntreno"]');
         const labelDescanso = document.querySelector('label[for="superavitDescanso"]');
 
         if (!objetivoSelect || !superavitEntrenoSelect || !superavitDescansoSelect) {
