@@ -3254,16 +3254,17 @@ function actualizarOpcionesSuperavit(select, objetivo) {
     }
 
     // Valor por defecto según el objetivo
+    const esEntreno = select.id === 'superavitEntreno';
     let valorPorDefecto = '0';
     switch (objetivo) {
         case 'aumentar':
-            valorPorDefecto = '5'; // Superávit por defecto para ganar masa
+            valorPorDefecto = esEntreno ? '15' : '10'; // Mayor superávit en días de entreno
             break;
         case 'adelgazar':
-            valorPorDefecto = '0'; // Sin cambio por defecto (ya no hay negativos)
+            valorPorDefecto = esEntreno ? '15' : '10'; // Se convertirán a déficit automáticamente
             break;
         case 'mantener':
-            valorPorDefecto = '0'; // Sin cambio por defecto para mantener
+            valorPorDefecto = esEntreno ? '5' : '0';
             break;
         default:
             valorPorDefecto = '0';
@@ -3350,29 +3351,11 @@ window.actualizarSuperavitPorObjetivo = function () {
         }
     }
 
-    // Guardar el valor actual antes de actualizar opciones
-    const valorActualEntreno = superavitEntrenoSelect.value;
-    const valorActualDescanso = superavitDescansoSelect.value;
-
-    // Actualizar opciones disponibles según el objetivo
+    // Actualizar opciones disponibles según el objetivo y aplicar inmediatamente los valores sugeridos
     const valorPorDefectoEntreno = actualizarOpcionesSuperavit(superavitEntrenoSelect, objetivo);
     const valorPorDefectoDescanso = actualizarOpcionesSuperavit(superavitDescansoSelect, objetivo);
-
-    // Intentar mantener el valor actual si está disponible en las nuevas opciones
-    const opcionesEntreno = Array.from(superavitEntrenoSelect.options).map(opt => opt.value);
-    const opcionesDescanso = Array.from(superavitDescansoSelect.options).map(opt => opt.value);
-
-    if (opcionesEntreno.includes(valorActualEntreno)) {
-        superavitEntrenoSelect.value = valorActualEntreno;
-    } else {
-        superavitEntrenoSelect.value = valorPorDefectoEntreno;
-    }
-
-    if (opcionesDescanso.includes(valorActualDescanso)) {
-        superavitDescansoSelect.value = valorActualDescanso;
-    } else {
-        superavitDescansoSelect.value = valorPorDefectoDescanso;
-    }
+    superavitEntrenoSelect.value = valorPorDefectoEntreno;
+    superavitDescansoSelect.value = valorPorDefectoDescanso;
 
     // Usar la función centralizada para actualizar todo
     // Pasar skipObjetivoCheck=true para evitar verificar el objetivo de nuevo (ya lo acabamos de actualizar)
@@ -4375,14 +4358,53 @@ function inicializarBotones() {
                 }
             }
             .header {
-                margin-bottom: 0.3mm;
+                margin-bottom: 0.5mm;
                 position: relative;
                 margin-top: 0;
+                width: 100%;
+                padding: 0;
+            }
+            .header-top-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                width: 100%;
+                gap: 4mm;
+                padding: 0 2mm;
+            }
+            .contacto-left {
+                font-size: 6.8pt;
+                color: #000;
+                font-weight: 600;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+                gap: 0.4mm;
+                line-height: 1.2;
+                padding-left: 0;
+            }
+            .contacto-left span { white-space: nowrap; }
+            .titulo-block {
+                flex: 1;
+                text-align: center;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                text-align: center;
-                width: 100%;
+                justify-content: center;
+                gap: 0.4mm;
+            }
+            .logo-header-right {
+                display: flex;
+                align-items: flex-start;
+                justify-content: flex-end;
+                min-width: 28mm;
+            }
+            .logo-pdf {
+                width: 25mm;
+                height: auto;
+                max-height: 20mm;
+                object-fit: contain;
             }
             .titulo-principal {
                 font-size: 14pt;
@@ -4394,16 +4416,6 @@ function inicializarBotones() {
                 color: #000;
                 text-align: center;
                 line-height: 0.95;
-            }
-            .header-top {
-                position: relative;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                gap: 12mm;
-                margin: 0;
-                padding: 0;
-                width: 100%;
             }
             .header-content {
                 text-align: center;
@@ -4428,39 +4440,17 @@ function inicializarBotones() {
                 padding: 0;
                 line-height: 1;
             }
-            .contacto {
-                font-size: 6.8pt;
-                color: #000;
-                font-weight: 600;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                gap: 0.4mm;
-                line-height: 1.2;
-            }
-            .contacto span { white-space: nowrap; }
-            .logo-header {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin: 0 auto;
-                padding-top: 0;
-            }
-            .logo-pdf {
-                width: 32mm;
-                height: 22mm;
-                object-fit: contain;
-            }
             .cliente-info {
                 margin-bottom: 0.5mm;
                 padding-bottom: 0.3mm;
                 border-bottom: 1px solid #000;
                 display: flex;
+                flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                gap: 4mm;
+                gap: 1mm;
                 text-align: center;
+                width: 100%;
             }
             .cliente-nombre {
                 font-weight: 700;
@@ -4468,13 +4458,15 @@ function inicializarBotones() {
                 color: #000;
                 line-height: 1.2;
                 white-space: nowrap;
+                width: 100%;
             }
             .cliente-datos {
                 font-size: 7.2pt;
                 color: #000;
                 font-weight: 500;
                 line-height: 1.3;
-                flex: 1;
+                width: 100%;
+                text-align: center;
             }
             .recordatorio-agua {
                 color: #4FC3F7;
@@ -4736,18 +4728,18 @@ function inicializarBotones() {
 
         return `
             <div class="header">
-                <div class="titulo-principal">PLAN DE ALIMENTACIÓN PERSONALIZADO</div>
-                <div class="header-content">
-                    <div class="nombre-profesional">MAIKA PORCUNA</div>
-                    <div class="especialidades">Nutrición · Dietética · Suplementación · Nutrición Deportiva</div>
-                </div>
-                <div class="header-top">
-                    <div class="contacto">
+                <div class="header-top-row">
+                    <div class="contacto-left">
                         <span>📝 ${fecha}</span>
                         <span>📧 Maikafit1977@gmail.com</span>
                         <span>📞 +34 650 229 987</span>
                     </div>
-                    ${logoHTML ? `<div class="logo-header">${logoHTML}</div>` : '<div class="logo-header"></div>'}
+                    <div class="titulo-block">
+                        <div class="titulo-principal">PLAN DE ALIMENTACIÓN PERSONALIZADO</div>
+                        <div class="nombre-profesional">MAIKA PORCUNA</div>
+                        <div class="especialidades">Nutrición · Dietética · Suplementación · Nutrición Deportiva</div>
+                    </div>
+                    ${logoHTML ? `<div class="logo-header-right">${logoHTML}</div>` : '<div class="logo-header-right"></div>'}
                 </div>
             </div>
             <div class="cliente-info">

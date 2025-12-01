@@ -13,17 +13,12 @@
     --bg-section: #f1f5f9;
 
     --text-primary: #0f172a;
-    /* Slate 900 */
     --text-secondary: #475569;
-    /* Slate 600 */
     --text-heading: #1e293b;
-    /* Slate 800 */
     --text-strong: #0f172a;
 
     --primary-color: #1e40af;
-    /* Blue 800 */
     --accent-color: #d97706;
-    /* Amber 600 */
 
     --border-color: #e2e8f0;
     --shadow-color: rgba(15, 23, 42, 0.08);
@@ -42,9 +37,7 @@ body.dark-mode {
     --text-strong: #f8fafc;
 
     --primary-color: #60a5fa;
-    /* Blue 400 */
     --accent-color: #fbbf24;
-    /* Amber 400 */
 
     --border-color: #334155;
     --shadow-color: rgba(0, 0, 0, 0.3);

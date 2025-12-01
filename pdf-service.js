@@ -23,11 +23,14 @@ class PDFService {
         const orientationOption = options.orientacion || options.orientation || 'portrait';
         const isLandscape = orientationOption === 'l' || orientationOption === 'landscape';
 
-        const contenidoAnchoPx = isLandscape ? 920 : 718; // Ajuste para ocupar más ancho sin recortes
+        // A4 = 210mm, con márgenes aproximados de 10mm a cada lado = 190mm de contenido
+        // 190mm a 96 DPI = 190 * 3.779527559 = ~718px. Dejamos un poco más (760px) sin cortar bordes.
+        const contenidoAnchoPx = isLandscape ? 990 : 780;
         const windowWidthPx = isLandscape ? 1123 : 794; // Ancho total de la hoja A4 a 96 DPI
+        const html2canvasWindowWidth = Math.max(windowWidthPx, contenidoAnchoPx + 120);
 
         const defaultOptions = {
-            margin: isLandscape ? [8, 8, 8, 8] : [10, 10, 10, 10], // Márgenes en mm
+            margin: isLandscape ? [10, 4, 10, 10] : [10, 4, 10, 10], // Márgenes en mm (izquierda, arriba, derecha, abajo)
             filename: filename,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: {
@@ -36,7 +39,7 @@ class PDFService {
                 logging: false,
                 letterRendering: true,
                 scrollY: 0,
-                windowWidth: windowWidthPx
+                windowWidth: html2canvasWindowWidth
             },
             jsPDF: {
                 unit: 'mm',
@@ -56,22 +59,32 @@ class PDFService {
 
             // Asegurar que el elemento tenga el ancho correcto para A4
             // A4 = 210mm o 297mm según orientación. Ajustamos el ancho del contenido restando márgenes.
-            elementToPrint.style.width = '100%';
+            elementToPrint.style.width = `${contenidoAnchoPx}px`;
             elementToPrint.style.maxWidth = `${contenidoAnchoPx}px`;
             elementToPrint.style.margin = '0 auto';
             elementToPrint.style.background = 'white';
             elementToPrint.style.padding = '0';
+            elementToPrint.style.textAlign = 'center';
+            elementToPrint.style.boxSizing = 'border-box';
             elementToPrint.classList.add('pdf-mode');
+            
+            // Asegurar que los elementos internos también aprovechen el espacio
+            const tables = elementToPrint.querySelectorAll('table');
+            tables.forEach(table => {
+                table.style.width = '100%';
+                table.style.maxWidth = '100%';
+            });
 
             // Contenedor temporal fuera de pantalla pero visible para html2canvas
             const container = document.createElement('div');
             container.style.position = 'absolute';
             container.style.left = '-9999px';
             container.style.top = '0';
-            container.style.width = `${windowWidthPx}px`; // Ancho total de la hoja a 96 DPI
+            container.style.width = `${html2canvasWindowWidth}px`; // Asegurar que hay espacio para centrar
             container.style.padding = '0';
             container.style.display = 'flex';
             container.style.justifyContent = 'center';
+            container.style.alignItems = 'flex-start';
             container.appendChild(elementToPrint);
             document.body.appendChild(container);
 
