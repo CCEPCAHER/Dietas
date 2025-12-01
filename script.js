@@ -6104,4 +6104,4 @@ ${lineas.join('\n')}`;
 
         modal.appendChild(modalContent);
         document.body.appendChild(modal);
-    }
+    };
