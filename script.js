@@ -3228,77 +3228,84 @@ function recalcularIngestasPorSuperavit() {
             }
         }
 
-        // Actualizar gráficos después de recalcular
-        // COMENTADO: Gráficos eliminados por problemas en móviles/tablets
-        const labelDescanso = document.querySelector('label[for="superavitDescanso"]');
+    window.actualizarSuperavitPorObjetivo = function () {
+        try {
+            const objetivoSelect = document.getElementById('objetivo');
+            const superavitEntrenoSelect = document.getElementById('superavitEntreno');
+            const superavitDescansoSelect = document.getElementById('superavitDescanso');
+            const labelEntreno = document.querySelector('label[for="superavitEntreno"]');
+            const labelDescanso = document.querySelector('label[for="superavitDescanso"]');
 
-        if (!objetivoSelect || !superavitEntrenoSelect || !superavitDescansoSelect) {
-            return;
-        }
-
-        const objetivo = objetivoSelect.value;
-
-        // Actualizar etiquetas según el objetivo
-        let textoEntreno = '';
-        let textoDescanso = '';
-
-        switch (objetivo) {
-            case 'aumentar':
-                textoEntreno = 'Superávit día entrenamiento (%):';
-                textoDescanso = 'Superávit día descanso (%):';
-                break;
-            case 'adelgazar':
-                textoEntreno = 'Déficit día entrenamiento (%):';
-                textoDescanso = 'Déficit día descanso (%):';
-                break;
-            case 'mantener':
-                textoEntreno = 'Déficit/Superávit día entrenamiento (%):';
-                textoDescanso = 'Déficit/Superávit día descanso (%):';
-                break;
-            default:
-                textoEntreno = 'Déficit/Superávit día entrenamiento (%):';
-                textoDescanso = 'Déficit/Superávit día descanso (%):';
-        }
-
-        // Actualizar etiquetas
-        if (labelEntreno) {
-            const tooltipIcon = labelEntreno.querySelector('.tooltip-icon');
-            labelEntreno.innerHTML = textoEntreno;
-            if (tooltipIcon) {
-                labelEntreno.appendChild(tooltipIcon);
-            } else {
-                const icon = document.createElement('span');
-                icon.className = 'tooltip-icon';
-                icon.setAttribute('data-tooltip', 'Se actualiza automáticamente según el objetivo seleccionado.');
-                icon.textContent = 'ℹ️';
-                labelEntreno.appendChild(icon);
+            if (!objetivoSelect || !superavitEntrenoSelect || !superavitDescansoSelect) {
+                return;
             }
-        }
 
-        if (labelDescanso) {
-            const tooltipIcon = labelDescanso.querySelector('.tooltip-icon');
-            labelDescanso.innerHTML = textoDescanso;
-            if (tooltipIcon) {
-                labelDescanso.appendChild(tooltipIcon);
-            } else {
-                const icon = document.createElement('span');
-                icon.className = 'tooltip-icon';
-                icon.setAttribute('data-tooltip', 'Se actualiza automáticamente según el objetivo seleccionado.');
-                icon.textContent = 'ℹ️';
-                labelDescanso.appendChild(icon);
+            const objetivo = objetivoSelect.value;
+
+            // Actualizar etiquetas según el objetivo
+            let textoEntreno = '';
+            let textoDescanso = '';
+
+            switch (objetivo) {
+                case 'aumentar':
+                    textoEntreno = 'Superávit día entrenamiento (%):';
+                    textoDescanso = 'Superávit día descanso (%):';
+                    break;
+                case 'adelgazar':
+                    textoEntreno = 'Déficit día entrenamiento (%):';
+                    textoDescanso = 'Déficit día descanso (%):';
+                    break;
+                case 'mantener':
+                    textoEntreno = 'Déficit/Superávit día entrenamiento (%):';
+                    textoDescanso = 'Déficit/Superávit día descanso (%):';
+                    break;
+                default:
+                    textoEntreno = 'Déficit/Superávit día entrenamiento (%):';
+                    textoDescanso = 'Déficit/Superávit día descanso (%):';
             }
+
+            // Actualizar etiquetas
+            if (labelEntreno) {
+                const tooltipIcon = labelEntreno.querySelector('.tooltip-icon');
+                labelEntreno.innerHTML = textoEntreno;
+                if (tooltipIcon) {
+                    labelEntreno.appendChild(tooltipIcon);
+                } else {
+                    const icon = document.createElement('span');
+                    icon.className = 'tooltip-icon';
+                    icon.setAttribute('data-tooltip', 'Se actualiza automáticamente según el objetivo seleccionado.');
+                    icon.textContent = 'ℹ️';
+                    labelEntreno.appendChild(icon);
+                }
+            }
+
+            if (labelDescanso) {
+                const tooltipIcon = labelDescanso.querySelector('.tooltip-icon');
+                labelDescanso.innerHTML = textoDescanso;
+                if (tooltipIcon) {
+                    labelDescanso.appendChild(tooltipIcon);
+                } else {
+                    const icon = document.createElement('span');
+                    icon.className = 'tooltip-icon';
+                    icon.setAttribute('data-tooltip', 'Se actualiza automáticamente según el objetivo seleccionado.');
+                    icon.textContent = 'ℹ️';
+                    labelDescanso.appendChild(icon);
+                }
+            }
+
+            // Actualizar opciones disponibles según el objetivo y aplicar inmediatamente los valores sugeridos
+            const valorPorDefectoEntreno = actualizarOpcionesSuperavit(superavitEntrenoSelect, objetivo);
+            const valorPorDefectoDescanso = actualizarOpcionesSuperavit(superavitDescansoSelect, objetivo);
+            superavitEntrenoSelect.value = valorPorDefectoEntreno;
+            superavitDescansoSelect.value = valorPorDefectoDescanso;
+
+            // Usar la función centralizada para actualizar todo
+            // Pasar skipObjetivoCheck=true para evitar verificar el objetivo de nuevo (ya lo acabamos de actualizar)
+            // Esto actualiza macros, tablas, gráficos, etc.
+            actualizarTodoAutomaticamente(true);
+        } catch (error) {
+            console.error('❌ Error al actualizar superávit por objetivo:', error);
         }
-
-        // Actualizar opciones disponibles según el objetivo y aplicar inmediatamente los valores sugeridos
-        const valorPorDefectoEntreno = actualizarOpcionesSuperavit(superavitEntrenoSelect, objetivo);
-        const valorPorDefectoDescanso = actualizarOpcionesSuperavit(superavitDescansoSelect, objetivo);
-        superavitEntrenoSelect.value = valorPorDefectoEntreno;
-        superavitDescansoSelect.value = valorPorDefectoDescanso;
-
-        // Usar la función centralizada para actualizar todo
-        // Pasar skipObjetivoCheck=true para evitar verificar el objetivo de nuevo (ya lo acabamos de actualizar)
-        // Esto actualiza macros, tablas, gráficos, etc.
-        actualizarTodoAutomaticamente(true);
     };
 
     /**
