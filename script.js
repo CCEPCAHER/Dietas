@@ -3299,7 +3299,7 @@ function recalcularIngestasPorSuperavit() {
         // Pasar skipObjetivoCheck=true para evitar verificar el objetivo de nuevo (ya lo acabamos de actualizar)
         // Esto actualiza macros, tablas, gráficos, etc.
         actualizarTodoAutomaticamente(true);
-    }
+    };
 
     /**
      * Función centralizada para actualizar todos los cálculos, gráficos y tablas
