@@ -64,11 +64,15 @@
         retryCount: {}
     };
 
+    // Detectar iOS/iPad
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
     // Configuración
     const CONFIG = {
-        timeout: 15000, // 15 segundos timeout (aumentado para iOS)
-        maxRetries: 3,
-        retryDelay: 1000,
+        timeout: isIOS ? 25000 : 15000, // 25 segundos para iOS, 15 para otros
+        maxRetries: isIOS ? 5 : 3, // Más reintentos en iOS
+        retryDelay: isIOS ? 1500 : 1000, // Más tiempo entre reintentos en iOS
         showNotifications: true
     };
 
@@ -166,8 +170,9 @@
                     console.log(`🔄 Attempting to load ${config.name} from ${cdnName}...`);
                     await loadScript(url);
 
-                    // Pequeña espera para que la librería se inicialice
-                    await new Promise(resolve => setTimeout(resolve, 200));
+                    // Espera para que la librería se inicialice (más tiempo en iOS)
+                    const initDelay = isIOS ? 500 : 200;
+                    await new Promise(resolve => setTimeout(resolve, initDelay));
 
                     // Validar que realmente se cargó
                     if (config.validator()) {
@@ -182,9 +187,10 @@
                     console.warn(`⚠️ Failed to load ${config.name} from ${cdnName}:`, error.message);
                     lastError = error;
 
-                    // Si no es el último CDN, esperar un poco antes de intentar el siguiente
+                    // Si no es el último CDN, esperar un poco antes de intentar el siguiente (más tiempo en iOS)
                     if (i < urls.length - 1) {
-                        await new Promise(resolve => setTimeout(resolve, 500));
+                        const retryDelay = isIOS ? 1000 : 500;
+                        await new Promise(resolve => setTimeout(resolve, retryDelay));
                     }
                 }
             }
@@ -323,11 +329,16 @@
     };
 
     // Auto-inicializar cuando el DOM esté listo
+    // En iOS, esperar un poco más para asegurar que los scripts con defer estén listos
+    const initDelay = isIOS ? 500 : 100;
+    
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(init, initDelay);
+        });
     } else {
-        // DOM ya está listo, iniciar inmediatamente
-        setTimeout(init, 100);
+        // DOM ya está listo, iniciar después de un pequeño delay
+        setTimeout(init, initDelay);
     }
 
     console.log('📚 Library Loader inicializado');

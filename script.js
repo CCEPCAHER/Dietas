@@ -3234,6 +3234,66 @@ function recalcularIngestasPorSuperavit() {
     }
 }
 
+    /**
+     * Actualiza las opciones del select de superávit según el objetivo
+     * @param {HTMLSelectElement} selectElement - Elemento select a actualizar
+     * @param {string} objetivo - Objetivo seleccionado ('aumentar', 'adelgazar', 'mantener')
+     * @returns {string} Valor por defecto sugerido
+     */
+    function actualizarOpcionesSuperavit(selectElement, objetivo) {
+        if (!selectElement) {
+            return '0';
+        }
+
+        // Guardar el valor actual antes de limpiar
+        const valorActual = selectElement.value;
+
+        // Limpiar opciones existentes (excepto la primera si es placeholder)
+        selectElement.innerHTML = '';
+
+        // Definir opciones y valores por defecto según el objetivo
+        let opciones = [];
+        let valorPorDefecto = '0';
+
+        switch (objetivo) {
+            case 'aumentar':
+                // Para aumentar: superávit positivo (5% a 30% típicamente)
+                opciones = ['0', '5', '10', '15', '20', '25', '30', '35', '40'];
+                valorPorDefecto = '10'; // Superávit moderado por defecto
+                break;
+            case 'adelgazar':
+                // Para adelgazar: déficit (0% a 30% típicamente)
+                opciones = ['0', '5', '10', '15', '20', '25', '30'];
+                valorPorDefecto = '15'; // Déficit moderado por defecto
+                break;
+            case 'mantener':
+            default:
+                // Para mantener: rango completo (puede ser déficit o superávit)
+                opciones = ['0', '5', '10', '15', '20', '25', '30', '35', '40', '45', '50'];
+                valorPorDefecto = '0'; // Mantener equilibrio por defecto
+                break;
+        }
+
+        // Agregar opciones al select
+        opciones.forEach(valor => {
+            const option = document.createElement('option');
+            option.value = valor;
+            option.textContent = `${valor}%`;
+            if (valor === valorPorDefecto) {
+                option.selected = true;
+            }
+            selectElement.appendChild(option);
+        });
+
+        // Si el valor actual existe en las nuevas opciones, mantenerlo
+        if (opciones.includes(valorActual)) {
+            selectElement.value = valorActual;
+            return valorActual;
+        }
+
+        return valorPorDefecto;
+    }
+
     window.actualizarSuperavitPorObjetivo = function () {
         try {
             const objetivoSelect = document.getElementById('objetivo');
@@ -5476,17 +5536,108 @@ ${lineas.join('\n')}`;
         }
 
         /**
+         * Espera a que las librerías PDF estén cargadas (especialmente importante para iOS/iPad)
+         */
+        window.esperarLibreriasPDF = async function (maxIntentos = null, intervalo = null) {
+            // Detectar iOS/iPad para ajustar parámetros
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            
+            // Ajustar parámetros para iOS
+            const maxIntentosFinal = maxIntentos || (isIOS ? 15 : 10);
+            const intervaloFinal = intervalo || (isIOS ? 800 : 500);
+            
+            console.log(`📚 Esperando librerías PDF... (iOS: ${isIOS}, intentos: ${maxIntentosFinal}, intervalo: ${intervaloFinal}ms)`);
+            
+            // Si LibraryLoader está disponible, usarlo
+            if (window.LibraryLoader && typeof window.LibraryLoader.isPDFReady === 'function') {
+                for (let i = 0; i < maxIntentosFinal; i++) {
+                    if (window.LibraryLoader.isPDFReady()) {
+                        console.log('✅ Librerías PDF listas (vía LibraryLoader)');
+                        return true;
+                    }
+                    if (i % 3 === 0) {
+                        console.log(`⏳ Esperando librerías... (intento ${i + 1}/${maxIntentosFinal})`);
+                    }
+                    await new Promise(resolve => setTimeout(resolve, intervaloFinal));
+                }
+                // Si no están listas, intentar cargarlas
+                if (window.LibraryLoader.loadAll) {
+                    try {
+                        console.log('🔄 Intentando cargar librerías con LibraryLoader...');
+                        await window.LibraryLoader.loadAll(false);
+                        if (window.LibraryLoader.isPDFReady()) {
+                            console.log('✅ Librerías PDF cargadas exitosamente');
+                            return true;
+                        }
+                    } catch (error) {
+                        console.warn('⚠️ Error cargando librerías con LibraryLoader:', error);
+                    }
+                }
+            }
+
+            // Verificación directa de librerías
+            for (let i = 0; i < maxIntentosFinal; i++) {
+                const html2pdfReady = typeof window.html2pdf === 'function';
+                const html2canvasReady = typeof window.html2canvas === 'function';
+                const jsPDFReady = typeof window.jsPDF !== 'undefined' || typeof window.jspdf !== 'undefined';
+                
+                // Aceptamos html2pdf O (html2canvas + jsPDF)
+                if (html2pdfReady || (html2canvasReady && jsPDFReady)) {
+                    console.log('✅ Librerías PDF listas (verificación directa)', {
+                        html2pdf: html2pdfReady,
+                        html2canvas: html2canvasReady,
+                        jsPDF: jsPDFReady
+                    });
+                    return true;
+                }
+                
+                if (i % 3 === 0) {
+                    console.log(`⏳ Esperando librerías... (intento ${i + 1}/${maxIntentosFinal})`, {
+                        html2pdf: html2pdfReady,
+                        html2canvas: html2canvasReady,
+                        jsPDF: jsPDFReady
+                    });
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, intervaloFinal));
+            }
+            
+            console.warn('❌ Librerías PDF no disponibles después de todos los intentos');
+            return false;
+        }
+
+        /**
          * Función unificada para generar PDF profesional (blanco y negro, minimalista)
          * @param {string} fuente - 'principal' o 'tabla-editable'
          */
         window.generarPDFProfesional = async function (fuente = 'principal') {
-            // Validar librerías
-            if (typeof html2pdf === 'undefined' || typeof html2canvas === 'undefined') {
-                alert('Error: Las librerías PDF no están cargadas. Por favor, recarga la página.');
-                return;
+            // Mostrar notificación de carga
+            mostrarNotificacion('⏳ Verificando librerías PDF...', 'info');
+
+            // Esperar a que las librerías estén cargadas (especialmente importante para iOS/iPad)
+            const libreriasListas = await window.esperarLibreriasPDF();
+            
+            if (!libreriasListas) {
+                // Último intento: verificar directamente
+                const html2pdfReady = typeof window.html2pdf === 'function';
+                const html2canvasReady = typeof window.html2canvas === 'function';
+                const jsPDFReady = typeof window.jsPDF !== 'undefined' || typeof window.jspdf !== 'undefined';
+                
+                if (!html2pdfReady && !(html2canvasReady && jsPDFReady)) {
+                    const mensaje = 'Error: Las librerías PDF no están cargadas.\n\n' +
+                        'Por favor, verifica tu conexión a internet y recarga la página.\n\n' +
+                        'Si el problema persiste, intenta:\n' +
+                        '1. Limpiar la caché del navegador\n' +
+                        '2. Recargar la página\n' +
+                        '3. Usar otro navegador';
+                    alert(mensaje);
+                    mostrarNotificacion('❌ Error: Librerías PDF no disponibles', 'error');
+                    return;
+                }
             }
 
-            // Mostrar notificación de carga
+            // Mostrar notificación de generación
             mostrarNotificacion('⏳ Generando PDF...', 'info');
 
             // Obtener datos según la fuente
@@ -5699,12 +5850,29 @@ ${lineas.join('\n')}`;
 
                 nuevoBtnWhatsApp.addEventListener('click', async function () {
                     try {
+                        mostrarNotificacion('🔄 Verificando librerías PDF...', 'info');
+
+                        // Esperar a que las librerías estén cargadas (especialmente importante para iOS/iPad)
+                        const libreriasListas = await window.esperarLibreriasPDF();
+                        
+                        if (!libreriasListas) {
+                            const html2pdfReady = typeof window.html2pdf === 'function';
+                            if (!html2pdfReady) {
+                                throw new Error('Las librerías PDF no están disponibles. Por favor, recarga la página.');
+                            }
+                        }
+
                         mostrarNotificacion('🔄 Generando PDF para compartir...', 'info');
 
                         // Obtener el contenido del PDF
                         const pdfContent = document.getElementById('pdf-content');
                         if (!pdfContent) {
                             throw new Error('No se encontró el contenido del PDF');
+                        }
+
+                        // Verificar que html2pdf esté disponible
+                        if (typeof window.html2pdf !== 'function') {
+                            throw new Error('La librería html2pdf no está disponible');
                         }
 
                         // Usar html2pdf para generar el blob directamente

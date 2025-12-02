@@ -330,13 +330,13 @@ class TablaEditable {
         // Si el día NO está en la lista de días de entreno, entonces es día de descanso
         const esDescanso = !diasEntrenoNormalizados.includes(valorDia);
         
-        // Debug: log para verificar el comportamiento
-        console.log(`🔍 esDiaDescanso('${nombreDia}'):`, {
-            valorDia,
-            diasEntreno: diasEntreno,
-            diasEntrenoNormalizados: diasEntrenoNormalizados,
-            esDescanso
-        });
+        // Debug: log deshabilitado para reducir ruido en consola (descomentar si es necesario para debugging)
+        // console.log(`🔍 esDiaDescanso('${nombreDia}'):`, {
+        //     valorDia,
+        //     diasEntreno: diasEntreno,
+        //     diasEntrenoNormalizados: diasEntrenoNormalizados,
+        //     esDescanso
+        // });
         
         return esDescanso;
     }

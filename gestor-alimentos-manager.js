@@ -140,11 +140,15 @@ class GestorAlimentosManager {
                 return false;
             }
 
-            const user = window.authManager?.getCurrentUser();
+            // Obtener usuario autenticado usando el método mejorado
+            const user = await this.obtenerUsuarioAutenticado(2, 300);
+            
             if (!user) {
                 console.log('📦 Usuario no autenticado, saltando carga desde Firestore');
                 return false;
             }
+            
+            console.log('✅ Usuario autenticado para cargar:', user.email || user.uid);
 
             // Intentar obtener la referencia de Firestore de múltiples formas
             let db = null;
@@ -191,6 +195,70 @@ class GestorAlimentosManager {
         }
     }
 
+    /**
+     * Obtiene el usuario autenticado usando múltiples métodos con reintentos
+     * @param {number} maxIntentos - Número máximo de intentos
+     * @param {number} delay - Delay entre intentos en ms
+     * @returns {Promise<Object|null>} Usuario autenticado o null
+     */
+    async obtenerUsuarioAutenticado(maxIntentos = 3, delay = 500) {
+        for (let intento = 0; intento < maxIntentos; intento++) {
+            let user = null;
+            
+            // Método 1: Usar authManager si está disponible
+            if (window.authManager) {
+                try {
+                    user = window.authManager.getCurrentUser();
+                    if (user) {
+                        console.log('✅ Usuario obtenido de authManager:', user.email || user.uid);
+                        return user;
+                    }
+                } catch (e) {
+                    console.warn(`⚠️ Intento ${intento + 1}: Error al obtener usuario de authManager:`, e);
+                }
+            }
+            
+            // Método 2: Usar firebaseAuth directamente si authManager falló
+            if (!user && window.firebaseAuth) {
+                try {
+                    user = window.firebaseAuth.currentUser;
+                    if (user) {
+                        console.log('✅ Usuario obtenido de firebaseAuth:', user.email || user.uid);
+                        return user;
+                    }
+                } catch (e) {
+                    console.warn(`⚠️ Intento ${intento + 1}: Error al obtener usuario de firebaseAuth:`, e);
+                }
+            }
+            
+            // Método 3: Usar firebase.auth() directamente como último recurso
+            if (!user && typeof firebase !== 'undefined' && firebase.auth) {
+                try {
+                    user = firebase.auth().currentUser;
+                    if (user) {
+                        console.log('✅ Usuario obtenido de firebase.auth():', user.email || user.uid);
+                        return user;
+                    }
+                } catch (e) {
+                    console.warn(`⚠️ Intento ${intento + 1}: Error al obtener usuario de firebase.auth():`, e);
+                }
+            }
+            
+            // Si no se encontró usuario y no es el último intento, esperar antes de reintentar
+            if (intento < maxIntentos - 1) {
+                console.log(`⏳ Usuario no encontrado, reintentando en ${delay}ms... (intento ${intento + 1}/${maxIntentos})`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+        
+        // Si después de todos los intentos no se encontró usuario
+        console.warn('⚠️ No se pudo obtener usuario autenticado después de', maxIntentos, 'intentos');
+        console.warn('🔍 Debug - authManager disponible:', !!window.authManager);
+        console.warn('🔍 Debug - firebaseAuth disponible:', !!window.firebaseAuth);
+        console.warn('🔍 Debug - firebase.auth disponible:', !!(typeof firebase !== 'undefined' && firebase.auth));
+        return null;
+    }
+
     async guardarEnFirestore() {
         try {
             // Verificar si Firebase está disponible
@@ -200,12 +268,16 @@ class GestorAlimentosManager {
                 return false;
             }
 
-            const user = window.authManager?.getCurrentUser();
+            // Obtener usuario autenticado con reintentos
+            const user = await this.obtenerUsuarioAutenticado(3, 500);
+            
             if (!user) {
                 console.warn('⚠️ Usuario no autenticado, saltando guardado en Firestore');
                 window.mostrarNotificacion?.('⚠️ Debes iniciar sesión para guardar en Firebase', 'warning');
                 return false;
             }
+            
+            console.log('✅ Usuario autenticado para guardar:', user.email || user.uid);
 
             if (!this.baseDatosCompleta || this.baseDatosCompleta.length === 0) {
                 console.warn('⚠️ No hay datos para guardar en Firestore');
