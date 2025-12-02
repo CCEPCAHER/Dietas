@@ -542,7 +542,8 @@ class GestorAlimentosManager {
                     <table class="gestor-table">
                         <thead>
                             <tr>
-                                <th>Nombre</th>
+                                <th>Alimento</th>
+                                <th style="text-align: center;">Marca</th>
                                 <th style="text-align: center;">Categoría</th>
                                 <th style="text-align: center;">Subcat.</th>
                                 <th style="text-align: center;">Peso</th>
@@ -561,7 +562,7 @@ class GestorAlimentosManager {
         if (this.baseDatosFiltrada.length === 0) {
             html += `
                 <tr>
-                    <td colspan="11" style="text-align: center; padding: 40px 20px; color: #718096;">
+                    <td colspan="12" style="text-align: center; padding: 40px 20px; color: #718096;">
                         <div style="font-size: 3em; margin-bottom: 15px; opacity: 0.5;">🔍</div>
                         <div style="font-weight: 700; color: #4a5568; font-size: 1.1em; margin-bottom: 8px;">No se encontraron alimentos</div>
                         <div style="font-size: 0.9em; color: #718096;">Intenta con otros términos de búsqueda</div>
@@ -572,6 +573,7 @@ class GestorAlimentosManager {
 
         this.baseDatosFiltrada.forEach((alimento, index) => {
             const nombre = alimento.nombre || alimento.ALIMENTO || 'Sin nombre';
+            const marca = alimento.marca || alimento['MARCA REGISTRADA'] || alimento.MARCA_REGISTRADA || '-';
             // Buscar categoría en todos los campos posibles
             const categoria = (
                 alimento.categoria_principal || 
@@ -595,10 +597,12 @@ class GestorAlimentosManager {
             const pesoDisplay = peso ? peso : '-';
             const grasasSaturadasDisplay = grasasSaturadas > 0 ? `${grasasSaturadas.toFixed(1)}` : '-';
             const azucarDisplay = azucar > 0 ? `${azucar.toFixed(1)}` : '-';
+            const marcaDisplay = marca && marca !== '-' ? marca : '-';
 
             html += `
                 <tr>
                     <td style="font-weight: 600; color: #2d3748;">${nombre}</td>
+                    <td style="text-align: center; color: #718096;">${marcaDisplay}</td>
                     <td style="text-align: center;"><span style="padding: 4px 8px; background: #ebf8ff; color: #2c5282; border: 1px solid #bee3f8; border-radius: 12px; font-size: 0.75em; font-weight: 700; display: inline-block; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${categoria}</span></td>
                     <td style="text-align: center;"><span style="padding: 4px 8px; background: #f3e5f5; color: #553c9a; border: 1px solid #d6bcfa; border-radius: 12px; font-size: 0.75em; font-weight: 700; display: inline-block; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${subcategoria}</span></td>
                     <td style="text-align: center; color: #718096;">${pesoDisplay}</td>
@@ -635,8 +639,8 @@ class GestorAlimentosManager {
                     
                     <form id="gestorFormAlimento" onsubmit="window.gestorAlimentosManager.guardarAlimento(event)">
                         <div class="form-group">
-                            <label>Nombre del alimento *</label>
-                            <input type="text" id="gestorNombre" required>
+                            <label>Alimento *</label>
+                            <input type="text" id="gestorNombre" placeholder="Nombre del alimento" required>
                         </div>
 
                         <div class="form-row">
@@ -844,6 +848,8 @@ class GestorAlimentosManager {
         
         const categoriaPrincipal = alimento.categoria_principal || alimento.MACRONUTRIENTE_PRINCIPAL || alimento['MACRONUTRIENTE PRINCIPAL'] || alimento['CATEGORÍA PRINCIPAL'] || '';
         
+        const marca = alimento.marca || alimento.MARCA_REGISTRADA || alimento['MARCA REGISTRADA'] || '';
+        
         return {
             nombre: alimento.nombre || alimento.ALIMENTO,
             categoria_principal: categoriaPrincipal,
@@ -853,8 +859,11 @@ class GestorAlimentosManager {
             subcategoria: alimento.subcategoria || alimento.CLASIFICACIÓN,
             UNIDAD: alimento.presentacion || alimento.UNIDAD || '',
             PESO_POR_UNIDAD: alimento.peso || alimento.PESO_POR_UNIDAD || alimento['PESO POR UNIDAD'] || '',
-            MARCA_REGISTRADA: alimento.marca || alimento.MARCA_REGISTRADA || alimento['MARCA REGISTRADA'] || '',
+            marca: marca,
+            MARCA_REGISTRADA: marca,
+            producto: alimento.producto || alimento.NOMBRE_DEL_PRODUCTO || alimento['NOMBRE DEL PRODUCTO'] || '',
             NOMBRE_DEL_PRODUCTO: alimento.producto || alimento.NOMBRE_DEL_PRODUCTO || alimento['NOMBRE DEL PRODUCTO'] || '',
+            notas: alimento.notas || alimento.descripcion || alimento.OTRAS_NOTAS || alimento['OTRAS NOTAS'] || '',
             OTRAS_NOTAS: alimento.notas || alimento.descripcion || alimento.OTRAS_NOTAS || alimento['OTRAS NOTAS'] || '',
             CALORÍAS: calorias,
             PROTEÍNAS: proteinas,
