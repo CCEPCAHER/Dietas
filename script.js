@@ -3228,6 +3228,12 @@ function recalcularIngestasPorSuperavit() {
             }
         }
 
+        console.log('✅ Ingestas recalculadas por cambio de superávit');
+    } catch (error) {
+        console.error('❌ Error al recalcular ingestas por superávit:', error);
+    }
+}
+
     window.actualizarSuperavitPorObjetivo = function () {
         try {
             const objetivoSelect = document.getElementById('objetivo');
