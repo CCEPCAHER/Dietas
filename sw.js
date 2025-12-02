@@ -1,6 +1,6 @@
 // Service Worker para MAIKA PORCUNA - PWA
 // Versión actualizada para auto-actualización automática
-const CACHE_NAME = 'maika-porcuna-v5.0.0';
+const CACHE_NAME = 'maika-porcuna-v5.0.1';
 const BASE_PATH = self.location.pathname.replace(/sw\.js$/, '');
 const urlsToCache = [
   './',
@@ -21,13 +21,13 @@ const urlsToCache = [
   './manifest.json',
   './icon-192x192.png',
   './icon-512x512.png',
-  // CDN externos críticos
+  './library-loader.js',
+  // CDN externos críticos - NO cachear librerías PDF (siempre usar red)
   'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
   'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js',
-  'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+  'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js'
+  // NOTA: Las librerías PDF (html2pdf, html2canvas, jspdf) NO se cachean
+  // para asegurar que siempre se carguen desde la red y funcionen en PWA móvil
 ];
 
 // Instalación del Service Worker
@@ -75,6 +75,26 @@ self.addEventListener('fetch', (event) => {
       event.request.url.includes('googleapis') ||
       event.request.url.includes('gstatic')) {
     return; // Dejar que Firebase maneje su propia cache
+  }
+  
+  // No cachear librerías PDF/Excel - siempre usar red para obtener la versión más reciente
+  if (event.request.url.includes('html2pdf') || 
+      event.request.url.includes('html2canvas') ||
+      event.request.url.includes('jspdf') ||
+      event.request.url.includes('exceljs') ||
+      event.request.url.includes('FileSaver') ||
+      event.request.url.includes('cdnjs.cloudflare.com') ||
+      event.request.url.includes('cdn.jsdelivr.net') ||
+      event.request.url.includes('unpkg.com')) {
+    // Para librerías externas, siempre usar red y no cachear
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' })
+        .catch(() => {
+          // Si falla la red, intentar desde cache como último recurso
+          return caches.match(event.request);
+        })
+    );
+    return;
   }
 
   // Solo cachear peticiones GET

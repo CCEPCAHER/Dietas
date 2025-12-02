@@ -5536,18 +5536,31 @@ ${lineas.join('\n')}`;
         }
 
         /**
-         * Espera a que las librerías PDF estén cargadas (especialmente importante para iOS/iPad)
+         * Espera a que las librerías PDF estén cargadas (especialmente importante para iOS/iPad y PWA móvil)
          */
         window.esperarLibreriasPDF = async function (maxIntentos = null, intervalo = null) {
-            // Detectar iOS/iPad para ajustar parámetros
+            // Detectar iOS/iPad
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
             
-            // Ajustar parámetros para iOS
-            const maxIntentosFinal = maxIntentos || (isIOS ? 15 : 10);
-            const intervaloFinal = intervalo || (isIOS ? 800 : 500);
+            // Detectar móvil/tablet
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent);
             
-            console.log(`📚 Esperando librerías PDF... (iOS: ${isIOS}, intentos: ${maxIntentosFinal}, intervalo: ${intervaloFinal}ms)`);
+            // Detectar PWA (standalone mode)
+            const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                          window.navigator.standalone === true;
+            
+            const isStandalone = window.navigator.standalone === true || 
+                                 window.matchMedia('(display-mode: standalone)').matches ||
+                                 window.matchMedia('(display-mode: fullscreen)').matches;
+            
+            const isMobileOrPWA = isMobile || isPWA || isStandalone;
+            
+            // Ajustar parámetros para móvil/PWA
+            const maxIntentosFinal = maxIntentos || (isMobileOrPWA ? 20 : (isIOS ? 15 : 10));
+            const intervaloFinal = intervalo || (isMobileOrPWA ? 1000 : (isIOS ? 800 : 500));
+            
+            console.log(`📚 Esperando librerías PDF... (iOS: ${isIOS}, Móvil/PWA: ${isMobileOrPWA}, intentos: ${maxIntentosFinal}, intervalo: ${intervaloFinal}ms)`);
             
             // Si LibraryLoader está disponible, usarlo
             if (window.LibraryLoader && typeof window.LibraryLoader.isPDFReady === 'function') {
@@ -5625,15 +5638,45 @@ ${lineas.join('\n')}`;
                 const jsPDFReady = typeof window.jsPDF !== 'undefined' || typeof window.jspdf !== 'undefined';
                 
                 if (!html2pdfReady && !(html2canvasReady && jsPDFReady)) {
-                    const mensaje = 'Error: Las librerías PDF no están cargadas.\n\n' +
-                        'Por favor, verifica tu conexión a internet y recarga la página.\n\n' +
-                        'Si el problema persiste, intenta:\n' +
-                        '1. Limpiar la caché del navegador\n' +
-                        '2. Recargar la página\n' +
-                        '3. Usar otro navegador';
-                    alert(mensaje);
-                    mostrarNotificacion('❌ Error: Librerías PDF no disponibles', 'error');
-                    return;
+                    // Detectar si es móvil/PWA
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent);
+                    const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+                    
+                    let mensaje = 'Error: Las librerías PDF no están cargadas.\n\n';
+                    
+                    if (isMobile || isPWA) {
+                        mensaje += 'En modo PWA/móvil, las librerías pueden tardar más en cargar.\n\n';
+                        mensaje += 'Por favor:\n';
+                        mensaje += '1. Verifica tu conexión a internet\n';
+                        mensaje += '2. Espera unos segundos y vuelve a intentar\n';
+                        mensaje += '3. Si el problema persiste, recarga la aplicación\n';
+                        mensaje += '4. O abre la aplicación en el navegador (no en modo PWA)';
+                    } else {
+                        mensaje += 'Por favor, verifica tu conexión a internet y recarga la página.\n\n';
+                        mensaje += 'Si el problema persiste, intenta:\n';
+                        mensaje += '1. Limpiar la caché del navegador\n';
+                        mensaje += '2. Recargar la página\n';
+                        mensaje += '3. Usar otro navegador';
+                    }
+                    
+                    // Intentar recargar las librerías una vez más
+                    if (window.LibraryLoader && window.LibraryLoader.retry) {
+                        mostrarNotificacion('🔄 Reintentando cargar librerías PDF...', 'info');
+                        const retrySuccess = await window.LibraryLoader.retry();
+                        if (retrySuccess && window.LibraryLoader.isPDFReady()) {
+                            console.log('✅ Librerías cargadas después del reintento');
+                            mostrarNotificacion('✅ Librerías PDF cargadas correctamente', 'success');
+                            // Continuar con la generación del PDF
+                        } else {
+                            alert(mensaje);
+                            mostrarNotificacion('❌ Error: Librerías PDF no disponibles', 'error');
+                            return;
+                        }
+                    } else {
+                        alert(mensaje);
+                        mostrarNotificacion('❌ Error: Librerías PDF no disponibles', 'error');
+                        return;
+                    }
                 }
             }
 

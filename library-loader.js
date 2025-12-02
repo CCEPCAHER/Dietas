@@ -67,14 +67,42 @@
     // Detectar iOS/iPad
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    
+    // Detectar móvil/tablet
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent);
+    
+    // Detectar PWA (standalone mode)
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                  window.navigator.standalone === true ||
+                  (window.matchMedia('(display-mode: standalone)').matches === false && 
+                   window.matchMedia('(display-mode: fullscreen)').matches === false &&
+                   window.matchMedia('(display-mode: minimal-ui)').matches === false &&
+                   window.navigator.standalone === undefined &&
+                   document.referrer.includes('android-app://'));
+    
+    // Detectar si está en modo standalone o PWA instalada
+    const isStandalone = window.navigator.standalone === true || 
+                         window.matchMedia('(display-mode: standalone)').matches ||
+                         window.matchMedia('(display-mode: fullscreen)').matches;
 
-    // Configuración
+    // Configuración - Aumentar tiempos para móvil/PWA
+    const isMobileOrPWA = isMobile || isPWA || isStandalone;
     const CONFIG = {
-        timeout: isIOS ? 25000 : 15000, // 25 segundos para iOS, 15 para otros
-        maxRetries: isIOS ? 5 : 3, // Más reintentos en iOS
-        retryDelay: isIOS ? 1500 : 1000, // Más tiempo entre reintentos en iOS
+        timeout: isMobileOrPWA ? 30000 : (isIOS ? 25000 : 15000), // 30s para móvil/PWA, 25s iOS, 15s otros
+        maxRetries: isMobileOrPWA ? 6 : (isIOS ? 5 : 3), // Más reintentos en móvil/PWA
+        retryDelay: isMobileOrPWA ? 2000 : (isIOS ? 1500 : 1000), // Más tiempo entre reintentos
         showNotifications: true
     };
+    
+    console.log('📱 Detección de entorno:', {
+        isIOS,
+        isMobile,
+        isPWA,
+        isStandalone,
+        isMobileOrPWA,
+        timeout: CONFIG.timeout,
+        maxRetries: CONFIG.maxRetries
+    });
 
     /**
      * Muestra notificación al usuario
@@ -97,7 +125,10 @@
             const script = document.createElement('script');
             script.type = 'text/javascript';
             script.async = true;
-            script.src = url;
+            
+            // En móvil/PWA, agregar timestamp para evitar cache
+            const cacheBuster = isMobileOrPWA ? `?t=${Date.now()}` : '';
+            script.src = url + cacheBuster;
 
             let timeoutId;
             let loaded = false;
@@ -170,8 +201,8 @@
                     console.log(`🔄 Attempting to load ${config.name} from ${cdnName}...`);
                     await loadScript(url);
 
-                    // Espera para que la librería se inicialice (más tiempo en iOS)
-                    const initDelay = isIOS ? 500 : 200;
+                    // Espera para que la librería se inicialice (más tiempo en móvil/PWA)
+                    const initDelay = isMobileOrPWA ? 800 : (isIOS ? 500 : 200);
                     await new Promise(resolve => setTimeout(resolve, initDelay));
 
                     // Validar que realmente se cargó
@@ -187,9 +218,9 @@
                     console.warn(`⚠️ Failed to load ${config.name} from ${cdnName}:`, error.message);
                     lastError = error;
 
-                    // Si no es el último CDN, esperar un poco antes de intentar el siguiente (más tiempo en iOS)
+                    // Si no es el último CDN, esperar un poco antes de intentar el siguiente (más tiempo en móvil/PWA)
                     if (i < urls.length - 1) {
-                        const retryDelay = isIOS ? 1000 : 500;
+                        const retryDelay = isMobileOrPWA ? 1500 : (isIOS ? 1000 : 500);
                         await new Promise(resolve => setTimeout(resolve, retryDelay));
                     }
                 }
@@ -329,17 +360,27 @@
     };
 
     // Auto-inicializar cuando el DOM esté listo
-    // En iOS, esperar un poco más para asegurar que los scripts con defer estén listos
-    const initDelay = isIOS ? 500 : 100;
+    // En móvil/PWA, esperar más para asegurar que los scripts con defer estén listos
+    const initDelay = isMobileOrPWA ? 1000 : (isIOS ? 500 : 100);
     
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(init, initDelay);
         });
     } else {
-        // DOM ya está listo, iniciar después de un pequeño delay
+        // DOM ya está listo, iniciar después de un delay
         setTimeout(init, initDelay);
     }
+    
+    // También intentar inicializar después de que la ventana esté completamente cargada (importante para PWA)
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            if (!window.librariesReady) {
+                console.log('🔄 Reintentando carga de librerías después de window.load...');
+                init().catch(err => console.warn('Error en reintento de carga:', err));
+            }
+        }, isMobileOrPWA ? 2000 : 1000);
+    });
 
     console.log('📚 Library Loader inicializado');
 })();
