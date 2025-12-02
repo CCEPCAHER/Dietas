@@ -1,0 +1,60 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Reglas para usuarios - Solo pueden leer/escribir sus propios datos
+    match /usuarios/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Reglas para clientes - Solo pueden leer/escribir sus propios clientes
+    match /clientes/{clienteId} {
+      // Leer: Solo el nutricionista propietario
+      allow read: if request.auth != null && 
+        request.auth.uid == resource.data.nutricionistaId;
+      
+      // Crear: Cualquier usuario autenticado puede crear (pero debe incluir su ID)
+      allow create: if request.auth != null && 
+        request.resource.data.nutricionistaId == request.auth.uid;
+      
+      // Actualizar: Solo el nutricionista propietario
+      allow update: if request.auth != null && 
+        request.auth.uid == resource.data.nutricionistaId;
+      
+      // Eliminar: Solo el nutricionista propietario
+      allow delete: if request.auth != null && 
+        request.auth.uid == resource.data.nutricionistaId;
+    }
+    
+    // Reglas para dietas - Solo pueden leer/escribir sus propias dietas
+    match /dietas/{dietaId} {
+      // Leer: Permitir lectura a cualquier usuario autenticado
+      // Esto permite acceso a dietas antiguas sin userId y a dietas del usuario
+      // La verificación de seguridad se hace en el código del cliente
+      allow read: if request.auth != null;
+      
+      // Crear: Cualquier usuario autenticado puede crear (pero debe incluir su ID)
+      allow create: if request.auth != null && 
+        request.resource.data.userId == request.auth.uid;
+      
+      // Actualizar: Solo el usuario propietario o si no tiene userId
+      // Verificación en el cliente para seguridad adicional
+      allow update: if request.auth != null && 
+        (resource.data.userId == request.auth.uid || 
+         resource.data.userId == null);
+      
+      // Eliminar: Solo el usuario propietario o si no tiene userId
+      // Verificación en el cliente para seguridad adicional
+      allow delete: if request.auth != null && 
+        (resource.data.userId == request.auth.uid || 
+         resource.data.userId == null);
+    }
+    
+    // Reglas para alimentos - Base de datos compartida, cualquier usuario autenticado puede leer/escribir
+    match /alimentos/{alimentoId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+

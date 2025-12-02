@@ -1,0 +1,101 @@
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (si en el futuro agregas npm)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Archivos temporales
+*.tmp
+*.log
+*.temp
+
+# Archivos de backup
+*.bak
+*.backup
+*.pdf
+
+# Archivos específicos del proyecto
+# Nota: firebase-config.js se incluye porque las credenciales de Firebase
+# son públicas por diseño (no son un riesgo de seguridad)
+
+# Archivos que NO deben subirse por seguridad
+*.env
+.env.local
+.env.production
+secrets.json
+config.private.js
+
+# Firebase Admin SDK (si lo usas en el futuro)
+firebase-adminsdk*.json
+serviceAccountKey.json
+
+# Archivos de usuarios locales
+.pnp.*
+.yarn/*
+!yarn/*
+cache/
+.eslintcache
+
+# Herramientas de desarrollo
+*.local
+.vscode/
+.idea/
+
+# Archivos de Python (si usas generador de iconos)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Claves privadas (por si acaso)
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+*.crt
+
+# Archivos de la app que no se necesitan en Git
+# (temporales, backups, etc.)
+*.tmp
+*.bak
+*.backup
+*.old
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Coverage directory usado por testing
+coverage/
+*.lcov
+
+# Archivos de producción
+dist/
+build/
+out/
+
