@@ -813,6 +813,234 @@
         tbody tr:nth-child(5) {
             animation-delay: 0.25s;
         }
+
+        /* =========================================
+           OPTIMIZACIÓN MÓVIL (Landscape y Portrait)
+           ========================================= */
+        @media screen and (max-width: 900px) {
+
+            /* Ajustes generales del contenedor principal */
+            body {
+                padding: 0;
+            }
+
+            .container {
+                width: 100%;
+                border-radius: 0;
+                margin: 0;
+                box-shadow: none;
+                border: none;
+            }
+
+            .content,
+            .header {
+                padding: 15px 10px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+                line-height: 1.2;
+            }
+
+            .header p {
+                font-size: 0.9em;
+            }
+
+            /* Stats compactos */
+            .stats {
+                grid-template-columns: repeat(3, 1fr);
+                /* Forzar 3 columnas en una fila */
+                gap: 5px;
+                padding: 10px;
+                margin-bottom: 20px;
+            }
+
+            .stat-card {
+                padding: 10px 5px;
+            }
+
+            .stat-card h3 {
+                font-size: 1.2em;
+            }
+
+            .stat-card p {
+                font-size: 0.6em;
+            }
+
+            /* Controles y Filtros compactos */
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+                margin-bottom: 15px;
+                padding: 0;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 12px;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .filters {
+                padding: 0px;
+                background: transparent;
+                box-shadow: none;
+                border: none;
+                margin-bottom: 15px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .filter-select {
+                min-width: unset;
+                width: 100%;
+                padding: 8px;
+                font-size: 0.85em;
+            }
+
+            /* === OPTIMIZACIÓN TABLA === */
+            .table-container {
+                margin-top: 0;
+                padding: 0;
+                border: none;
+                box-shadow: none;
+                background: transparent;
+                /* Permitir scroll suave en touch */
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Reducir padding y tamaño de fuente en celdas para aprovechar espacio */
+            th,
+            td {
+                padding: 8px 4px;
+                /* Padding vertical decente, horizontal mínimo */
+                font-size: 0.8rem;
+                /* Letra legible pero pequeña */
+                white-space: nowrap;
+                /* Evitar saltos de línea por defecto */
+                min-width: unset !important;
+                /* Resetear anchos mínimos forzados */
+                max-width: unset !important;
+            }
+
+            /* Ajustes cabecera sticky */
+            th {
+                top: 0;
+                z-index: 20;
+                font-size: 0.7em;
+                /* Cabeceras más pequeñas */
+                letter-spacing: 0;
+            }
+
+            /* 1. COLUMNA NOMBRE: Sticky a la izquierda */
+            th:nth-child(1),
+            td:nth-child(1) {
+                position: sticky;
+                left: 0;
+                z-index: 25;
+                /* Encima de otras celdas */
+                background-color: white;
+                /* Necesario para tapar el scroll */
+                border-right: 2px solid rgba(0, 0, 0, 0.05);
+                /* Sombra separadora */
+                max-width: 130px !important;
+                white-space: normal;
+                /* Permitir wrap solo en nombre */
+                overflow: hidden;
+            }
+
+            /* Fondo correcto para el header del nombre */
+            th:nth-child(1) {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                z-index: 30;
+                /* Encima de todo */
+            }
+
+            /* Ajuste de color en filas pares para la columna sticky */
+            tbody tr:nth-child(even) td:nth-child(1) {
+                background-color: #f8f9fa;
+            }
+
+            /* 2. Marca - Pequeña */
+            th:nth-child(2),
+            td:nth-child(2) {
+                max-width: 80px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            /* 3 & 4 Categorías - Badges compactos */
+            td:nth-child(3) span,
+            td:nth-child(4) span {
+                padding: 2px 4px;
+                font-size: 0.65rem !important;
+                border-radius: 4px;
+            }
+
+            /* COLUMNAS NUMÉRICAS (5 a 11) - Muy compactas */
+            th:nth-child(5),
+            td:nth-child(5),
+            /* Peso */
+            th:nth-child(6),
+            td:nth-child(6),
+            /* Prot */
+            th:nth-child(7),
+            td:nth-child(7),
+            /* GS */
+            th:nth-child(8),
+            td:nth-child(8),
+            /* Carb */
+            th:nth-child(9),
+            td:nth-child(9),
+            /* Grasas */
+            th:nth-child(10),
+            td:nth-child(10),
+            /* Azuc */
+            th:nth-child(11),
+            td:nth-child(11)
+
+            /* Kcal */
+                {
+                min-width: 45px !important;
+                text-align: center;
+                padding: 8px 2px;
+                font-variant-numeric: tabular-nums;
+            }
+
+            /* 12. ACCIONES (Última) - Sticky a la derecha */
+            th:last-child,
+            td:last-child {
+                position: sticky;
+                right: 0;
+                z-index: 25;
+                background-color: white;
+                border-left: 2px solid rgba(0, 0, 0, 0.05);
+                min-width: 80px !important;
+                padding: 4px;
+            }
+
+            /* Fondo correcto para header de acciones */
+            th:last-child {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                z-index: 30;
+            }
+
+            /* Ajuste de color en filas pares para acciones sticky */
+            tbody tr:nth-child(even) td:last-child {
+                background-color: #f8f9fa;
+            }
+
+            /* Botones de acción más grandes para dedo */
+            td:last-child button {
+                font-size: 1.3rem;
+                padding: 8px 10px;
+                margin: 0;
+            }
+        }
     </style>
 </head>
 
