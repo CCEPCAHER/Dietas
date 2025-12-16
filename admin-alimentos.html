@@ -986,23 +986,140 @@
                 border-radius: 4px;
             }
 
-            /* COLUMNAS NUMÉRICAS (5 a 11) - Muy compactas */
+            /* === OPTIMIZACIÓN TABLA "VIEWPORT ÚNICO" === */
+
+            .table-container {
+                margin-top: 5px;
+                padding: 0;
+                border: none;
+                box-shadow: none;
+                background: white;
+                overflow-x: hidden;
+                /* ELIMINAR SCROLL HORIZONTAL */
+                width: 100%;
+            }
+
+            table {
+                width: 100%;
+                table-layout: fixed;
+                /* Anchos fijos estrictos */
+                min-width: 0;
+                /* Permitir encogimiento */
+            }
+
+            th,
+            td {
+                padding: 6px 2px !important;
+                /* Padding mínimo */
+                font-size: 0.75rem !important;
+                /* Letra pequeña */
+                white-space: normal !important;
+                /* Permitir saltos de línea */
+                overflow: hidden;
+                word-wrap: break-word;
+            }
+
+            /* --- GESTIÓN DE COLUMNAS (OCULTAR LO NO ESENCIAL) --- */
+
+            /* 2. Marca - OCULTAR */
+            th:nth-child(2),
+            td:nth-child(2) {
+                display: none;
+            }
+
+            /* 4. Subcategoría - OCULTAR */
+            th:nth-child(4),
+            td:nth-child(4) {
+                display: none;
+            }
+
+            /* 5. Peso - OCULTAR */
             th:nth-child(5),
-            td:nth-child(5),
-            /* Peso */
+            td:nth-child(5) {
+                display: none;
+            }
+
+            /* 7. Grasas Saturadas - OCULTAR */
+            th:nth-child(7),
+            td:nth-child(7) {
+                display: none;
+            }
+
+            /* 10. Azúcares - OCULTAR */
+            th:nth-child(10),
+            td:nth-child(10) {
+                display: none;
+            }
+
+
+            /* --- AJUSTE DE COLUMNAS VISIBLES --- */
+
+            /* 1. Alimento (Principal) */
+            th:nth-child(1),
+            td:nth-child(1) {
+                width: 25%;
+                /* Dale espacio al nombre */
+                position: static !important;
+                /* Quitar sticky para evitar líos */
+                background: transparent !important;
+                border: none !important;
+            }
+
+            /* 3. Categoría */
+            th:nth-child(3),
+            td:nth-child(3) {
+                width: 15%;
+            }
+
+            /* Badges más pequeños */
+            td:nth-child(3) span {
+                font-size: 0.6rem !important;
+                padding: 2px !important;
+                display: block !important;
+                /* Apilar si es necesario */
+                white-space: normal !important;
+            }
+
+            /* MACROS (6, 8, 9) y KCAL (11) - Muy compactos */
             th:nth-child(6),
             td:nth-child(6),
             /* Prot */
-            th:nth-child(7),
-            td:nth-child(7),
-            /* GS */
             th:nth-child(8),
             td:nth-child(8),
             /* Carb */
             th:nth-child(9),
             td:nth-child(9),
-            /* Grasas */
-            th:nth-child(10),
+            /* Gras */
+            th:nth-child(11),
+            td:nth-child(11)
+
+            /* Kcal */
+                {
+                width: 10%;
+                text-align: center;
+                font-weight: 700;
+            }
+
+            /* 12. Acciones */
+            th:last-child,
+            td:last-child {
+                width: 15%;
+                text-align: center;
+                position: static !important;
+            }
+
+            /* Botones de acción minimalistas */
+            .btn-sm {
+                padding: 4px !important;
+                font-size: 1rem !important;
+                /* Emojis grandes */
+                background: transparent !important;
+                color: #333 !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+            }
+
+            /* Ocultar texto "Editar/Eliminar" y dejar solo iconos si posible, o reducir */
             td:nth-child(10),
             /* Azuc */
             th:nth-child(11),
