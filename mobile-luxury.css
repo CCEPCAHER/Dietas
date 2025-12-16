@@ -1,0 +1,285 @@
+/* 
+   📱 MOBILE LUXURY UI OVERHAUL 
+   Designed to make the Dietas App feel like a native, premium experience.
+*/
+
+:root {
+    --premium-bg: #f5f7fa;
+    --premium-card: #ffffff;
+    --premium-text: #1f2937;
+    --premium-text-light: #6b7280;
+    --premium-primary: #4f46e5;
+    --premium-accent: #f59e0b;
+    --premium-success: #10b981;
+    --premium-radius: 16px;
+    --premium-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    --premium-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Base Body Improvements */
+body {
+    background-color: var(--premium-bg);
+    color: var(--premium-text);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Modern Container */
+.container {
+    padding: 24px !important;
+    border-radius: 24px !important;
+    box-shadow: var(--premium-shadow) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+}
+
+/* Enhanced Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.025em;
+    color: #111827;
+}
+
+.main-header h1 {
+    font-size: 2.25rem !important;
+    font-weight: 800 !important;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle-header {
+    font-size: 1rem !important;
+    color: var(--premium-text-light) !important;
+    font-weight: 500 !important;
+}
+
+/* Premium Cards */
+.card-modern,
+.tmb-section,
+.macro-info,
+.stats,
+.controls {
+    background: var(--premium-card) !important;
+    border-radius: var(--premium-radius) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid rgba(229, 231, 235, 0.5) !important;
+    padding: 24px !important;
+    margin-bottom: 24px !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--premium-shadow-hover) !important;
+}
+
+/* Modern Form Inputs - Apple Style */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="date"],
+select,
+textarea {
+    background-color: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    padding: 14px 16px !important;
+    font-size: 1rem !important;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    background-color: #ffffff !important;
+    border-color: var(--premium-primary) !important;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1) !important;
+    transform: translateY(-1px);
+}
+
+/* Floating Labels (mimic) */
+.form-group label {
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    color: #374151 !important;
+    margin-bottom: 6px !important;
+    display: inline-block;
+}
+
+/* Premium Buttons */
+button,
+.btn,
+.btn-submit,
+.btn-download,
+.btn-save {
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.025em !important;
+    padding: 14px 24px !important;
+    font-size: 1rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.btn-submit {
+    background: linear-gradient(to right, #4f46e5, #4338ca) !important;
+}
+
+.btn-submit:active {
+    transform: scale(0.98);
+}
+
+/* Tab Bar - Native App Feel */
+.tabs {
+    background: #f3f4f6;
+    padding: 6px;
+    border-radius: 16px;
+    gap: 0;
+}
+
+.tab {
+    border-radius: 12px;
+    padding: 10px 20px;
+    color: #6b7280;
+    background: transparent;
+    border: none;
+    font-weight: 600;
+    flex: 1;
+    text-align: center;
+}
+
+.tab.active {
+    background: #ffffff;
+    color: #111827;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    transform: none;
+}
+
+/* Tables - Horizontal Scroll Friendly */
+.table-container,
+.table-responsive {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    background: white;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+th {
+    background-color: #f9fafb !important;
+    color: #374151 !important;
+    font-weight: 600 !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 16px !important;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+td {
+    padding: 16px !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+    color: #4b5563;
+}
+
+tr:last-child td {
+    border-bottom: none !important;
+}
+
+/* =========================================
+   📱 MOBILE SPECIFIC OVERRIDES (< 768px)
+   ========================================= */
+@media (max-width: 768px) {
+    body {
+        padding: 12px;
+    }
+
+    .container {
+        padding: 16px !important;
+        border-radius: 20px !important;
+    }
+
+    .main-header h1 {
+        font-size: 1.75rem !important;
+    }
+
+    /* Cards full width on mobile */
+    .card-modern,
+    .tmb-section,
+    .stats {
+        padding: 16px !important;
+        margin-left: -8px;
+        margin-right: -8px;
+        border-radius: 16px !important;
+    }
+
+    /* Bigger tap targets */
+    input,
+    select,
+    button {
+        min-height: 48px;
+        /* Minimum accessible touch target */
+    }
+
+    .form-group {
+        margin-bottom: 20px !important;
+    }
+
+    /* Stacked buttons */
+    .btn-container {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    /* Smooth horizontal table scrolling */
+    .table-container {
+        margin: 0 -8px;
+        /* Bleed to edges */
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    table {
+        min-width: 600px;
+        /* Ensure logical width */
+    }
+
+    /* Sticky first column for tables */
+    th:first-child,
+    td:first-child {
+        position: sticky;
+        left: 0;
+        background: white;
+        z-index: 10;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    }
+
+    th:first-child {
+        background: #f9fafb;
+    }
+
+    /* Bottom Navigation Bar (if we implement one later) or fixed actions */
+    .fab-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 100;
+    }
+}

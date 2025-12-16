@@ -1,11 +1,13 @@
 // Service Worker para MAIKA PORCUNA - PWA
 // Versión actualizada para auto-actualización automática
-const CACHE_NAME = 'maika-porcuna-v5.0.2';
+const CACHE_NAME = 'maika-porcuna-v5.0.35';
 const BASE_PATH = self.location.pathname.replace(/sw\.js$/, '');
 const urlsToCache = [
   './',
   './index.html',
   './styles.css',
+  './ui-improvements.css',
+  './mobile-luxury.css', // New UI File
   './firebase-config.js',
   './auth.js',
   './dietaService.js',
