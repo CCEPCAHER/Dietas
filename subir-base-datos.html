@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Base de Datos a Firebase</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #resultado {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        #resultado.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            display: block;
+        }
+        #resultado.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            display: block;
+        }
+        #resultado.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            display: block;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        .stat-card h3 {
+            font-size: 2em;
+            color: #667eea;
+            margin: 0;
+        }
+        .stat-card p {
+            color: #666;
+            margin: 5px 0 0 0;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Subir Base de Datos a Firebase</h1>
+        
+        <p>Esta herramienta te permite subir la base de datos de alimentos a Firebase Firestore de forma manual.</p>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <h3 id="totalAlimentos">0</h3>
+                <p>Total Alimentos</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="estado">-</h3>
+                <p>Estado</p>
+            </div>
+        </div>
+        
+        <div>
+            <button onclick="subirBaseDatos()">📤 Subir a Firebase</button>
+            <button onclick="verificarBD()">🔍 Verificar Estado</button>
+            <button onclick="limpiarLocalStorage()">🗑️ Limpiar localStorage</button>
+        </div>
+        
+        <div id="resultado"></div>
+    </div>
+
+    <!-- Firebase SDKs v8 (compatible con el proyecto actual) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <!-- Cargar configuración y base de datos -->
+    <script src="firebase-config.js"></script>
+    <script src="base-datos-alimentos.js"></script>
+    
+    <!-- Script principal -->
+    <script>
+        let baseDatosLocal = null;
+        
+        // Cargar base de datos al inicio
+        window.addEventListener('load', () => {
+            if (window.baseDatosAlimentos) {
+                baseDatosLocal = window.baseDatosAlimentos;
+                document.getElementById('totalAlimentos').textContent = baseDatosLocal.length;
+                console.log('✅ Base de datos cargada:', baseDatosLocal.length, 'alimentos');
+            } else {
+                document.getElementById('totalAlimentos').textContent = 'Error';
+                console.error('❌ No se pudo cargar la base de datos');
+            }
+            
+            // Verificar autenticación
+            verificarAuth();
+        });
+        
+        function verificarAuth() {
+            if (window.firebaseAuth) {
+                firebase.auth().onAuthStateChanged((user) => {
+                    if (user) {
+                        document.getElementById('estado').textContent = '✓';
+                        console.log('✅ Usuario autenticado');
+                    } else {
+                        document.getElementById('estado').textContent = '✗';
+                        console.log('⚠️ Usuario no autenticado');
+                    }
+                });
+            } else {
+                console.error('❌ Firebase Auth no disponible');
+            }
+        }
+        
+        function mostrarResultado(tipo, mensaje) {
+            const div = document.getElementById('resultado');
+            div.className = tipo;
+            div.innerHTML = mensaje;
+        }
+        
+        async function subirBaseDatos() {
+            if (!baseDatosLocal || baseDatosLocal.length === 0) {
+                mostrarResultado('error', '❌ No se pudo cargar la base de datos local.');
+                return;
+            }
+            
+            // Verificar autenticación
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                // Intentar autenticación anónima
+                mostrarResultado('info', '⏳ Autenticando...');
+                try {
+                    await firebase.auth().signInAnonymously();
+                } catch (error) {
+                    mostrarResultado('error', '❌ Error de autenticación: ' + error.message);
+                    return;
+                }
+            }
+            
+            try {
+                mostrarResultado('info', '⏳ Subiendo ' + baseDatosLocal.length + ' alimentos a Firebase...');
+                
+                // Limpiar datos: eliminar campos undefined
+                const baseDatosLimpia = baseDatosLocal.map(alimento => {
+                    const limpio = {};
+                    for (const key in alimento) {
+                        if (alimento[key] !== undefined) {
+                            limpio[key] = alimento[key];
+                        }
+                    }
+                    return limpio;
+                });
+                
+                // Subir a Firestore
+                await firebase.firestore().collection('alimentos').doc('base-datos').set({
+                    alimentos: baseDatosLimpia,
+                    fechaActualizacion: firebase.firestore.FieldValue.serverTimestamp(),
+                    totalAlimentos: baseDatosLimpia.length
+                }, { merge: false });
+                
+                mostrarResultado('success', 
+                    '✅ ¡Base de datos subida correctamente!<br>' +
+                    '<strong>Total de alimentos:</strong> ' + baseDatosLocal.length + '<br>' +
+                    '<strong>Fecha:</strong> ' + new Date().toLocaleString('es-ES') + '<br>' +
+                    '<br>Verifica en <a href="https://console.firebase.google.com/project/maikafit-f1756/firestore" target="_blank">Firebase Console</a>'
+                );
+                
+                // Actualizar localStorage también
+                localStorage.setItem('baseDatosAlimentosPersonalizada', JSON.stringify(baseDatosLocal));
+                console.log('✅ Base de datos guardada en localStorage');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarResultado('error', '❌ Error al subir: ' + error.message + '<br>Verifica la consola (F12) para más detalles.');
+            }
+        }
+        
+        async function verificarBD() {
+            // Verificar autenticación
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                mostrarResultado('error', '❌ No hay usuario autenticado. Haz clic en "Subir a Firebase" primero.');
+                return;
+            }
+            
+            try {
+                mostrarResultado('info', '⏳ Verificando estado en Firebase...');
+                
+                const docRef = firebase.firestore().collection('alimentos').doc('base-datos');
+                const docSnap = await docRef.get();
+                
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+                    const fechaActualizacion = data.fechaActualizacion?.toDate();
+                    mostrarResultado('success', 
+                        '✅ Base de datos existe en Firebase<br>' +
+                        '<strong>Total en Firebase:</strong> ' + (data.alimentos?.length || 0) + ' alimentos<br>' +
+                        '<strong>Total en Local:</strong> ' + baseDatosLocal.length + ' alimentos<br>' +
+                        '<strong>Última actualización:</strong> ' + (fechaActualizacion ? fechaActualizacion.toLocaleString('es-ES') : 'N/A')
+                    );
+                } else {
+                    mostrarResultado('info', '⚠️ No hay base de datos en Firebase todavía.<br>Haz clic en "Subir a Firebase".');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarResultado('error', '❌ Error al verificar: ' + error.message);
+            }
+        }
+        
+        function limpiarLocalStorage() {
+            if (confirm('¿Estás seguro de limpiar el localStorage? Esto eliminará las personalizaciones locales de alimentos.')) {
+                localStorage.removeItem('baseDatosAlimentosPersonalizada');
+                mostrarResultado('success', '✅ localStorage limpiado.<br>Se cargarán los datos originales de base-datos-alimentos.js');
+                setTimeout(() => window.location.reload(), 2000);
+            }
+        }
+    </script>
+</body>
+</html>
