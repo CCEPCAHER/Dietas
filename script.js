@@ -1,859 +1,4 @@
-// Base de datos de alimentos por objetivo
-const alimentosPorObjetivo = {
-    aumentar: {
-        semana: [
-            {
-                dia: "LUNES",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Avena (80g)", "Plátano", "Leche entera (250ml)", "Almendras (30g)", "Miel (1 cucharada)"],
-                        calorias: 620,
-                        proteinas: 25,
-                        carbohidratos: 85,
-                        grasas: 20
-                    },
-                    medioDia: {
-                        alimentos: ["Batido de proteína", "Fruta"],
-                        calorias: 200,
-                        proteinas: 25,
-                        carbohidratos: 20,
-                        grasas: 3
-                    },
-                    almuerzo: {
-                        alimentos: ["Pechuga de pollo (200g)", "Arroz integral (150g)", "Brócoli al vapor", "Aguacate (medio)", "Aceite de oliva"],
-                        calorias: 750,
-                        proteinas: 50,
-                        carbohidratos: 75,
-                        grasas: 25
-                    },
-                    merienda: {
-                        alimentos: ["Batido de proteína", "Plátano", "Mantequilla de maní (2 cucharadas)", "Avena (40g)"],
-                        calorias: 520,
-                        proteinas: 35,
-                        carbohidratos: 55,
-                        grasas: 18
-                    },
-                    cena: {
-                        alimentos: ["Salmón a la plancha (180g)", "Batata asada (200g)", "Espárragos", "Ensalada verde", "Aceite de oliva"],
-                        calorias: 650,
-                        proteinas: 45,
-                        carbohidratos: 60,
-                        grasas: 22
-                    }
-                }
-            },
-            {
-                dia: "MARTES",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Huevos revueltos (4 unidades)", "Pan integral (2 rebanadas)", "Aguacate", "Queso", "Jugo de naranja"],
-                        calorias: 640,
-                        proteinas: 30,
-                        carbohidratos: 70,
-                        grasas: 25
-                    },
-                    medioDia: {
-                        alimentos: ["Yogur griego", "Frutos secos (30g)"],
-                        calorias: 220,
-                        proteinas: 15,
-                        carbohidratos: 15,
-                        grasas: 12
-                    },
-                    almuerzo: {
-                        alimentos: ["Ternera (200g)", "Pasta integral (120g)", "Verduras salteadas", "Queso parmesano", "Aceite de oliva"],
-                        calorias: 800,
-                        proteinas: 55,
-                        carbohidratos: 80,
-                        grasas: 28
-                    },
-                    merienda: {
-                        alimentos: ["Yogur griego (200g)", "Granola (50g)", "Fresas", "Nueces (30g)", "Miel"],
-                        calorias: 530,
-                        proteinas: 25,
-                        carbohidratos: 60,
-                        grasas: 20
-                    },
-                    cena: {
-                        alimentos: ["Pavo al horno (180g)", "Quinoa (150g)", "Calabacín asado", "Tomate", "Aceite de oliva"],
-                        calorias: 660,
-                        proteinas: 48,
-                        carbohidratos: 65,
-                        grasas: 20
-                    }
-                }
-            },
-            {
-                dia: "MIÉRCOLES",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Tortilla francesa (3 huevos)", "Avena (60g)", "Plátano", "Leche", "Almendras (20g)"],
-                        calorias: 610,
-                        proteinas: 28,
-                        carbohidratos: 75,
-                        grasas: 22
-                    },
-                    medioDia: {
-                        alimentos: ["Manzana", "Mantequilla de almendras (2 cucharadas)"],
-                        calorias: 250,
-                        proteinas: 8,
-                        carbohidratos: 25,
-                        grasas: 14
-                    },
-                    almuerzo: {
-                        alimentos: ["Atún (200g)", "Arroz basmati (150g)", "Garbanzos", "Ensalada mixta", "Aceite de oliva"],
-                        calorias: 740,
-                        proteinas: 52,
-                        carbohidratos: 85,
-                        grasas: 20
-                    },
-                    merienda: {
-                        alimentos: ["Batido (proteína, avena, plátano)", "Mantequilla de almendras", "Leche entera"],
-                        calorias: 570,
-                        proteinas: 40,
-                        carbohidratos: 60,
-                        grasas: 18
-                    },
-                    cena: {
-                        alimentos: ["Pollo al curry (200g)", "Arroz integral (120g)", "Lentejas", "Verduras", "Yogur"],
-                        calorias: 680,
-                        proteinas: 50,
-                        carbohidratos: 70,
-                        grasas: 22
-                    }
-                }
-            },
-            {
-                dia: "JUEVES",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Pancakes de avena (3 unidades)", "Huevos (2)", "Miel", "Frutos rojos", "Yogur griego"],
-                        calorias: 630,
-                        proteinas: 30,
-                        carbohidratos: 80,
-                        grasas: 20
-                    },
-                    medioDia: {
-                        alimentos: ["Batido de proteína", "Plátano"],
-                        calorias: 200,
-                        proteinas: 25,
-                        carbohidratos: 25,
-                        grasas: 2
-                    },
-                    almuerzo: {
-                        alimentos: ["Salmón (200g)", "Patatas al horno (200g)", "Espinacas", "Zanahoria", "Aceite de oliva"],
-                        calorias: 760,
-                        proteinas: 48,
-                        carbohidratos: 75,
-                        grasas: 28
-                    },
-                    merienda: {
-                        alimentos: ["Sándwich integral (pollo, aguacate)", "Fruta", "Nueces (25g)"],
-                        calorias: 590,
-                        proteinas: 35,
-                        carbohidratos: 65,
-                        grasas: 22
-                    },
-                    cena: {
-                        alimentos: ["Pechuga de pavo (180g)", "Cuscús (150g)", "Berenjena asada", "Ensalada", "Hummus"],
-                        calorias: 650,
-                        proteinas: 46,
-                        carbohidratos: 68,
-                        grasas: 20
-                    }
-                }
-            },
-            {
-                dia: "VIERNES",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Batido (avena, proteína, plátano, mantequilla de maní)", "Pan integral tostado", "Mermelada"],
-                        calorias: 690,
-                        proteinas: 35,
-                        carbohidratos: 90,
-                        grasas: 22
-                    },
-                    medioDia: {
-                        alimentos: ["Yogur con granola", "Frutos rojos"],
-                        calorias: 230,
-                        proteinas: 12,
-                        carbohidratos: 30,
-                        grasas: 8
-                    },
-                    almuerzo: {
-                        alimentos: ["Ternera magra (200g)", "Arroz con verduras (180g)", "Judías verdes", "Aguacate", "Aceite de oliva"],
-                        calorias: 780,
-                        proteinas: 52,
-                        carbohidratos: 80,
-                        grasas: 26
-                    },
-                    merienda: {
-                        alimentos: ["Yogur con granola (200g)", "Plátano", "Nueces (30g)", "Miel"],
-                        calorias: 580,
-                        proteinas: 38,
-                        carbohidratos: 62,
-                        grasas: 20
-                    },
-                    cena: {
-                        alimentos: ["Pollo al horno (200g)", "Batata (200g)", "Brócoli", "Queso", "Aceite de oliva"],
-                        calorias: 680,
-                        proteinas: 50,
-                        carbohidratos: 65,
-                        grasas: 24
-                    }
-                }
-            },
-            {
-                dia: "SÁBADO",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Tostadas francesas (3 rebanadas)", "Huevos (3)", "Bacon (2 tiras)", "Fruta", "Yogur"],
-                        calorias: 680,
-                        proteinas: 32,
-                        carbohidratos: 75,
-                        grasas: 28
-                    },
-                    medioDia: {
-                        alimentos: ["Batido de proteína", "Frutos secos mixtos (30g)"],
-                        calorias: 250,
-                        proteinas: 28,
-                        carbohidratos: 15,
-                        grasas: 12
-                    },
-                    almuerzo: {
-                        alimentos: ["Pasta con pollo y nata (250g)", "Ensalada César", "Pan integral", "Queso parmesano"],
-                        calorias: 870,
-                        proteinas: 55,
-                        carbohidratos: 95,
-                        grasas: 30
-                    },
-                    merienda: {
-                        alimentos: ["Batido completo (proteína, avena, plátano, mantequilla de almendras, leche)"],
-                        calorias: 650,
-                        proteinas: 42,
-                        carbohidratos: 70,
-                        grasas: 22
-                    },
-                    cena: {
-                        alimentos: ["Pizza casera integral (pollo, verduras, queso)", "Ensalada", "Aceite de oliva"],
-                        calorias: 750,
-                        proteinas: 48,
-                        carbohidratos: 80,
-                        grasas: 25
-                    }
-                }
-            },
-            {
-                dia: "DOMINGO",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Desayuno completo: huevos, bacon, tostadas, aguacate, tomate", "Jugo natural"],
-                        calorias: 700,
-                        proteinas: 35,
-                        carbohidratos: 70,
-                        grasas: 30
-                    },
-                    medioDia: {
-                        alimentos: ["Yogur griego", "Miel", "Nueces"],
-                        calorias: 240,
-                        proteinas: 18,
-                        carbohidratos: 20,
-                        grasas: 12
-                    },
-                    almuerzo: {
-                        alimentos: ["Arroz con pollo (300g)", "Frijoles", "Plátano macho frito", "Ensalada", "Aguacate"],
-                        calorias: 880,
-                        proteinas: 58,
-                        carbohidratos: 100,
-                        grasas: 28
-                    },
-                    merienda: {
-                        alimentos: ["Sándwich grande (atún, huevo, aguacate)", "Fruta", "Yogur", "Nueces"],
-                        calorias: 640,
-                        proteinas: 40,
-                        carbohidratos: 65,
-                        grasas: 24
-                    },
-                    cena: {
-                        alimentos: ["Salmón al horno (200g)", "Quinoa (150g)", "Verduras asadas", "Ensalada", "Aceite de oliva"],
-                        calorias: 700,
-                        proteinas: 48,
-                        carbohidratos: 68,
-                        grasas: 26
-                    }
-                }
-            }
-        ]
-    },
-    adelgazar: {
-        semana: [
-            {
-                dia: "LUNES",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Yogur griego desnatado (150g)", "Frutos rojos", "Avena (30g)", "Té verde"],
-                        calorias: 270,
-                        proteinas: 20,
-                        carbohidratos: 35,
-                        grasas: 5
-                    },
-                    medioDia: {
-                        alimentos: ["Manzana", "Almendras (10g)"],
-                        calorias: 120,
-                        proteinas: 3,
-                        carbohidratos: 18,
-                        grasas: 5
-                    },
-                    almuerzo: {
-                        alimentos: ["Pechuga de pollo (150g)", "Ensalada grande mixta", "Quinoa (80g)", "Limón y especias"],
-                        calorias: 420,
-                        proteinas: 40,
-                        carbohidratos: 45,
-                        grasas: 8
-                    },
-                    merienda: {
-                        alimentos: ["Manzana", "Almendras (15g)", "Té verde"],
-                        calorias: 170,
-                        proteinas: 5,
-                        carbohidratos: 20,
-                        grasas: 8
-                    },
-                    cena: {
-                        alimentos: ["Merluza al horno (150g)", "Verduras al vapor", "Ensalada verde", "Aceite de oliva (1 cucharada)"],
-                        calorias: 320,
-                        proteinas: 35,
-                        carbohidratos: 15,
-                        grasas: 12
-                    }
-                }
-            },
-            {
-                dia: "MARTES",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Tortilla de claras (4 claras)", "Tomate", "Espinacas", "Pan integral (1 rebanada)", "Café solo"],
-                        calorias: 230,
-                        proteinas: 18,
-                        carbohidratos: 30,
-                        grasas: 4
-                    },
-                    medioDia: {
-                        alimentos: ["Yogur desnatado", "Kiwi"],
-                        calorias: 100,
-                        proteinas: 6,
-                        carbohidratos: 15,
-                        grasas: 1
-                    },
-                    almuerzo: {
-                        alimentos: ["Atún al natural (120g)", "Judías verdes", "Arroz integral (60g)", "Ensalada", "Limón"],
-                        calorias: 400,
-                        proteinas: 38,
-                        carbohidratos: 48,
-                        grasas: 6
-                    },
-                    merienda: {
-                        alimentos: ["Yogur desnatado", "Kiwi", "Té de hierbas"],
-                        calorias: 120,
-                        proteinas: 8,
-                        carbohidratos: 18,
-                        grasas: 2
-                    },
-                    cena: {
-                        alimentos: ["Pechuga de pavo (140g)", "Calabacín a la plancha", "Berenjena", "Champiñones", "Especias"],
-                        calorias: 260,
-                        proteinas: 38,
-                        carbohidratos: 12,
-                        grasas: 5
-                    }
-                }
-            },
-            {
-                dia: "MIÉRCOLES",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Batido verde (espinacas, piña, plátano)", "Semillas de chía (10g)", "Té verde"],
-                        calorias: 250,
-                        proteinas: 8,
-                        carbohidratos: 40,
-                        grasas: 6
-                    },
-                    medioDia: {
-                        alimentos: ["Pera", "Té de hierbas"],
-                        calorias: 80,
-                        proteinas: 1,
-                        carbohidratos: 20,
-                        grasas: 0
-                    },
-                    almuerzo: {
-                        alimentos: ["Salmón a la plancha (120g)", "Brócoli al vapor", "Coliflor", "Arroz de coliflor", "Limón"],
-                        calorias: 360,
-                        proteinas: 35,
-                        carbohidratos: 20,
-                        grasas: 15
-                    },
-                    merienda: {
-                        alimentos: ["Pera", "Nueces (10g)", "Infusión"],
-                        calorias: 170,
-                        proteinas: 4,
-                        carbohidratos: 22,
-                        grasas: 7
-                    },
-                    cena: {
-                        alimentos: ["Pollo al limón (140g)", "Ensalada de espinacas", "Tomate cherry", "Pepino", "Vinagre balsámico"],
-                        calorias: 250,
-                        proteinas: 36,
-                        carbohidratos: 10,
-                        grasas: 6
-                    }
-                }
-            },
-            {
-                dia: "JUEVES",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Tostada integral (1 rebanada)", "Aguacate (40g)", "Tomate", "Huevo pochado", "Té"],
-                        calorias: 260,
-                        proteinas: 12,
-                        carbohidratos: 28,
-                        grasas: 10
-                    },
-                    medioDia: {
-                        alimentos: ["Zanahoria", "Hummus (30g)"],
-                        calorias: 90,
-                        proteinas: 3,
-                        carbohidratos: 12,
-                        grasas: 4
-                    },
-                    almuerzo: {
-                        alimentos: ["Ternera magra (130g)", "Lentejas (80g)", "Verduras salteadas", "Ensalada", "Limón"],
-                        calorias: 410,
-                        proteinas: 42,
-                        carbohidratos: 40,
-                        grasas: 8
-                    },
-                    merienda: {
-                        alimentos: ["Requesón bajo en grasa (100g)", "Fresas", "Canela"],
-                        calorias: 115,
-                        proteinas: 12,
-                        carbohidratos: 10,
-                        grasas: 3
-                    },
-                    cena: {
-                        alimentos: ["Merluza al papillote (150g)", "Espárragos", "Zanahoria", "Cebolla", "Hierbas aromáticas"],
-                        calorias: 250,
-                        proteinas: 36,
-                        carbohidratos: 14,
-                        grasas: 4
-                    }
-                }
-            },
-            {
-                dia: "VIERNES",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Yogur griego (150g)", "Granola light (20g)", "Arándanos", "Café solo"],
-                        calorias: 260,
-                        proteinas: 18,
-                        carbohidratos: 32,
-                        grasas: 6
-                    },
-                    medioDia: {
-                        alimentos: ["Naranja", "Té verde"],
-                        calorias: 70,
-                        proteinas: 1,
-                        carbohidratos: 17,
-                        grasas: 0
-                    },
-                    almuerzo: {
-                        alimentos: ["Pollo al curry light (140g)", "Arroz integral (70g)", "Verduras al vapor", "Ensalada"],
-                        calorias: 450,
-                        proteinas: 40,
-                        carbohidratos: 50,
-                        grasas: 9
-                    },
-                    merienda: {
-                        alimentos: ["Batido de proteína", "Plátano pequeño"],
-                        calorias: 220,
-                        proteinas: 25,
-                        carbohidratos: 25,
-                        grasas: 2
-                    },
-                    cena: {
-                        alimentos: ["Sopa de verduras", "Tofu a la plancha (100g)", "Ensalada mixta", "Aceite de oliva (1 cucharadita)"],
-                        calorias: 240,
-                        proteinas: 18,
-                        carbohidratos: 18,
-                        grasas: 10
-                    }
-                }
-            },
-            {
-                dia: "SÁBADO",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Huevos revueltos (2 enteros)", "Espinacas", "Tomate", "Pan integral (1 rebanada)", "Té verde"],
-                        calorias: 290,
-                        proteinas: 16,
-                        carbohidratos: 28,
-                        grasas: 12
-                    },
-                    medioDia: {
-                        alimentos: ["Yogur desnatado", "Canela"],
-                        calorias: 80,
-                        proteinas: 8,
-                        carbohidratos: 12,
-                        grasas: 0
-                    },
-                    almuerzo: {
-                        alimentos: ["Pavo al horno (150g)", "Batata pequeña (100g)", "Brócoli", "Coliflor", "Limón"],
-                        calorias: 380,
-                        proteinas: 42,
-                        carbohidratos: 35,
-                        grasas: 6
-                    },
-                    merienda: {
-                        alimentos: ["Naranja", "Yogur desnatado", "Canela"],
-                        calorias: 150,
-                        proteinas: 8,
-                        carbohidratos: 24,
-                        grasas: 2
-                    },
-                    cena: {
-                        alimentos: ["Sepia a la plancha (150g)", "Ensalada de rúcula", "Tomate", "Pepino", "Limón"],
-                        calorias: 185,
-                        proteinas: 30,
-                        carbohidratos: 8,
-                        grasas: 3
-                    }
-                }
-            },
-            {
-                dia: "DOMINGO",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Tortitas de avena (2 unidades)", "Claras de huevo", "Fresas", "Miel (1 cucharadita)", "Café"],
-                        calorias: 290,
-                        proteinas: 20,
-                        carbohidratos: 38,
-                        grasas: 6
-                    },
-                    medioDia: {
-                        alimentos: ["Macedonia de frutas", "Infusión"],
-                        calorias: 100,
-                        proteinas: 2,
-                        carbohidratos: 24,
-                        grasas: 0
-                    },
-                    almuerzo: {
-                        alimentos: ["Salmón (130g)", "Quinoa (70g)", "Espárragos", "Ensalada verde", "Aceite de oliva (1 cucharadita)"],
-                        calorias: 490,
-                        proteinas: 38,
-                        carbohidratos: 42,
-                        grasas: 18
-                    },
-                    merienda: {
-                        alimentos: ["Macedonia de frutas", "Yogur griego desnatado", "Menta"],
-                        calorias: 190,
-                        proteinas: 12,
-                        carbohidratos: 28,
-                        grasas: 3
-                    },
-                    cena: {
-                        alimentos: ["Pollo a la plancha (140g)", "Crema de calabacín", "Ensalada", "Cebolla", "Especias"],
-                        calorias: 290,
-                        proteinas: 38,
-                        carbohidratos: 15,
-                        grasas: 7
-                    }
-                }
-            }
-        ]
-    },
-    mantener: {
-        semana: [
-            {
-                dia: "LUNES",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Avena (50g)", "Leche semidesnatada", "Plátano", "Almendras (20g)", "Café"],
-                        calorias: 410,
-                        proteinas: 18,
-                        carbohidratos: 55,
-                        grasas: 12
-                    },
-                    medioDia: {
-                        alimentos: ["Yogur natural", "Fruta pequeña"],
-                        calorias: 150,
-                        proteinas: 8,
-                        carbohidratos: 20,
-                        grasas: 4
-                    },
-                    almuerzo: {
-                        alimentos: ["Pechuga de pollo (160g)", "Arroz integral (100g)", "Ensalada mixta", "Verduras al vapor", "Aceite de oliva"],
-                        calorias: 570,
-                        proteinas: 45,
-                        carbohidratos: 60,
-                        grasas: 15
-                    },
-                    merienda: {
-                        alimentos: ["Yogur natural", "Fruta", "Nueces (15g)"],
-                        calorias: 250,
-                        proteinas: 12,
-                        carbohidratos: 28,
-                        grasas: 10
-                    },
-                    cena: {
-                        alimentos: ["Salmón (140g)", "Verduras asadas", "Patata pequeña (100g)", "Ensalada", "Aceite de oliva"],
-                        calorias: 470,
-                        proteinas: 38,
-                        carbohidratos: 35,
-                        grasas: 18
-                    }
-                }
-            },
-            {
-                dia: "MARTES",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Tostadas integrales (2)", "Huevos revueltos (2)", "Tomate", "Aguacate (30g)", "Té"],
-                        calorias: 410,
-                        proteinas: 20,
-                        carbohidratos: 45,
-                        grasas: 15
-                    },
-                    medioDia: {
-                        alimentos: ["Manzana", "Nueces (10g)"],
-                        calorias: 130,
-                        proteinas: 3,
-                        carbohidratos: 20,
-                        grasas: 6
-                    },
-                    almuerzo: {
-                        alimentos: ["Ternera (150g)", "Pasta integral (90g)", "Verduras salteadas", "Ensalada", "Queso rallado"],
-                        calorias: 630,
-                        proteinas: 48,
-                        carbohidratos: 65,
-                        grasas: 18
-                    },
-                    merienda: {
-                        alimentos: ["Batido (leche, plátano, avena)", "Almendras (10g)"],
-                        calorias: 280,
-                        proteinas: 15,
-                        carbohidratos: 35,
-                        grasas: 8
-                    },
-                    cena: {
-                        alimentos: ["Pavo (150g)", "Quinoa (100g)", "Brócoli", "Zanahoria", "Aceite de oliva"],
-                        calorias: 480,
-                        proteinas: 42,
-                        carbohidratos: 48,
-                        grasas: 12
-                    }
-                }
-            },
-            {
-                dia: "MIÉRCOLES",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Yogur griego (150g)", "Granola (30g)", "Fresas", "Miel", "Café"],
-                        calorias: 360,
-                        proteinas: 18,
-                        carbohidratos: 48,
-                        grasas: 10
-                    },
-                    medioDia: {
-                        alimentos: ["Queso fresco (50g)", "Tostadas integrales (2)"],
-                        calorias: 170,
-                        proteinas: 10,
-                        carbohidratos: 20,
-                        grasas: 6
-                    },
-                    almuerzo: {
-                        alimentos: ["Atún (150g)", "Arroz basmati (100g)", "Garbanzos (60g)", "Ensalada", "Aceite de oliva"],
-                        calorias: 600,
-                        proteinas: 46,
-                        carbohidratos: 68,
-                        grasas: 14
-                    },
-                    merienda: {
-                        alimentos: ["Manzana", "Queso fresco (50g)", "Nueces (15g)"],
-                        calorias: 240,
-                        proteinas: 10,
-                        carbohidratos: 22,
-                        grasas: 12
-                    },
-                    cena: {
-                        alimentos: ["Pollo al horno (150g)", "Batata (120g)", "Espárragos", "Ensalada verde", "Aceite de oliva"],
-                        calorias: 480,
-                        proteinas: 42,
-                        carbohidratos: 42,
-                        grasas: 14
-                    }
-                }
-            },
-            {
-                dia: "JUEVES",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Tortilla (2 huevos)", "Pan integral (2 rebanadas)", "Tomate", "Jamón de pavo", "Café con leche"],
-                        calorias: 400,
-                        proteinas: 24,
-                        carbohidratos: 42,
-                        grasas: 14
-                    },
-                    medioDia: {
-                        alimentos: ["Yogur", "Granola (20g)"],
-                        calorias: 150,
-                        proteinas: 8,
-                        carbohidratos: 22,
-                        grasas: 4
-                    },
-                    almuerzo: {
-                        alimentos: ["Merluza (160g)", "Patatas al horno (150g)", "Pimientos", "Cebolla", "Aceite de oliva"],
-                        calorias: 540,
-                        proteinas: 40,
-                        carbohidratos: 52,
-                        grasas: 16
-                    },
-                    merienda: {
-                        alimentos: ["Yogur con frutas", "Avena (20g)", "Almendras (15g)"],
-                        calorias: 270,
-                        proteinas: 14,
-                        carbohidratos: 32,
-                        grasas: 10
-                    },
-                    cena: {
-                        alimentos: ["Pechuga de pollo (150g)", "Verduras al wok", "Arroz integral (80g)", "Soja", "Jengibre"],
-                        calorias: 500,
-                        proteinas: 44,
-                        carbohidratos: 50,
-                        grasas: 12
-                    }
-                }
-            },
-            {
-                dia: "VIERNES",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Batido (avena, plátano, leche, mantequilla de maní)", "Tostada integral", "Café"],
-                        calorias: 450,
-                        proteinas: 20,
-                        carbohidratos: 58,
-                        grasas: 14
-                    },
-                    medioDia: {
-                        alimentos: ["Plátano", "Almendras (15g)"],
-                        calorias: 160,
-                        proteinas: 4,
-                        carbohidratos: 25,
-                        grasas: 7
-                    },
-                    almuerzo: {
-                        alimentos: ["Ternera magra (150g)", "Lentejas (100g)", "Verduras", "Ensalada", "Pan integral"],
-                        calorias: 610,
-                        proteinas: 48,
-                        carbohidratos: 65,
-                        grasas: 15
-                    },
-                    merienda: {
-                        alimentos: ["Sándwich (pavo, queso, tomate)", "Fruta"],
-                        calorias: 290,
-                        proteinas: 18,
-                        carbohidratos: 35,
-                        grasas: 8
-                    },
-                    cena: {
-                        alimentos: ["Salmón (140g)", "Cuscús (100g)", "Verduras asadas", "Ensalada", "Aceite de oliva"],
-                        calorias: 540,
-                        proteinas: 40,
-                        carbohidratos: 52,
-                        grasas: 18
-                    }
-                }
-            },
-            {
-                dia: "SÁBADO",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Pancakes integrales (3)", "Huevo", "Frutos rojos", "Miel", "Yogur", "Café"],
-                        calorias: 440,
-                        proteinas: 22,
-                        carbohidratos: 55,
-                        grasas: 14
-                    },
-                    medioDia: {
-                        alimentos: ["Batido de proteína", "Fruta"],
-                        calorias: 180,
-                        proteinas: 25,
-                        carbohidratos: 18,
-                        grasas: 2
-                    },
-                    almuerzo: {
-                        alimentos: ["Paella mixta (pollo, pescado, arroz, verduras)", "Ensalada", "Pan"],
-                        calorias: 700,
-                        proteinas: 50,
-                        carbohidratos: 75,
-                        grasas: 20
-                    },
-                    merienda: {
-                        alimentos: ["Batido de proteína", "Plátano", "Nueces (15g)"],
-                        calorias: 350,
-                        proteinas: 28,
-                        carbohidratos: 35,
-                        grasas: 10
-                    },
-                    cena: {
-                        alimentos: ["Pizza casera integral (pollo, verduras)", "Ensalada verde", "Aceite de oliva"],
-                        calorias: 590,
-                        proteinas: 42,
-                        carbohidratos: 60,
-                        grasas: 18
-                    }
-                }
-            },
-            {
-                dia: "DOMINGO",
-                comidas: {
-                    desayuno: {
-                        alimentos: ["Desayuno completo: huevos, bacon, tostadas, aguacate", "Tomate", "Café con leche"],
-                        calorias: 510,
-                        proteinas: 28,
-                        carbohidratos: 48,
-                        grasas: 22
-                    },
-                    medioDia: {
-                        alimentos: ["Yogur griego", "Granola (25g)", "Miel"],
-                        calorias: 200,
-                        proteinas: 12,
-                        carbohidratos: 26,
-                        grasas: 6
-                    },
-                    almuerzo: {
-                        alimentos: ["Pollo asado (180g)", "Patatas al horno (150g)", "Verduras", "Ensalada", "Pan integral"],
-                        calorias: 670,
-                        proteinas: 52,
-                        carbohidratos: 70,
-                        grasas: 18
-                    },
-                    merienda: {
-                        alimentos: ["Yogur griego", "Fruta mixta", "Granola (25g)", "Miel"],
-                        calorias: 320,
-                        proteinas: 16,
-                        carbohidratos: 40,
-                        grasas: 10
-                    },
-                    cena: {
-                        alimentos: ["Sopa de verduras", "Tortilla de patatas (pequeña)", "Ensalada mixta", "Pan integral"],
-                        calorias: 430,
-                        proteinas: 20,
-                        carbohidratos: 48,
-                        grasas: 16
-                    }
-                }
-            }
-        ]
-    }
-};
-
+﻿
 // Variables globales
 let datosUsuario = {};
 window.datosUsuario = datosUsuario; // Exportar para uso en otros módulos
@@ -2697,43 +1842,23 @@ function mostrarPlanAlimentacion() {
 
         // Verificar si hay base de datos ampliada disponible
         let planSemana;
-        if (window.generarPlanVariado && window.baseDatosAlimentos) {
-            // Usar generador variado con base de datos ampliada
-            console.log('📊 Usando generador variado con base de datos ampliada');
-            try {
-                planSemana = window.generarPlanVariado(objetivo, duracion);
-                console.log('✅ Plan generado:', { dias: planSemana ? planSemana.length : 0 });
-            } catch (genError) {
-                console.error('❌ Error al generar plan variado:', genError);
-                throw new Error('Error al generar el plan: ' + genError.message);
+        // Verificar si hay generador y base de datos disponibles
+        if (!window.generarPlanVariado || !window.baseDatosAlimentos) {
+            console.error('❌ Error: generador variado o base de datos no disponible');
+            if (typeof mostrarNotificacion === 'function') {
+                mostrarNotificacion('❌ Error crítico: Falta la base de datos de alimentos', 'error');
             }
-        } else {
-            // Usar plan estático original y extender según duración
-            const semanaBase = alimentosPorObjetivo[objetivo].semana;
-            planSemana = [];
+            throw new Error('Componentes necesarios no disponibles (generarPlanVariado o baseDatosAlimentos)');
+        }
 
-            // Determinar cuántas semanas necesitamos
-            let semanas;
-            if (duracion === 'semana') {
-                semanas = 1;
-            } else if (duracion === '2semanas') {
-                semanas = 2;
-            } else if (duracion === '3semanas') {
-                semanas = 3;
-            } else if (duracion === 'mes') {
-                semanas = 4;
-            } else {
-                semanas = 1;
-            }
+        console.log('📊 Usando generador variado con base de datos unificada');
 
-            // Duplicar la semana base según necesidad
-            for (let s = 0; s < semanas; s++) {
-                // Crear copias con variaciones menores
-                semanaBase.forEach((diaOriginal, diaIndex) => {
-                    const diaCopia = JSON.parse(JSON.stringify(diaOriginal));
-                    planSemana.push(diaCopia);
-                });
-            }
+        try {
+            planSemana = window.generarPlanVariado(objetivo, duracion);
+            console.log('✅ Plan generado:', { dias: planSemana ? planSemana.length : 0 });
+        } catch (genError) {
+            console.error('❌ Error al generar plan variado:', genError);
+            throw new Error('Error al generar el plan: ' + genError.message);
         }
 
         let htmlPlan = '';
@@ -3234,1059 +2359,1059 @@ function recalcularIngestasPorSuperavit() {
     }
 }
 
-    /**
-     * Actualiza las opciones del select de superávit según el objetivo
-     * @param {HTMLSelectElement} selectElement - Elemento select a actualizar
-     * @param {string} objetivo - Objetivo seleccionado ('aumentar', 'adelgazar', 'mantener')
-     * @returns {string} Valor por defecto sugerido
-     */
-    function actualizarOpcionesSuperavit(selectElement, objetivo) {
-        if (!selectElement) {
-            return '0';
+/**
+ * Actualiza las opciones del select de superávit según el objetivo
+ * @param {HTMLSelectElement} selectElement - Elemento select a actualizar
+ * @param {string} objetivo - Objetivo seleccionado ('aumentar', 'adelgazar', 'mantener')
+ * @returns {string} Valor por defecto sugerido
+ */
+function actualizarOpcionesSuperavit(selectElement, objetivo) {
+    if (!selectElement) {
+        return '0';
+    }
+
+    // Guardar el valor actual antes de limpiar
+    const valorActual = selectElement.value;
+
+    // Limpiar opciones existentes (excepto la primera si es placeholder)
+    selectElement.innerHTML = '';
+
+    // Definir opciones y valores por defecto según el objetivo
+    let opciones = [];
+    let valorPorDefecto = '0';
+
+    switch (objetivo) {
+        case 'aumentar':
+            // Para aumentar: superávit positivo (5% a 30% típicamente)
+            opciones = ['0', '5', '10', '15', '20', '25', '30', '35', '40'];
+            valorPorDefecto = '10'; // Superávit moderado por defecto
+            break;
+        case 'adelgazar':
+            // Para adelgazar: déficit (0% a 30% típicamente)
+            opciones = ['0', '5', '10', '15', '20', '25', '30'];
+            valorPorDefecto = '15'; // Déficit moderado por defecto
+            break;
+        case 'mantener':
+        default:
+            // Para mantener: rango completo (puede ser déficit o superávit)
+            opciones = ['0', '5', '10', '15', '20', '25', '30', '35', '40', '45', '50'];
+            valorPorDefecto = '0'; // Mantener equilibrio por defecto
+            break;
+    }
+
+    // Agregar opciones al select
+    opciones.forEach(valor => {
+        const option = document.createElement('option');
+        option.value = valor;
+        option.textContent = `${valor}%`;
+        if (valor === valorPorDefecto) {
+            option.selected = true;
+        }
+        selectElement.appendChild(option);
+    });
+
+    // Si el valor actual existe en las nuevas opciones, mantenerlo
+    if (opciones.includes(valorActual)) {
+        selectElement.value = valorActual;
+        return valorActual;
+    }
+
+    return valorPorDefecto;
+}
+
+window.actualizarSuperavitPorObjetivo = function () {
+    try {
+        const objetivoSelect = document.getElementById('objetivo');
+        const superavitEntrenoSelect = document.getElementById('superavitEntreno');
+        const superavitDescansoSelect = document.getElementById('superavitDescanso');
+        const labelEntreno = document.querySelector('label[for="superavitEntreno"]');
+        const labelDescanso = document.querySelector('label[for="superavitDescanso"]');
+
+        if (!objetivoSelect || !superavitEntrenoSelect || !superavitDescansoSelect) {
+            return;
         }
 
-        // Guardar el valor actual antes de limpiar
-        const valorActual = selectElement.value;
+        const objetivo = objetivoSelect.value;
 
-        // Limpiar opciones existentes (excepto la primera si es placeholder)
-        selectElement.innerHTML = '';
-
-        // Definir opciones y valores por defecto según el objetivo
-        let opciones = [];
-        let valorPorDefecto = '0';
+        // Actualizar etiquetas según el objetivo
+        let textoEntreno = '';
+        let textoDescanso = '';
 
         switch (objetivo) {
             case 'aumentar':
-                // Para aumentar: superávit positivo (5% a 30% típicamente)
-                opciones = ['0', '5', '10', '15', '20', '25', '30', '35', '40'];
-                valorPorDefecto = '10'; // Superávit moderado por defecto
+                textoEntreno = 'Superávit día entrenamiento (%):';
+                textoDescanso = 'Superávit día descanso (%):';
                 break;
             case 'adelgazar':
-                // Para adelgazar: déficit (0% a 30% típicamente)
-                opciones = ['0', '5', '10', '15', '20', '25', '30'];
-                valorPorDefecto = '15'; // Déficit moderado por defecto
+                textoEntreno = 'Déficit día entrenamiento (%):';
+                textoDescanso = 'Déficit día descanso (%):';
                 break;
             case 'mantener':
-            default:
-                // Para mantener: rango completo (puede ser déficit o superávit)
-                opciones = ['0', '5', '10', '15', '20', '25', '30', '35', '40', '45', '50'];
-                valorPorDefecto = '0'; // Mantener equilibrio por defecto
+                textoEntreno = 'Déficit/Superávit día entrenamiento (%):';
+                textoDescanso = 'Déficit/Superávit día descanso (%):';
                 break;
+            default:
+                textoEntreno = 'Déficit/Superávit día entrenamiento (%):';
+                textoDescanso = 'Déficit/Superávit día descanso (%):';
         }
 
-        // Agregar opciones al select
-        opciones.forEach(valor => {
-            const option = document.createElement('option');
-            option.value = valor;
-            option.textContent = `${valor}%`;
-            if (valor === valorPorDefecto) {
-                option.selected = true;
+        // Actualizar etiquetas
+        if (labelEntreno) {
+            const tooltipIcon = labelEntreno.querySelector('.tooltip-icon');
+            labelEntreno.innerHTML = textoEntreno;
+            if (tooltipIcon) {
+                labelEntreno.appendChild(tooltipIcon);
+            } else {
+                const icon = document.createElement('span');
+                icon.className = 'tooltip-icon';
+                icon.setAttribute('data-tooltip', 'Se actualiza automáticamente según el objetivo seleccionado.');
+                icon.textContent = 'ℹ️';
+                labelEntreno.appendChild(icon);
             }
-            selectElement.appendChild(option);
-        });
-
-        // Si el valor actual existe en las nuevas opciones, mantenerlo
-        if (opciones.includes(valorActual)) {
-            selectElement.value = valorActual;
-            return valorActual;
         }
 
-        return valorPorDefecto;
-    }
+        if (labelDescanso) {
+            const tooltipIcon = labelDescanso.querySelector('.tooltip-icon');
+            labelDescanso.innerHTML = textoDescanso;
+            if (tooltipIcon) {
+                labelDescanso.appendChild(tooltipIcon);
+            } else {
+                const icon = document.createElement('span');
+                icon.className = 'tooltip-icon';
+                icon.setAttribute('data-tooltip', 'Se actualiza automáticamente según el objetivo seleccionado.');
+                icon.textContent = 'ℹ️';
+                labelDescanso.appendChild(icon);
+            }
+        }
 
-    window.actualizarSuperavitPorObjetivo = function () {
-        try {
+        // Actualizar opciones disponibles según el objetivo y aplicar inmediatamente los valores sugeridos
+        const valorPorDefectoEntreno = actualizarOpcionesSuperavit(superavitEntrenoSelect, objetivo);
+        const valorPorDefectoDescanso = actualizarOpcionesSuperavit(superavitDescansoSelect, objetivo);
+        superavitEntrenoSelect.value = valorPorDefectoEntreno;
+        superavitDescansoSelect.value = valorPorDefectoDescanso;
+
+        // Usar la función centralizada para actualizar todo
+        // Pasar skipObjetivoCheck=true para evitar verificar el objetivo de nuevo (ya lo acabamos de actualizar)
+        // Esto actualiza macros, tablas, gráficos, etc.
+        actualizarTodoAutomaticamente(true);
+    } catch (error) {
+        console.error('❌ Error al actualizar superávit por objetivo:', error);
+    }
+};
+
+/**
+ * Función centralizada para actualizar todos los cálculos, gráficos y tablas
+ * cuando cambia cualquier campo del formulario, incluso después de crear la dieta.
+ * Funciona como Excel: cualquier cambio actualiza todo lo relacionado.
+ * @param {boolean} skipObjetivoCheck - Si es true, no verifica cambios en el objetivo (para evitar bucles)
+ */
+function actualizarTodoAutomaticamente(skipObjetivoCheck = false) {
+    // Verificar si hay una dieta creada (resultados visibles)
+    const resultadosDiv = document.getElementById('resultados');
+    const dietaCreada = resultadosDiv && !resultadosDiv.classList.contains('oculto');
+
+    try {
+        // Si el objetivo cambió y no estamos en modo skip, actualizar opciones de superávit primero
+        if (!skipObjetivoCheck) {
             const objetivoSelect = document.getElementById('objetivo');
-            const superavitEntrenoSelect = document.getElementById('superavitEntreno');
-            const superavitDescansoSelect = document.getElementById('superavitDescanso');
-            const labelEntreno = document.querySelector('label[for="superavitEntreno"]');
-            const labelDescanso = document.querySelector('label[for="superavitDescanso"]');
-
-            if (!objetivoSelect || !superavitEntrenoSelect || !superavitDescansoSelect) {
-                return;
+            if (objetivoSelect && objetivoSelect.dataset.objetivoAnterior !== objetivoSelect.value) {
+                objetivoSelect.dataset.objetivoAnterior = objetivoSelect.value;
+                // Llamar a actualizarSuperavitPorObjetivo que actualizará las opciones y luego llamará a esta función
+                window.actualizarSuperavitPorObjetivo();
+                return; // actualizarSuperavitPorObjetivo ya llama a actualizarTodoAutomaticamente(true)
             }
-
-            const objetivo = objetivoSelect.value;
-
-            // Actualizar etiquetas según el objetivo
-            let textoEntreno = '';
-            let textoDescanso = '';
-
-            switch (objetivo) {
-                case 'aumentar':
-                    textoEntreno = 'Superávit día entrenamiento (%):';
-                    textoDescanso = 'Superávit día descanso (%):';
-                    break;
-                case 'adelgazar':
-                    textoEntreno = 'Déficit día entrenamiento (%):';
-                    textoDescanso = 'Déficit día descanso (%):';
-                    break;
-                case 'mantener':
-                    textoEntreno = 'Déficit/Superávit día entrenamiento (%):';
-                    textoDescanso = 'Déficit/Superávit día descanso (%):';
-                    break;
-                default:
-                    textoEntreno = 'Déficit/Superávit día entrenamiento (%):';
-                    textoDescanso = 'Déficit/Superávit día descanso (%):';
-            }
-
-            // Actualizar etiquetas
-            if (labelEntreno) {
-                const tooltipIcon = labelEntreno.querySelector('.tooltip-icon');
-                labelEntreno.innerHTML = textoEntreno;
-                if (tooltipIcon) {
-                    labelEntreno.appendChild(tooltipIcon);
-                } else {
-                    const icon = document.createElement('span');
-                    icon.className = 'tooltip-icon';
-                    icon.setAttribute('data-tooltip', 'Se actualiza automáticamente según el objetivo seleccionado.');
-                    icon.textContent = 'ℹ️';
-                    labelEntreno.appendChild(icon);
-                }
-            }
-
-            if (labelDescanso) {
-                const tooltipIcon = labelDescanso.querySelector('.tooltip-icon');
-                labelDescanso.innerHTML = textoDescanso;
-                if (tooltipIcon) {
-                    labelDescanso.appendChild(tooltipIcon);
-                } else {
-                    const icon = document.createElement('span');
-                    icon.className = 'tooltip-icon';
-                    icon.setAttribute('data-tooltip', 'Se actualiza automáticamente según el objetivo seleccionado.');
-                    icon.textContent = 'ℹ️';
-                    labelDescanso.appendChild(icon);
-                }
-            }
-
-            // Actualizar opciones disponibles según el objetivo y aplicar inmediatamente los valores sugeridos
-            const valorPorDefectoEntreno = actualizarOpcionesSuperavit(superavitEntrenoSelect, objetivo);
-            const valorPorDefectoDescanso = actualizarOpcionesSuperavit(superavitDescansoSelect, objetivo);
-            superavitEntrenoSelect.value = valorPorDefectoEntreno;
-            superavitDescansoSelect.value = valorPorDefectoDescanso;
-
-            // Usar la función centralizada para actualizar todo
-            // Pasar skipObjetivoCheck=true para evitar verificar el objetivo de nuevo (ya lo acabamos de actualizar)
-            // Esto actualiza macros, tablas, gráficos, etc.
-            actualizarTodoAutomaticamente(true);
-        } catch (error) {
-            console.error('❌ Error al actualizar superávit por objetivo:', error);
         }
-    };
 
-    /**
-     * Función centralizada para actualizar todos los cálculos, gráficos y tablas
-     * cuando cambia cualquier campo del formulario, incluso después de crear la dieta.
-     * Funciona como Excel: cualquier cambio actualiza todo lo relacionado.
-     * @param {boolean} skipObjetivoCheck - Si es true, no verifica cambios en el objetivo (para evitar bucles)
-     */
-    function actualizarTodoAutomaticamente(skipObjetivoCheck = false) {
-        // Verificar si hay una dieta creada (resultados visibles)
-        const resultadosDiv = document.getElementById('resultados');
-        const dietaCreada = resultadosDiv && !resultadosDiv.classList.contains('oculto');
-
-        try {
-            // Si el objetivo cambió y no estamos en modo skip, actualizar opciones de superávit primero
-            if (!skipObjetivoCheck) {
-                const objetivoSelect = document.getElementById('objetivo');
-                if (objetivoSelect && objetivoSelect.dataset.objetivoAnterior !== objetivoSelect.value) {
-                    objetivoSelect.dataset.objetivoAnterior = objetivoSelect.value;
-                    // Llamar a actualizarSuperavitPorObjetivo que actualizará las opciones y luego llamará a esta función
-                    window.actualizarSuperavitPorObjetivo();
-                    return; // actualizarSuperavitPorObjetivo ya llama a actualizarTodoAutomaticamente(true)
-                }
-            }
-
-            // Si no hay dieta creada, solo recalcular macros básicos
-            if (!dietaCreada) {
-                calcularMacronutrientes();
-                return;
-            }
-
-            // Recalcular macronutrientes con los nuevos valores
+        // Si no hay dieta creada, solo recalcular macros básicos
+        if (!dietaCreada) {
             calcularMacronutrientes();
+            return;
+        }
 
-            // Actualizar todas las tablas
-            if (typeof mostrarInfoUsuario === 'function') {
-                mostrarInfoUsuario();
-            }
+        // Recalcular macronutrientes con los nuevos valores
+        calcularMacronutrientes();
 
-            if (typeof mostrarCalculosDetallados === 'function') {
-                mostrarCalculosDetallados();
-            }
+        // Actualizar todas las tablas
+        if (typeof mostrarInfoUsuario === 'function') {
+            mostrarInfoUsuario();
+        }
 
-            if (typeof mostrarTablaMacros === 'function') {
-                mostrarTablaMacros();
-            }
+        if (typeof mostrarCalculosDetallados === 'function') {
+            mostrarCalculosDetallados();
+        }
 
-            if (typeof mostrarMacronutrientesDistribucion === 'function') {
-                mostrarMacronutrientesDistribucion();
-            }
+        if (typeof mostrarTablaMacros === 'function') {
+            mostrarTablaMacros();
+        }
 
-            if (typeof mostrarDistribucionEntrenos === 'function') {
-                mostrarDistribucionEntrenos();
-            }
+        if (typeof mostrarMacronutrientesDistribucion === 'function') {
+            mostrarMacronutrientesDistribucion();
+        }
 
-            // Actualizar plan de alimentación si existe
-            // Nota: Si el plan fue generado automáticamente, se regenerará con el nuevo objetivo
-            // Si el plan fue editado manualmente, se mantendrá pero con nuevos objetivos calóricos
-            if (typeof mostrarPlanAlimentacion === 'function') {
-                try {
-                    console.log('🔄 Regenerando plan de alimentación con nuevo objetivo...');
-                    // Asegurar que el objetivo esté actualizado en datosUsuario antes de regenerar
-                    const objetivoSelect = document.getElementById('objetivo');
-                    if (objetivoSelect && objetivoSelect.value) {
-                        datosUsuario.objetivo = objetivoSelect.value;
-                        window.datosUsuario = datosUsuario;
-                        console.log(`📋 Objetivo actualizado en datosUsuario: ${datosUsuario.objetivo}`);
-                    }
-                    mostrarPlanAlimentacion();
-                    console.log('✅ Plan de alimentación regenerado');
-                } catch (error) {
-                    console.error('❌ Error al actualizar plan de alimentación:', error);
+        if (typeof mostrarDistribucionEntrenos === 'function') {
+            mostrarDistribucionEntrenos();
+        }
+
+        // Actualizar plan de alimentación si existe
+        // Nota: Si el plan fue generado automáticamente, se regenerará con el nuevo objetivo
+        // Si el plan fue editado manualmente, se mantendrá pero con nuevos objetivos calóricos
+        if (typeof mostrarPlanAlimentacion === 'function') {
+            try {
+                console.log('🔄 Regenerando plan de alimentación con nuevo objetivo...');
+                // Asegurar que el objetivo esté actualizado en datosUsuario antes de regenerar
+                const objetivoSelect = document.getElementById('objetivo');
+                if (objetivoSelect && objetivoSelect.value) {
+                    datosUsuario.objetivo = objetivoSelect.value;
+                    window.datosUsuario = datosUsuario;
+                    console.log(`📋 Objetivo actualizado en datosUsuario: ${datosUsuario.objetivo}`);
                 }
+                mostrarPlanAlimentacion();
+                console.log('✅ Plan de alimentación regenerado');
+            } catch (error) {
+                console.error('❌ Error al actualizar plan de alimentación:', error);
             }
+        }
 
-            // Si hay tabla editable (modo manual), actualizar los objetivos calóricos
-            if (window.tablaEditable) {
-                // Actualizar estilos del día (esto actualiza los objetivos mostrados)
-                if (typeof window.tablaEditable.actualizarEstilosDia === 'function') {
-                    window.tablaEditable.actualizarEstilosDia();
-                }
-                // Actualizar totales diarios para recalcular el progreso con los nuevos objetivos
-                if (typeof window.tablaEditable.actualizarTotalesDiarios === 'function') {
-                    window.tablaEditable.actualizarTotalesDiarios();
-                }
+        // Si hay tabla editable (modo manual), actualizar los objetivos calóricos
+        if (window.tablaEditable) {
+            // Actualizar estilos del día (esto actualiza los objetivos mostrados)
+            if (typeof window.tablaEditable.actualizarEstilosDia === 'function') {
+                window.tablaEditable.actualizarEstilosDia();
             }
+            // Actualizar totales diarios para recalcular el progreso con los nuevos objetivos
+            if (typeof window.tablaEditable.actualizarTotalesDiarios === 'function') {
+                window.tablaEditable.actualizarTotalesDiarios();
+            }
+        }
 
-            // Actualizar gráficos
-            // COMENTADO: Gráficos eliminados por problemas en móviles/tablets
-            // setTimeout(() => {
-            //     actualizarGraficosMacronutrientes();
-            // }, 200);
+        // Actualizar gráficos
+        // COMENTADO: Gráficos eliminados por problemas en móviles/tablets
+        // setTimeout(() => {
+        //     actualizarGraficosMacronutrientes();
+        // }, 200);
 
-            console.log('✅ Todo actualizado automáticamente (incluyendo plan de alimentación)');
-        } catch (error) {
-            console.error('❌ Error al actualizar automáticamente:', error);
+        console.log('✅ Todo actualizado automáticamente (incluyendo plan de alimentación)');
+    } catch (error) {
+        console.error('❌ Error al actualizar automáticamente:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Event listener para el selector de objetivo
+    const objetivoSelect = document.getElementById('objetivo');
+    if (objetivoSelect) {
+        // Guardar el valor inicial para detectar cambios
+        objetivoSelect.dataset.objetivoAnterior = objetivoSelect.value;
+
+        objetivoSelect.addEventListener('change', function () {
+            actualizarTodoAutomaticamente();
+        });
+
+        // Si ya hay un objetivo seleccionado al cargar la página, actualizar valores
+        if (objetivoSelect.value) {
+            // Esperar un momento para que todos los elementos estén listos
+            setTimeout(() => {
+                window.actualizarSuperavitPorObjetivo();
+            }, 100);
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        // Event listener para el selector de objetivo
-        const objetivoSelect = document.getElementById('objetivo');
-        if (objetivoSelect) {
-            // Guardar el valor inicial para detectar cambios
-            objetivoSelect.dataset.objetivoAnterior = objetivoSelect.value;
+    // Event listeners para los selects de superávit
+    const superavitEntrenoInput = document.getElementById('superavitEntreno');
+    const superavitDescansoInput = document.getElementById('superavitDescanso');
 
-            objetivoSelect.addEventListener('change', function () {
-                actualizarTodoAutomaticamente();
-            });
-
-            // Si ya hay un objetivo seleccionado al cargar la página, actualizar valores
-            if (objetivoSelect.value) {
-                // Esperar un momento para que todos los elementos estén listos
-                setTimeout(() => {
-                    window.actualizarSuperavitPorObjetivo();
-                }, 100);
-            }
-        }
-
-        // Event listeners para los selects de superávit
-        const superavitEntrenoInput = document.getElementById('superavitEntreno');
-        const superavitDescansoInput = document.getElementById('superavitDescanso');
-
-        if (superavitEntrenoInput) {
-            superavitEntrenoInput.addEventListener('change', function () {
-                actualizarTodoAutomaticamente();
-            });
-        }
-
-        if (superavitDescansoInput) {
-            superavitDescansoInput.addEventListener('change', function () {
-                actualizarTodoAutomaticamente();
-            });
-        }
-
-        // Event listeners para todos los campos que afectan los cálculos
-        const camposCalculo = [
-            'edad',
-            'sexo',
-            'altura',
-            'peso',
-            'tipoPersona',
-            'actividadFisicaDeporte',
-            'tipoTermogenico'
-        ];
-
-        camposCalculo.forEach(campoId => {
-            const campo = document.getElementById(campoId);
-            if (campo) {
-                // Usar 'input' para campos de texto/número y 'change' para selects
-                const evento = campo.tagName === 'SELECT' ? 'change' : 'input';
-
-                campo.addEventListener(evento, function () {
-                    // Debounce: esperar 300ms después del último cambio para evitar cálculos excesivos
-                    clearTimeout(campo.dataset.timeoutId);
-                    campo.dataset.timeoutId = setTimeout(() => {
-                        actualizarTodoAutomaticamente();
-                    }, 300);
-                });
-            }
+    if (superavitEntrenoInput) {
+        superavitEntrenoInput.addEventListener('change', function () {
+            actualizarTodoAutomaticamente();
         });
+    }
 
-        // Event listeners para los checkboxes de días de entrenamiento
-        const diasEntrenoCheckboxes = document.querySelectorAll('input[name="diaEntreno"]');
-        diasEntrenoCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function () {
-                // Actualizar cuando cambian los días de entrenamiento
-                actualizarTodoAutomaticamente();
-            });
+    if (superavitDescansoInput) {
+        superavitDescansoInput.addEventListener('change', function () {
+            actualizarTodoAutomaticamente();
         });
+    }
 
-        // Event listener para el formulario
-        const dietForm = document.getElementById('dietForm');
-        if (dietForm) {
-            dietForm.addEventListener('submit', async function (e) {
-                e.preventDefault();
+    // Event listeners para todos los campos que afectan los cálculos
+    const camposCalculo = [
+        'edad',
+        'sexo',
+        'altura',
+        'peso',
+        'tipoPersona',
+        'actividadFisicaDeporte',
+        'tipoTermogenico'
+    ];
 
-                // Obtener referencia al botón de submit
-                const submitButton = document.querySelector('#dietForm button[type="submit"]');
+    camposCalculo.forEach(campoId => {
+        const campo = document.getElementById(campoId);
+        if (campo) {
+            // Usar 'input' para campos de texto/número y 'change' para selects
+            const evento = campo.tagName === 'SELECT' ? 'change' : 'input';
 
-                // Deshabilitar botón y mostrar estado de carga visual (sin overlay todavía)
-                if (submitButton) {
-                    submitButton.classList.add('btn-loading');
-                    submitButton.disabled = true;
+            campo.addEventListener(evento, function () {
+                // Debounce: esperar 300ms después del último cambio para evitar cálculos excesivos
+                clearTimeout(campo.dataset.timeoutId);
+                campo.dataset.timeoutId = setTimeout(() => {
+                    actualizarTodoAutomaticamente();
+                }, 300);
+            });
+        }
+    });
+
+    // Event listeners para los checkboxes de días de entrenamiento
+    const diasEntrenoCheckboxes = document.querySelectorAll('input[name="diaEntreno"]');
+    diasEntrenoCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+            // Actualizar cuando cambian los días de entrenamiento
+            actualizarTodoAutomaticamente();
+        });
+    });
+
+    // Event listener para el formulario
+    const dietForm = document.getElementById('dietForm');
+    if (dietForm) {
+        dietForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            // Obtener referencia al botón de submit
+            const submitButton = document.querySelector('#dietForm button[type="submit"]');
+
+            // Deshabilitar botón y mostrar estado de carga visual (sin overlay todavía)
+            if (submitButton) {
+                submitButton.classList.add('btn-loading');
+                submitButton.disabled = true;
+            }
+
+            try {
+                // Validar que el usuario esté autenticado
+                if (!window.authManager || !window.authManager.isAuthenticated()) {
+                    // Restaurar botón
+                    if (submitButton) {
+                        submitButton.classList.remove('btn-loading');
+                        submitButton.disabled = false;
+                    }
+                    window.uiManager?.openModal();
+                    mostrarNotificacion('⚠️ Debes iniciar sesión para generar dietas', 'error');
+                    return;
                 }
 
+                // Recopilar intolerancias seleccionadas
+                const checkboxesIntolerancias = document.querySelectorAll('input[name="intolerancia"]:checked');
+                const intolerancias = Array.from(checkboxesIntolerancias).map(cb => cb.value);
+
+                // Recopilar preferencias dietéticas seleccionadas
+                const checkboxesPreferencias = document.querySelectorAll('input[name="preferencia"]:checked');
+                const preferencias = Array.from(checkboxesPreferencias).map(cb => cb.value);
+
+                // Combinar intolerancias y prohibiciones adicionales
+                const prohibicionesElement = document.getElementById('prohibiciones');
+                const prohibicionesAdicionales = prohibicionesElement ? prohibicionesElement.value : '';
+                const todasLasProhibiciones = [...intolerancias, prohibicionesAdicionales].filter(p => p.trim() !== '').join(', ');
+
+                // Obtener días de entrenamiento seleccionados
+                const diasEntrenoCheckboxes = document.querySelectorAll('input[name="diaEntreno"]:checked');
+                const diasEntreno = Array.from(diasEntrenoCheckboxes).map(cb => cb.value);
+                const numDiasEntreno = diasEntreno.length;
+
+                // Obtener actividad física del deporte
+                const actividadFisicaDeporte = document.getElementById('actividadFisicaDeporte')?.value || 'moderada';
+
+                // Validar coherencia entre días de entrenamiento y nivel de actividad
+                const rangosActividad = {
+                    'sedentario': { min: 0, max: 2, descripcion: '0-2 días' },
+                    'ligera': { min: 1, max: 3, descripcion: '1-3 días' },
+                    'moderada': { min: 3, max: 5, descripcion: '3-5 días' },
+                    'intensa': { min: 6, max: 7, descripcion: '6-7 días' },
+                    'muy-intensa': { min: 6, max: 7, descripcion: '6-7 días' }
+                };
+
+                const rangoEsperado = rangosActividad[actividadFisicaDeporte];
+                if (rangoEsperado && (numDiasEntreno < rangoEsperado.min || numDiasEntreno > rangoEsperado.max)) {
+                    const actividadTexto = {
+                        'sedentario': 'Sedentaria',
+                        'ligera': 'Ligera (1-3 días)',
+                        'moderada': 'Moderada (3-5 días)',
+                        'intensa': 'Intensa (6-7 días)',
+                        'muy-intensa': 'Muy intensa (6-7 días)'
+                    }[actividadFisicaDeporte] || actividadFisicaDeporte;
+
+                    // Ocultar loading overlay si está visible
+                    if (window.hideLoadingOverlay) {
+                        window.hideLoadingOverlay();
+                    }
+
+                    // Restaurar botón
+                    if (submitButton) {
+                        submitButton.classList.remove('btn-loading');
+                        submitButton.disabled = false;
+                    }
+
+                    mostrarNotificacion(
+                        `⚠️ Inconsistencia detectada: Has seleccionado "${actividadTexto}" pero has marcado ${numDiasEntreno} día(s) de entrenamiento. ` +
+                        `Para esta actividad, el rango esperado es ${rangoEsperado.descripcion}. ` +
+                        `Por favor, ajusta los días de entrenamiento o cambia el nivel de actividad antes de generar el plan.`,
+                        'error'
+                    );
+                    return; // Detener la generación de la dieta
+                }
+
+                // Validar que los campos requeridos existan antes de acceder
+                const nombreElem = document.getElementById('nombre');
+                const fechaRegistroElem = document.getElementById('fechaRegistro');
+                const sexoElem = document.getElementById('sexo');
+                const edadElem = document.getElementById('edad');
+                const alturaElem = document.getElementById('altura');
+                const pesoElem = document.getElementById('peso');
+                const tipoPersonaElem = document.getElementById('tipoPersona');
+                const objetivoElem = document.getElementById('objetivo');
+                const modoGeneracionElem = document.getElementById('modoGeneracion');
+                const duracionElem = document.getElementById('duracion');
+                const tipoTermogenicoElem = document.getElementById('tipoTermogenico');
+                const superavitEntrenoElem = document.getElementById('superavitEntreno');
+                const superavitDescansoElem = document.getElementById('superavitDescanso');
+
+                if (!nombreElem || !fechaRegistroElem || !sexoElem || !edadElem || !alturaElem || !pesoElem || !tipoPersonaElem || !objetivoElem || !duracionElem) {
+                    // Asegurar que el loading overlay esté oculto
+                    if (window.hideLoadingOverlay) {
+                        window.hideLoadingOverlay();
+                    }
+                    // Restaurar botón
+                    if (submitButton) {
+                        submitButton.classList.remove('btn-loading');
+                        submitButton.disabled = false;
+                    }
+                    mostrarNotificacion('❌ Error: Faltan campos requeridos en el formulario', 'error');
+                    console.error('Campos faltantes:', {
+                        nombre: !!nombreElem,
+                        fechaRegistro: !!fechaRegistroElem,
+                        sexo: !!sexoElem,
+                        edad: !!edadElem,
+                        altura: !!alturaElem,
+                        peso: !!pesoElem,
+                        tipoPersona: !!tipoPersonaElem,
+                        objetivo: !!objetivoElem,
+                        duracion: !!duracionElem
+                    });
+                    return;
+                }
+
+                // Limpiar ID de dieta cargada cuando se genera una nueva dieta
+                window.dietaIdCargada = null;
+                console.log('🆕 Generando nueva dieta - ID de dieta cargada limpiado');
+
+                datosUsuario = {
+                    nombre: nombreElem.value,
+                    fechaRegistro: fechaRegistroElem.value,
+                    sexo: sexoElem.value,
+                    edad: parseInt(edadElem.value) || 0,
+                    altura: parseFloat(alturaElem.value) || 0,
+                    peso: parseFloat(pesoElem.value) || 0,
+                    tipoPersona: tipoPersonaElem.value,
+                    objetivo: objetivoElem.value,
+                    modoGeneracion: modoGeneracionElem ? (modoGeneracionElem.value || 'automatico') : 'automatico',
+                    prohibiciones: todasLasProhibiciones,
+                    intolerancias: intolerancias,
+                    preferencias: preferencias, // Guardar preferencias dietéticas
+                    duracion: duracionElem.value,
+                    diasEntreno: diasEntreno,
+                    actividadFisicaDeporte: actividadFisicaDeporte,
+                    tipoTermogenico: tipoTermogenicoElem ? tipoTermogenicoElem.value : 'no-sedentaria',
+                    superavitEntreno: superavitEntrenoElem ? parseFloat(superavitEntrenoElem.value || 5) : 5,
+                    superavitDescanso: superavitDescansoElem ? parseFloat(superavitDescansoElem.value || 5) : 5
+                };
+
+                // Calcular macronutrientes con manejo de errores
                 try {
-                    // Validar que el usuario esté autenticado
-                    if (!window.authManager || !window.authManager.isAuthenticated()) {
-                        // Restaurar botón
-                        if (submitButton) {
-                            submitButton.classList.remove('btn-loading');
-                            submitButton.disabled = false;
-                        }
-                        window.uiManager?.openModal();
-                        mostrarNotificacion('⚠️ Debes iniciar sesión para generar dietas', 'error');
-                        return;
-                    }
-
-                    // Recopilar intolerancias seleccionadas
-                    const checkboxesIntolerancias = document.querySelectorAll('input[name="intolerancia"]:checked');
-                    const intolerancias = Array.from(checkboxesIntolerancias).map(cb => cb.value);
-
-                    // Recopilar preferencias dietéticas seleccionadas
-                    const checkboxesPreferencias = document.querySelectorAll('input[name="preferencia"]:checked');
-                    const preferencias = Array.from(checkboxesPreferencias).map(cb => cb.value);
-
-                    // Combinar intolerancias y prohibiciones adicionales
-                    const prohibicionesElement = document.getElementById('prohibiciones');
-                    const prohibicionesAdicionales = prohibicionesElement ? prohibicionesElement.value : '';
-                    const todasLasProhibiciones = [...intolerancias, prohibicionesAdicionales].filter(p => p.trim() !== '').join(', ');
-
-                    // Obtener días de entrenamiento seleccionados
-                    const diasEntrenoCheckboxes = document.querySelectorAll('input[name="diaEntreno"]:checked');
-                    const diasEntreno = Array.from(diasEntrenoCheckboxes).map(cb => cb.value);
-                    const numDiasEntreno = diasEntreno.length;
-
-                    // Obtener actividad física del deporte
-                    const actividadFisicaDeporte = document.getElementById('actividadFisicaDeporte')?.value || 'moderada';
-
-                    // Validar coherencia entre días de entrenamiento y nivel de actividad
-                    const rangosActividad = {
-                        'sedentario': { min: 0, max: 2, descripcion: '0-2 días' },
-                        'ligera': { min: 1, max: 3, descripcion: '1-3 días' },
-                        'moderada': { min: 3, max: 5, descripcion: '3-5 días' },
-                        'intensa': { min: 6, max: 7, descripcion: '6-7 días' },
-                        'muy-intensa': { min: 6, max: 7, descripcion: '6-7 días' }
-                    };
-
-                    const rangoEsperado = rangosActividad[actividadFisicaDeporte];
-                    if (rangoEsperado && (numDiasEntreno < rangoEsperado.min || numDiasEntreno > rangoEsperado.max)) {
-                        const actividadTexto = {
-                            'sedentario': 'Sedentaria',
-                            'ligera': 'Ligera (1-3 días)',
-                            'moderada': 'Moderada (3-5 días)',
-                            'intensa': 'Intensa (6-7 días)',
-                            'muy-intensa': 'Muy intensa (6-7 días)'
-                        }[actividadFisicaDeporte] || actividadFisicaDeporte;
-
-                        // Ocultar loading overlay si está visible
-                        if (window.hideLoadingOverlay) {
-                            window.hideLoadingOverlay();
-                        }
-
-                        // Restaurar botón
-                        if (submitButton) {
-                            submitButton.classList.remove('btn-loading');
-                            submitButton.disabled = false;
-                        }
-
-                        mostrarNotificacion(
-                            `⚠️ Inconsistencia detectada: Has seleccionado "${actividadTexto}" pero has marcado ${numDiasEntreno} día(s) de entrenamiento. ` +
-                            `Para esta actividad, el rango esperado es ${rangoEsperado.descripcion}. ` +
-                            `Por favor, ajusta los días de entrenamiento o cambia el nivel de actividad antes de generar el plan.`,
-                            'error'
-                        );
-                        return; // Detener la generación de la dieta
-                    }
-
-                    // Validar que los campos requeridos existan antes de acceder
-                    const nombreElem = document.getElementById('nombre');
-                    const fechaRegistroElem = document.getElementById('fechaRegistro');
-                    const sexoElem = document.getElementById('sexo');
-                    const edadElem = document.getElementById('edad');
-                    const alturaElem = document.getElementById('altura');
-                    const pesoElem = document.getElementById('peso');
-                    const tipoPersonaElem = document.getElementById('tipoPersona');
-                    const objetivoElem = document.getElementById('objetivo');
-                    const modoGeneracionElem = document.getElementById('modoGeneracion');
-                    const duracionElem = document.getElementById('duracion');
-                    const tipoTermogenicoElem = document.getElementById('tipoTermogenico');
-                    const superavitEntrenoElem = document.getElementById('superavitEntreno');
-                    const superavitDescansoElem = document.getElementById('superavitDescanso');
-
-                    if (!nombreElem || !fechaRegistroElem || !sexoElem || !edadElem || !alturaElem || !pesoElem || !tipoPersonaElem || !objetivoElem || !duracionElem) {
-                        // Asegurar que el loading overlay esté oculto
-                        if (window.hideLoadingOverlay) {
-                            window.hideLoadingOverlay();
-                        }
-                        // Restaurar botón
-                        if (submitButton) {
-                            submitButton.classList.remove('btn-loading');
-                            submitButton.disabled = false;
-                        }
-                        mostrarNotificacion('❌ Error: Faltan campos requeridos en el formulario', 'error');
-                        console.error('Campos faltantes:', {
-                            nombre: !!nombreElem,
-                            fechaRegistro: !!fechaRegistroElem,
-                            sexo: !!sexoElem,
-                            edad: !!edadElem,
-                            altura: !!alturaElem,
-                            peso: !!pesoElem,
-                            tipoPersona: !!tipoPersonaElem,
-                            objetivo: !!objetivoElem,
-                            duracion: !!duracionElem
-                        });
-                        return;
-                    }
-
-                    // Limpiar ID de dieta cargada cuando se genera una nueva dieta
-                    window.dietaIdCargada = null;
-                    console.log('🆕 Generando nueva dieta - ID de dieta cargada limpiado');
-
-                    datosUsuario = {
-                        nombre: nombreElem.value,
-                        fechaRegistro: fechaRegistroElem.value,
-                        sexo: sexoElem.value,
-                        edad: parseInt(edadElem.value) || 0,
-                        altura: parseFloat(alturaElem.value) || 0,
-                        peso: parseFloat(pesoElem.value) || 0,
-                        tipoPersona: tipoPersonaElem.value,
-                        objetivo: objetivoElem.value,
-                        modoGeneracion: modoGeneracionElem ? (modoGeneracionElem.value || 'automatico') : 'automatico',
-                        prohibiciones: todasLasProhibiciones,
-                        intolerancias: intolerancias,
-                        preferencias: preferencias, // Guardar preferencias dietéticas
-                        duracion: duracionElem.value,
-                        diasEntreno: diasEntreno,
-                        actividadFisicaDeporte: actividadFisicaDeporte,
-                        tipoTermogenico: tipoTermogenicoElem ? tipoTermogenicoElem.value : 'no-sedentaria',
-                        superavitEntreno: superavitEntrenoElem ? parseFloat(superavitEntrenoElem.value || 5) : 5,
-                        superavitDescanso: superavitDescansoElem ? parseFloat(superavitDescansoElem.value || 5) : 5
-                    };
-
-                    // Calcular macronutrientes con manejo de errores
-                    try {
-                        calcularMacronutrientes();
-                    } catch (error) {
-                        console.error('❌ Error al calcular macronutrientes:', error);
-                        // Asegurar que el loading overlay esté oculto
-                        if (window.hideLoadingOverlay) {
-                            window.hideLoadingOverlay();
-                        }
-                        // Restaurar botón
-                        if (submitButton) {
-                            submitButton.classList.remove('btn-loading');
-                            submitButton.disabled = false;
-                        }
-                        mostrarNotificacion('❌ Error al calcular macronutrientes: ' + error.message, 'error');
-                        return;
-                    }
-
-                    // Actualizar referencia global
-                    window.datosUsuario = datosUsuario;
-
-                    // Marcar operación crítica para prevenir reload del Service Worker
-                    if (window.marcarOperacionCritica) {
-                        window.marcarOperacionCritica(true);
-                    }
-
-                    // Update loading message - SOLO DESPUÉS de todas las validaciones
-                    window.showLoadingOverlay('Calculando macronutrientes...');
-                    await new Promise(resolve => setTimeout(resolve, 300));
-
-                    window.showLoadingOverlay('Generando plan de alimentación...');
-
-                    // Timeout de seguridad para evitar carga infinita (30 segundos)
-                    const timeoutId = setTimeout(() => {
-                        console.error('⏱️ Timeout: La generación del plan está tardando demasiado');
-                        mostrarNotificacion('⏱️ La generación está tardando más de lo esperado. Por favor, intenta de nuevo.', 'error');
-                        window.hideLoadingOverlay();
-                        const submitBtn = document.querySelector('#dietForm button[type="submit"]');
-                        if (submitBtn) {
-                            submitBtn.classList.remove('btn-loading');
-                            submitBtn.disabled = false;
-                        }
-                        if (window.marcarOperacionCritica) {
-                            window.marcarOperacionCritica(false);
-                        }
-                    }, 30000); // 30 segundos
-
-                    try {
-                        await new Promise(resolve => setTimeout(resolve, 300));
-
-                        // Generar el plan ANTES de mostrar resultados
-                        console.log('🔄 Iniciando generación del plan...');
-                        if (typeof window.mostrarPlanAlimentacion === 'function') {
-                            try {
-                                window.mostrarPlanAlimentacion();
-                                console.log('✅ Plan generado correctamente');
-                            } catch (planError) {
-                                console.error('❌ Error al generar el plan:', planError);
-                                clearTimeout(timeoutId);
-                                window.hideLoadingOverlay();
-                                const submitBtn = document.querySelector('#dietForm button[type="submit"]');
-                                if (submitBtn) {
-                                    submitBtn.classList.remove('btn-loading');
-                                    submitBtn.disabled = false;
-                                }
-                                if (window.marcarOperacionCritica) {
-                                    window.marcarOperacionCritica(false);
-                                }
-                                mostrarNotificacion('❌ Error al generar el plan: ' + planError.message, 'error');
-                                return; // Salir temprano si hay error
-                            }
-                        } else {
-                            console.warn('⚠️ mostrarPlanAlimentacion no está disponible');
-                            clearTimeout(timeoutId);
-                            window.hideLoadingOverlay();
-                            const submitBtn = document.querySelector('#dietForm button[type="submit"]');
-                            if (submitBtn) {
-                                submitBtn.classList.remove('btn-loading');
-                                submitBtn.disabled = false;
-                            }
-                            if (window.marcarOperacionCritica) {
-                                window.marcarOperacionCritica(false);
-                            }
-                            mostrarNotificacion('❌ Error: Función de generación no disponible', 'error');
-                            return;
-                        }
-
-                        // Esperar un momento antes de mostrar resultados para asegurar que todo esté listo
-                        await new Promise(resolve => setTimeout(resolve, 100));
-
-                        // Mostrar resultados con manejo de errores
-                        if (window.mostrarResultados) {
-                            try {
-                                window.mostrarResultados();
-                                // Cancelar timeout si todo salió bien
-                                clearTimeout(timeoutId);
-                                // Hide loading after results are shown
-                                setTimeout(() => {
-                                    window.hideLoadingOverlay();
-                                    // Restore submit button
-                                    const submitBtn = document.querySelector('#dietForm button[type="submit"]');
-                                    if (submitBtn) {
-                                        submitBtn.classList.remove('btn-loading');
-                                        submitBtn.disabled = false;
-                                    }
-                                }, 500);
-                            } catch (resultadosError) {
-                                console.error('❌ Error al mostrar resultados:', resultadosError);
-                                clearTimeout(timeoutId);
-                                window.hideLoadingOverlay();
-                                const submitBtn = document.querySelector('#dietForm button[type="submit"]');
-                                if (submitBtn) {
-                                    submitBtn.classList.remove('btn-loading');
-                                    submitBtn.disabled = false;
-                                }
-                                if (window.marcarOperacionCritica) {
-                                    window.marcarOperacionCritica(false);
-                                }
-                                mostrarNotificacion('❌ Error al mostrar resultados: ' + resultadosError.message, 'error');
-                            }
-                        } else {
-                            console.error('❌ mostrarResultados no está disponible');
-                            clearTimeout(timeoutId);
-                            mostrarNotificacion('❌ Error: No se puede mostrar el plan de alimentación', 'error');
-                            window.hideLoadingOverlay();
-                            const submitBtn = document.querySelector('#dietForm button[type="submit"]');
-                            if (submitBtn) {
-                                submitBtn.classList.remove('btn-loading');
-                                submitBtn.disabled = false;
-                            }
-                            if (window.marcarOperacionCritica) {
-                                window.marcarOperacionCritica(false);
-                            }
-                        }
-                    } catch (error) {
-                        console.error('❌ Error crítico al generar o mostrar resultados:', error);
-                        clearTimeout(timeoutId);
-                        mostrarNotificacion('❌ Error al generar el plan: ' + error.message, 'error');
-                        window.hideLoadingOverlay();
-                        const submitBtn = document.querySelector('#dietForm button[type="submit"]');
-                        if (submitBtn) {
-                            submitBtn.classList.remove('btn-loading');
-                            submitBtn.disabled = false;
-                        }
-                        if (window.marcarOperacionCritica) {
-                            window.marcarOperacionCritica(false);
-                        }
-                    } finally {
-                        // Desmarcar operación crítica después de un delay para asegurar que todo se haya renderizado
-                        // Solo si no se ha desmarcado ya en los catch anteriores
-                        setTimeout(() => {
-                            if (window.marcarOperacionCritica) {
-                                window.marcarOperacionCritica(false);
-                            }
-                        }, 2000); // Esperar 2 segundos después de mostrar resultados
-                    }
+                    calcularMacronutrientes();
                 } catch (error) {
-                    console.error('❌ Error crítico al procesar formulario:', error);
-                    mostrarNotificacion('❌ Error crítico al generar el plan: ' + error.message, 'error');
+                    console.error('❌ Error al calcular macronutrientes:', error);
+                    // Asegurar que el loading overlay esté oculto
+                    if (window.hideLoadingOverlay) {
+                        window.hideLoadingOverlay();
+                    }
+                    // Restaurar botón
+                    if (submitButton) {
+                        submitButton.classList.remove('btn-loading');
+                        submitButton.disabled = false;
+                    }
+                    mostrarNotificacion('❌ Error al calcular macronutrientes: ' + error.message, 'error');
+                    return;
+                }
+
+                // Actualizar referencia global
+                window.datosUsuario = datosUsuario;
+
+                // Marcar operación crítica para prevenir reload del Service Worker
+                if (window.marcarOperacionCritica) {
+                    window.marcarOperacionCritica(true);
+                }
+
+                // Update loading message - SOLO DESPUÉS de todas las validaciones
+                window.showLoadingOverlay('Calculando macronutrientes...');
+                await new Promise(resolve => setTimeout(resolve, 300));
+
+                window.showLoadingOverlay('Generando plan de alimentación...');
+
+                // Timeout de seguridad para evitar carga infinita (30 segundos)
+                const timeoutId = setTimeout(() => {
+                    console.error('⏱️ Timeout: La generación del plan está tardando demasiado');
+                    mostrarNotificacion('⏱️ La generación está tardando más de lo esperado. Por favor, intenta de nuevo.', 'error');
                     window.hideLoadingOverlay();
-                    // Restore submit button
                     const submitBtn = document.querySelector('#dietForm button[type="submit"]');
                     if (submitBtn) {
                         submitBtn.classList.remove('btn-loading');
                         submitBtn.disabled = false;
                     }
-                    // Asegurar que se desmarque la operación crítica incluso si hay error
                     if (window.marcarOperacionCritica) {
                         window.marcarOperacionCritica(false);
                     }
-                }
-            });
-        }
+                }, 30000); // 30 segundos
 
-        const tabs = document.querySelectorAll('.tab');
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 300));
 
-        tabs.forEach(tab => {
-            tab.addEventListener('click', function () {
-                const tabName = this.getAttribute('data-tab');
-
-                tabs.forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-
-                this.classList.add('active');
-                document.getElementById(`tab-${tabName}`).classList.add('active');
-            });
-        });
-
-        const hoy = new Date();
-        const fechaInput = document.getElementById('fechaRegistro');
-        if (fechaInput) {
-            fechaInput.valueAsDate = hoy;
-        }
-
-        // ============================================
-        // ENHANCED UX: Real-time validation & feedback
-        // ============================================
-
-        // Real-time form validation
-        const formInputs = document.querySelectorAll('#dietForm input, #dietForm select, #dietForm textarea');
-        formInputs.forEach(input => {
-            // Validate on blur
-            input.addEventListener('blur', function () {
-                validateField(this);
-            });
-
-            // Validate on input (for immediate feedback)
-            input.addEventListener('input', function () {
-                if (this.value.trim() !== '') {
-                    validateField(this);
-                }
-            });
-        });
-
-        // Function to validate individual field
-        function validateField(field) {
-            const formGroup = field.closest('.form-group');
-            if (!formGroup) return;
-
-            // Remove previous validation messages
-            const existingMessage = formGroup.querySelector('.field-error-message');
-            if (existingMessage) {
-                existingMessage.remove();
-            }
-
-            // Check validity
-            if (field.validity.valid) {
-                field.classList.remove('invalid');
-                field.classList.add('valid');
-            } else {
-                field.classList.remove('valid');
-                field.classList.add('invalid');
-
-                // Show error message
-                const errorMessage = document.createElement('div');
-                errorMessage.className = 'field-error-message';
-                errorMessage.textContent = getValidationMessage(field);
-                formGroup.appendChild(errorMessage);
-            }
-        }
-
-        // Get validation message for field
-        function getValidationMessage(field) {
-            if (field.validity.valueMissing) {
-                return 'Este campo es obligatorio';
-            }
-            if (field.validity.rangeOverflow) {
-                return `El valor máximo es ${field.max}`;
-            }
-            if (field.validity.rangeUnderflow) {
-                return `El valor mínimo es ${field.min}`;
-            }
-            if (field.validity.typeMismatch) {
-                return 'El formato no es válido';
-            }
-            return 'Por favor, corrige este campo';
-        }
-
-        // Loading overlay management
-        window.showLoadingOverlay = function (message = 'Generando plan de alimentación...') {
-            const overlay = document.getElementById('loadingOverlay');
-            const messageEl = document.getElementById('loadingMessage');
-            if (overlay) {
-                if (messageEl) messageEl.textContent = message;
-                overlay.classList.add('active');
-            }
-        };
-
-        window.hideLoadingOverlay = function () {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) {
-                overlay.classList.remove('active');
-            }
-        };
-
-        // Enhanced submit button feedback
-        const submitButton = document.querySelector('#dietForm button[type="submit"]');
-        // COMENTADO: Este event listener causaba que el loading overlay se mostrara antes de las validaciones
-        // El loading overlay ahora se muestra solo después de pasar todas las validaciones en el event listener principal
-        /*
-        if (submitButton && dietForm) {
-            dietForm.addEventListener('submit', function() {
-                // Show loading state
-                submitButton.classList.add('btn-loading');
-                submitButton.disabled = true;
-                window.showLoadingOverlay('Generando tu plan personalizado...');
-            });
-        }
-        */
-
-        // Smooth scroll to results when they appear
-        const observer = new MutationObserver(function (mutations) {
-            mutations.forEach(function (mutation) {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                    const resultados = document.getElementById('resultados');
-                    if (resultados && !resultados.classList.contains('oculto')) {
-                        setTimeout(() => {
-                            resultados.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }, 300);
+                    // Generar el plan ANTES de mostrar resultados
+                    console.log('🔄 Iniciando generación del plan...');
+                    if (typeof window.mostrarPlanAlimentacion === 'function') {
+                        try {
+                            window.mostrarPlanAlimentacion();
+                            console.log('✅ Plan generado correctamente');
+                        } catch (planError) {
+                            console.error('❌ Error al generar el plan:', planError);
+                            clearTimeout(timeoutId);
+                            window.hideLoadingOverlay();
+                            const submitBtn = document.querySelector('#dietForm button[type="submit"]');
+                            if (submitBtn) {
+                                submitBtn.classList.remove('btn-loading');
+                                submitBtn.disabled = false;
+                            }
+                            if (window.marcarOperacionCritica) {
+                                window.marcarOperacionCritica(false);
+                            }
+                            mostrarNotificacion('❌ Error al generar el plan: ' + planError.message, 'error');
+                            return; // Salir temprano si hay error
+                        }
+                    } else {
+                        console.warn('⚠️ mostrarPlanAlimentacion no está disponible');
+                        clearTimeout(timeoutId);
+                        window.hideLoadingOverlay();
+                        const submitBtn = document.querySelector('#dietForm button[type="submit"]');
+                        if (submitBtn) {
+                            submitBtn.classList.remove('btn-loading');
+                            submitBtn.disabled = false;
+                        }
+                        if (window.marcarOperacionCritica) {
+                            window.marcarOperacionCritica(false);
+                        }
+                        mostrarNotificacion('❌ Error: Función de generación no disponible', 'error');
+                        return;
                     }
+
+                    // Esperar un momento antes de mostrar resultados para asegurar que todo esté listo
+                    await new Promise(resolve => setTimeout(resolve, 100));
+
+                    // Mostrar resultados con manejo de errores
+                    if (window.mostrarResultados) {
+                        try {
+                            window.mostrarResultados();
+                            // Cancelar timeout si todo salió bien
+                            clearTimeout(timeoutId);
+                            // Hide loading after results are shown
+                            setTimeout(() => {
+                                window.hideLoadingOverlay();
+                                // Restore submit button
+                                const submitBtn = document.querySelector('#dietForm button[type="submit"]');
+                                if (submitBtn) {
+                                    submitBtn.classList.remove('btn-loading');
+                                    submitBtn.disabled = false;
+                                }
+                            }, 500);
+                        } catch (resultadosError) {
+                            console.error('❌ Error al mostrar resultados:', resultadosError);
+                            clearTimeout(timeoutId);
+                            window.hideLoadingOverlay();
+                            const submitBtn = document.querySelector('#dietForm button[type="submit"]');
+                            if (submitBtn) {
+                                submitBtn.classList.remove('btn-loading');
+                                submitBtn.disabled = false;
+                            }
+                            if (window.marcarOperacionCritica) {
+                                window.marcarOperacionCritica(false);
+                            }
+                            mostrarNotificacion('❌ Error al mostrar resultados: ' + resultadosError.message, 'error');
+                        }
+                    } else {
+                        console.error('❌ mostrarResultados no está disponible');
+                        clearTimeout(timeoutId);
+                        mostrarNotificacion('❌ Error: No se puede mostrar el plan de alimentación', 'error');
+                        window.hideLoadingOverlay();
+                        const submitBtn = document.querySelector('#dietForm button[type="submit"]');
+                        if (submitBtn) {
+                            submitBtn.classList.remove('btn-loading');
+                            submitBtn.disabled = false;
+                        }
+                        if (window.marcarOperacionCritica) {
+                            window.marcarOperacionCritica(false);
+                        }
+                    }
+                } catch (error) {
+                    console.error('❌ Error crítico al generar o mostrar resultados:', error);
+                    clearTimeout(timeoutId);
+                    mostrarNotificacion('❌ Error al generar el plan: ' + error.message, 'error');
+                    window.hideLoadingOverlay();
+                    const submitBtn = document.querySelector('#dietForm button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.classList.remove('btn-loading');
+                        submitBtn.disabled = false;
+                    }
+                    if (window.marcarOperacionCritica) {
+                        window.marcarOperacionCritica(false);
+                    }
+                } finally {
+                    // Desmarcar operación crítica después de un delay para asegurar que todo se haya renderizado
+                    // Solo si no se ha desmarcado ya en los catch anteriores
+                    setTimeout(() => {
+                        if (window.marcarOperacionCritica) {
+                            window.marcarOperacionCritica(false);
+                        }
+                    }, 2000); // Esperar 2 segundos después de mostrar resultados
                 }
-            });
+            } catch (error) {
+                console.error('❌ Error crítico al procesar formulario:', error);
+                mostrarNotificacion('❌ Error crítico al generar el plan: ' + error.message, 'error');
+                window.hideLoadingOverlay();
+                // Restore submit button
+                const submitBtn = document.querySelector('#dietForm button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.classList.remove('btn-loading');
+                    submitBtn.disabled = false;
+                }
+                // Asegurar que se desmarque la operación crítica incluso si hay error
+                if (window.marcarOperacionCritica) {
+                    window.marcarOperacionCritica(false);
+                }
+            }
         });
+    }
 
-        const resultados = document.getElementById('resultados');
-        if (resultados) {
-            observer.observe(resultados, { attributes: true });
-        }
+    const tabs = document.querySelectorAll('.tab');
 
-        // Enhanced tooltip initialization
-        const tooltipIcons = document.querySelectorAll('.tooltip-icon');
-        tooltipIcons.forEach(icon => {
-            icon.addEventListener('mouseenter', function () {
-                this.style.opacity = '1';
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function () {
+            const tabName = this.getAttribute('data-tab');
+
+            tabs.forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
             });
-            icon.addEventListener('mouseleave', function () {
-                this.style.opacity = '0.7';
-            });
-        });
 
-        // Add smooth transitions to cards
-        const cards = document.querySelectorAll('.card-modern');
-        cards.forEach((card, index) => {
-            card.style.animationDelay = `${index * 0.1}s`;
+            this.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
         });
     });
 
-    function inicializarBotones() {
-        // Botón guardar dieta
-        const btnGuardar = document.getElementById('btnGuardar');
-        if (btnGuardar) {
-            btnGuardar.replaceWith(btnGuardar.cloneNode(true));
-            const nuevoBtnGuardar = document.getElementById('btnGuardar');
+    const hoy = new Date();
+    const fechaInput = document.getElementById('fechaRegistro');
+    if (fechaInput) {
+        fechaInput.valueAsDate = hoy;
+    }
 
-            nuevoBtnGuardar.addEventListener('click', async function () {
-                const boton = this;
-                const textoOriginal = boton.innerHTML;
+    // ============================================
+    // ENHANCED UX: Real-time validation & feedback
+    // ============================================
 
-                if (!window.authManager || !window.authManager.isAuthenticated()) {
-                    window.uiManager?.openModal();
-                    mostrarNotificacion('⚠️ Debes iniciar sesión para guardar dietas', 'error');
-                    return;
+    // Real-time form validation
+    const formInputs = document.querySelectorAll('#dietForm input, #dietForm select, #dietForm textarea');
+    formInputs.forEach(input => {
+        // Validate on blur
+        input.addEventListener('blur', function () {
+            validateField(this);
+        });
+
+        // Validate on input (for immediate feedback)
+        input.addEventListener('input', function () {
+            if (this.value.trim() !== '') {
+                validateField(this);
+            }
+        });
+    });
+
+    // Function to validate individual field
+    function validateField(field) {
+        const formGroup = field.closest('.form-group');
+        if (!formGroup) return;
+
+        // Remove previous validation messages
+        const existingMessage = formGroup.querySelector('.field-error-message');
+        if (existingMessage) {
+            existingMessage.remove();
+        }
+
+        // Check validity
+        if (field.validity.valid) {
+            field.classList.remove('invalid');
+            field.classList.add('valid');
+        } else {
+            field.classList.remove('valid');
+            field.classList.add('invalid');
+
+            // Show error message
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'field-error-message';
+            errorMessage.textContent = getValidationMessage(field);
+            formGroup.appendChild(errorMessage);
+        }
+    }
+
+    // Get validation message for field
+    function getValidationMessage(field) {
+        if (field.validity.valueMissing) {
+            return 'Este campo es obligatorio';
+        }
+        if (field.validity.rangeOverflow) {
+            return `El valor máximo es ${field.max}`;
+        }
+        if (field.validity.rangeUnderflow) {
+            return `El valor mínimo es ${field.min}`;
+        }
+        if (field.validity.typeMismatch) {
+            return 'El formato no es válido';
+        }
+        return 'Por favor, corrige este campo';
+    }
+
+    // Loading overlay management
+    window.showLoadingOverlay = function (message = 'Generando plan de alimentación...') {
+        const overlay = document.getElementById('loadingOverlay');
+        const messageEl = document.getElementById('loadingMessage');
+        if (overlay) {
+            if (messageEl) messageEl.textContent = message;
+            overlay.classList.add('active');
+        }
+    };
+
+    window.hideLoadingOverlay = function () {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+            overlay.classList.remove('active');
+        }
+    };
+
+    // Enhanced submit button feedback
+    const submitButton = document.querySelector('#dietForm button[type="submit"]');
+    // COMENTADO: Este event listener causaba que el loading overlay se mostrara antes de las validaciones
+    // El loading overlay ahora se muestra solo después de pasar todas las validaciones en el event listener principal
+    /*
+    if (submitButton && dietForm) {
+        dietForm.addEventListener('submit', function() {
+            // Show loading state
+            submitButton.classList.add('btn-loading');
+            submitButton.disabled = true;
+            window.showLoadingOverlay('Generando tu plan personalizado...');
+        });
+    }
+    */
+
+    // Smooth scroll to results when they appear
+    const observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                const resultados = document.getElementById('resultados');
+                if (resultados && !resultados.classList.contains('oculto')) {
+                    setTimeout(() => {
+                        resultados.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 300);
+                }
+            }
+        });
+    });
+
+    const resultados = document.getElementById('resultados');
+    if (resultados) {
+        observer.observe(resultados, { attributes: true });
+    }
+
+    // Enhanced tooltip initialization
+    const tooltipIcons = document.querySelectorAll('.tooltip-icon');
+    tooltipIcons.forEach(icon => {
+        icon.addEventListener('mouseenter', function () {
+            this.style.opacity = '1';
+        });
+        icon.addEventListener('mouseleave', function () {
+            this.style.opacity = '0.7';
+        });
+    });
+
+    // Add smooth transitions to cards
+    const cards = document.querySelectorAll('.card-modern');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+    });
+});
+
+function inicializarBotones() {
+    // Botón guardar dieta
+    const btnGuardar = document.getElementById('btnGuardar');
+    if (btnGuardar) {
+        btnGuardar.replaceWith(btnGuardar.cloneNode(true));
+        const nuevoBtnGuardar = document.getElementById('btnGuardar');
+
+        nuevoBtnGuardar.addEventListener('click', async function () {
+            const boton = this;
+            const textoOriginal = boton.innerHTML;
+
+            if (!window.authManager || !window.authManager.isAuthenticated()) {
+                window.uiManager?.openModal();
+                mostrarNotificacion('⚠️ Debes iniciar sesión para guardar dietas', 'error');
+                return;
+            }
+
+            // Verificar si hay una dieta cargada (tiene ID)
+            const dietaIdCargada = window.dietaIdCargada || null;
+            let accion = 'crear'; // Por defecto crear nueva
+
+            if (dietaIdCargada) {
+                // Preguntar al usuario qué quiere hacer
+                const respuesta = confirm(
+                    'Ya tienes una dieta cargada.\n\n' +
+                    '¿Qué deseas hacer?\n\n' +
+                    '• Aceptar: Actualizar la dieta existente\n' +
+                    '• Cancelar: Crear una nueva dieta con los cambios'
+                );
+
+                if (respuesta) {
+                    // Usuario quiere actualizar
+                    accion = 'actualizar';
+                } else {
+                    // Usuario quiere crear nueva
+                    accion = 'crear';
+                    // Limpiar el ID para que se cree una nueva
+                    window.dietaIdCargada = null;
+                }
+            }
+
+            boton.innerHTML = accion === 'actualizar' ? '⏳ Actualizando...' : '⏳ Guardando...';
+            boton.disabled = true;
+
+            try {
+                // Sincronizar plan manual antes de guardar (si aplica)
+                if (datosUsuario.modoGeneracion === 'manual' && window.tablaEditable) {
+                    sincronizarPlanManualConDatosUsuario();
                 }
 
-                // Verificar si hay una dieta cargada (tiene ID)
-                const dietaIdCargada = window.dietaIdCargada || null;
-                let accion = 'crear'; // Por defecto crear nueva
-
-                if (dietaIdCargada) {
-                    // Preguntar al usuario qué quiere hacer
-                    const respuesta = confirm(
-                        'Ya tienes una dieta cargada.\n\n' +
-                        '¿Qué deseas hacer?\n\n' +
-                        '• Aceptar: Actualizar la dieta existente\n' +
-                        '• Cancelar: Crear una nueva dieta con los cambios'
-                    );
-
-                    if (respuesta) {
-                        // Usuario quiere actualizar
-                        accion = 'actualizar';
-                    } else {
-                        // Usuario quiere crear nueva
-                        accion = 'crear';
-                        // Limpiar el ID para que se cree una nueva
-                        window.dietaIdCargada = null;
-                    }
+                // Si hay un cliente asociado, guardar en su historial
+                if (window.clienteIdDieta && window.clienteService) {
+                    await window.clienteService.agregarDieta(window.clienteIdDieta, datosUsuario);
                 }
 
-                boton.innerHTML = accion === 'actualizar' ? '⏳ Actualizando...' : '⏳ Guardando...';
-                boton.disabled = true;
+                // Asegurar que el ID esté en datosUsuario si hay una dieta cargada
+                if (dietaIdCargada && !datosUsuario.id) {
+                    datosUsuario.id = dietaIdCargada;
+                    console.log(`💾 ID agregado a datosUsuario antes de guardar: ${dietaIdCargada}`);
+                }
 
-                try {
-                    // Sincronizar plan manual antes de guardar (si aplica)
-                    if (datosUsuario.modoGeneracion === 'manual' && window.tablaEditable) {
-                        sincronizarPlanManualConDatosUsuario();
+                let resultado;
+                if (accion === 'actualizar' && dietaIdCargada) {
+                    // Actualizar dieta existente
+                    console.log(`🔄 Actualizando dieta existente con ID: ${dietaIdCargada}`);
+                    console.log(`📋 ID en datosUsuario: ${datosUsuario.id || 'NO TIENE'}`);
+                    console.log(`📋 ID en window.dietaIdCargada: ${window.dietaIdCargada || 'NO TIENE'}`);
+
+                    // Usar el ID de dietaIdCargada como fuente de verdad
+                    const idParaActualizar = dietaIdCargada || datosUsuario.id || window.dietaIdCargada;
+                    if (!idParaActualizar) {
+                        throw new Error('No se puede actualizar: ID de dieta no encontrado');
                     }
 
-                    // Si hay un cliente asociado, guardar en su historial
-                    if (window.clienteIdDieta && window.clienteService) {
-                        await window.clienteService.agregarDieta(window.clienteIdDieta, datosUsuario);
-                    }
+                    resultado = await window.dietaService.actualizarDieta(idParaActualizar, datosUsuario);
 
-                    // Asegurar que el ID esté en datosUsuario si hay una dieta cargada
-                    if (dietaIdCargada && !datosUsuario.id) {
-                        datosUsuario.id = dietaIdCargada;
-                        console.log(`💾 ID agregado a datosUsuario antes de guardar: ${dietaIdCargada}`);
-                    }
-
-                    let resultado;
-                    if (accion === 'actualizar' && dietaIdCargada) {
-                        // Actualizar dieta existente
-                        console.log(`🔄 Actualizando dieta existente con ID: ${dietaIdCargada}`);
-                        console.log(`📋 ID en datosUsuario: ${datosUsuario.id || 'NO TIENE'}`);
-                        console.log(`📋 ID en window.dietaIdCargada: ${window.dietaIdCargada || 'NO TIENE'}`);
-
-                        // Usar el ID de dietaIdCargada como fuente de verdad
-                        const idParaActualizar = dietaIdCargada || datosUsuario.id || window.dietaIdCargada;
-                        if (!idParaActualizar) {
-                            throw new Error('No se puede actualizar: ID de dieta no encontrado');
-                        }
-
-                        resultado = await window.dietaService.actualizarDieta(idParaActualizar, datosUsuario);
-
-                        // Mantener el ID después de actualizar
-                        if (resultado.success) {
-                            window.dietaIdCargada = idParaActualizar;
-                            datosUsuario.id = idParaActualizar;
-                        }
-                    } else {
-                        // Crear nueva dieta
-                        console.log(`➕ Creando nueva dieta`);
-                        // Asegurar que no hay ID en datosUsuario para crear nueva
-                        delete datosUsuario.id;
-                        window.dietaIdCargada = null;
-
-                        resultado = await window.dietaService.guardarDieta(datosUsuario);
-
-                        // Si se creó exitosamente, guardar el nuevo ID
-                        if (resultado.success && resultado.dietaId) {
-                            window.dietaIdCargada = resultado.dietaId;
-                            datosUsuario.id = resultado.dietaId;
-                            console.log(`✅ Nueva dieta creada con ID: ${resultado.dietaId}`);
-                        }
-                    }
-
+                    // Mantener el ID después de actualizar
                     if (resultado.success) {
-                        const mensaje = accion === 'actualizar'
-                            ? '✅ Dieta actualizada correctamente'
-                            : '✅ Dieta guardada correctamente';
-                        mostrarNotificacion(mensaje, 'success');
-                        boton.innerHTML = '✅ Guardado';
-                        setTimeout(() => {
-                            boton.innerHTML = textoOriginal;
-                            boton.disabled = false;
-                        }, 2000);
-                    } else {
-                        mostrarNotificacion('❌ Error al guardar: ' + resultado.error, 'error');
+                        window.dietaIdCargada = idParaActualizar;
+                        datosUsuario.id = idParaActualizar;
+                    }
+                } else {
+                    // Crear nueva dieta
+                    console.log(`➕ Creando nueva dieta`);
+                    // Asegurar que no hay ID en datosUsuario para crear nueva
+                    delete datosUsuario.id;
+                    window.dietaIdCargada = null;
+
+                    resultado = await window.dietaService.guardarDieta(datosUsuario);
+
+                    // Si se creó exitosamente, guardar el nuevo ID
+                    if (resultado.success && resultado.dietaId) {
+                        window.dietaIdCargada = resultado.dietaId;
+                        datosUsuario.id = resultado.dietaId;
+                        console.log(`✅ Nueva dieta creada con ID: ${resultado.dietaId}`);
+                    }
+                }
+
+                if (resultado.success) {
+                    const mensaje = accion === 'actualizar'
+                        ? '✅ Dieta actualizada correctamente'
+                        : '✅ Dieta guardada correctamente';
+                    mostrarNotificacion(mensaje, 'success');
+                    boton.innerHTML = '✅ Guardado';
+                    setTimeout(() => {
                         boton.innerHTML = textoOriginal;
                         boton.disabled = false;
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    mostrarNotificacion('❌ Error al guardar dieta', 'error');
+                    }, 2000);
+                } else {
+                    mostrarNotificacion('❌ Error al guardar: ' + resultado.error, 'error');
                     boton.innerHTML = textoOriginal;
                     boton.disabled = false;
                 }
-            });
-        }
-
-        // Botón editar dieta
-        const btnEditarDieta = document.getElementById('btnEditarDieta');
-        if (btnEditarDieta) {
-            btnEditarDieta.replaceWith(btnEditarDieta.cloneNode(true));
-            const nuevoBtnEditar = document.getElementById('btnEditarDieta');
-
-            nuevoBtnEditar.addEventListener('click', function () {
-                // Usar el nuevo sistema de tabla editable para edición
-                if (window.tablaEditable) {
-                    // Cambiar al modo manual si no está ya activado
-                    const modoActual = datosUsuario.modoGeneracion || 'automatico';
-                    if (modoActual !== 'manual') {
-                        datosUsuario.modoGeneracion = 'manual';
-                        mostrarTablaEditable();
-                        mostrarNotificacion('✏️ Modo edición activado. Puedes editar alimentos directamente en las tablas.', 'info');
-                    } else {
-                        mostrarTablaEditable();
-                        mostrarNotificacion('✏️ Modo edición ya activado. Haz clic en cualquier fila para editar.', 'info');
-                    }
-                } else {
-                    mostrarNotificacion('⚠️ Sistema de edición no disponible. Recarga la página.', 'error');
-                }
-            });
-        }
-
-        // Botón actualizar dieta
-        const btnActualizarDieta = document.getElementById('btnActualizarDieta');
-        if (btnActualizarDieta) {
-            btnActualizarDieta.replaceWith(btnActualizarDieta.cloneNode(true));
-            const nuevoBtnActualizar = document.getElementById('btnActualizarDieta');
-
-            nuevoBtnActualizar.addEventListener('click', async function () {
-                try {
-                    // Mostrar loading
-                    window.showLoadingOverlay('Actualizando dieta con nuevos valores...');
-
-                    // Recalcular macronutrientes con los valores actuales del formulario
-                    calcularMacronutrientes();
-                    recalcularIngestasPorSuperavit();
-
-                    // Esperar un momento para que los cálculos se completen
-                    await new Promise(resolve => setTimeout(resolve, 300));
-
-                    // Regenerar el plan de alimentación
-                    if (typeof window.mostrarPlanAlimentacion === 'function') {
-                        window.mostrarPlanAlimentacion();
-
-                        // Actualizar todas las tablas y visualizaciones
-                        if (typeof mostrarMacronutrientesDistribucion === 'function') {
-                            mostrarMacronutrientesDistribucion();
-                        }
-                        if (typeof mostrarCalculosDetallados === 'function') {
-                            mostrarCalculosDetallados();
-                        }
-                        if (typeof mostrarTablaMacros === 'function') {
-                            mostrarTablaMacros();
-                        }
-                        if (typeof mostrarInfoUsuario === 'function') {
-                            mostrarInfoUsuario();
-                        }
-                        if (typeof mostrarDistribucionEntrenos === 'function') {
-                            mostrarDistribucionEntrenos();
-                        }
-
-                        // Actualizar gráficos
-                        // COMENTADO: Gráficos eliminados por problemas en móviles/tablets
-                        setTimeout(() => {
-                            // actualizarGraficosMacronutrientes();
-                            window.hideLoadingOverlay();
-                            mostrarNotificacion('✅ Dieta actualizada correctamente con los nuevos valores', 'success');
-                        }, 800);
-                    } else {
-                        window.hideLoadingOverlay();
-                        mostrarNotificacion('⚠️ No se puede actualizar la dieta. Por favor, genera una nueva dieta.', 'error');
-                    }
-                } catch (error) {
-                    console.error('❌ Error al actualizar la dieta:', error);
-                    window.hideLoadingOverlay();
-                    mostrarNotificacion('❌ Error al actualizar la dieta: ' + error.message, 'error');
-                }
-            });
-        }
-
-        // ============================================
-        // FUNCIONES AUXILIARES PARA GENERACIÓN DE PDF
-        // ============================================
-
-        /**
-         * Obtiene los datos según la fuente especificada
-         * @param {string} fuente - 'principal' o 'tabla-editable'
-         * @returns {{datos: object, contenidoOriginal: HTMLElement|null, error: string|null}}
-         */
-        function obtenerDatosPDF(fuente) {
-            if (fuente === 'principal') {
-                if (!datosUsuario || !datosUsuario.nombre) {
-                    return { datos: null, contenidoOriginal: null, error: 'Error: No hay datos de dieta para generar el PDF.' };
-                }
-                return {
-                    datos: datosUsuario,
-                    contenidoOriginal: document.getElementById('pdf-content'),
-                    error: null
-                };
-            } else if (fuente === 'tabla-editable') {
-                if (!window.tablaEditable) {
-                    return { datos: null, contenidoOriginal: null, error: 'Error: No hay datos de tabla editable disponibles.' };
-                }
-                const cab = window.tablaEditable.obtenerCabeceraExport();
-                return {
-                    datos: {
-                        nombre: cab.nombre,
-                        edad: cab.edad,
-                        altura: cab.altura,
-                        peso: cab.peso,
-                        imc: cab.imc,
-                        sexo: cab.sexo,
-                        tipoPersona: cab.tipoPersona,
-                        objetivo: cab.objetivo,
-                        diasEntreno: window.tablaEditable.planSemana ? Object.keys(window.tablaEditable.planSemana) : []
-                    },
-                    contenidoOriginal: null,
-                    error: null
-                };
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('❌ Error al guardar dieta', 'error');
+                boton.innerHTML = textoOriginal;
+                boton.disabled = false;
             }
-            return { datos: null, contenidoOriginal: null, error: 'Error: Fuente de datos no reconocida.' };
-        }
+        });
+    }
 
-        /**
-         * Genera el CSS para el PDF (minimalista, blanco y negro)
-         * @param {Object} tamanosFuente - Tamaños de fuente dinámicos (opcional)
-         * @returns {string}
-         */
-        function generarCSSPDF(tamanosFuente = null) {
-            // Usar tamaños dinámicos si están disponibles, sino usar valores por defecto
-            const tamanos = tamanosFuente || window.tamanosFuentePDF || {
-                tamanoItemAlimento: 7.6,
-                tamanoTituloComida: 7.8,
-                tamanoHeader: 8.4,
-                tamanoSubtitulo: 8.0
+    // Botón editar dieta
+    const btnEditarDieta = document.getElementById('btnEditarDieta');
+    if (btnEditarDieta) {
+        btnEditarDieta.replaceWith(btnEditarDieta.cloneNode(true));
+        const nuevoBtnEditar = document.getElementById('btnEditarDieta');
+
+        nuevoBtnEditar.addEventListener('click', function () {
+            // Usar el nuevo sistema de tabla editable para edición
+            if (window.tablaEditable) {
+                // Cambiar al modo manual si no está ya activado
+                const modoActual = datosUsuario.modoGeneracion || 'automatico';
+                if (modoActual !== 'manual') {
+                    datosUsuario.modoGeneracion = 'manual';
+                    mostrarTablaEditable();
+                    mostrarNotificacion('✏️ Modo edición activado. Puedes editar alimentos directamente en las tablas.', 'info');
+                } else {
+                    mostrarTablaEditable();
+                    mostrarNotificacion('✏️ Modo edición ya activado. Haz clic en cualquier fila para editar.', 'info');
+                }
+            } else {
+                mostrarNotificacion('⚠️ Sistema de edición no disponible. Recarga la página.', 'error');
+            }
+        });
+    }
+
+    // Botón actualizar dieta
+    const btnActualizarDieta = document.getElementById('btnActualizarDieta');
+    if (btnActualizarDieta) {
+        btnActualizarDieta.replaceWith(btnActualizarDieta.cloneNode(true));
+        const nuevoBtnActualizar = document.getElementById('btnActualizarDieta');
+
+        nuevoBtnActualizar.addEventListener('click', async function () {
+            try {
+                // Mostrar loading
+                window.showLoadingOverlay('Actualizando dieta con nuevos valores...');
+
+                // Recalcular macronutrientes con los valores actuales del formulario
+                calcularMacronutrientes();
+                recalcularIngestasPorSuperavit();
+
+                // Esperar un momento para que los cálculos se completen
+                await new Promise(resolve => setTimeout(resolve, 300));
+
+                // Regenerar el plan de alimentación
+                if (typeof window.mostrarPlanAlimentacion === 'function') {
+                    window.mostrarPlanAlimentacion();
+
+                    // Actualizar todas las tablas y visualizaciones
+                    if (typeof mostrarMacronutrientesDistribucion === 'function') {
+                        mostrarMacronutrientesDistribucion();
+                    }
+                    if (typeof mostrarCalculosDetallados === 'function') {
+                        mostrarCalculosDetallados();
+                    }
+                    if (typeof mostrarTablaMacros === 'function') {
+                        mostrarTablaMacros();
+                    }
+                    if (typeof mostrarInfoUsuario === 'function') {
+                        mostrarInfoUsuario();
+                    }
+                    if (typeof mostrarDistribucionEntrenos === 'function') {
+                        mostrarDistribucionEntrenos();
+                    }
+
+                    // Actualizar gráficos
+                    // COMENTADO: Gráficos eliminados por problemas en móviles/tablets
+                    setTimeout(() => {
+                        // actualizarGraficosMacronutrientes();
+                        window.hideLoadingOverlay();
+                        mostrarNotificacion('✅ Dieta actualizada correctamente con los nuevos valores', 'success');
+                    }, 800);
+                } else {
+                    window.hideLoadingOverlay();
+                    mostrarNotificacion('⚠️ No se puede actualizar la dieta. Por favor, genera una nueva dieta.', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Error al actualizar la dieta:', error);
+                window.hideLoadingOverlay();
+                mostrarNotificacion('❌ Error al actualizar la dieta: ' + error.message, 'error');
+            }
+        });
+    }
+
+    // ============================================
+    // FUNCIONES AUXILIARES PARA GENERACIÓN DE PDF
+    // ============================================
+
+    /**
+     * Obtiene los datos según la fuente especificada
+     * @param {string} fuente - 'principal' o 'tabla-editable'
+     * @returns {{datos: object, contenidoOriginal: HTMLElement|null, error: string|null}}
+     */
+    function obtenerDatosPDF(fuente) {
+        if (fuente === 'principal') {
+            if (!datosUsuario || !datosUsuario.nombre) {
+                return { datos: null, contenidoOriginal: null, error: 'Error: No hay datos de dieta para generar el PDF.' };
+            }
+            return {
+                datos: datosUsuario,
+                contenidoOriginal: document.getElementById('pdf-content'),
+                error: null
             };
-            return `
+        } else if (fuente === 'tabla-editable') {
+            if (!window.tablaEditable) {
+                return { datos: null, contenidoOriginal: null, error: 'Error: No hay datos de tabla editable disponibles.' };
+            }
+            const cab = window.tablaEditable.obtenerCabeceraExport();
+            return {
+                datos: {
+                    nombre: cab.nombre,
+                    edad: cab.edad,
+                    altura: cab.altura,
+                    peso: cab.peso,
+                    imc: cab.imc,
+                    sexo: cab.sexo,
+                    tipoPersona: cab.tipoPersona,
+                    objetivo: cab.objetivo,
+                    diasEntreno: window.tablaEditable.planSemana ? Object.keys(window.tablaEditable.planSemana) : []
+                },
+                contenidoOriginal: null,
+                error: null
+            };
+        }
+        return { datos: null, contenidoOriginal: null, error: 'Error: Fuente de datos no reconocida.' };
+    }
+
+    /**
+     * Genera el CSS para el PDF (minimalista, blanco y negro)
+     * @param {Object} tamanosFuente - Tamaños de fuente dinámicos (opcional)
+     * @returns {string}
+     */
+    function generarCSSPDF(tamanosFuente = null) {
+        // Usar tamaños dinámicos si están disponibles, sino usar valores por defecto
+        const tamanos = tamanosFuente || window.tamanosFuentePDF || {
+            tamanoItemAlimento: 7.6,
+            tamanoTituloComida: 7.8,
+            tamanoHeader: 8.4,
+            tamanoSubtitulo: 8.0
+        };
+        return `
             * { margin: 0; padding: 0; box-sizing: border-box; }
             html {
                 -webkit-text-size-adjust: 100%;
@@ -4706,38 +3831,38 @@ function recalcularIngestasPorSuperavit() {
                 clear: both;
             }
         `;
+    }
+
+    /**
+     * Genera el header del PDF con información profesional y del cliente
+     * @param {object} datos - Datos del cliente
+     * @param {string} fecha - Fecha formateada
+     * @returns {Promise<string>}
+     */
+    async function generarHeaderPDF(datos, fecha) {
+        const nombreCliente = datos.nombre || 'Cliente';
+        const subtags = [];
+        if (datos.edad) subtags.push(`Edad: ${datos.edad}`);
+        if (datos.altura) subtags.push(`Altura: ${datos.altura} cm`);
+        if (datos.peso) subtags.push(`Peso: ${datos.peso} kg`);
+        if (datos.imc) subtags.push(`IMC: ${datos.imc}`);
+        if (datos.sexo) subtags.push(`Sexo: ${datos.sexo}`);
+        if (datos.tipoPersona) subtags.push(`Tipo: ${datos.tipoPersona}`);
+        if (datos.objetivo) subtags.push(`Objetivo: ${datos.objetivo}`);
+
+        // Convertir logo a base64
+        let logoBase64 = '';
+        try {
+            logoBase64 = await convertirImagenABase64('iconofit.png');
+        } catch (e) {
+            console.warn('No se pudo cargar el logo:', e);
         }
 
-        /**
-         * Genera el header del PDF con información profesional y del cliente
-         * @param {object} datos - Datos del cliente
-         * @param {string} fecha - Fecha formateada
-         * @returns {Promise<string>}
-         */
-        async function generarHeaderPDF(datos, fecha) {
-            const nombreCliente = datos.nombre || 'Cliente';
-            const subtags = [];
-            if (datos.edad) subtags.push(`Edad: ${datos.edad}`);
-            if (datos.altura) subtags.push(`Altura: ${datos.altura} cm`);
-            if (datos.peso) subtags.push(`Peso: ${datos.peso} kg`);
-            if (datos.imc) subtags.push(`IMC: ${datos.imc}`);
-            if (datos.sexo) subtags.push(`Sexo: ${datos.sexo}`);
-            if (datos.tipoPersona) subtags.push(`Tipo: ${datos.tipoPersona}`);
-            if (datos.objetivo) subtags.push(`Objetivo: ${datos.objetivo}`);
+        const logoHTML = logoBase64 ? `<img src="${logoBase64}" alt="Logo" class="logo-pdf">` : '';
+        const infoCliente = subtags.join(' · ');
+        const recordatorioHidratacion = 'Hidratación: Consumir entre 2-3 litros de agua al día.';
 
-            // Convertir logo a base64
-            let logoBase64 = '';
-            try {
-                logoBase64 = await convertirImagenABase64('iconofit.png');
-            } catch (e) {
-                console.warn('No se pudo cargar el logo:', e);
-            }
-
-            const logoHTML = logoBase64 ? `<img src="${logoBase64}" alt="Logo" class="logo-pdf">` : '';
-            const infoCliente = subtags.join(' · ');
-            const recordatorioHidratacion = 'Hidratación: Consumir entre 2-3 litros de agua al día.';
-
-            return `
+        return `
             <div class="header">
                 <div class="header-top-row">
                     <div class="contacto-left">
@@ -4758,972 +3883,972 @@ function recalcularIngestasPorSuperavit() {
                 <div class="cliente-datos">${infoCliente} · <span class="recordatorio-agua">${recordatorioHidratacion}</span></div>
             </div>
         `;
+    }
+
+    /**
+     * Procesa el contenido HTML eliminando elementos no deseados y aplicando estilos minimalistas
+     * @param {HTMLElement} clone - Clon del elemento original
+     * @returns {HTMLElement}
+     */
+    function procesarContenidoParaPDF(clone) {
+        // Remover tabs y contenido no necesario
+        clone.querySelectorAll('.tabs, .tab-content:not(.active), .tmb-section, .tmb-calculator, #tmb-calculator').forEach(el => el.remove());
+
+        // Remover completamente la tabla de macronutrientes del PDF
+        const macroTable = clone.querySelector('.macro-table');
+        if (macroTable) macroTable.remove();
+
+        const tablaMacros = clone.querySelector('#tabla-macros, .tabla-macros');
+        if (tablaMacros) {
+            const macroTableContainer = tablaMacros.closest('.macro-table') || tablaMacros.parentElement;
+            if (macroTableContainer) macroTableContainer.remove();
         }
 
-        /**
-         * Procesa el contenido HTML eliminando elementos no deseados y aplicando estilos minimalistas
-         * @param {HTMLElement} clone - Clon del elemento original
-         * @returns {HTMLElement}
-         */
-        function procesarContenidoParaPDF(clone) {
-            // Remover tabs y contenido no necesario
-            clone.querySelectorAll('.tabs, .tab-content:not(.active), .tmb-section, .tmb-calculator, #tmb-calculator').forEach(el => el.remove());
+        // Remover tabla de información del usuario si existe (datos duplicados)
+        const infoUsuarioTable = clone.querySelector('.info-usuario-table, #info-usuario-table');
+        if (infoUsuarioTable) {
+            infoUsuarioTable.remove();
+        }
 
-            // Remover completamente la tabla de macronutrientes del PDF
-            const macroTable = clone.querySelector('.macro-table');
-            if (macroTable) macroTable.remove();
+        // Convertir a texto simple sin colores - MINIMALISTA BLANCO Y NEGRO
+        clone.querySelectorAll('*').forEach(el => {
+            el.style.color = '#000';
+            el.style.backgroundColor = '#fff';
+            el.style.background = '#fff';
+            el.style.borderColor = '#000';
+            el.style.border = el.style.border ? el.style.border.replace(/rgb\(\d+,\s*\d+,\s*\d+\)|#[a-fA-F0-9]{3,6}/g, '#000') : '1px solid #000';
+            el.style.boxShadow = 'none';
+            el.style.textShadow = 'none';
+            el.style.filter = 'none';
 
-            const tablaMacros = clone.querySelector('#tabla-macros, .tabla-macros');
-            if (tablaMacros) {
-                const macroTableContainer = tablaMacros.closest('.macro-table') || tablaMacros.parentElement;
-                if (macroTableContainer) macroTableContainer.remove();
-            }
-
-            // Remover tabla de información del usuario si existe (datos duplicados)
-            const infoUsuarioTable = clone.querySelector('.info-usuario-table, #info-usuario-table');
-            if (infoUsuarioTable) {
-                infoUsuarioTable.remove();
-            }
-
-            // Convertir a texto simple sin colores - MINIMALISTA BLANCO Y NEGRO
-            clone.querySelectorAll('*').forEach(el => {
-                el.style.color = '#000';
+            if (el.tagName === 'TH') {
                 el.style.backgroundColor = '#fff';
-                el.style.background = '#fff';
+                el.style.border = '1px solid #000';
+                el.style.fontWeight = '700';
+                el.style.color = '#000';
+            }
+            if (el.tagName === 'TD') {
+                el.style.backgroundColor = '#fff';
+                el.style.border = '1px solid #666';
+                el.style.color = '#000';
+            }
+            if (el.tagName === 'H2' || el.tagName === 'H3') {
+                el.style.color = '#000';
                 el.style.borderColor = '#000';
-                el.style.border = el.style.border ? el.style.border.replace(/rgb\(\d+,\s*\d+,\s*\d+\)|#[a-fA-F0-9]{3,6}/g, '#000') : '1px solid #000';
-                el.style.boxShadow = 'none';
-                el.style.textShadow = 'none';
-                el.style.filter = 'none';
+            }
+        });
 
-                if (el.tagName === 'TH') {
-                    el.style.backgroundColor = '#fff';
-                    el.style.border = '1px solid #000';
-                    el.style.fontWeight = '700';
-                    el.style.color = '#000';
-                }
-                if (el.tagName === 'TD') {
-                    el.style.backgroundColor = '#fff';
-                    el.style.border = '1px solid #666';
-                    el.style.color = '#000';
-                }
-                if (el.tagName === 'H2' || el.tagName === 'H3') {
-                    el.style.color = '#000';
-                    el.style.borderColor = '#000';
-                }
+        return clone;
+    }
+
+    /**
+     * Construye una estructura normalizada del plan semanal para reutilizar en PDF/Excel
+     * @returns {{diasBase: string[], comidas: string[], semanas: Array, formatoAlimento: Function, esDiaDescanso: Function}|null}
+     */
+    function construirPlanSemanalEstructurado() {
+        const diasBase = window.tablaEditable?.dias || ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+        const comidas = window.tablaEditable?.comidas || ['Desayuno', 'Media Mañana', 'Comida', 'Merienda', 'Cena'];
+        const planEditable = window.tablaEditable?.planSemana;
+        const planDatosUsuario = datosUsuario?.planSemana;
+
+        const tieneDatos = (obj) => obj && typeof obj === 'object' && Object.keys(obj).length > 0;
+        const plan = tieneDatos(planEditable) ? planEditable : (tieneDatos(planDatosUsuario) ? planDatosUsuario : {});
+
+        const normalizar = (texto = '') => texto
+            .toString()
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-zñ ]/g, '')
+            .trim();
+
+        const esDiaDescanso = (nombreDia) => {
+            if (!window.datosUsuario || !Array.isArray(window.datosUsuario.diasEntreno) || window.datosUsuario.diasEntreno.length === 0) {
+                return false; // Si no hay días seleccionados, todos son de entreno por defecto (consistente con esDiaDescanso global)
+            }
+            const valorDia = normalizar(nombreDia);
+            const diasEntrenoNormalizados = window.datosUsuario.diasEntreno.map(d => normalizar(d));
+            return !diasEntrenoNormalizados.includes(valorDia);
+        };
+
+        const formatoAlimento = (item = {}) => {
+            const gramos = item.gramos != null && item.gramos !== '' ? `${item.gramos}g` : '';
+            const nombre = item.alimento || item.nombre || '';
+
+            if (gramos && nombre) return `${gramos} ${nombre}`;
+            if (nombre) return nombre;
+            if (gramos) return gramos;
+            return '';
+        };
+
+        const agrupados = {};
+        diasBase.forEach(dia => agrupados[normalizar(dia)] = []);
+
+        Object.entries(plan).forEach(([nombreDiaOriginal, datosDia]) => {
+            const nombreNormalizado = normalizar(nombreDiaOriginal.split('-')[0]);
+            if (!agrupados[nombreNormalizado]) {
+                agrupados[nombreNormalizado] = [];
+            }
+            agrupados[nombreNormalizado].push({ nombre: nombreDiaOriginal, datos: datosDia });
+        });
+
+        const semanasCantidad = Math.max(1, ...Object.values(agrupados).map(arr => arr.length || 0));
+        const semanas = [];
+        let hayContenido = false;
+
+        for (let semana = 0; semana < semanasCantidad; semana++) {
+            const columnas = diasBase.map(dia => {
+                const lista = agrupados[normalizar(dia)] || [];
+                const entrada = lista[semana] || (semana === 0 && plan[dia] ? { nombre: dia, datos: plan[dia] } : null);
+                const datosDia = entrada?.datos || null;
+
+                const alimentosPorComida = {};
+                comidas.forEach(comida => {
+                    const items = datosDia && Array.isArray(datosDia[comida]) ? datosDia[comida] : [];
+                    if (items.length > 0) {
+                        hayContenido = true;
+                    }
+                    alimentosPorComida[comida] = items;
+                });
+
+                const titulo = entrada ? entrada.nombre : dia;
+                return {
+                    diaBase: dia,
+                    titulo,
+                    esDescanso: esDiaDescanso(titulo),
+                    alimentosPorComida
+                };
             });
 
-            return clone;
+            semanas.push({ indice: semana + 1, columnas });
         }
 
-        /**
-         * Construye una estructura normalizada del plan semanal para reutilizar en PDF/Excel
-         * @returns {{diasBase: string[], comidas: string[], semanas: Array, formatoAlimento: Function, esDiaDescanso: Function}|null}
-         */
-        function construirPlanSemanalEstructurado() {
-            const diasBase = window.tablaEditable?.dias || ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-            const comidas = window.tablaEditable?.comidas || ['Desayuno', 'Media Mañana', 'Comida', 'Merienda', 'Cena'];
-            const planEditable = window.tablaEditable?.planSemana;
-            const planDatosUsuario = datosUsuario?.planSemana;
+        if (!hayContenido) {
+            return null;
+        }
 
-            const tieneDatos = (obj) => obj && typeof obj === 'object' && Object.keys(obj).length > 0;
-            const plan = tieneDatos(planEditable) ? planEditable : (tieneDatos(planDatosUsuario) ? planDatosUsuario : {});
+        return { diasBase, comidas, semanas, formatoAlimento, esDiaDescanso };
+    }
 
-            const normalizar = (texto = '') => texto
-                .toString()
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .replace(/[^a-zñ ]/g, '')
-                .trim();
-
-            const esDiaDescanso = (nombreDia) => {
-                if (!window.datosUsuario || !Array.isArray(window.datosUsuario.diasEntreno) || window.datosUsuario.diasEntreno.length === 0) {
-                    return false; // Si no hay días seleccionados, todos son de entreno por defecto (consistente con esDiaDescanso global)
-                }
-                const valorDia = normalizar(nombreDia);
-                const diasEntrenoNormalizados = window.datosUsuario.diasEntreno.map(d => normalizar(d));
-                return !diasEntrenoNormalizados.includes(valorDia);
+    /**
+     * Actualiza una representación consistente del plan semanal para otros módulos (ej. Excel)
+     * @returns {ReturnType<typeof construirPlanSemanalEstructurado>}
+     */
+    function actualizarEstructuraPlanExport() {
+        const estructura = construirPlanSemanalEstructurado();
+        if (estructura) {
+            const resumenPlano = {
+                diasBase: estructura.diasBase.slice(),
+                comidas: estructura.comidas.slice(),
+                semanas: estructura.semanas.map(semana => ({
+                    indice: semana.indice,
+                    columnas: semana.columnas.map(col => {
+                        const alimentosPorComida = {};
+                        estructura.comidas.forEach(comida => {
+                            const items = col.alimentosPorComida[comida] || [];
+                            alimentosPorComida[comida] = items.map(item => estructura.formatoAlimento(item));
+                        });
+                        return {
+                            diaBase: col.diaBase,
+                            titulo: col.titulo,
+                            esDescanso: col.esDescanso,
+                            alimentosPorComida
+                        };
+                    })
+                }))
             };
+            datosUsuario.planExcelDatos = resumenPlano;
+            window.datosUsuario = datosUsuario;
+        } else if (datosUsuario.planExcelDatos) {
+            delete datosUsuario.planExcelDatos;
+        }
+        return estructura;
+    }
+    window.actualizarEstructuraPlanExport = actualizarEstructuraPlanExport;
 
-            const formatoAlimento = (item = {}) => {
-                const gramos = item.gramos != null && item.gramos !== '' ? `${item.gramos}g` : '';
-                const nombre = item.alimento || item.nombre || '';
+    /**
+     * Calcula el tamaño de fuente dinámico basado en la cantidad de contenido
+     * @param {Object} estructura - Estructura del plan semanal
+     * @returns {Object} - Tamaños de fuente calculados
+     */
+    function calcularTamanosFuenteDinamicos(estructura) {
+        const { diasBase, comidas, semanas } = estructura;
 
-                if (gramos && nombre) return `${gramos} ${nombre}`;
-                if (nombre) return nombre;
-                if (gramos) return gramos;
-                return '';
-            };
+        // Contar total de alimentos en todas las celdas
+        let totalAlimentos = 0;
+        let maxAlimentosPorCelda = 0;
 
-            const agrupados = {};
-            diasBase.forEach(dia => agrupados[normalizar(dia)] = []);
+        semanas.forEach(semana => {
+            semana.columnas.forEach(col => {
+                comidas.forEach(comida => {
+                    const items = col.alimentosPorComida[comida] || [];
+                    totalAlimentos += items.length;
+                    if (items.length > maxAlimentosPorCelda) {
+                        maxAlimentosPorCelda = items.length;
+                    }
+                });
+            });
+        });
 
-            Object.entries(plan).forEach(([nombreDiaOriginal, datosDia]) => {
-                const nombreNormalizado = normalizar(nombreDiaOriginal.split('-')[0]);
-                if (!agrupados[nombreNormalizado]) {
-                    agrupados[nombreNormalizado] = [];
-                }
-                agrupados[nombreNormalizado].push({ nombre: nombreDiaOriginal, datos: datosDia });
+        // Calcular densidad: alimentos por celda promedio
+        const totalCeldas = semanas.length * diasBase.length * comidas.length;
+        const densidadAlimentos = totalCeldas > 0 ? totalAlimentos / totalCeldas : 0;
+
+        // Tamaños base para A4 horizontal (297mm x 210mm)
+        // Altura disponible aproximada: ~195mm (descontando header y márgenes mínimos)
+        // Ancho disponible: ~287mm
+
+        // Calcular tamaño de fuente basado en densidad y distribución
+        // Objetivo: ajustar dinámicamente para mejor legibilidad y uso del espacio
+
+        // Calcular altura promedio de contenido por celda (estimación)
+        const alturaEstimadaPorCelda = (totalAlimentos / totalCeldas) * 4; // ~4mm por alimento
+
+        // Tamaño base inicial - ajustado para que quepa en una sola hoja
+        // Altura disponible: ~182mm (descontando header ~25mm y margen inferior 3mm)
+        // Ancho disponible: ~287mm / 7 días = ~41mm por columna
+        const alturaDisponiblePorCelda = 182 / 5; // ~36.4mm por fila de comida
+        const anchoDisponiblePorCelda = 287 / 7; // ~41mm por columna
+
+        // Calcular espacio disponible estimado por celda (en mm)
+        const espacioDisponible = alturaDisponiblePorCelda * anchoDisponiblePorCelda; // mm²
+
+        // Calcular espacio ocupado estimado
+        const espacioOcupado = alturaEstimadaPorCelda * anchoDisponiblePorCelda;
+        const porcentajeUso = espacioOcupado > 0 ? (espacioOcupado / espacioDisponible) * 100 : 0;
+
+        // Calcular tamaño base - 10.0pt como tamaño base
+        let tamanoBase = 10.0; // Tamaño base fijado en 10.0pt
+
+        // Ajuste según densidad de alimentos
+        if (densidadAlimentos < 1.0) {
+            tamanoBase = Math.min(12.0, 11.0 + (1.0 - densidadAlimentos) * 1.0);
+        } else if (densidadAlimentos < 2.0) {
+            tamanoBase = Math.min(11.5, 11.0 + (2.0 - densidadAlimentos) * 0.5);
+        } else if (densidadAlimentos < 3.0) {
+            tamanoBase = 10.0;
+        } else if (densidadAlimentos < 4.0) {
+            tamanoBase = Math.max(9.0, 10.0 - (densidadAlimentos - 3.0) * 0.5);
+        } else {
+            tamanoBase = Math.max(8.5, 9.0 - (densidadAlimentos - 4.0) * 0.3);
+        }
+
+        // Ajuste según máximo de alimentos por celda
+        if (maxAlimentosPorCelda > 8) {
+            tamanoBase = Math.max(8.5, tamanoBase - 0.8);
+        } else if (maxAlimentosPorCelda > 6) {
+            tamanoBase = Math.max(9.0, tamanoBase - 0.5);
+        } else if (maxAlimentosPorCelda <= 2 && densidadAlimentos < 2.0) {
+            tamanoBase = Math.min(12.0, tamanoBase + 1.0);
+        } else if (maxAlimentosPorCelda <= 3 && densidadAlimentos < 2.5) {
+            tamanoBase = Math.min(11.5, tamanoBase + 0.8);
+        }
+
+        // Ajuste según altura estimada (para evitar desbordamiento)
+        if (alturaEstimadaPorCelda > 35) {
+            tamanoBase = Math.max(8.5, tamanoBase - 0.8);
+        } else if (alturaEstimadaPorCelda > 30) {
+            tamanoBase = Math.max(9.0, tamanoBase - 0.5);
+        } else if (alturaEstimadaPorCelda < 15 && densidadAlimentos < 2.5) {
+            tamanoBase = Math.min(11.5, tamanoBase + 0.8);
+        }
+
+        console.log(`📊 Cálculo dinámico: densidad=${densidadAlimentos.toFixed(2)}, maxPorCelda=${maxAlimentosPorCelda}, alturaEst=${alturaEstimadaPorCelda.toFixed(1)}mm, usoEspacio=${porcentajeUso.toFixed(1)}%, tamañoBase=${tamanoBase.toFixed(1)}pt`);
+
+        // Redondear a 1 decimal
+        tamanoBase = Math.round(tamanoBase * 10) / 10;
+
+        // Calcular tamaños relativos con mejor proporción
+        const tamanoItem = tamanoBase;
+        const tamanoTitulo = Math.min(tamanoBase + 1.0, tamanoBase * 1.15); // Máximo 15% más grande
+        const tamanoHeader = Math.min(tamanoBase + 1.5, tamanoBase * 1.25); // Máximo 25% más grande
+        const tamanoSubtitulo = Math.min(tamanoBase + 0.5, tamanoBase * 1.1); // Máximo 10% más grande
+
+        return {
+            tamanoItemAlimento: tamanoItem,
+            tamanoTituloComida: tamanoTitulo,
+            tamanoHeader: tamanoHeader,
+            tamanoSubtitulo: tamanoSubtitulo
+        };
+    }
+
+    /**
+     * Genera el HTML del plan desde tabla editable
+     * @returns {string}
+     */
+    function generarHTMLDesdeTablaEditable() {
+        const estructura = construirPlanSemanalEstructurado();
+        if (!estructura) {
+            return '<div class="plan-tabla-editable"><p style="padding:8px;font-size:9pt;">No hay datos disponibles para generar el plan semanal.</p></div>';
+        }
+
+        const { diasBase, comidas, semanas, formatoAlimento, esDiaDescanso } = estructura;
+
+        // Calcular tamaños dinámicos
+        const tamanos = calcularTamanosFuenteDinamicos(estructura);
+
+        // Guardar tamaños en window para que el CSS los use
+        window.tamanosFuentePDF = tamanos;
+
+        const escapeHTML = (str = '') => String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+
+        let html = '<div class="plan-tabla-editable">';
+
+        semanas.forEach((semana, indice) => {
+            html += '<div class="pdf-semana">';
+            if (semanas.length > 1) {
+                html += `<h2 class="titulo-semana">Semana ${indice + 1}</h2>`;
+            }
+            html += '<table class="tabla-plan-semanal"><thead><tr>';
+
+            semana.columnas.forEach(col => {
+                const icono = col.esDescanso ? '😴' : '💪';
+                // Asegurar que el día se muestre correctamente
+                const diaNombre = col.diaBase || col.titulo || 'Día';
+                const etiquetaDia = `${diaNombre} ${icono}`;
+                html += `<th title="${escapeHTML(diaNombre)}">${escapeHTML(etiquetaDia)}</th>`;
             });
 
-            const semanasCantidad = Math.max(1, ...Object.values(agrupados).map(arr => arr.length || 0));
-            const semanas = [];
-            let hayContenido = false;
+            html += '</tr></thead><tbody>';
 
-            for (let semana = 0; semana < semanasCantidad; semana++) {
-                const columnas = diasBase.map(dia => {
-                    const lista = agrupados[normalizar(dia)] || [];
-                    const entrada = lista[semana] || (semana === 0 && plan[dia] ? { nombre: dia, datos: plan[dia] } : null);
-                    const datosDia = entrada?.datos || null;
+            comidas.forEach(comida => {
+                html += '<tr>';
+                semana.columnas.forEach(col => {
+                    const items = col.alimentosPorComida[comida] || [];
+                    if (!items.length) {
+                        html += '<td class="celda-dia celda-vacia">-</td>';
+                    } else {
+                        const contenido = items
+                            .map(item => `<span class="item-alimento">${escapeHTML(formatoAlimento(item))}</span>`)
+                            .join(' ');
+                        html += `<td class="celda-dia"><span class="titulo-comida">${escapeHTML(comida)}</span>${contenido}</td>`;
+                    }
+                });
+                html += '</tr>';
+            });
 
-                    const alimentosPorComida = {};
-                    comidas.forEach(comida => {
-                        const items = datosDia && Array.isArray(datosDia[comida]) ? datosDia[comida] : [];
-                        if (items.length > 0) {
-                            hayContenido = true;
-                        }
-                        alimentosPorComida[comida] = items;
-                    });
+            html += '</tbody></table></div>';
+        });
 
-                    const titulo = entrada ? entrada.nombre : dia;
-                    return {
-                        diaBase: dia,
-                        titulo,
-                        esDescanso: esDiaDescanso(titulo),
-                        alimentosPorComida
+        html += '</div>';
+        // Sin línea final, solo el margen inferior
+        return html;
+    }
+
+    async function exportarExcelProfesional() {
+        try {
+            if (!window.ExcelJS || typeof window.ExcelJS.Workbook !== 'function') {
+                throw new Error('No se cargó la librería ExcelJS');
+            }
+            if (typeof window.saveAs !== 'function') {
+                throw new Error('No se encontró la función saveAs (FileSaver)');
+            }
+
+            // Asegurar que los cálculos estén actualizados antes de exportar
+            if (window.MacronutrientesCalculator && typeof window.MacronutrientesCalculator.calcularMacronutrientes === 'function') {
+                const formulario = {
+                    edad: document.getElementById('edad'),
+                    sexo: document.getElementById('sexo'),
+                    altura: document.getElementById('altura'),
+                    peso: document.getElementById('peso'),
+                    objetivo: document.getElementById('objetivo'),
+                    tipoPersona: document.getElementById('tipoPersona'),
+                    actividadFisicaDeporte: document.getElementById('actividadFisicaDeporte'),
+                    tipoTermogenico: document.getElementById('tipoTermogenico'),
+                    superavitEntreno: document.getElementById('superavitEntreno'),
+                    superavitDescanso: document.getElementById('superavitDescanso')
+                };
+                // Recalcular para asegurar que caloriasEntreno y caloriasDescanso estén actualizados
+                datosUsuario = window.MacronutrientesCalculator.calcularMacronutrientes(datosUsuario, formulario);
+                window.datosUsuario = datosUsuario;
+            }
+
+            const estructura = actualizarEstructuraPlanExport();
+            if (!estructura) {
+                mostrarNotificacion?.('⚠️ No hay datos suficientes para exportar a Excel', 'warning');
+                return;
+            }
+
+            const ExcelJS = window.ExcelJS;
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'Maika Porcuna';
+            workbook.created = new Date();
+            workbook.modified = new Date();
+
+            const cabecera = typeof window.tablaEditable?.obtenerCabeceraExport === 'function'
+                ? window.tablaEditable.obtenerCabeceraExport()
+                : {};
+
+            const diasBase = estructura.diasBase;
+            const comidas = estructura.comidas;
+
+            estructura.semanas.forEach((semana, indexSemana) => {
+                const sheetName = estructura.semanas.length > 1 ? `Semana ${indexSemana + 1}` : 'Plan Semanal';
+                const sheet = workbook.addWorksheet(sheetName, {
+                    properties: { defaultRowHeight: 20 },
+                    pageSetup: {
+                        orientation: 'landscape',
+                        paperSize: 9,
+                        fitToPage: true,
+                        fitToWidth: 1,
+                        fitToHeight: 0
+                    },
+                    views: [{ state: 'frozen', xSplit: 0, ySplit: 5 }]
+                });
+
+                const totalColumnas = diasBase.length;
+
+                sheet.mergeCells(1, 1, 1, totalColumnas);
+                const tituloCell = sheet.getCell(1, 1);
+                tituloCell.value = 'PLAN DE ALIMENTACIÓN PERSONALIZADO';
+                tituloCell.font = { bold: true, size: 18 };
+                tituloCell.alignment = { horizontal: 'center', vertical: 'middle' };
+                sheet.getRow(1).height = 26;
+
+                sheet.mergeCells(2, 1, 2, totalColumnas);
+                const infoCell = sheet.getCell(2, 1);
+                infoCell.value = `Cliente: ${cabecera.nombre || datosUsuario.nombre || 'Cliente'}    Fecha: ${cabecera.fecha || new Date().toLocaleDateString('es-ES')}`;
+                infoCell.font = { bold: true, size: 12 };
+                infoCell.alignment = { horizontal: 'center', vertical: 'middle' };
+
+                sheet.mergeCells(3, 1, 3, totalColumnas);
+                const metaCell = sheet.getCell(3, 1);
+                metaCell.value = `Objetivo: ${cabecera.objetivo || datosUsuario.objetivo || 'N/D'}    Tipo de persona: ${cabecera.tipoPersona || datosUsuario.tipoPersona || 'N/D'}    Sexo: ${cabecera.sexo || datosUsuario.sexo || 'N/D'}`;
+                metaCell.font = { size: 11 };
+                metaCell.alignment = { horizontal: 'center', vertical: 'middle' };
+                sheet.getRow(3).height = 18;
+
+                sheet.addRow([]);
+
+                const headerRow = sheet.addRow(semana.columnas.map(col => col.titulo));
+                headerRow.font = { bold: true, size: 12 };
+                headerRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+                headerRow.height = 28;
+                headerRow.eachCell((cell, colNumber) => {
+                    const esDescanso = semana.columnas[colNumber - 1]?.esDescanso;
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: esDescanso ? 'FFFDEBD0' : 'FFE8F5E9' }
+                    };
+                    cell.border = {
+                        top: { style: 'thin', color: { argb: 'FF666666' } },
+                        left: { style: 'thin', color: { argb: 'FF666666' } },
+                        bottom: { style: 'thin', color: { argb: 'FF666666' } },
+                        right: { style: 'thin', color: { argb: 'FF666666' } }
                     };
                 });
 
-                semanas.push({ indice: semana + 1, columnas });
-            }
-
-            if (!hayContenido) {
-                return null;
-            }
-
-            return { diasBase, comidas, semanas, formatoAlimento, esDiaDescanso };
-        }
-
-        /**
-         * Actualiza una representación consistente del plan semanal para otros módulos (ej. Excel)
-         * @returns {ReturnType<typeof construirPlanSemanalEstructurado>}
-         */
-        function actualizarEstructuraPlanExport() {
-            const estructura = construirPlanSemanalEstructurado();
-            if (estructura) {
-                const resumenPlano = {
-                    diasBase: estructura.diasBase.slice(),
-                    comidas: estructura.comidas.slice(),
-                    semanas: estructura.semanas.map(semana => ({
-                        indice: semana.indice,
-                        columnas: semana.columnas.map(col => {
-                            const alimentosPorComida = {};
-                            estructura.comidas.forEach(comida => {
-                                const items = col.alimentosPorComida[comida] || [];
-                                alimentosPorComida[comida] = items.map(item => estructura.formatoAlimento(item));
-                            });
-                            return {
-                                diaBase: col.diaBase,
-                                titulo: col.titulo,
-                                esDescanso: col.esDescanso,
-                                alimentosPorComida
-                            };
-                        })
-                    }))
-                };
-                datosUsuario.planExcelDatos = resumenPlano;
-                window.datosUsuario = datosUsuario;
-            } else if (datosUsuario.planExcelDatos) {
-                delete datosUsuario.planExcelDatos;
-            }
-            return estructura;
-        }
-        window.actualizarEstructuraPlanExport = actualizarEstructuraPlanExport;
-
-        /**
-         * Calcula el tamaño de fuente dinámico basado en la cantidad de contenido
-         * @param {Object} estructura - Estructura del plan semanal
-         * @returns {Object} - Tamaños de fuente calculados
-         */
-        function calcularTamanosFuenteDinamicos(estructura) {
-            const { diasBase, comidas, semanas } = estructura;
-
-            // Contar total de alimentos en todas las celdas
-            let totalAlimentos = 0;
-            let maxAlimentosPorCelda = 0;
-
-            semanas.forEach(semana => {
-                semana.columnas.forEach(col => {
-                    comidas.forEach(comida => {
-                        const items = col.alimentosPorComida[comida] || [];
-                        totalAlimentos += items.length;
-                        if (items.length > maxAlimentosPorCelda) {
-                            maxAlimentosPorCelda = items.length;
+                // Agregar fila con calorías objetivo por día (entreno/descanso)
+                // Asegurar que usamos los valores exactos de datosUsuario (sin fallback a calorias)
+                const caloriasObjetivoRow = sheet.addRow(semana.columnas.map(col => {
+                    const esDescanso = col.esDescanso;
+                    // Usar directamente caloriasEntreno o caloriasDescanso, sin fallback a calorias promedio
+                    let caloriasObjetivo = 0;
+                    if (esDescanso) {
+                        caloriasObjetivo = datosUsuario.caloriasDescanso || 0;
+                        // Si no hay valor, calcular desde gasto base + superávit/déficit
+                        if (caloriasObjetivo === 0 && datosUsuario.gastoBaseDescanso !== undefined) {
+                            caloriasObjetivo = (datosUsuario.gastoBaseDescanso || 0) + (datosUsuario.superavitDescansoKcal || 0);
                         }
-                    });
+                    } else {
+                        caloriasObjetivo = datosUsuario.caloriasEntreno || 0;
+                        // Si no hay valor, calcular desde gasto base + superávit/déficit
+                        if (caloriasObjetivo === 0 && datosUsuario.gastoBaseEntreno !== undefined) {
+                            caloriasObjetivo = (datosUsuario.gastoBaseEntreno || 0) + (datosUsuario.superavitEntrenoKcal || 0);
+                        }
+                    }
+                    return `KCAL OBJETIVO: ${caloriasObjetivo}`;
+                }));
+                caloriasObjetivoRow.font = { bold: true, size: 11, color: { argb: 'FF0000FF' } };
+                caloriasObjetivoRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+                caloriasObjetivoRow.height = 22;
+                caloriasObjetivoRow.eachCell((cell, colNumber) => {
+                    const esDescanso = semana.columnas[colNumber - 1]?.esDescanso;
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: esDescanso ? 'FFFFF8E1' : 'FFE8F5E9' }
+                    };
+                    cell.border = {
+                        top: { style: 'thin', color: { argb: 'FF666666' } },
+                        left: { style: 'thin', color: { argb: 'FF666666' } },
+                        bottom: { style: 'thin', color: { argb: 'FF666666' } },
+                        right: { style: 'thin', color: { argb: 'FF666666' } }
+                    };
                 });
-            });
-
-            // Calcular densidad: alimentos por celda promedio
-            const totalCeldas = semanas.length * diasBase.length * comidas.length;
-            const densidadAlimentos = totalCeldas > 0 ? totalAlimentos / totalCeldas : 0;
-
-            // Tamaños base para A4 horizontal (297mm x 210mm)
-            // Altura disponible aproximada: ~195mm (descontando header y márgenes mínimos)
-            // Ancho disponible: ~287mm
-
-            // Calcular tamaño de fuente basado en densidad y distribución
-            // Objetivo: ajustar dinámicamente para mejor legibilidad y uso del espacio
-
-            // Calcular altura promedio de contenido por celda (estimación)
-            const alturaEstimadaPorCelda = (totalAlimentos / totalCeldas) * 4; // ~4mm por alimento
-
-            // Tamaño base inicial - ajustado para que quepa en una sola hoja
-            // Altura disponible: ~182mm (descontando header ~25mm y margen inferior 3mm)
-            // Ancho disponible: ~287mm / 7 días = ~41mm por columna
-            const alturaDisponiblePorCelda = 182 / 5; // ~36.4mm por fila de comida
-            const anchoDisponiblePorCelda = 287 / 7; // ~41mm por columna
-
-            // Calcular espacio disponible estimado por celda (en mm)
-            const espacioDisponible = alturaDisponiblePorCelda * anchoDisponiblePorCelda; // mm²
-
-            // Calcular espacio ocupado estimado
-            const espacioOcupado = alturaEstimadaPorCelda * anchoDisponiblePorCelda;
-            const porcentajeUso = espacioOcupado > 0 ? (espacioOcupado / espacioDisponible) * 100 : 0;
-
-            // Calcular tamaño base - 10.0pt como tamaño base
-            let tamanoBase = 10.0; // Tamaño base fijado en 10.0pt
-
-            // Ajuste según densidad de alimentos
-            if (densidadAlimentos < 1.0) {
-                tamanoBase = Math.min(12.0, 11.0 + (1.0 - densidadAlimentos) * 1.0);
-            } else if (densidadAlimentos < 2.0) {
-                tamanoBase = Math.min(11.5, 11.0 + (2.0 - densidadAlimentos) * 0.5);
-            } else if (densidadAlimentos < 3.0) {
-                tamanoBase = 10.0;
-            } else if (densidadAlimentos < 4.0) {
-                tamanoBase = Math.max(9.0, 10.0 - (densidadAlimentos - 3.0) * 0.5);
-            } else {
-                tamanoBase = Math.max(8.5, 9.0 - (densidadAlimentos - 4.0) * 0.3);
-            }
-
-            // Ajuste según máximo de alimentos por celda
-            if (maxAlimentosPorCelda > 8) {
-                tamanoBase = Math.max(8.5, tamanoBase - 0.8);
-            } else if (maxAlimentosPorCelda > 6) {
-                tamanoBase = Math.max(9.0, tamanoBase - 0.5);
-            } else if (maxAlimentosPorCelda <= 2 && densidadAlimentos < 2.0) {
-                tamanoBase = Math.min(12.0, tamanoBase + 1.0);
-            } else if (maxAlimentosPorCelda <= 3 && densidadAlimentos < 2.5) {
-                tamanoBase = Math.min(11.5, tamanoBase + 0.8);
-            }
-
-            // Ajuste según altura estimada (para evitar desbordamiento)
-            if (alturaEstimadaPorCelda > 35) {
-                tamanoBase = Math.max(8.5, tamanoBase - 0.8);
-            } else if (alturaEstimadaPorCelda > 30) {
-                tamanoBase = Math.max(9.0, tamanoBase - 0.5);
-            } else if (alturaEstimadaPorCelda < 15 && densidadAlimentos < 2.5) {
-                tamanoBase = Math.min(11.5, tamanoBase + 0.8);
-            }
-
-            console.log(`📊 Cálculo dinámico: densidad=${densidadAlimentos.toFixed(2)}, maxPorCelda=${maxAlimentosPorCelda}, alturaEst=${alturaEstimadaPorCelda.toFixed(1)}mm, usoEspacio=${porcentajeUso.toFixed(1)}%, tamañoBase=${tamanoBase.toFixed(1)}pt`);
-
-            // Redondear a 1 decimal
-            tamanoBase = Math.round(tamanoBase * 10) / 10;
-
-            // Calcular tamaños relativos con mejor proporción
-            const tamanoItem = tamanoBase;
-            const tamanoTitulo = Math.min(tamanoBase + 1.0, tamanoBase * 1.15); // Máximo 15% más grande
-            const tamanoHeader = Math.min(tamanoBase + 1.5, tamanoBase * 1.25); // Máximo 25% más grande
-            const tamanoSubtitulo = Math.min(tamanoBase + 0.5, tamanoBase * 1.1); // Máximo 10% más grande
-
-            return {
-                tamanoItemAlimento: tamanoItem,
-                tamanoTituloComida: tamanoTitulo,
-                tamanoHeader: tamanoHeader,
-                tamanoSubtitulo: tamanoSubtitulo
-            };
-        }
-
-        /**
-         * Genera el HTML del plan desde tabla editable
-         * @returns {string}
-         */
-        function generarHTMLDesdeTablaEditable() {
-            const estructura = construirPlanSemanalEstructurado();
-            if (!estructura) {
-                return '<div class="plan-tabla-editable"><p style="padding:8px;font-size:9pt;">No hay datos disponibles para generar el plan semanal.</p></div>';
-            }
-
-            const { diasBase, comidas, semanas, formatoAlimento, esDiaDescanso } = estructura;
-
-            // Calcular tamaños dinámicos
-            const tamanos = calcularTamanosFuenteDinamicos(estructura);
-
-            // Guardar tamaños en window para que el CSS los use
-            window.tamanosFuentePDF = tamanos;
-
-            const escapeHTML = (str = '') => String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-
-            let html = '<div class="plan-tabla-editable">';
-
-            semanas.forEach((semana, indice) => {
-                html += '<div class="pdf-semana">';
-                if (semanas.length > 1) {
-                    html += `<h2 class="titulo-semana">Semana ${indice + 1}</h2>`;
-                }
-                html += '<table class="tabla-plan-semanal"><thead><tr>';
-
-                semana.columnas.forEach(col => {
-                    const icono = col.esDescanso ? '😴' : '💪';
-                    // Asegurar que el día se muestre correctamente
-                    const diaNombre = col.diaBase || col.titulo || 'Día';
-                    const etiquetaDia = `${diaNombre} ${icono}`;
-                    html += `<th title="${escapeHTML(diaNombre)}">${escapeHTML(etiquetaDia)}</th>`;
-                });
-
-                html += '</tr></thead><tbody>';
 
                 comidas.forEach(comida => {
-                    html += '<tr>';
-                    semana.columnas.forEach(col => {
+                    const rowData = semana.columnas.map(col => {
                         const items = col.alimentosPorComida[comida] || [];
                         if (!items.length) {
-                            html += '<td class="celda-dia celda-vacia">-</td>';
-                        } else {
-                            const contenido = items
-                                .map(item => `<span class="item-alimento">${escapeHTML(formatoAlimento(item))}</span>`)
-                                .join(' ');
-                            html += `<td class="celda-dia"><span class="titulo-comida">${escapeHTML(comida)}</span>${contenido}</td>`;
+                            return `${comida}:
+—`;
                         }
+                        const lineas = items.map(item => `• ${estructura.formatoAlimento(item)}`);
+                        return `${comida}:
+${lineas.join('\n')}`;
                     });
-                    html += '</tr>';
+
+                    const row = sheet.addRow(rowData);
+                    row.font = { size: 12 };
+                    row.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+                    row.height = 140;
+                    row.eachCell(cell => {
+                        cell.border = {
+                            top: { style: 'thin', color: { argb: 'FF999999' } },
+                            left: { style: 'thin', color: { argb: 'FF999999' } },
+                            bottom: { style: 'thin', color: { argb: 'FF999999' } },
+                            right: { style: 'thin', color: { argb: 'FF999999' } }
+                        };
+                    });
                 });
 
-                html += '</tbody></table></div>';
+                sheet.columns.forEach((col, colIndex) => {
+                    col.width = 28;
+                    const esDescanso = semana.columnas[colIndex]?.esDescanso;
+                    if (esDescanso) {
+                        col.eachCell({ includeEmpty: true }, cell => {
+                            cell.fill = cell.fill || {
+                                type: 'pattern',
+                                pattern: 'solid',
+                                fgColor: { argb: 'FFFDF7E3' }
+                            };
+                        });
+                    }
+                });
             });
 
-            html += '</div>';
-            // Sin línea final, solo el margen inferior
-            return html;
+            const buffer = await workbook.xlsx.writeBuffer();
+            const nombreArchivo = `Plan_Alimentacion_${(datosUsuario.nombre || cabecera.nombre || 'cliente').replace(/\s+/g, '_')}.xlsx`;
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            window.saveAs(blob, nombreArchivo);
+
+            mostrarNotificacion?.('✅ Excel exportado correctamente', 'success');
+        } catch (error) {
+            console.error('❌ Error al exportar Excel:', error);
+            mostrarNotificacion?.('❌ Error al exportar Excel: ' + error.message, 'error');
         }
+    }
+    window.exportarExcelProfesional = exportarExcelProfesional;
 
-        async function exportarExcelProfesional() {
-            try {
-                if (!window.ExcelJS || typeof window.ExcelJS.Workbook !== 'function') {
-                    throw new Error('No se cargó la librería ExcelJS');
-                }
-                if (typeof window.saveAs !== 'function') {
-                    throw new Error('No se encontró la función saveAs (FileSaver)');
-                }
-
-                // Asegurar que los cálculos estén actualizados antes de exportar
-                if (window.MacronutrientesCalculator && typeof window.MacronutrientesCalculator.calcularMacronutrientes === 'function') {
-                    const formulario = {
-                        edad: document.getElementById('edad'),
-                        sexo: document.getElementById('sexo'),
-                        altura: document.getElementById('altura'),
-                        peso: document.getElementById('peso'),
-                        objetivo: document.getElementById('objetivo'),
-                        tipoPersona: document.getElementById('tipoPersona'),
-                        actividadFisicaDeporte: document.getElementById('actividadFisicaDeporte'),
-                        tipoTermogenico: document.getElementById('tipoTermogenico'),
-                        superavitEntreno: document.getElementById('superavitEntreno'),
-                        superavitDescanso: document.getElementById('superavitDescanso')
-                    };
-                    // Recalcular para asegurar que caloriasEntreno y caloriasDescanso estén actualizados
-                    datosUsuario = window.MacronutrientesCalculator.calcularMacronutrientes(datosUsuario, formulario);
-                    window.datosUsuario = datosUsuario;
-                }
-
-                const estructura = actualizarEstructuraPlanExport();
-                if (!estructura) {
-                    mostrarNotificacion?.('⚠️ No hay datos suficientes para exportar a Excel', 'warning');
-                    return;
-                }
-
-                const ExcelJS = window.ExcelJS;
-                const workbook = new ExcelJS.Workbook();
-                workbook.creator = 'Maika Porcuna';
-                workbook.created = new Date();
-                workbook.modified = new Date();
-
-                const cabecera = typeof window.tablaEditable?.obtenerCabeceraExport === 'function'
-                    ? window.tablaEditable.obtenerCabeceraExport()
-                    : {};
-
-                const diasBase = estructura.diasBase;
-                const comidas = estructura.comidas;
-
-                estructura.semanas.forEach((semana, indexSemana) => {
-                    const sheetName = estructura.semanas.length > 1 ? `Semana ${indexSemana + 1}` : 'Plan Semanal';
-                    const sheet = workbook.addWorksheet(sheetName, {
-                        properties: { defaultRowHeight: 20 },
-                        pageSetup: {
-                            orientation: 'landscape',
-                            paperSize: 9,
-                            fitToPage: true,
-                            fitToWidth: 1,
-                            fitToHeight: 0
-                        },
-                        views: [{ state: 'frozen', xSplit: 0, ySplit: 5 }]
-                    });
-
-                    const totalColumnas = diasBase.length;
-
-                    sheet.mergeCells(1, 1, 1, totalColumnas);
-                    const tituloCell = sheet.getCell(1, 1);
-                    tituloCell.value = 'PLAN DE ALIMENTACIÓN PERSONALIZADO';
-                    tituloCell.font = { bold: true, size: 18 };
-                    tituloCell.alignment = { horizontal: 'center', vertical: 'middle' };
-                    sheet.getRow(1).height = 26;
-
-                    sheet.mergeCells(2, 1, 2, totalColumnas);
-                    const infoCell = sheet.getCell(2, 1);
-                    infoCell.value = `Cliente: ${cabecera.nombre || datosUsuario.nombre || 'Cliente'}    Fecha: ${cabecera.fecha || new Date().toLocaleDateString('es-ES')}`;
-                    infoCell.font = { bold: true, size: 12 };
-                    infoCell.alignment = { horizontal: 'center', vertical: 'middle' };
-
-                    sheet.mergeCells(3, 1, 3, totalColumnas);
-                    const metaCell = sheet.getCell(3, 1);
-                    metaCell.value = `Objetivo: ${cabecera.objetivo || datosUsuario.objetivo || 'N/D'}    Tipo de persona: ${cabecera.tipoPersona || datosUsuario.tipoPersona || 'N/D'}    Sexo: ${cabecera.sexo || datosUsuario.sexo || 'N/D'}`;
-                    metaCell.font = { size: 11 };
-                    metaCell.alignment = { horizontal: 'center', vertical: 'middle' };
-                    sheet.getRow(3).height = 18;
-
-                    sheet.addRow([]);
-
-                    const headerRow = sheet.addRow(semana.columnas.map(col => col.titulo));
-                    headerRow.font = { bold: true, size: 12 };
-                    headerRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
-                    headerRow.height = 28;
-                    headerRow.eachCell((cell, colNumber) => {
-                        const esDescanso = semana.columnas[colNumber - 1]?.esDescanso;
-                        cell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: { argb: esDescanso ? 'FFFDEBD0' : 'FFE8F5E9' }
-                        };
-                        cell.border = {
-                            top: { style: 'thin', color: { argb: 'FF666666' } },
-                            left: { style: 'thin', color: { argb: 'FF666666' } },
-                            bottom: { style: 'thin', color: { argb: 'FF666666' } },
-                            right: { style: 'thin', color: { argb: 'FF666666' } }
-                        };
-                    });
-
-                    // Agregar fila con calorías objetivo por día (entreno/descanso)
-                    // Asegurar que usamos los valores exactos de datosUsuario (sin fallback a calorias)
-                    const caloriasObjetivoRow = sheet.addRow(semana.columnas.map(col => {
-                        const esDescanso = col.esDescanso;
-                        // Usar directamente caloriasEntreno o caloriasDescanso, sin fallback a calorias promedio
-                        let caloriasObjetivo = 0;
-                        if (esDescanso) {
-                            caloriasObjetivo = datosUsuario.caloriasDescanso || 0;
-                            // Si no hay valor, calcular desde gasto base + superávit/déficit
-                            if (caloriasObjetivo === 0 && datosUsuario.gastoBaseDescanso !== undefined) {
-                                caloriasObjetivo = (datosUsuario.gastoBaseDescanso || 0) + (datosUsuario.superavitDescansoKcal || 0);
-                            }
-                        } else {
-                            caloriasObjetivo = datosUsuario.caloriasEntreno || 0;
-                            // Si no hay valor, calcular desde gasto base + superávit/déficit
-                            if (caloriasObjetivo === 0 && datosUsuario.gastoBaseEntreno !== undefined) {
-                                caloriasObjetivo = (datosUsuario.gastoBaseEntreno || 0) + (datosUsuario.superavitEntrenoKcal || 0);
-                            }
-                        }
-                        return `KCAL OBJETIVO: ${caloriasObjetivo}`;
-                    }));
-                    caloriasObjetivoRow.font = { bold: true, size: 11, color: { argb: 'FF0000FF' } };
-                    caloriasObjetivoRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
-                    caloriasObjetivoRow.height = 22;
-                    caloriasObjetivoRow.eachCell((cell, colNumber) => {
-                        const esDescanso = semana.columnas[colNumber - 1]?.esDescanso;
-                        cell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: { argb: esDescanso ? 'FFFFF8E1' : 'FFE8F5E9' }
-                        };
-                        cell.border = {
-                            top: { style: 'thin', color: { argb: 'FF666666' } },
-                            left: { style: 'thin', color: { argb: 'FF666666' } },
-                            bottom: { style: 'thin', color: { argb: 'FF666666' } },
-                            right: { style: 'thin', color: { argb: 'FF666666' } }
-                        };
-                    });
-
-                    comidas.forEach(comida => {
-                        const rowData = semana.columnas.map(col => {
-                            const items = col.alimentosPorComida[comida] || [];
-                            if (!items.length) {
-                                return `${comida}:
-—`;
-                            }
-                            const lineas = items.map(item => `• ${estructura.formatoAlimento(item)}`);
-                            return `${comida}:
-${lineas.join('\n')}`;
-                        });
-
-                        const row = sheet.addRow(rowData);
-                        row.font = { size: 12 };
-                        row.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
-                        row.height = 140;
-                        row.eachCell(cell => {
-                            cell.border = {
-                                top: { style: 'thin', color: { argb: 'FF999999' } },
-                                left: { style: 'thin', color: { argb: 'FF999999' } },
-                                bottom: { style: 'thin', color: { argb: 'FF999999' } },
-                                right: { style: 'thin', color: { argb: 'FF999999' } }
-                            };
-                        });
-                    });
-
-                    sheet.columns.forEach((col, colIndex) => {
-                        col.width = 28;
-                        const esDescanso = semana.columnas[colIndex]?.esDescanso;
-                        if (esDescanso) {
-                            col.eachCell({ includeEmpty: true }, cell => {
-                                cell.fill = cell.fill || {
-                                    type: 'pattern',
-                                    pattern: 'solid',
-                                    fgColor: { argb: 'FFFDF7E3' }
-                                };
-                            });
-                        }
-                    });
-                });
-
-                const buffer = await workbook.xlsx.writeBuffer();
-                const nombreArchivo = `Plan_Alimentacion_${(datosUsuario.nombre || cabecera.nombre || 'cliente').replace(/\s+/g, '_')}.xlsx`;
-                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                window.saveAs(blob, nombreArchivo);
-
-                mostrarNotificacion?.('✅ Excel exportado correctamente', 'success');
-            } catch (error) {
-                console.error('❌ Error al exportar Excel:', error);
-                mostrarNotificacion?.('❌ Error al exportar Excel: ' + error.message, 'error');
+    /**
+     * Genera el PDF usando html2canvas y jsPDF
+     * @param {string} htmlPDF - HTML completo del documento
+     * @param {string} nombreCliente - Nombre del cliente para el archivo
+     */
+    /**
+     * Convierte una imagen a base64
+     * @param {string} src - Ruta de la imagen
+     * @returns {Promise<string>} - Base64 de la imagen
+     */
+    function convertirImagenABase64(src) {
+        return new Promise((resolve) => {
+            // Si ya es base64, retornar directamente
+            if (src.startsWith('data:')) {
+                resolve(src);
+                return;
             }
-        }
-        window.exportarExcelProfesional = exportarExcelProfesional;
 
-        /**
-         * Genera el PDF usando html2canvas y jsPDF
-         * @param {string} htmlPDF - HTML completo del documento
-         * @param {string} nombreCliente - Nombre del cliente para el archivo
-         */
-        /**
-         * Convierte una imagen a base64
-         * @param {string} src - Ruta de la imagen
-         * @returns {Promise<string>} - Base64 de la imagen
-         */
-        function convertirImagenABase64(src) {
-            return new Promise((resolve) => {
-                // Si ya es base64, retornar directamente
-                if (src.startsWith('data:')) {
-                    resolve(src);
+            // Primero intentar buscar la imagen en el DOM si ya está cargada
+            const imagenesEnDOM = document.querySelectorAll('img[src*="' + src + '"], img[src*="iconofit"]');
+            for (const imgDOM of imagenesEnDOM) {
+                if (imgDOM.complete && imgDOM.naturalWidth > 0 && imgDOM.naturalHeight > 0) {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = imgDOM.naturalWidth;
+                        canvas.height = imgDOM.naturalHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(imgDOM, 0, 0);
+                        const base64 = canvas.toDataURL('image/png');
+                        resolve(base64);
+                        return;
+                    } catch (e) {
+                        // Continuar con el método normal si falla
+                    }
+                }
+            }
+
+            // Intentar primero con fetch (más robusto para archivos locales y remotos)
+            const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+            const origin = window.location.origin;
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname;
+            const pathname = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+
+            // Generar todas las posibles rutas
+            const rutas = [
+                src, // Ruta original
+                '/' + src, // Desde raíz
+                './' + src, // Relativa al directorio actual
+                baseUrl + src, // Base URL completa
+                origin + '/' + src, // Origin + raíz
+                origin + pathname + src, // Origin + pathname
+                protocol + '//' + hostname + '/' + src, // Protocolo + hostname + raíz
+                protocol + '//' + hostname + pathname + src // Protocolo + hostname + pathname
+            ];
+
+            // Eliminar duplicados
+            const rutasUnicas = [...new Set(rutas)];
+
+            // Timeout para evitar esperas indefinidas (5 segundos)
+            const timeout = setTimeout(() => {
+                console.log('Timeout al cargar la imagen:', src);
+                resolve(null);
+            }, 5000);
+
+            // Función para limpiar timeout y resolver
+            const resolver = (result) => {
+                clearTimeout(timeout);
+                resolve(result);
+            };
+
+            // Intentar cargar con fetch primero
+            const intentarFetch = async (rutaIndex = 0) => {
+                if (rutaIndex >= rutasUnicas.length) {
+                    // Si fetch falla con todas las rutas, intentar con Image
+                    cargarConImage();
                     return;
                 }
 
-                // Primero intentar buscar la imagen en el DOM si ya está cargada
-                const imagenesEnDOM = document.querySelectorAll('img[src*="' + src + '"], img[src*="iconofit"]');
-                for (const imgDOM of imagenesEnDOM) {
-                    if (imgDOM.complete && imgDOM.naturalWidth > 0 && imgDOM.naturalHeight > 0) {
-                        try {
-                            const canvas = document.createElement('canvas');
-                            canvas.width = imgDOM.naturalWidth;
-                            canvas.height = imgDOM.naturalHeight;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(imgDOM, 0, 0);
-                            const base64 = canvas.toDataURL('image/png');
-                            resolve(base64);
-                            return;
-                        } catch (e) {
-                            // Continuar con el método normal si falla
-                        }
-                    }
-                }
-
-                // Intentar primero con fetch (más robusto para archivos locales y remotos)
-                const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-                const origin = window.location.origin;
-                const protocol = window.location.protocol;
-                const hostname = window.location.hostname;
-                const pathname = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-
-                // Generar todas las posibles rutas
-                const rutas = [
-                    src, // Ruta original
-                    '/' + src, // Desde raíz
-                    './' + src, // Relativa al directorio actual
-                    baseUrl + src, // Base URL completa
-                    origin + '/' + src, // Origin + raíz
-                    origin + pathname + src, // Origin + pathname
-                    protocol + '//' + hostname + '/' + src, // Protocolo + hostname + raíz
-                    protocol + '//' + hostname + pathname + src // Protocolo + hostname + pathname
-                ];
-
-                // Eliminar duplicados
-                const rutasUnicas = [...new Set(rutas)];
-
-                // Timeout para evitar esperas indefinidas (5 segundos)
-                const timeout = setTimeout(() => {
-                    console.log('Timeout al cargar la imagen:', src);
-                    resolve(null);
-                }, 5000);
-
-                // Función para limpiar timeout y resolver
-                const resolver = (result) => {
-                    clearTimeout(timeout);
-                    resolve(result);
-                };
-
-                // Intentar cargar con fetch primero
-                const intentarFetch = async (rutaIndex = 0) => {
-                    if (rutaIndex >= rutasUnicas.length) {
-                        // Si fetch falla con todas las rutas, intentar con Image
-                        cargarConImage();
-                        return;
-                    }
-
-                    const ruta = rutasUnicas[rutaIndex];
-                    try {
-                        const response = await fetch(ruta);
-                        if (response.ok) {
-                            const blob = await response.blob();
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                                resolver(reader.result); // Base64
-                            };
-                            reader.onerror = () => {
-                                intentarFetch(rutaIndex + 1);
-                            };
-                            reader.readAsDataURL(blob);
-                        } else {
+                const ruta = rutasUnicas[rutaIndex];
+                try {
+                    const response = await fetch(ruta);
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            resolver(reader.result); // Base64
+                        };
+                        reader.onerror = () => {
                             intentarFetch(rutaIndex + 1);
-                        }
-                    } catch (e) {
+                        };
+                        reader.readAsDataURL(blob);
+                    } else {
                         intentarFetch(rutaIndex + 1);
                     }
-                };
+                } catch (e) {
+                    intentarFetch(rutaIndex + 1);
+                }
+            };
 
-                // Método alternativo con Image element
-                const cargarConImage = () => {
-                    const img = new Image();
-                    img.crossOrigin = 'anonymous';
+            // Método alternativo con Image element
+            const cargarConImage = () => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
 
-                    // Función para convertir a base64 cuando la imagen se carga
-                    const convertir = function () {
-                        try {
-                            // Verificar que la imagen se cargó correctamente
-                            if (!img.complete || img.naturalWidth === 0 || img.naturalHeight === 0) {
-                                resolver(null);
-                                return;
-                            }
-                            const canvas = document.createElement('canvas');
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0);
-                            const base64 = canvas.toDataURL('image/png');
-                            resolver(base64);
-                        } catch (e) {
+                // Función para convertir a base64 cuando la imagen se carga
+                const convertir = function () {
+                    try {
+                        // Verificar que la imagen se cargó correctamente
+                        if (!img.complete || img.naturalWidth === 0 || img.naturalHeight === 0) {
                             resolver(null);
+                            return;
                         }
-                    };
-
-                    img.onload = convertir;
-
-                    let intentoActual = 0;
-
-                    img.onerror = function () {
-                        intentoActual++;
-                        if (intentoActual < rutasUnicas.length) {
-                            img.src = rutasUnicas[intentoActual];
-                        } else {
-                            resolver(null);
-                        }
-                    };
-
-                    // Intentar cargar la imagen
-                    if (src.startsWith('http')) {
-                        img.src = src;
-                    } else {
-                        img.src = rutasUnicas[0];
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        const base64 = canvas.toDataURL('image/png');
+                        resolver(base64);
+                    } catch (e) {
+                        resolver(null);
                     }
                 };
 
-                // Comenzar con fetch
-                intentarFetch(0);
+                img.onload = convertir;
+
+                let intentoActual = 0;
+
+                img.onerror = function () {
+                    intentoActual++;
+                    if (intentoActual < rutasUnicas.length) {
+                        img.src = rutasUnicas[intentoActual];
+                    } else {
+                        resolver(null);
+                    }
+                };
+
+                // Intentar cargar la imagen
+                if (src.startsWith('http')) {
+                    img.src = src;
+                } else {
+                    img.src = rutasUnicas[0];
+                }
+            };
+
+            // Comenzar con fetch
+            intentarFetch(0);
+        });
+    }
+
+    /**
+     * Reemplaza todas las imágenes en el HTML con sus versiones base64
+     * @param {string} html - HTML original
+     * @returns {Promise<string>} - HTML con imágenes en base64
+     */
+    async function procesarImagenesParaPDF(html) {
+        // Buscar todas las imágenes en el HTML usando regex
+        const regexImg = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+        const matches = [];
+        let match;
+
+        while ((match = regexImg.exec(html)) !== null) {
+            matches.push({
+                fullMatch: match[0],
+                src: match[1]
             });
         }
 
-        /**
-         * Reemplaza todas las imágenes en el HTML con sus versiones base64
-         * @param {string} html - HTML original
-         * @returns {Promise<string>} - HTML con imágenes en base64
-         */
-        async function procesarImagenesParaPDF(html) {
-            // Buscar todas las imágenes en el HTML usando regex
-            const regexImg = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
-            const matches = [];
-            let match;
+        // Convertir cada imagen a base64
+        const promesas = matches.map(async (match) => {
+            const src = match.src;
+            if (src && !src.startsWith('data:') && !src.startsWith('http')) {
+                try {
+                    // Intentar diferentes rutas
+                    let rutaAbsoluta = src;
+                    if (!src.startsWith('/')) {
+                        rutaAbsoluta = window.location.origin + '/' + src;
+                    }
 
-            while ((match = regexImg.exec(html)) !== null) {
-                matches.push({
-                    fullMatch: match[0],
-                    src: match[1]
+                    const base64 = await convertirImagenABase64(rutaAbsoluta);
+                    if (base64 && base64.startsWith('data:')) {
+                        // Reemplazar en el HTML
+                        const nuevoTag = match.fullMatch.replace(src, base64);
+                        html = html.replace(match.fullMatch, nuevoTag);
+                    }
+                } catch (e) {
+                    console.warn('Error procesando imagen:', src, e);
+                }
+            }
+        });
+
+        await Promise.all(promesas);
+        return html;
+    }
+
+    async function generarArchivoPDF(htmlPDF, nombreCliente, opciones = {}) {
+        // Contenedor temporal para el contenido del PDF
+        const container = document.createElement('div');
+        container.className = 'pdf-container-temp';
+
+        // Insertar el HTML. Los navegadores modernos manejarán las etiquetas html/head/body 
+        // renderizando el contenido correctamente dentro del div.
+        // Las etiquetas <style> se aplicarán globalmente mientras el elemento esté en el DOM.
+        container.innerHTML = htmlPDF;
+
+        // Asegurar rutas absolutas para imágenes
+        const images = container.querySelectorAll('img');
+        images.forEach(img => {
+            const src = img.getAttribute('src');
+            if (src && !src.startsWith('http') && !src.startsWith('data:')) {
+                img.src = new URL(src, window.location.href).href;
+            }
+        });
+
+        try {
+            await window.pdfService.generatePDF(container, nombreCliente, opciones);
+        } catch (error) {
+            console.error('Error en generarArchivoPDF:', error);
+            mostrarNotificacion('❌ Error al generar el PDF', 'error');
+        }
+    }
+
+    /**
+     * Espera a que las librerías PDF estén cargadas (especialmente importante para iOS/iPad y PWA móvil)
+     */
+    window.esperarLibreriasPDF = async function (maxIntentos = null, intervalo = null) {
+        // Detectar iOS/iPad
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+        // Detectar móvil/tablet
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent);
+
+        // Detectar PWA (standalone mode)
+        const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+            window.navigator.standalone === true;
+
+        const isStandalone = window.navigator.standalone === true ||
+            window.matchMedia('(display-mode: standalone)').matches ||
+            window.matchMedia('(display-mode: fullscreen)').matches;
+
+        const isMobileOrPWA = isMobile || isPWA || isStandalone;
+
+        // Ajustar parámetros para móvil/PWA
+        const maxIntentosFinal = maxIntentos || (isMobileOrPWA ? 20 : (isIOS ? 15 : 10));
+        const intervaloFinal = intervalo || (isMobileOrPWA ? 1000 : (isIOS ? 800 : 500));
+
+        console.log(`📚 Esperando librerías PDF... (iOS: ${isIOS}, Móvil/PWA: ${isMobileOrPWA}, intentos: ${maxIntentosFinal}, intervalo: ${intervaloFinal}ms)`);
+
+        // Si LibraryLoader está disponible, usarlo
+        if (window.LibraryLoader && typeof window.LibraryLoader.isPDFReady === 'function') {
+            for (let i = 0; i < maxIntentosFinal; i++) {
+                if (window.LibraryLoader.isPDFReady()) {
+                    console.log('✅ Librerías PDF listas (vía LibraryLoader)');
+                    return true;
+                }
+                if (i % 3 === 0) {
+                    console.log(`⏳ Esperando librerías... (intento ${i + 1}/${maxIntentosFinal})`);
+                }
+                await new Promise(resolve => setTimeout(resolve, intervaloFinal));
+            }
+            // Si no están listas, intentar cargarlas
+            if (window.LibraryLoader.loadAll) {
+                try {
+                    console.log('🔄 Intentando cargar librerías con LibraryLoader...');
+                    await window.LibraryLoader.loadAll(false);
+                    if (window.LibraryLoader.isPDFReady()) {
+                        console.log('✅ Librerías PDF cargadas exitosamente');
+                        return true;
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Error cargando librerías con LibraryLoader:', error);
+                }
+            }
+        }
+
+        // Verificación directa de librerías
+        for (let i = 0; i < maxIntentosFinal; i++) {
+            const html2pdfReady = typeof window.html2pdf === 'function';
+            const html2canvasReady = typeof window.html2canvas === 'function';
+            const jsPDFReady = typeof window.jsPDF !== 'undefined' || typeof window.jspdf !== 'undefined';
+
+            // Aceptamos html2pdf O (html2canvas + jsPDF)
+            if (html2pdfReady || (html2canvasReady && jsPDFReady)) {
+                console.log('✅ Librerías PDF listas (verificación directa)', {
+                    html2pdf: html2pdfReady,
+                    html2canvas: html2canvasReady,
+                    jsPDF: jsPDFReady
+                });
+                return true;
+            }
+
+            if (i % 3 === 0) {
+                console.log(`⏳ Esperando librerías... (intento ${i + 1}/${maxIntentosFinal})`, {
+                    html2pdf: html2pdfReady,
+                    html2canvas: html2canvasReady,
+                    jsPDF: jsPDFReady
                 });
             }
 
-            // Convertir cada imagen a base64
-            const promesas = matches.map(async (match) => {
-                const src = match.src;
-                if (src && !src.startsWith('data:') && !src.startsWith('http')) {
-                    try {
-                        // Intentar diferentes rutas
-                        let rutaAbsoluta = src;
-                        if (!src.startsWith('/')) {
-                            rutaAbsoluta = window.location.origin + '/' + src;
-                        }
-
-                        const base64 = await convertirImagenABase64(rutaAbsoluta);
-                        if (base64 && base64.startsWith('data:')) {
-                            // Reemplazar en el HTML
-                            const nuevoTag = match.fullMatch.replace(src, base64);
-                            html = html.replace(match.fullMatch, nuevoTag);
-                        }
-                    } catch (e) {
-                        console.warn('Error procesando imagen:', src, e);
-                    }
-                }
-            });
-
-            await Promise.all(promesas);
-            return html;
+            await new Promise(resolve => setTimeout(resolve, intervaloFinal));
         }
 
-        async function generarArchivoPDF(htmlPDF, nombreCliente, opciones = {}) {
-            // Contenedor temporal para el contenido del PDF
-            const container = document.createElement('div');
-            container.className = 'pdf-container-temp';
+        console.warn('❌ Librerías PDF no disponibles después de todos los intentos');
+        return false;
+    }
 
-            // Insertar el HTML. Los navegadores modernos manejarán las etiquetas html/head/body 
-            // renderizando el contenido correctamente dentro del div.
-            // Las etiquetas <style> se aplicarán globalmente mientras el elemento esté en el DOM.
-            container.innerHTML = htmlPDF;
+    /**
+     * Función unificada para generar PDF profesional (blanco y negro, minimalista)
+     * @param {string} fuente - 'principal' o 'tabla-editable'
+     */
+    window.generarPDFProfesional = async function (fuente = 'principal') {
+        // Mostrar notificación de carga
+        mostrarNotificacion('⏳ Verificando librerías PDF...', 'info');
 
-            // Asegurar rutas absolutas para imágenes
-            const images = container.querySelectorAll('img');
-            images.forEach(img => {
-                const src = img.getAttribute('src');
-                if (src && !src.startsWith('http') && !src.startsWith('data:')) {
-                    img.src = new URL(src, window.location.href).href;
+        // Esperar a que las librerías estén cargadas (especialmente importante para iOS/iPad)
+        const libreriasListas = await window.esperarLibreriasPDF();
+
+        if (!libreriasListas) {
+            // Último intento: verificar directamente
+            const html2pdfReady = typeof window.html2pdf === 'function';
+            const html2canvasReady = typeof window.html2canvas === 'function';
+            const jsPDFReady = typeof window.jsPDF !== 'undefined' || typeof window.jspdf !== 'undefined';
+
+            if (!html2pdfReady && !(html2canvasReady && jsPDFReady)) {
+                // Detectar si es móvil/PWA
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent);
+                const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+                let mensaje = 'Error: Las librerías PDF no están cargadas.\n\n';
+
+                if (isMobile || isPWA) {
+                    mensaje += 'En modo PWA/móvil, las librerías pueden tardar más en cargar.\n\n';
+                    mensaje += 'Por favor:\n';
+                    mensaje += '1. Verifica tu conexión a internet\n';
+                    mensaje += '2. Espera unos segundos y vuelve a intentar\n';
+                    mensaje += '3. Si el problema persiste, recarga la aplicación\n';
+                    mensaje += '4. O abre la aplicación en el navegador (no en modo PWA)';
+                } else {
+                    mensaje += 'Por favor, verifica tu conexión a internet y recarga la página.\n\n';
+                    mensaje += 'Si el problema persiste, intenta:\n';
+                    mensaje += '1. Limpiar la caché del navegador\n';
+                    mensaje += '2. Recargar la página\n';
+                    mensaje += '3. Usar otro navegador';
                 }
-            });
 
-            try {
-                await window.pdfService.generatePDF(container, nombreCliente, opciones);
-            } catch (error) {
-                console.error('Error en generarArchivoPDF:', error);
-                mostrarNotificacion('❌ Error al generar el PDF', 'error');
-            }
-        }
-
-        /**
-         * Espera a que las librerías PDF estén cargadas (especialmente importante para iOS/iPad y PWA móvil)
-         */
-        window.esperarLibreriasPDF = async function (maxIntentos = null, intervalo = null) {
-            // Detectar iOS/iPad
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            
-            // Detectar móvil/tablet
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent);
-            
-            // Detectar PWA (standalone mode)
-            const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
-                          window.navigator.standalone === true;
-            
-            const isStandalone = window.navigator.standalone === true || 
-                                 window.matchMedia('(display-mode: standalone)').matches ||
-                                 window.matchMedia('(display-mode: fullscreen)').matches;
-            
-            const isMobileOrPWA = isMobile || isPWA || isStandalone;
-            
-            // Ajustar parámetros para móvil/PWA
-            const maxIntentosFinal = maxIntentos || (isMobileOrPWA ? 20 : (isIOS ? 15 : 10));
-            const intervaloFinal = intervalo || (isMobileOrPWA ? 1000 : (isIOS ? 800 : 500));
-            
-            console.log(`📚 Esperando librerías PDF... (iOS: ${isIOS}, Móvil/PWA: ${isMobileOrPWA}, intentos: ${maxIntentosFinal}, intervalo: ${intervaloFinal}ms)`);
-            
-            // Si LibraryLoader está disponible, usarlo
-            if (window.LibraryLoader && typeof window.LibraryLoader.isPDFReady === 'function') {
-                for (let i = 0; i < maxIntentosFinal; i++) {
-                    if (window.LibraryLoader.isPDFReady()) {
-                        console.log('✅ Librerías PDF listas (vía LibraryLoader)');
-                        return true;
-                    }
-                    if (i % 3 === 0) {
-                        console.log(`⏳ Esperando librerías... (intento ${i + 1}/${maxIntentosFinal})`);
-                    }
-                    await new Promise(resolve => setTimeout(resolve, intervaloFinal));
-                }
-                // Si no están listas, intentar cargarlas
-                if (window.LibraryLoader.loadAll) {
-                    try {
-                        console.log('🔄 Intentando cargar librerías con LibraryLoader...');
-                        await window.LibraryLoader.loadAll(false);
-                        if (window.LibraryLoader.isPDFReady()) {
-                            console.log('✅ Librerías PDF cargadas exitosamente');
-                            return true;
-                        }
-                    } catch (error) {
-                        console.warn('⚠️ Error cargando librerías con LibraryLoader:', error);
-                    }
-                }
-            }
-
-            // Verificación directa de librerías
-            for (let i = 0; i < maxIntentosFinal; i++) {
-                const html2pdfReady = typeof window.html2pdf === 'function';
-                const html2canvasReady = typeof window.html2canvas === 'function';
-                const jsPDFReady = typeof window.jsPDF !== 'undefined' || typeof window.jspdf !== 'undefined';
-                
-                // Aceptamos html2pdf O (html2canvas + jsPDF)
-                if (html2pdfReady || (html2canvasReady && jsPDFReady)) {
-                    console.log('✅ Librerías PDF listas (verificación directa)', {
-                        html2pdf: html2pdfReady,
-                        html2canvas: html2canvasReady,
-                        jsPDF: jsPDFReady
-                    });
-                    return true;
-                }
-                
-                if (i % 3 === 0) {
-                    console.log(`⏳ Esperando librerías... (intento ${i + 1}/${maxIntentosFinal})`, {
-                        html2pdf: html2pdfReady,
-                        html2canvas: html2canvasReady,
-                        jsPDF: jsPDFReady
-                    });
-                }
-                
-                await new Promise(resolve => setTimeout(resolve, intervaloFinal));
-            }
-            
-            console.warn('❌ Librerías PDF no disponibles después de todos los intentos');
-            return false;
-        }
-
-        /**
-         * Función unificada para generar PDF profesional (blanco y negro, minimalista)
-         * @param {string} fuente - 'principal' o 'tabla-editable'
-         */
-        window.generarPDFProfesional = async function (fuente = 'principal') {
-            // Mostrar notificación de carga
-            mostrarNotificacion('⏳ Verificando librerías PDF...', 'info');
-
-            // Esperar a que las librerías estén cargadas (especialmente importante para iOS/iPad)
-            const libreriasListas = await window.esperarLibreriasPDF();
-            
-            if (!libreriasListas) {
-                // Último intento: verificar directamente
-                const html2pdfReady = typeof window.html2pdf === 'function';
-                const html2canvasReady = typeof window.html2canvas === 'function';
-                const jsPDFReady = typeof window.jsPDF !== 'undefined' || typeof window.jspdf !== 'undefined';
-                
-                if (!html2pdfReady && !(html2canvasReady && jsPDFReady)) {
-                    // Detectar si es móvil/PWA
-                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent);
-                    const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-                    
-                    let mensaje = 'Error: Las librerías PDF no están cargadas.\n\n';
-                    
-                    if (isMobile || isPWA) {
-                        mensaje += 'En modo PWA/móvil, las librerías pueden tardar más en cargar.\n\n';
-                        mensaje += 'Por favor:\n';
-                        mensaje += '1. Verifica tu conexión a internet\n';
-                        mensaje += '2. Espera unos segundos y vuelve a intentar\n';
-                        mensaje += '3. Si el problema persiste, recarga la aplicación\n';
-                        mensaje += '4. O abre la aplicación en el navegador (no en modo PWA)';
-                    } else {
-                        mensaje += 'Por favor, verifica tu conexión a internet y recarga la página.\n\n';
-                        mensaje += 'Si el problema persiste, intenta:\n';
-                        mensaje += '1. Limpiar la caché del navegador\n';
-                        mensaje += '2. Recargar la página\n';
-                        mensaje += '3. Usar otro navegador';
-                    }
-                    
-                    // Intentar recargar las librerías una vez más
-                    if (window.LibraryLoader && window.LibraryLoader.retry) {
-                        mostrarNotificacion('🔄 Reintentando cargar librerías PDF...', 'info');
-                        const retrySuccess = await window.LibraryLoader.retry();
-                        if (retrySuccess && window.LibraryLoader.isPDFReady()) {
-                            console.log('✅ Librerías cargadas después del reintento');
-                            mostrarNotificacion('✅ Librerías PDF cargadas correctamente', 'success');
-                            // Continuar con la generación del PDF
-                        } else {
-                            alert(mensaje);
-                            mostrarNotificacion('❌ Error: Librerías PDF no disponibles', 'error');
-                            return;
-                        }
+                // Intentar recargar las librerías una vez más
+                if (window.LibraryLoader && window.LibraryLoader.retry) {
+                    mostrarNotificacion('🔄 Reintentando cargar librerías PDF...', 'info');
+                    const retrySuccess = await window.LibraryLoader.retry();
+                    if (retrySuccess && window.LibraryLoader.isPDFReady()) {
+                        console.log('✅ Librerías cargadas después del reintento');
+                        mostrarNotificacion('✅ Librerías PDF cargadas correctamente', 'success');
+                        // Continuar con la generación del PDF
                     } else {
                         alert(mensaje);
                         mostrarNotificacion('❌ Error: Librerías PDF no disponibles', 'error');
                         return;
                     }
+                } else {
+                    alert(mensaje);
+                    mostrarNotificacion('❌ Error: Librerías PDF no disponibles', 'error');
+                    return;
                 }
             }
+        }
 
-            // Mostrar notificación de generación
-            mostrarNotificacion('⏳ Generando PDF...', 'info');
+        // Mostrar notificación de generación
+        mostrarNotificacion('⏳ Generando PDF...', 'info');
 
-            // Obtener datos según la fuente
-            const { datos, contenidoOriginal, error } = obtenerDatosPDF(fuente);
-            if (error) {
-                alert(error);
-                return;
+        // Obtener datos según la fuente
+        const { datos, contenidoOriginal, error } = obtenerDatosPDF(fuente);
+        if (error) {
+            alert(error);
+            return;
+        }
+
+        // Construir HTML del PDF
+        const fecha = new Date().toLocaleDateString('es-ES');
+        const nombreCliente = datos.nombre || 'Cliente';
+        const headerHTML = await generarHeaderPDF(datos, fecha);
+
+        // Si es tabla editable, calcular tamaños dinámicos ANTES de generar CSS
+        let tamanosFuente = null;
+        if (fuente === 'tabla-editable') {
+            const estructura = construirPlanSemanalEstructurado();
+            if (estructura) {
+                tamanosFuente = calcularTamanosFuenteDinamicos(estructura);
+                // Guardar también en window para que esté disponible
+                window.tamanosFuentePDF = tamanosFuente;
+                console.log('📊 Tamaños de fuente calculados:', tamanosFuente);
             }
+        }
 
-            // Construir HTML del PDF
-            const fecha = new Date().toLocaleDateString('es-ES');
-            const nombreCliente = datos.nombre || 'Cliente';
-            const headerHTML = await generarHeaderPDF(datos, fecha);
+        const cssHTML = generarCSSPDF(tamanosFuente);
 
-            // Si es tabla editable, calcular tamaños dinámicos ANTES de generar CSS
-            let tamanosFuente = null;
-            if (fuente === 'tabla-editable') {
-                const estructura = construirPlanSemanalEstructurado();
-                if (estructura) {
-                    tamanosFuente = calcularTamanosFuenteDinamicos(estructura);
-                    // Guardar también en window para que esté disponible
-                    window.tamanosFuentePDF = tamanosFuente;
-                    console.log('📊 Tamaños de fuente calculados:', tamanosFuente);
-                }
-            }
+        // Siempre usar formato horizontal para maximizar el espacio y evitar recortes
+        const bodyClass = 'layout-landscape';
 
-            const cssHTML = generarCSSPDF(tamanosFuente);
+        // Detectar móvil para agregar viewport optimizado
+        const esMovilPDF = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent) ||
+            (window.innerWidth <= 768) ||
+            ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
-            // Siempre usar formato horizontal para maximizar el espacio y evitar recortes
-            const bodyClass = 'layout-landscape';
+        // Calcular ancho del viewport para móviles
+        const orientacionPDF = 'l';
+        const pageWidthPDF = 297;
+        const mmToPxPDF = 3.779527559;
+        const viewportWidth = esMovilPDF ? Math.round(pageWidthPDF * mmToPxPDF) : 'device-width';
 
-            // Detectar móvil para agregar viewport optimizado
-            const esMovilPDF = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent) ||
-                (window.innerWidth <= 768) ||
-                ('ontouchstart' in window || navigator.maxTouchPoints > 0);
-
-            // Calcular ancho del viewport para móviles
-            const orientacionPDF = 'l';
-            const pageWidthPDF = 297;
-            const mmToPxPDF = 3.779527559;
-            const viewportWidth = esMovilPDF ? Math.round(pageWidthPDF * mmToPxPDF) : 'device-width';
-
-            let htmlPDF = `
+        let htmlPDF = `
             <!DOCTYPE html>
             <html>
             <head>
@@ -5736,298 +4861,298 @@ ${lineas.join('\n')}`;
                 ${headerHTML}
         `;
 
-            // Agregar contenido según la fuente
-            if (fuente === 'principal' && contenidoOriginal) {
-                // 1. CAPTURAR GRÁFICOS (CANVAS) ANTES DE CLONAR
-                // Los canvas se pierden al clonar o usar innerHTML, así que los convertimos a imágenes
-                const canvasReales = contenidoOriginal.querySelectorAll('canvas');
-                const canvasMap = new Map();
+        // Agregar contenido según la fuente
+        if (fuente === 'principal' && contenidoOriginal) {
+            // 1. CAPTURAR GRÁFICOS (CANVAS) ANTES DE CLONAR
+            // Los canvas se pierden al clonar o usar innerHTML, así que los convertimos a imágenes
+            const canvasReales = contenidoOriginal.querySelectorAll('canvas');
+            const canvasMap = new Map();
 
-                canvasReales.forEach((canvas, index) => {
-                    try {
-                        if (canvas.width > 0 && canvas.height > 0) {
-                            // Crear fondo blanco para evitar transparencia negra en algunos visualizadores PDF
-                            const tempCanvas = document.createElement('canvas');
-                            tempCanvas.width = canvas.width;
-                            tempCanvas.height = canvas.height;
-                            const ctx = tempCanvas.getContext('2d');
+            canvasReales.forEach((canvas, index) => {
+                try {
+                    if (canvas.width > 0 && canvas.height > 0) {
+                        // Crear fondo blanco para evitar transparencia negra en algunos visualizadores PDF
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = canvas.width;
+                        tempCanvas.height = canvas.height;
+                        const ctx = tempCanvas.getContext('2d');
 
-                            // Rellenar blanco
-                            ctx.fillStyle = '#ffffff';
-                            ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                        // Rellenar blanco
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-                            // Dibujar el canvas original encima
-                            ctx.drawImage(canvas, 0, 0);
+                        // Dibujar el canvas original encima
+                        ctx.drawImage(canvas, 0, 0);
 
-                            const dataUrl = tempCanvas.toDataURL('image/png');
-                            // Usar un ID único basado en el ID del elemento si existe, o generar uno
-                            const canvasId = canvas.id || 'canvas-' + index;
-                            canvas.setAttribute('data-pdf-id', canvasId);
-                            canvasMap.set(canvasId, dataUrl);
-                        }
-                    } catch (e) {
-                        console.warn('Error capturando canvas para PDF:', e);
+                        const dataUrl = tempCanvas.toDataURL('image/png');
+                        // Usar un ID único basado en el ID del elemento si existe, o generar uno
+                        const canvasId = canvas.id || 'canvas-' + index;
+                        canvas.setAttribute('data-pdf-id', canvasId);
+                        canvasMap.set(canvasId, dataUrl);
                     }
-                });
+                } catch (e) {
+                    console.warn('Error capturando canvas para PDF:', e);
+                }
+            });
 
-                // Procesar imágenes en el DOM real primero (para obtener imágenes ya cargadas)
-                const imagenesReales = contenidoOriginal.querySelectorAll('img[src]');
-                const imagenesBase64 = new Map();
+            // Procesar imágenes en el DOM real primero (para obtener imágenes ya cargadas)
+            const imagenesReales = contenidoOriginal.querySelectorAll('img[src]');
+            const imagenesBase64 = new Map();
 
-                for (const img of imagenesReales) {
-                    const src = img.getAttribute('src');
-                    if (src && !src.startsWith('data:') && !src.startsWith('http')) {
-                        try {
-                            // Intentar obtener la imagen directamente del DOM si ya está cargada
-                            let base64 = null;
-                            if (img.complete && img.naturalWidth > 0) {
-                                // La imagen ya está cargada, convertirla directamente
-                                try {
-                                    const canvas = document.createElement('canvas');
-                                    canvas.width = img.naturalWidth;
-                                    canvas.height = img.naturalHeight;
-                                    const ctx = canvas.getContext('2d');
-                                    ctx.drawImage(img, 0, 0);
-                                    base64 = canvas.toDataURL('image/png');
-                                } catch (e) {
-                                    // Si falla, intentar con la función de conversión
-                                    base64 = await convertirImagenABase64(src);
-                                }
-                            } else {
-                                // Intentar cargar la imagen
+            for (const img of imagenesReales) {
+                const src = img.getAttribute('src');
+                if (src && !src.startsWith('data:') && !src.startsWith('http')) {
+                    try {
+                        // Intentar obtener la imagen directamente del DOM si ya está cargada
+                        let base64 = null;
+                        if (img.complete && img.naturalWidth > 0) {
+                            // La imagen ya está cargada, convertirla directamente
+                            try {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = img.naturalWidth;
+                                canvas.height = img.naturalHeight;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(img, 0, 0);
+                                base64 = canvas.toDataURL('image/png');
+                            } catch (e) {
+                                // Si falla, intentar con la función de conversión
                                 base64 = await convertirImagenABase64(src);
                             }
-
-                            if (base64 && base64.startsWith('data:')) {
-                                imagenesBase64.set(src, base64);
-                            }
-                        } catch (e) {
-                            console.warn('Error procesando imagen:', src, e);
+                        } else {
+                            // Intentar cargar la imagen
+                            base64 = await convertirImagenABase64(src);
                         }
+
+                        if (base64 && base64.startsWith('data:')) {
+                            imagenesBase64.set(src, base64);
+                        }
+                    } catch (e) {
+                        console.warn('Error procesando imagen:', src, e);
                     }
                 }
-
-                // Ahora clonar y reemplazar las imágenes en el clone
-                const clone = contenidoOriginal.cloneNode(true);
-
-                // 2. RESTAURAR GRÁFICOS EN EL CLON
-                const canvasClone = clone.querySelectorAll('canvas');
-                canvasClone.forEach((canvas, index) => {
-                    // Buscar por ID primero, luego por atributo data-pdf-id
-                    const canvasId = canvas.id || canvas.getAttribute('data-pdf-id');
-                    let dataUrl = canvasId ? canvasMap.get(canvasId) : null;
-
-                    // Si no se encuentra, intentar por índice secuencial como fallback
-                    if (!dataUrl && canvasMap.has('canvas-' + index)) {
-                        dataUrl = canvasMap.get('canvas-' + index);
-                    }
-
-                    if (dataUrl) {
-                        const img = document.createElement('img');
-                        img.src = dataUrl;
-
-                        // Asegurar que la imagen tenga dimensiones explícitas
-                        // En móviles, los canvas pueden tener width/height 0 si están ocultos o colapsados
-                        // Usamos style.width = '100%' para que se adapte al contenedor
-                        img.style.width = '100%';
-                        img.style.maxWidth = '600px'; // Limitar ancho máximo para que no explote
-                        img.style.height = 'auto';
-                        img.className = canvas.className; // Mantener clases
-                        img.style.display = 'block';
-                        img.style.margin = '0 auto';
-
-                        // Reemplazar canvas con imagen
-                        if (canvas.parentNode) {
-                            canvas.parentNode.replaceChild(img, canvas);
-                        }
-                    }
-                });
-
-                const imagenesClone = clone.querySelectorAll('img[src]');
-                for (const img of imagenesClone) {
-                    const src = img.getAttribute('src');
-                    if (imagenesBase64.has(src)) {
-                        img.setAttribute('src', imagenesBase64.get(src));
-                    }
-                }
-
-                procesarContenidoParaPDF(clone);
-                htmlPDF += clone.innerHTML;
-                // Sin línea final, solo el margen inferior
-            } else if (fuente === 'tabla-editable') {
-                htmlPDF += generarHTMLDesdeTablaEditable();
             }
 
-            htmlPDF += `
+            // Ahora clonar y reemplazar las imágenes en el clone
+            const clone = contenidoOriginal.cloneNode(true);
+
+            // 2. RESTAURAR GRÁFICOS EN EL CLON
+            const canvasClone = clone.querySelectorAll('canvas');
+            canvasClone.forEach((canvas, index) => {
+                // Buscar por ID primero, luego por atributo data-pdf-id
+                const canvasId = canvas.id || canvas.getAttribute('data-pdf-id');
+                let dataUrl = canvasId ? canvasMap.get(canvasId) : null;
+
+                // Si no se encuentra, intentar por índice secuencial como fallback
+                if (!dataUrl && canvasMap.has('canvas-' + index)) {
+                    dataUrl = canvasMap.get('canvas-' + index);
+                }
+
+                if (dataUrl) {
+                    const img = document.createElement('img');
+                    img.src = dataUrl;
+
+                    // Asegurar que la imagen tenga dimensiones explícitas
+                    // En móviles, los canvas pueden tener width/height 0 si están ocultos o colapsados
+                    // Usamos style.width = '100%' para que se adapte al contenedor
+                    img.style.width = '100%';
+                    img.style.maxWidth = '600px'; // Limitar ancho máximo para que no explote
+                    img.style.height = 'auto';
+                    img.className = canvas.className; // Mantener clases
+                    img.style.display = 'block';
+                    img.style.margin = '0 auto';
+
+                    // Reemplazar canvas con imagen
+                    if (canvas.parentNode) {
+                        canvas.parentNode.replaceChild(img, canvas);
+                    }
+                }
+            });
+
+            const imagenesClone = clone.querySelectorAll('img[src]');
+            for (const img of imagenesClone) {
+                const src = img.getAttribute('src');
+                if (imagenesBase64.has(src)) {
+                    img.setAttribute('src', imagenesBase64.get(src));
+                }
+            }
+
+            procesarContenidoParaPDF(clone);
+            htmlPDF += clone.innerHTML;
+            // Sin línea final, solo el margen inferior
+        } else if (fuente === 'tabla-editable') {
+            htmlPDF += generarHTMLDesdeTablaEditable();
+        }
+
+        htmlPDF += `
             </body>
             </html>
         `;
 
-            // Generar y descargar PDF (ahora es async)
-            // orientacionPDF ya está declarada arriba, solo usar su valor
-            await generarArchivoPDF(htmlPDF, nombreCliente, { orientacion: orientacionPDF });
-        };
+        // Generar y descargar PDF (ahora es async)
+        // orientacionPDF ya está declarada arriba, solo usar su valor
+        await generarArchivoPDF(htmlPDF, nombreCliente, { orientacion: orientacionPDF });
+    };
 
-        // Botón descargar PDF
-        const btnDescargar = document.getElementById('btnDescargar');
-        if (btnDescargar) {
-            btnDescargar.replaceWith(btnDescargar.cloneNode(true));
-            const nuevoBtn = document.getElementById('btnDescargar');
+    // Botón descargar PDF
+    const btnDescargar = document.getElementById('btnDescargar');
+    if (btnDescargar) {
+        btnDescargar.replaceWith(btnDescargar.cloneNode(true));
+        const nuevoBtn = document.getElementById('btnDescargar');
 
-            nuevoBtn.addEventListener('click', function () {
-                window.generarPDFProfesional('principal');
-            });
-        }
+        nuevoBtn.addEventListener('click', function () {
+            window.generarPDFProfesional('principal');
+        });
+    }
 
-        // Botón compartir por WhatsApp (solo móvil)
-        const btnCompartirWhatsApp = document.getElementById('btnCompartirWhatsApp');
-        if (btnCompartirWhatsApp) {
-            // Detectar si es dispositivo móvil
-            const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    // Botón compartir por WhatsApp (solo móvil)
+    const btnCompartirWhatsApp = document.getElementById('btnCompartirWhatsApp');
+    if (btnCompartirWhatsApp) {
+        // Detectar si es dispositivo móvil
+        const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-            if (esMovil) {
-                btnCompartirWhatsApp.style.display = 'block';
+        if (esMovil) {
+            btnCompartirWhatsApp.style.display = 'block';
 
-                btnCompartirWhatsApp.replaceWith(btnCompartirWhatsApp.cloneNode(true));
-                const nuevoBtnWhatsApp = document.getElementById('btnCompartirWhatsApp');
+            btnCompartirWhatsApp.replaceWith(btnCompartirWhatsApp.cloneNode(true));
+            const nuevoBtnWhatsApp = document.getElementById('btnCompartirWhatsApp');
 
-                nuevoBtnWhatsApp.addEventListener('click', async function () {
-                    try {
-                        mostrarNotificacion('🔄 Verificando librerías PDF...', 'info');
+            nuevoBtnWhatsApp.addEventListener('click', async function () {
+                try {
+                    mostrarNotificacion('🔄 Verificando librerías PDF...', 'info');
 
-                        // Esperar a que las librerías estén cargadas (especialmente importante para iOS/iPad)
-                        const libreriasListas = await window.esperarLibreriasPDF();
-                        
-                        if (!libreriasListas) {
-                            const html2pdfReady = typeof window.html2pdf === 'function';
-                            if (!html2pdfReady) {
-                                throw new Error('Las librerías PDF no están disponibles. Por favor, recarga la página.');
-                            }
+                    // Esperar a que las librerías estén cargadas (especialmente importante para iOS/iPad)
+                    const libreriasListas = await window.esperarLibreriasPDF();
+
+                    if (!libreriasListas) {
+                        const html2pdfReady = typeof window.html2pdf === 'function';
+                        if (!html2pdfReady) {
+                            throw new Error('Las librerías PDF no están disponibles. Por favor, recarga la página.');
                         }
-
-                        mostrarNotificacion('🔄 Generando PDF para compartir...', 'info');
-
-                        // Obtener el contenido del PDF
-                        const pdfContent = document.getElementById('pdf-content');
-                        if (!pdfContent) {
-                            throw new Error('No se encontró el contenido del PDF');
-                        }
-
-                        // Verificar que html2pdf esté disponible
-                        if (typeof window.html2pdf !== 'function') {
-                            throw new Error('La librería html2pdf no está disponible');
-                        }
-
-                        // Usar html2pdf para generar el blob directamente
-                        // Margen inferior de 3 mm - convertir a pulgadas: 3mm = 0.11811 in
-                        const margenInferiorPulgadas = 0.11811; // 3 mm en pulgadas
-                        const opt = {
-                            margin: [0, 0, margenInferiorPulgadas, 0], // [top, right, bottom, left] - solo margen inferior
-                            filename: `Plan_Alimentacion_${datosUsuario.nombre || 'Cliente'}.pdf`,
-                            image: { type: 'jpeg', quality: 0.98 },
-                            html2canvas: { scale: 2, useCORS: true },
-                            jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
-                        };
-
-                        // Generar PDF como blob
-                        const pdfBlob = await html2pdf().set(opt).from(pdfContent).outputPdf('blob');
-
-                        // Crear archivo desde el blob
-                        const filename = `Plan_Alimentacion_${(datosUsuario.nombre || 'Cliente').replace(/\s+/g, '_')}.pdf`;
-                        const file = new File([pdfBlob], filename, { type: 'application/pdf' });
-
-                        // Intentar usar Web Share API (soporta WhatsApp en móviles)
-                        if (navigator.share && navigator.canShare) {
-                            try {
-                                if (navigator.canShare({ files: [file] })) {
-                                    await navigator.share({
-                                        files: [file],
-                                        title: 'Plan de Alimentación Personalizado',
-                                        text: `Plan de alimentación personalizado para ${datosUsuario.nombre || 'cliente'}`
-                                    });
-                                    mostrarNotificacion('✅ PDF compartido exitosamente', 'success');
-                                    return;
-                                }
-                            } catch (shareError) {
-                                console.log('Web Share API no disponible, usando método alternativo');
-                            }
-                        }
-
-                        // Método alternativo: descargar y abrir WhatsApp
-                        const url = URL.createObjectURL(pdfBlob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-
-                        // Abrir WhatsApp con mensaje
-                        setTimeout(() => {
-                            const mensaje = encodeURIComponent(`Te comparto tu plan de alimentación personalizado. El archivo PDF se ha descargado en tu dispositivo.`);
-                            const urlWhatsApp = `https://wa.me/?text=${mensaje}`;
-                            window.open(urlWhatsApp, '_blank');
-
-                            mostrarNotificacion('📥 PDF descargado. Selecciona WhatsApp y adjunta el archivo descargado', 'info');
-
-                            // Limpiar URL después de un tiempo
-                            setTimeout(() => URL.revokeObjectURL(url), 1000);
-                        }, 500);
-
-                    } catch (error) {
-                        console.error('Error al compartir por WhatsApp:', error);
-                        mostrarNotificacion('⚠️ Error al compartir. Descarga el PDF y compártelo manualmente.', 'error');
-
-                        // Fallback: descargar el PDF normalmente
-                        window.generarPDFProfesional('principal');
-                    }
-                });
-            }
-        }
-
-        const btnNuevo = document.getElementById('btnNuevo');
-        if (btnNuevo) {
-            btnNuevo.replaceWith(btnNuevo.cloneNode(true));
-            const nuevoBtn2 = document.getElementById('btnNuevo');
-
-            nuevoBtn2.addEventListener('click', function () {
-                if (confirm('¿Estás seguro de que quieres crear una nueva dieta? Se perderá la información actual.')) {
-                    document.getElementById('resultados').classList.add('oculto');
-                    document.getElementById('dietForm').reset();
-                    document.getElementById('calorias').value = '';
-                    document.getElementById('proteinas').value = '';
-                    document.getElementById('grasas').value = '';
-                    document.getElementById('carbohidratos').value = '';
-
-                    const hoy = new Date();
-                    const fechaInput = document.getElementById('fechaRegistro');
-                    if (fechaInput) {
-                        fechaInput.valueAsDate = hoy;
                     }
 
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    mostrarNotificacion('✨ Listo para crear una nueva dieta', 'info');
+                    mostrarNotificacion('🔄 Generando PDF para compartir...', 'info');
+
+                    // Obtener el contenido del PDF
+                    const pdfContent = document.getElementById('pdf-content');
+                    if (!pdfContent) {
+                        throw new Error('No se encontró el contenido del PDF');
+                    }
+
+                    // Verificar que html2pdf esté disponible
+                    if (typeof window.html2pdf !== 'function') {
+                        throw new Error('La librería html2pdf no está disponible');
+                    }
+
+                    // Usar html2pdf para generar el blob directamente
+                    // Margen inferior de 3 mm - convertir a pulgadas: 3mm = 0.11811 in
+                    const margenInferiorPulgadas = 0.11811; // 3 mm en pulgadas
+                    const opt = {
+                        margin: [0, 0, margenInferiorPulgadas, 0], // [top, right, bottom, left] - solo margen inferior
+                        filename: `Plan_Alimentacion_${datosUsuario.nombre || 'Cliente'}.pdf`,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true },
+                        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+                    };
+
+                    // Generar PDF como blob
+                    const pdfBlob = await html2pdf().set(opt).from(pdfContent).outputPdf('blob');
+
+                    // Crear archivo desde el blob
+                    const filename = `Plan_Alimentacion_${(datosUsuario.nombre || 'Cliente').replace(/\s+/g, '_')}.pdf`;
+                    const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+
+                    // Intentar usar Web Share API (soporta WhatsApp en móviles)
+                    if (navigator.share && navigator.canShare) {
+                        try {
+                            if (navigator.canShare({ files: [file] })) {
+                                await navigator.share({
+                                    files: [file],
+                                    title: 'Plan de Alimentación Personalizado',
+                                    text: `Plan de alimentación personalizado para ${datosUsuario.nombre || 'cliente'}`
+                                });
+                                mostrarNotificacion('✅ PDF compartido exitosamente', 'success');
+                                return;
+                            }
+                        } catch (shareError) {
+                            console.log('Web Share API no disponible, usando método alternativo');
+                        }
+                    }
+
+                    // Método alternativo: descargar y abrir WhatsApp
+                    const url = URL.createObjectURL(pdfBlob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+
+                    // Abrir WhatsApp con mensaje
+                    setTimeout(() => {
+                        const mensaje = encodeURIComponent(`Te comparto tu plan de alimentación personalizado. El archivo PDF se ha descargado en tu dispositivo.`);
+                        const urlWhatsApp = `https://wa.me/?text=${mensaje}`;
+                        window.open(urlWhatsApp, '_blank');
+
+                        mostrarNotificacion('📥 PDF descargado. Selecciona WhatsApp y adjunta el archivo descargado', 'info');
+
+                        // Limpiar URL después de un tiempo
+                        setTimeout(() => URL.revokeObjectURL(url), 1000);
+                    }, 500);
+
+                } catch (error) {
+                    console.error('Error al compartir por WhatsApp:', error);
+                    mostrarNotificacion('⚠️ Error al compartir. Descarga el PDF y compártelo manualmente.', 'error');
+
+                    // Fallback: descargar el PDF normalmente
+                    window.generarPDFProfesional('principal');
                 }
-            });
-        }
-
-        const btnDescargarExcel = document.getElementById('btnDescargarExcel');
-        if (btnDescargarExcel) {
-            btnDescargarExcel.replaceWith(btnDescargarExcel.cloneNode(true));
-            const nuevoBtnExcel = document.getElementById('btnDescargarExcel');
-            nuevoBtnExcel.addEventListener('click', function () {
-                exportarExcelProfesional();
             });
         }
     }
 
-    // Hacer función global
-    window.mostrarNotificacion = function (mensaje, tipo = 'info') {
-        const notificacion = document.createElement('div');
-        notificacion.className = `notificacion notificacion-${tipo}`;
-        notificacion.textContent = mensaje;
+    const btnNuevo = document.getElementById('btnNuevo');
+    if (btnNuevo) {
+        btnNuevo.replaceWith(btnNuevo.cloneNode(true));
+        const nuevoBtn2 = document.getElementById('btnNuevo');
 
-        notificacion.style.cssText = `
+        nuevoBtn2.addEventListener('click', function () {
+            if (confirm('¿Estás seguro de que quieres crear una nueva dieta? Se perderá la información actual.')) {
+                document.getElementById('resultados').classList.add('oculto');
+                document.getElementById('dietForm').reset();
+                document.getElementById('calorias').value = '';
+                document.getElementById('proteinas').value = '';
+                document.getElementById('grasas').value = '';
+                document.getElementById('carbohidratos').value = '';
+
+                const hoy = new Date();
+                const fechaInput = document.getElementById('fechaRegistro');
+                if (fechaInput) {
+                    fechaInput.valueAsDate = hoy;
+                }
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                mostrarNotificacion('✨ Listo para crear una nueva dieta', 'info');
+            }
+        });
+    }
+
+    const btnDescargarExcel = document.getElementById('btnDescargarExcel');
+    if (btnDescargarExcel) {
+        btnDescargarExcel.replaceWith(btnDescargarExcel.cloneNode(true));
+        const nuevoBtnExcel = document.getElementById('btnDescargarExcel');
+        nuevoBtnExcel.addEventListener('click', function () {
+            exportarExcelProfesional();
+        });
+    }
+}
+
+// Hacer función global
+window.mostrarNotificacion = function (mensaje, tipo = 'info') {
+    const notificacion = document.createElement('div');
+    notificacion.className = `notificacion notificacion-${tipo}`;
+    notificacion.textContent = mensaje;
+
+    notificacion.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
@@ -6042,22 +5167,22 @@ ${lineas.join('\n')}`;
         max-width: 300px;
     `;
 
-        document.body.appendChild(notificacion);
+    document.body.appendChild(notificacion);
 
+    setTimeout(() => {
+        notificacion.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => {
-            notificacion.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => {
-                document.body.removeChild(notificacion);
-            }, 300);
-        }, 3000);
-    };
+            document.body.removeChild(notificacion);
+        }, 300);
+    }, 3000);
+};
 
-    // Función para mostrar vista previa del PDF con opciones de descarga/compartir
-    window.mostrarPreviewPDF = function (pdfUrl, pdfBlob, filename) {
-        // Crear modal de previsualización
-        const modal = document.createElement('div');
-        modal.id = 'pdfPreviewModal';
-        modal.style.cssText = `
+// Función para mostrar vista previa del PDF con opciones de descarga/compartir
+window.mostrarPreviewPDF = function (pdfUrl, pdfBlob, filename) {
+    // Crear modal de previsualización
+    const modal = document.createElement('div');
+    modal.id = 'pdfPreviewModal';
+    modal.style.cssText = `
         position: fixed;
         top: 0;
         left: 0;
@@ -6073,9 +5198,9 @@ ${lineas.join('\n')}`;
         animation: fadeIn 0.3s ease;
     `;
 
-        // Contenedor del modal
-        const modalContent = document.createElement('div');
-        modalContent.style.cssText = `
+    // Contenedor del modal
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
         background: white;
         border-radius: 12px;
         width: 90%;
@@ -6087,9 +5212,9 @@ ${lineas.join('\n')}`;
         overflow: hidden;
     `;
 
-        // Header del modal
-        const header = document.createElement('div');
-        header.style.cssText = `
+    // Header del modal
+    const header = document.createElement('div');
+    header.style.cssText = `
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         padding: 20px;
@@ -6099,17 +5224,17 @@ ${lineas.join('\n')}`;
         border-radius: 12px 12px 0 0;
     `;
 
-        const title = document.createElement('h3');
-        title.textContent = '📄 Vista Previa del PDF';
-        title.style.cssText = `
+    const title = document.createElement('h3');
+    title.textContent = '📄 Vista Previa del PDF';
+    title.style.cssText = `
         margin: 0;
         font-size: 1.5em;
         font-weight: 600;
     `;
 
-        const closeBtn = document.createElement('button');
-        closeBtn.innerHTML = '✕';
-        closeBtn.style.cssText = `
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '✕';
+    closeBtn.style.cssText = `
         background: rgba(255, 255, 255, 0.95);
         border: none;
         color: #dc3545;
@@ -6126,39 +5251,39 @@ ${lineas.join('\n')}`;
         justify-content: center;
         line-height: 1;
     `;
-        closeBtn.onmouseover = () => {
-            closeBtn.style.background = 'rgba(255, 255, 255, 1)';
-            closeBtn.style.color = '#c82333';
-            closeBtn.style.transform = 'scale(1.1)';
-            closeBtn.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
-        };
-        closeBtn.onmouseout = () => {
-            closeBtn.style.background = 'rgba(255, 255, 255, 0.95)';
-            closeBtn.style.color = '#dc3545';
-            closeBtn.style.transform = 'scale(1)';
-            closeBtn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
-        };
-        closeBtn.onclick = () => {
-            URL.revokeObjectURL(pdfUrl);
-            document.body.removeChild(modal);
-        };
+    closeBtn.onmouseover = () => {
+        closeBtn.style.background = 'rgba(255, 255, 255, 1)';
+        closeBtn.style.color = '#c82333';
+        closeBtn.style.transform = 'scale(1.1)';
+        closeBtn.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
+    };
+    closeBtn.onmouseout = () => {
+        closeBtn.style.background = 'rgba(255, 255, 255, 0.95)';
+        closeBtn.style.color = '#dc3545';
+        closeBtn.style.transform = 'scale(1)';
+        closeBtn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+    };
+    closeBtn.onclick = () => {
+        URL.revokeObjectURL(pdfUrl);
+        document.body.removeChild(modal);
+    };
 
-        header.appendChild(title);
-        header.appendChild(closeBtn);
+    header.appendChild(title);
+    header.appendChild(closeBtn);
 
-        // Visor de PDF
-        const pdfViewer = document.createElement('iframe');
-        pdfViewer.src = pdfUrl;
-        pdfViewer.style.cssText = `
+    // Visor de PDF
+    const pdfViewer = document.createElement('iframe');
+    pdfViewer.src = pdfUrl;
+    pdfViewer.style.cssText = `
         flex: 1;
         border: none;
         width: 100%;
         background: #f5f5f5;
     `;
 
-        // Footer con botones de acción
-        const footer = document.createElement('div');
-        footer.style.cssText = `
+    // Footer con botones de acción
+    const footer = document.createElement('div');
+    footer.style.cssText = `
         padding: 20px;
         background: #f8f9fa;
         display: flex;
@@ -6169,10 +5294,10 @@ ${lineas.join('\n')}`;
         border-top: 2px solid #e9ecef;
     `;
 
-        // Botón Descargar
-        const btnDescargar = document.createElement('button');
-        btnDescargar.innerHTML = '💾 Descargar PDF';
-        btnDescargar.style.cssText = `
+    // Botón Descargar
+    const btnDescargar = document.createElement('button');
+    btnDescargar.innerHTML = '💾 Descargar PDF';
+    btnDescargar.style.cssText = `
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border: none;
@@ -6184,26 +5309,26 @@ ${lineas.join('\n')}`;
         transition: all 0.3s;
         box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
     `;
-        btnDescargar.onmouseover = () => {
-            btnDescargar.style.transform = 'translateY(-2px)';
-            btnDescargar.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
-        };
-        btnDescargar.onmouseout = () => {
-            btnDescargar.style.transform = 'translateY(0)';
-            btnDescargar.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
-        };
-        btnDescargar.onclick = () => {
-            const a = document.createElement('a');
-            a.href = pdfUrl;
-            a.download = filename;
-            a.click();
-            mostrarNotificacion('✅ PDF descargado correctamente', 'success');
-        };
+    btnDescargar.onmouseover = () => {
+        btnDescargar.style.transform = 'translateY(-2px)';
+        btnDescargar.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+    };
+    btnDescargar.onmouseout = () => {
+        btnDescargar.style.transform = 'translateY(0)';
+        btnDescargar.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+    };
+    btnDescargar.onclick = () => {
+        const a = document.createElement('a');
+        a.href = pdfUrl;
+        a.download = filename;
+        a.click();
+        mostrarNotificacion('✅ PDF descargado correctamente', 'success');
+    };
 
-        // Botón Abrir en Nueva Ventana
-        const btnNuevaVentana = document.createElement('button');
-        btnNuevaVentana.innerHTML = '🔗 Abrir en Nueva Ventana';
-        btnNuevaVentana.style.cssText = `
+    // Botón Abrir en Nueva Ventana
+    const btnNuevaVentana = document.createElement('button');
+    btnNuevaVentana.innerHTML = '🔗 Abrir en Nueva Ventana';
+    btnNuevaVentana.style.cssText = `
         background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         color: white;
         border: none;
@@ -6215,23 +5340,23 @@ ${lineas.join('\n')}`;
         transition: all 0.3s;
         box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
     `;
-        btnNuevaVentana.onmouseover = () => {
-            btnNuevaVentana.style.transform = 'translateY(-2px)';
-            btnNuevaVentana.style.boxShadow = '0 6px 20px rgba(240, 147, 251, 0.5)';
-        };
-        btnNuevaVentana.onmouseout = () => {
-            btnNuevaVentana.style.transform = 'translateY(0)';
-            btnNuevaVentana.style.boxShadow = '0 4px 15px rgba(240, 147, 251, 0.4)';
-        };
-        btnNuevaVentana.onclick = () => {
-            window.open(pdfUrl, '_blank');
-            mostrarNotificacion('✅ PDF abierto en nueva ventana', 'info');
-        };
+    btnNuevaVentana.onmouseover = () => {
+        btnNuevaVentana.style.transform = 'translateY(-2px)';
+        btnNuevaVentana.style.boxShadow = '0 6px 20px rgba(240, 147, 251, 0.5)';
+    };
+    btnNuevaVentana.onmouseout = () => {
+        btnNuevaVentana.style.transform = 'translateY(0)';
+        btnNuevaVentana.style.boxShadow = '0 4px 15px rgba(240, 147, 251, 0.4)';
+    };
+    btnNuevaVentana.onclick = () => {
+        window.open(pdfUrl, '_blank');
+        mostrarNotificacion('✅ PDF abierto en nueva ventana', 'info');
+    };
 
-        // Botón WhatsApp
-        const btnWhatsApp = document.createElement('button');
-        btnWhatsApp.innerHTML = '📱 Compartir por WhatsApp';
-        btnWhatsApp.style.cssText = `
+    // Botón WhatsApp
+    const btnWhatsApp = document.createElement('button');
+    btnWhatsApp.innerHTML = '📱 Compartir por WhatsApp';
+    btnWhatsApp.style.cssText = `
         background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
         color: white;
         border: none;
@@ -6243,37 +5368,37 @@ ${lineas.join('\n')}`;
         transition: all 0.3s;
         box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
     `;
-        btnWhatsApp.onmouseover = () => {
-            btnWhatsApp.style.transform = 'translateY(-2px)';
-            btnWhatsApp.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.5)';
-        };
-        btnWhatsApp.onmouseout = () => {
-            btnWhatsApp.style.transform = 'translateY(0)';
-            btnWhatsApp.style.boxShadow = '0 4px 15px rgba(37, 211, 102, 0.4)';
-        };
-        btnWhatsApp.onclick = () => {
-            // Primero descargar el archivo
-            const a = document.createElement('a');
-            a.href = pdfUrl;
-            a.download = filename;
-            a.click();
+    btnWhatsApp.onmouseover = () => {
+        btnWhatsApp.style.transform = 'translateY(-2px)';
+        btnWhatsApp.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.5)';
+    };
+    btnWhatsApp.onmouseout = () => {
+        btnWhatsApp.style.transform = 'translateY(0)';
+        btnWhatsApp.style.boxShadow = '0 4px 15px rgba(37, 211, 102, 0.4)';
+    };
+    btnWhatsApp.onclick = () => {
+        // Primero descargar el archivo
+        const a = document.createElement('a');
+        a.href = pdfUrl;
+        a.download = filename;
+        a.click();
 
-            // Mostrar instrucciones
-            const mensaje = 'El PDF se ha descargado. Para compartirlo por WhatsApp:\n\n' +
-                '1. Abre WhatsApp\n' +
-                '2. Selecciona el contacto\n' +
-                '3. Toca el ícono de adjuntar (📎)\n' +
-                '4. Selecciona "Documento"\n' +
-                '5. Busca y selecciona el PDF descargado';
+        // Mostrar instrucciones
+        const mensaje = 'El PDF se ha descargado. Para compartirlo por WhatsApp:\n\n' +
+            '1. Abre WhatsApp\n' +
+            '2. Selecciona el contacto\n' +
+            '3. Toca el ícono de adjuntar (📎)\n' +
+            '4. Selecciona "Documento"\n' +
+            '5. Busca y selecciona el PDF descargado';
 
-            alert(mensaje);
-            mostrarNotificacion('💡 Sigue las instrucciones para compartir', 'info');
-        };
+        alert(mensaje);
+        mostrarNotificacion('💡 Sigue las instrucciones para compartir', 'info');
+    };
 
-        // Botón Email
-        const btnEmail = document.createElement('button');
-        btnEmail.innerHTML = '📧 Enviar por Email';
-        btnEmail.style.cssText = `
+    // Botón Email
+    const btnEmail = document.createElement('button');
+    btnEmail.innerHTML = '📧 Enviar por Email';
+    btnEmail.style.cssText = `
         background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         color: white;
         border: none;
@@ -6285,40 +5410,40 @@ ${lineas.join('\n')}`;
         transition: all 0.3s;
         box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
     `;
-        btnEmail.onmouseover = () => {
-            btnEmail.style.transform = 'translateY(-2px)';
-            btnEmail.style.boxShadow = '0 6px 20px rgba(79, 172, 254, 0.5)';
-        };
-        btnEmail.onmouseout = () => {
-            btnEmail.style.transform = 'translateY(0)';
-            btnEmail.style.boxShadow = '0 4px 15px rgba(79, 172, 254, 0.4)';
-        };
-        btnEmail.onclick = () => {
-            // Primero descargar el archivo
-            const a = document.createElement('a');
-            a.href = pdfUrl;
-            a.download = filename;
-            a.click();
-
-            // Abrir cliente de email
-            const subject = encodeURIComponent('Plan de Dieta Personalizado');
-            const body = encodeURIComponent('Adjunto encontrarás tu plan de dieta personalizado en formato PDF.');
-            window.location.href = `mailto:?subject=${subject}&body=${body}`;
-
-            mostrarNotificacion('📧 Adjunta el PDF descargado a tu email', 'info');
-        };
-
-        // Agregar botones al footer
-        footer.appendChild(btnDescargar);
-        footer.appendChild(btnNuevaVentana);
-        footer.appendChild(btnWhatsApp);
-        footer.appendChild(btnEmail);
-
-        // Ensamblar modal
-        modalContent.appendChild(header);
-        modalContent.appendChild(pdfViewer);
-        modalContent.appendChild(footer);
-
-        modal.appendChild(modalContent);
-        document.body.appendChild(modal);
+    btnEmail.onmouseover = () => {
+        btnEmail.style.transform = 'translateY(-2px)';
+        btnEmail.style.boxShadow = '0 6px 20px rgba(79, 172, 254, 0.5)';
     };
+    btnEmail.onmouseout = () => {
+        btnEmail.style.transform = 'translateY(0)';
+        btnEmail.style.boxShadow = '0 4px 15px rgba(79, 172, 254, 0.4)';
+    };
+    btnEmail.onclick = () => {
+        // Primero descargar el archivo
+        const a = document.createElement('a');
+        a.href = pdfUrl;
+        a.download = filename;
+        a.click();
+
+        // Abrir cliente de email
+        const subject = encodeURIComponent('Plan de Dieta Personalizado');
+        const body = encodeURIComponent('Adjunto encontrarás tu plan de dieta personalizado en formato PDF.');
+        window.location.href = `mailto:?subject=${subject}&body=${body}`;
+
+        mostrarNotificacion('📧 Adjunta el PDF descargado a tu email', 'info');
+    };
+
+    // Agregar botones al footer
+    footer.appendChild(btnDescargar);
+    footer.appendChild(btnNuevaVentana);
+    footer.appendChild(btnWhatsApp);
+    footer.appendChild(btnEmail);
+
+    // Ensamblar modal
+    modalContent.appendChild(header);
+    modalContent.appendChild(pdfViewer);
+    modalContent.appendChild(footer);
+
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+};

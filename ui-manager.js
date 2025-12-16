@@ -81,9 +81,9 @@ class UIManager {
         const errorDiv = document.getElementById('loginError');
 
         errorDiv.textContent = '';
-        
+
         const result = await window.authManager.login(email, password);
-        
+
         if (result.success) {
             this.closeModal();
             this.showNotification('✅ Sesión iniciada correctamente', 'success');
@@ -133,8 +133,11 @@ class UIManager {
             `;
             document.getElementById('logoutBtn').addEventListener('click', this.handleLogout.bind(this));
             document.getElementById('misDietasBtn').addEventListener('click', this.showMisDietas.bind(this));
-            document.getElementById('btnGestorAlimentos').addEventListener('click', this.showGestorAlimentos.bind(this));
-            
+
+            document.getElementById('btnGestorAlimentos').addEventListener('click', () => {
+                window.location.href = 'admin-alimentos.html';
+            });
+
             // Agregar event listener para botón de clientes - con múltiples intentos
             const agregarListenerCliente = () => {
                 const btnClientes = document.getElementById('btnClientes');
@@ -142,12 +145,12 @@ class UIManager {
                     // Remover listeners anteriores para evitar duplicados
                     const nuevoBtn = btnClientes.cloneNode(true);
                     btnClientes.parentNode.replaceChild(nuevoBtn, btnClientes);
-                    
+
                     nuevoBtn.addEventListener('click', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         console.log('Botón Mis Clientes clicked');
-                        
+
                         if (window.clienteManager) {
                             console.log('Llamando a mostrarSeccionClientes');
                             window.clienteManager.mostrarSeccionClientes();
@@ -156,14 +159,14 @@ class UIManager {
                             alert('Error: Sistema de clientes no está cargado. Por favor, recarga la página.');
                         }
                     });
-                    
+
                     console.log('Event listener agregado al botón de clientes');
                 } else {
                     console.warn('Botón btnClientes no encontrado aún, reintentando...');
                     setTimeout(agregarListenerCliente, 200);
                 }
             };
-            
+
             // Intentar inmediatamente y también después de un delay
             agregarListenerCliente();
             setTimeout(agregarListenerCliente, 300);
@@ -191,19 +194,19 @@ class UIManager {
 
     async showMisDietas() {
         const result = await window.dietaService.obtenerDietasUsuario();
-        
+
         if (!result.success) {
             this.showNotification('❌ Error al cargar dietas: ' + result.error, 'error');
             return;
         }
 
         const dietas = result.dietas;
-        
+
         console.log(`📋 Mostrando ${dietas.length} dietas guardadas`);
         dietas.forEach((dieta, index) => {
             console.log(`   ${index + 1}. ID: ${dieta.id}, Nombre: ${dieta.nombre || 'Sin nombre'}, userId: ${dieta.userId || 'NO TIENE'}`);
         });
-        
+
         // Crear modal de dietas guardadas
         const modalHTML = `
             <div id="dietasModal" class="modal">
@@ -223,7 +226,7 @@ class UIManager {
         const modalContainer = document.createElement('div');
         modalContainer.innerHTML = modalHTML;
         document.body.appendChild(modalContainer.firstElementChild);
-        
+
         const modal = document.getElementById('dietasModal');
         const dietasList = document.getElementById('dietasList');
 
@@ -231,18 +234,18 @@ class UIManager {
             dietasList.innerHTML = '<p class="no-dietas">No tienes dietas guardadas aún.</p>';
         } else {
             dietasList.innerHTML = dietas.map(dieta => {
-                const fecha = dieta.fechaCreacion?.toDate ? 
-                    dieta.fechaCreacion.toDate().toLocaleDateString('es-ES') : 
+                const fecha = dieta.fechaCreacion?.toDate ?
+                    dieta.fechaCreacion.toDate().toLocaleDateString('es-ES') :
                     'Fecha no disponible';
-                
+
                 // Validar que el ID existe y no está vacío
                 if (!dieta.id || dieta.id.trim() === '') {
                     console.error(`❌ ERROR: Dieta sin ID válido:`, dieta);
                     return ''; // No mostrar dietas sin ID
                 }
-                
+
                 console.log(`📄 Renderizando dieta con ID: ${dieta.id}`);
-                
+
                 return `
                     <div class="dieta-card" data-dieta-id="${dieta.id}">
                         <div class="dieta-info">
@@ -265,18 +268,18 @@ class UIManager {
                 btn.addEventListener('click', async (e) => {
                     const dietaId = e.target.getAttribute('data-id');
                     console.log(`🖱️ Click en botón Cargar - ID obtenido del atributo data-id: ${dietaId}`);
-                    
+
                     // Verificar que el ID no esté vacío
                     if (!dietaId || dietaId.trim() === '') {
                         console.error('❌ ERROR: ID de dieta vacío o inválido');
                         this.showNotification('❌ Error: ID de dieta inválido', 'error');
                         return;
                     }
-                    
+
                     // También obtener el ID del card padre como respaldo
                     const dietaCard = e.target.closest('.dieta-card');
                     const dietaIdDelCard = dietaCard ? dietaCard.getAttribute('data-dieta-id') : null;
-                    
+
                     if (dietaIdDelCard && dietaIdDelCard !== dietaId) {
                         console.warn(`⚠️ ADVERTENCIA: ID del card (${dietaIdDelCard}) no coincide con ID del botón (${dietaId})`);
                         console.warn(`💡 Usando ID del card: ${dietaIdDelCard}`);
@@ -292,13 +295,13 @@ class UIManager {
                 btn.addEventListener('click', async (e) => {
                     const dietaId = e.target.getAttribute('data-id');
                     console.log(`🖱️ Click en botón Eliminar - ID: ${dietaId}`);
-                    
+
                     if (!dietaId || dietaId.trim() === '') {
                         console.error('❌ ERROR: ID de dieta vacío o inválido');
                         this.showNotification('❌ Error: ID de dieta inválido', 'error');
                         return;
                     }
-                    
+
                     if (confirm('¿Estás seguro de eliminar esta dieta?')) {
                         await this.eliminarDieta(dietaId);
                     }
@@ -326,22 +329,22 @@ class UIManager {
         try {
             console.log(`🔄 Iniciando carga de dieta con ID: ${dietaId}`);
             console.log(`📋 Tipo de ID: ${typeof dietaId}, Longitud: ${dietaId ? dietaId.length : 0}`);
-            
+
             if (!dietaId || dietaId.trim() === '') {
                 console.error('❌ ERROR: ID de dieta vacío o inválido');
                 this.showNotification('❌ Error: ID de dieta inválido', 'error');
                 return;
             }
-            
+
             const result = await window.dietaService.obtenerDietaPorId(dietaId);
-            
+
             if (!result.success) {
                 this.showNotification('❌ Error al cargar dieta: ' + result.error, 'error');
                 return;
             }
 
             const dieta = result.dieta || {};
-            
+
             // Guardar el ID de la dieta cargada para poder actualizarla después
             const dietaIdCargada = dieta.id || null;
             if (dietaIdCargada) {
@@ -350,7 +353,7 @@ class UIManager {
             } else {
                 window.dietaIdCargada = null;
             }
-            
+
             // Normalizar campos que pueden venir como Timestamp u otros formatos
             const dietaNormalizada = { ...dieta };
             if (dietaNormalizada.fechaRegistro && typeof dietaNormalizada.fechaRegistro.toDate === 'function') {
@@ -363,27 +366,27 @@ class UIManager {
             if (dietaNormalizada.fechaModificacion && typeof dietaNormalizada.fechaModificacion.toDate === 'function') {
                 dietaNormalizada.fechaModificacion = dietaNormalizada.fechaModificacion.toDate();
             }
-            
+
             // Guardar planSemana si existe antes de actualizar datosUsuario
             const planSemanaGuardado = dietaNormalizada.planSemana || null;
-            
+
             // Asegurar que el ID se mantiene en los datos normalizados
             if (dietaIdCargada && !dietaNormalizada.id) {
                 dietaNormalizada.id = dietaIdCargada;
                 console.log(`💾 ID agregado a datos normalizados: ${dietaIdCargada}`);
             }
-            
+
             if (typeof window.actualizarDatosUsuarioGlobal === 'function') {
                 window.actualizarDatosUsuarioGlobal(dietaNormalizada);
             } else {
                 window.datosUsuario = dietaNormalizada;
             }
-            
+
             // Verificar que el ID se mantiene después de actualizar
             if (window.datosUsuario && window.datosUsuario.id) {
                 console.log(`✅ ID verificado en datosUsuario: ${window.datosUsuario.id}`);
                 console.log(`✅ ID verificado en window.dietaIdCargada: ${window.dietaIdCargada}`);
-                
+
                 // Asegurar que ambos IDs coinciden
                 if (window.datosUsuario.id !== window.dietaIdCargada) {
                     console.warn(`⚠️ ADVERTENCIA: IDs no coinciden! datosUsuario.id=${window.datosUsuario.id}, dietaIdCargada=${window.dietaIdCargada}`);
@@ -399,7 +402,7 @@ class UIManager {
                     console.log(`💾 ID restaurado en datosUsuario: ${window.dietaIdCargada}`);
                 }
             }
-            
+
             // Rellenar el formulario con validación de elementos
             const campos = {
                 'nombre': dietaNormalizada.nombre || '',
@@ -413,7 +416,7 @@ class UIManager {
                 'prohibiciones': dietaNormalizada.prohibiciones || '',
                 'duracion': dietaNormalizada.duracion || 'semana'
             };
-            
+
             Object.entries(campos).forEach(([id, valor]) => {
                 const elemento = document.getElementById(id);
                 if (elemento) {
@@ -422,7 +425,7 @@ class UIManager {
                     console.warn(`⚠️ Elemento con id "${id}" no encontrado al cargar dieta`);
                 }
             });
-            
+
             // Marcar días de entrenamiento previamente guardados
             if (Array.isArray(dietaNormalizada.diasEntreno)) {
                 const diasEntreno = dietaNormalizada.diasEntreno.map(d => d.toLowerCase());
@@ -434,14 +437,14 @@ class UIManager {
             // Guardar valores de superávit antes de actualizar opciones
             const superavitEntrenoGuardado = dietaNormalizada.superavitEntreno;
             const superavitDescansoGuardado = dietaNormalizada.superavitDescanso;
-            
+
             // Actualizar opciones y etiquetas según el objetivo (siempre, para asegurar que las etiquetas sean correctas)
             if (dietaNormalizada.objetivo && typeof window.actualizarSuperavitPorObjetivo === 'function') {
                 // Esperar un momento para que los elementos estén listos
                 setTimeout(() => {
                     // Primero actualizar las opciones y etiquetas según el objetivo
                     window.actualizarSuperavitPorObjetivo();
-                    
+
                     // Luego, si hay valores guardados, restaurarlos (después de que las opciones estén actualizadas)
                     if (superavitEntrenoGuardado !== undefined) {
                         const superavitEntrenoElem = document.getElementById('superavitEntreno');
@@ -453,14 +456,14 @@ class UIManager {
                                 // Buscar el valor más cercano si el valor exacto no está disponible
                                 const opciones = Array.from(superavitEntrenoElem.options).map(opt => parseFloat(opt.value));
                                 const valorNum = parseFloat(valor);
-                                const masCercano = opciones.reduce((prev, curr) => 
+                                const masCercano = opciones.reduce((prev, curr) =>
                                     Math.abs(curr - valorNum) < Math.abs(prev - valorNum) ? curr : prev
                                 );
                                 superavitEntrenoElem.value = String(masCercano);
                             }
                         }
                     }
-                    
+
                     if (superavitDescansoGuardado !== undefined) {
                         const superavitDescansoElem = document.getElementById('superavitDescanso');
                         if (superavitDescansoElem) {
@@ -471,14 +474,14 @@ class UIManager {
                                 // Buscar el valor más cercano si el valor exacto no está disponible
                                 const opciones = Array.from(superavitDescansoElem.options).map(opt => parseFloat(opt.value));
                                 const valorNum = parseFloat(valor);
-                                const masCercano = opciones.reduce((prev, curr) => 
+                                const masCercano = opciones.reduce((prev, curr) =>
                                     Math.abs(curr - valorNum) < Math.abs(prev - valorNum) ? curr : prev
                                 );
                                 superavitDescansoElem.value = String(masCercano);
                             }
                         }
                     }
-                    
+
                     // Recalcular después de restaurar valores
                     if (superavitEntrenoGuardado !== undefined || superavitDescansoGuardado !== undefined) {
                         if (typeof recalcularIngestasPorSuperavit === 'function') {
@@ -496,7 +499,7 @@ class UIManager {
                     'grasas': dietaNormalizada.grasas || '',
                     'carbohidratos': dietaNormalizada.carbohidratos || ''
                 };
-                
+
                 Object.entries(macroCampos).forEach(([id, valor]) => {
                     const elemento = document.getElementById(id);
                     if (elemento) {
@@ -515,10 +518,10 @@ class UIManager {
             if (window.marcarOperacionCritica) {
                 window.marcarOperacionCritica(true);
             }
-            
+
             // Esperar un momento antes de mostrar resultados para asegurar que todo esté listo
             await new Promise(resolve => setTimeout(resolve, 300));
-            
+
             // Cargar planSemana en tablaEditable si existe y está en modo manual
             if (planSemanaGuardado && dietaNormalizada.modoGeneracion === 'manual' && window.tablaEditable) {
                 try {
@@ -552,7 +555,7 @@ class UIManager {
             }
 
             this.showNotification('✅ Dieta cargada correctamente', 'success');
-            
+
             // Scroll al inicio
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
@@ -570,10 +573,10 @@ class UIManager {
         }
 
         const result = await window.dietaService.eliminarDieta(dietaId);
-        
+
         if (result.success) {
             this.showNotification('✅ Dieta eliminada correctamente', 'success');
-            
+
             // Eliminar visualmente la tarjeta del DOM inmediatamente
             const dietaCard = document.querySelector(`.btn-eliminar[data-id="${dietaId}"]`).closest('.dieta-card');
             if (dietaCard) {
@@ -582,7 +585,7 @@ class UIManager {
                 dietaCard.style.transform = 'scale(0.9)';
                 setTimeout(() => {
                     dietaCard.remove();
-                    
+
                     // Verificar si quedan dietas
                     const dietasList = document.getElementById('dietasList');
                     if (dietasList && dietasList.children.length === 0) {
@@ -605,7 +608,7 @@ class UIManager {
     showGestorAlimentos() {
         // Verificar si ya existe el modal
         let modal = document.getElementById('gestorAlimentosModal');
-        
+
         if (!modal) {
             // Crear modal del gestor de alimentos
             const modalHTML = `
@@ -619,17 +622,17 @@ class UIManager {
                     </div>
                 </div>
             `;
-            
+
             const modalContainer = document.createElement('div');
             modalContainer.innerHTML = modalHTML;
             document.body.appendChild(modalContainer.firstElementChild);
             modal = document.getElementById('gestorAlimentosModal');
-            
+
             // Cerrar modal
             modal.querySelector('.close-modal').addEventListener('click', () => {
                 modal.style.display = 'none';
             });
-            
+
             // Cargar contenido del admin después de un pequeño delay para asegurar que los scripts estén cargados
             setTimeout(() => {
                 this.cargarContenidoGestorAlimentos();
@@ -638,7 +641,7 @@ class UIManager {
             // Si el modal ya existe, asegurar que el contenido se cargue
             this.cargarContenidoGestorAlimentos();
         }
-        
+
         modal.style.display = 'block';
     }
 
@@ -648,19 +651,19 @@ class UIManager {
             console.error('⚠️ No se encontró el elemento gestorAlimentosContent');
             return;
         }
-        
+
         // Esperar un momento para asegurar que gestorAlimentosManager esté disponible
         let intentos = 0;
         while (!window.gestorAlimentosManager && intentos < 20) {
             await new Promise(resolve => setTimeout(resolve, 100));
             intentos++;
         }
-        
+
         // Si aún no está disponible, intentar inicializarlo manualmente
         if (!window.gestorAlimentosManager) {
             // Intentar obtener la clase desde window o desde el scope global
             const GestorClass = window.GestorAlimentosManager || (typeof GestorAlimentosManager !== 'undefined' ? GestorAlimentosManager : null);
-            
+
             if (GestorClass) {
                 console.log('🔧 Inicializando GestorAlimentosManager manualmente...');
                 try {
@@ -691,7 +694,7 @@ class UIManager {
                 return;
             }
         }
-        
+
         // Usar el gestor de alimentos integrado
         if (window.gestorAlimentosManager) {
             try {
