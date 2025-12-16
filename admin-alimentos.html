@@ -316,8 +316,8 @@
         /* 2. Marca (NEW) */
         th:nth-child(2),
         td:nth-child(2) {
-            min-width: 120px;
-            max-width: 200px;
+            min-width: 130px;
+            max-width: 220px;
             text-align: left;
         }
 
@@ -326,7 +326,8 @@
         td:nth-child(3),
         th:nth-child(4),
         td:nth-child(4) {
-            min-width: 110px;
+            min-width: 150px;
+            /* Increased from 110px to prevent badge truncation */
         }
 
         /* 4. Numeric columns - Center and fixed width */
@@ -354,8 +355,8 @@
         /* Kcal */
             {
             text-align: center;
-            width: 70px;
-            min-width: 70px;
+            min-width: 85px;
+            /* Increased from 70px for breathability */
         }
 
         /* 4. Actions */
@@ -1124,10 +1125,10 @@
                 tr.innerHTML = `
                     <td><strong style="color: #1a1a1a; font-size: 1.05em; letter-spacing: 0.3px;">${nombre}</strong></td>
                     <td style="color: #555; font-weight: 600;">${marca}</td>
-                    <td><span style="padding: 2px 6px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); color: #1565c0; border-radius: 8px; font-size: 0.65em; font-weight: 700; display: inline-block; box-shadow: 0 1px 2px rgba(21, 101, 192, 0.15); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${categoria}</span></td>
-                    <td><span style="padding: 2px 6px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); color: #6a1b9a; border-radius: 8px; font-size: 0.65em; font-weight: 600; display: inline-block; box-shadow: 0 1px 2px rgba(106, 27, 154, 0.15); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${subcategoria}</span></td>
-                    <td style="color: #757575; font-size: 0.88em; font-weight: 500;">${peso || '<span style="color: #bdbdbd;">-</span>'}</td>
-                    <td style="font-weight: 700; color: #c2185b; font-size: 0.95em;">${proteinas.toFixed(1)}<span style="font-size: 0.85em; font-weight: 500; color: #999;">g</span></td>
+                    <td><span style="padding: 4px 8px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); color: #1565c0; border-radius: 6px; font-size: 0.75em; font-weight: 700; display: inline-block; box-shadow: 0 1px 2px rgba(21, 101, 192, 0.15); white-space: nowrap;">${categoria}</span></td>
+                    <td><span style="padding: 4px 8px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); color: #6a1b9a; border-radius: 6px; font-size: 0.75em; font-weight: 600; display: inline-block; box-shadow: 0 1px 2px rgba(106, 27, 154, 0.15); white-space: nowrap;">${subcategoria}</span></td>
+                    <td style="color: #757575; font-size: 0.9em; font-weight: 500;">${peso || '<span style="color: #bdbdbd;">-</span>'}</td>
+                    <td style="font-weight: 700; color: #c2185b; font-size: 1em;">${proteinas.toFixed(1)}</td>
                     <td style="color: #757575; font-size: 0.88em; font-weight: 500;">${grasasSaturadas === '-' || grasasSaturadas === 'Irrelevante' ? '<span style="color: #bdbdbd;">-</span>' : parseFloat(grasasSaturadas).toFixed(1) + '<span style="font-size: 0.85em;">g</span>'}</td>
                     <td style="font-weight: 700; color: #f57c00; font-size: 0.95em;">${carbohidratos.toFixed(1)}<span style="font-size: 0.85em; font-weight: 500; color: #999;">g</span></td>
                     <td style="font-weight: 700; color: #388e3c; font-size: 0.95em;">${grasas.toFixed(1)}<span style="font-size: 0.85em; font-weight: 500; color: #999;">g</span></td>
