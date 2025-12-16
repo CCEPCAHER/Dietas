@@ -1,6 +1,6 @@
 // Service Worker para MAIKA PORCUNA - PWA
 // Versión actualizada para auto-actualización automática
-const CACHE_NAME = 'maika-porcuna-v5.0.1';
+const CACHE_NAME = 'maika-porcuna-v5.0.2';
 const BASE_PATH = self.location.pathname.replace(/sw\.js$/, '');
 const urlsToCache = [
   './',
@@ -35,7 +35,7 @@ self.addEventListener('install', (event) => {
   console.log('Service Worker: Instalando versión', CACHE_NAME);
   // Forzar activación inmediata para aplicar actualizaciones
   self.skipWaiting();
-  
+
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -71,21 +71,21 @@ self.addEventListener('activate', (event) => {
 // Interceptar peticiones - Estrategia Network First para siempre obtener la versión más reciente
 self.addEventListener('fetch', (event) => {
   // No cachear peticiones a Firebase (siempre usar red)
-  if (event.request.url.includes('firebase') || 
-      event.request.url.includes('googleapis') ||
-      event.request.url.includes('gstatic')) {
+  if (event.request.url.includes('firebase') ||
+    event.request.url.includes('googleapis') ||
+    event.request.url.includes('gstatic')) {
     return; // Dejar que Firebase maneje su propia cache
   }
-  
+
   // No cachear librerías PDF/Excel - siempre usar red para obtener la versión más reciente
-  if (event.request.url.includes('html2pdf') || 
-      event.request.url.includes('html2canvas') ||
-      event.request.url.includes('jspdf') ||
-      event.request.url.includes('exceljs') ||
-      event.request.url.includes('FileSaver') ||
-      event.request.url.includes('cdnjs.cloudflare.com') ||
-      event.request.url.includes('cdn.jsdelivr.net') ||
-      event.request.url.includes('unpkg.com')) {
+  if (event.request.url.includes('html2pdf') ||
+    event.request.url.includes('html2canvas') ||
+    event.request.url.includes('jspdf') ||
+    event.request.url.includes('exceljs') ||
+    event.request.url.includes('FileSaver') ||
+    event.request.url.includes('cdnjs.cloudflare.com') ||
+    event.request.url.includes('cdn.jsdelivr.net') ||
+    event.request.url.includes('unpkg.com')) {
     // Para librerías externas, siempre usar red y no cachear
     event.respondWith(
       fetch(event.request, { cache: 'no-store' })
@@ -104,7 +104,8 @@ self.addEventListener('fetch', (event) => {
 
   event.respondWith(
     // ESTRATEGIA NETWORK FIRST: Intentar red primero, luego cache
-    fetch(event.request)
+    // IMPORTANTE: Usar { cache: 'reload' } para forzar la petición a la red y saltar la cache del navegador
+    fetch(event.request, { cache: 'reload' })
       .then((response) => {
         // Si la respuesta es válida, actualizar cache y retornar
         if (response && response.status === 200 && response.type === 'basic') {
@@ -118,19 +119,20 @@ self.addEventListener('fetch', (event) => {
         // Si falla, intentar desde cache
         throw new Error('Network response not ok');
       })
-      .catch(() => {
+      .catch((err) => {
         // Si falla la red, usar cache
+        console.log('Fetch falló, usando cache:', err);
         return caches.match(event.request)
           .then((cachedResponse) => {
             if (cachedResponse) {
               return cachedResponse;
             }
             // Si es una petición HTML y no hay cache, retornar index.html
-            if (event.request.headers.get('accept') && 
-                event.request.headers.get('accept').includes('text/html')) {
-              return caches.match('./index.html') || 
-                     caches.match('./') || 
-                     caches.match('index.html');
+            if (event.request.headers.get('accept') &&
+              event.request.headers.get('accept').includes('text/html')) {
+              return caches.match('./index.html') ||
+                caches.match('./') ||
+                caches.match('index.html');
             }
           });
       })
