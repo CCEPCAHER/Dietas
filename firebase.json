@@ -11,8 +11,7 @@
       "**/node_modules/**",
       "*.md",
       "generar_iconos.py",
-      "desplegar-reglas.bat",
-      "admin-alimentos.html"
+      "desplegar-reglas.bat"
     ],
     "rewrites": [
       {
