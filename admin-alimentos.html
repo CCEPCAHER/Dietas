@@ -911,20 +911,25 @@
                 background: transparent;
                 /* Permitir scroll suave en touch */
                 -webkit-overflow-scrolling: touch;
+                overflow-x: auto;
+                /* Asegurar scroll horizontal */
+            }
+
+            table {
+                min-width: 1000px;
+                /* Forzar ancho mínimo para evitar aplastamiento */
+                table-layout: fixed;
+                /* Mejor control de anchos */
             }
 
             /* Reducir padding y tamaño de fuente en celdas para aprovechar espacio */
             th,
             td {
-                padding: 8px 4px;
-                /* Padding vertical decente, horizontal mínimo */
-                font-size: 0.8rem;
-                /* Letra legible pero pequeña */
+                padding: 8px 6px;
+                font-size: 0.85rem;
                 white-space: nowrap;
-                /* Evitar saltos de línea por defecto */
-                min-width: unset !important;
-                /* Resetear anchos mínimos forzados */
-                max-width: unset !important;
+                min-width: 60px;
+                /* Restaurar ancho mínimo */
             }
 
             /* Ajustes cabecera sticky */
