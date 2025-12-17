@@ -5136,374 +5136,17 @@ ${lineas.join('\n')}`;
         });
     }
 
-    const btnDescargarExcel = document.getElementById('btnDescargarExcel');
-    if (btnDescargarExcel) {
-        btnDescargarExcel.replaceWith(btnDescargarExcel.cloneNode(true));
-        const nuevoBtnExcel = document.getElementById('btnDescargarExcel');
-        nuevoBtnExcel.addEventListener('click', function () {
+    
+const btnDescargarExcel = document.getElementById('btnDescargarExcel');
+if (btnDescargarExcel) {
+    btnDescargarExcel.replaceWith(btnDescargarExcel.cloneNode(true));
+    const nuevoBtnExcel = document.getElementById('btnDescargarExcel');
+    nuevoBtnExcel.addEventListener('click', function () {
+        if (typeof exportarExcelProfesional === 'function') {
             exportarExcelProfesional();
-        });
-    }
+        } else {
+            console.error('exportarExcelProfesional no definido');
+        }
+    });
 }
-
-// Hacer función global
-window.mostrarNotificacion = function (mensaje, tipo = 'info') {
-    const notificacion = document.createElement('div');
-    notificacion.className = `notificacion notificacion-${tipo}`;
-    notificacion.textContent = mensaje;
-
-    notificacion.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 25px;
-        background: ${tipo === 'success' ? '#28a745' : tipo === 'error' ? '#dc3545' : '#17a2b8'};
-        color: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        z-index: 10000;
-        animation: slideIn 0.3s ease;
-        font-weight: 600;
-        max-width: 300px;
-    `;
-
-    document.body.appendChild(notificacion);
-
-    setTimeout(() => {
-        notificacion.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => {
-            document.body.removeChild(notificacion);
-        }, 300);
-    }, 3000);
-};
-
-// Función para mostrar vista previa del PDF con opciones de descarga/compartir
-window.mostrarPreviewPDF = function (pdfUrl, pdfBlob, filename) {
-    // Crear modal de previsualización
-    const modal = document.createElement('div');
-    modal.id = 'pdfPreviewModal';
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.85);
-        z-index: 99999;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        animation: fadeIn 0.3s ease;
-    `;
-
-    // Contenedor del modal
-    const modalContent = document.createElement('div');
-    modalContent.style.cssText = `
-        background: white;
-        border-radius: 12px;
-        width: 90%;
-        max-width: 1000px;
-        height: 90%;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        overflow: hidden;
-    `;
-
-    // Header del modal
-    const header = document.createElement('div');
-    header.style.cssText = `
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-radius: 12px 12px 0 0;
-    `;
-
-    const title = document.createElement('h3');
-    title.textContent = '📄 Vista Previa del PDF';
-    title.style.cssText = `
-        margin: 0;
-        font-size: 1.5em;
-        font-weight: 600;
-    `;
-
-    const closeBtn = document.createElement('button');
-    closeBtn.innerHTML = '✕';
-    closeBtn.style.cssText = `
-        background: rgba(255, 255, 255, 0.95);
-        border: none;
-        color: #dc3545;
-        font-size: 36px;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: bold;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        line-height: 1;
-    `;
-    closeBtn.onmouseover = () => {
-        closeBtn.style.background = 'rgba(255, 255, 255, 1)';
-        closeBtn.style.color = '#c82333';
-        closeBtn.style.transform = 'scale(1.1)';
-        closeBtn.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
-    };
-    closeBtn.onmouseout = () => {
-        closeBtn.style.background = 'rgba(255, 255, 255, 0.95)';
-        closeBtn.style.color = '#dc3545';
-        closeBtn.style.transform = 'scale(1)';
-        closeBtn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
-    };
-    closeBtn.onclick = () => {
-        URL.revokeObjectURL(pdfUrl);
-        document.body.removeChild(modal);
-    };
-
-    header.appendChild(title);
-    header.appendChild(closeBtn);
-
-    // Visor de PDF
-    const pdfViewer = document.createElement('iframe');
-    pdfViewer.src = pdfUrl;
-    pdfViewer.style.cssText = `
-        flex: 1;
-        border: none;
-        width: 100%;
-        background: #f5f5f5;
-    `;
-
-    // Footer con botones de acción
-    const footer = document.createElement('div');
-    footer.style.cssText = `
-        padding: 20px;
-        background: #f8f9fa;
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        flex-wrap: wrap;
-        border-radius: 0 0 12px 12px;
-        border-top: 2px solid #e9ecef;
-    `;
-
-    // Botón Descargar
-    const btnDescargar = document.createElement('button');
-    btnDescargar.innerHTML = '💾 Descargar PDF';
-    btnDescargar.style.cssText = `
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    `;
-    btnDescargar.onmouseover = () => {
-        btnDescargar.style.transform = 'translateY(-2px)';
-        btnDescargar.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
-    };
-    btnDescargar.onmouseout = () => {
-        btnDescargar.style.transform = 'translateY(0)';
-        btnDescargar.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
-    };
-    btnDescargar.onclick = () => {
-        const a = document.createElement('a');
-        a.href = pdfUrl;
-        a.download = filename;
-        a.click();
-        mostrarNotificacion('✅ PDF descargado correctamente', 'success');
-    };
-
-    // Botón Abrir en Nueva Ventana
-    const btnNuevaVentana = document.createElement('button');
-    btnNuevaVentana.innerHTML = '🔗 Abrir en Nueva Ventana';
-    btnNuevaVentana.style.cssText = `
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
-    `;
-    btnNuevaVentana.onmouseover = () => {
-        btnNuevaVentana.style.transform = 'translateY(-2px)';
-        btnNuevaVentana.style.boxShadow = '0 6px 20px rgba(240, 147, 251, 0.5)';
-    };
-    btnNuevaVentana.onmouseout = () => {
-        btnNuevaVentana.style.transform = 'translateY(0)';
-        btnNuevaVentana.style.boxShadow = '0 4px 15px rgba(240, 147, 251, 0.4)';
-    };
-    btnNuevaVentana.onclick = () => {
-        window.open(pdfUrl, '_blank');
-        mostrarNotificacion('✅ PDF abierto en nueva ventana', 'info');
-    };
-
-    // Botón WhatsApp
-    const btnWhatsApp = document.createElement('button');
-    btnWhatsApp.innerHTML = '📱 Compartir por WhatsApp';
-    btnWhatsApp.style.cssText = `
-        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
-    `;
-    btnWhatsApp.onmouseover = () => {
-        btnWhatsApp.style.transform = 'translateY(-2px)';
-        btnWhatsApp.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.5)';
-    };
-    btnWhatsApp.onmouseout = () => {
-        btnWhatsApp.style.transform = 'translateY(0)';
-        btnWhatsApp.style.boxShadow = '0 4px 15px rgba(37, 211, 102, 0.4)';
-    };
-    btnWhatsApp.onclick = () => {
-        // Primero descargar el archivo
-        const a = document.createElement('a');
-        a.href = pdfUrl;
-        a.download = filename;
-        a.click();
-
-        // Mostrar instrucciones
-        const mensaje = 'El PDF se ha descargado. Para compartirlo por WhatsApp:\n\n' +
-            '1. Abre WhatsApp\n' +
-            '2. Selecciona el contacto\n' +
-            '3. Toca el ícono de adjuntar (📎)\n' +
-            '4. Selecciona "Documento"\n' +
-            '5. Busca y selecciona el PDF descargado';
-
-        alert(mensaje);
-        mostrarNotificacion('💡 Sigue las instrucciones para compartir', 'info');
-    };
-
-    // Botón Email
-    const btnEmail = document.createElement('button');
-    btnEmail.innerHTML = '📧 Enviar por Email';
-    btnEmail.style.cssText = `
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
-    `;
-    btnEmail.onmouseover = () => {
-        btnEmail.style.transform = 'translateY(-2px)';
-        btnEmail.style.boxShadow = '0 6px 20px rgba(79, 172, 254, 0.5)';
-    };
-    btnEmail.onmouseout = () => {
-        btnEmail.style.transform = 'translateY(0)';
-        btnEmail.style.boxShadow = '0 4px 15px rgba(79, 172, 254, 0.4)';
-    };
-    btnEmail.onclick = () => {
-        // Primero descargar el archivo
-        const a = document.createElement('a');
-        a.href = pdfUrl;
-        a.download = filename;
-        a.click();
-
-        // Abrir cliente de email
-        const subject = encodeURIComponent('Plan de Dieta Personalizado');
-        const body = encodeURIComponent('Adjunto encontrarás tu plan de dieta personalizado en formato PDF.');
-        window.location.href = `mailto:?subject=${subject}&body=${body}`;
-
-        mostrarNotificacion('📧 Adjunta el PDF descargado a tu email', 'info');
-    };
-
-    // Agregar botones al footer
-    footer.appendChild(btnDescargar);
-    footer.appendChild(btnNuevaVentana);
-    footer.appendChild(btnWhatsApp);
-    footer.appendChild(btnEmail);
-
-    // Ensamblar modal
-    modalContent.appendChild(header);
-    modalContent.appendChild(pdfViewer);
-    modalContent.appendChild(footer);
-
-    modal.appendChild(modalContent);
-    document.body.appendChild(modal);
-};
- 
- / *    
-       A U T O M A T I C   R E L C A L C U L A T I O N   L O G I C    
-       T r i g g e r e d   o n   c h a n g e s   t o   G o a l ,   A c t i v i t y ,   o r   a n t h r o p o m e t r i c   d a t a    
- * /  
-  
- f u n c t i o n   s e t u p A u t o C a l c u l a t i o n ( )   {  
-         c o n s o l e . l o g ( " � �� �   S e t t i n g   u p   a u t o - c a l c u l a t i o n   l i s t e n e r s . . . " ) ;  
-         c o n s t   t r i g g e r F i e l d s   =   [  
-                 ' o b j e t i v o ' ,  
-                 ' t i p o P e r s o n a ' ,  
-                 ' a c t i v i d a d F i s i c a D e p o r t e ' ,  
-                 ' e d a d ' ,  
-                 ' p e s o ' ,  
-                 ' a l t u r a ' ,  
-                 ' s e x o ' ,  
-                 ' t i p o T e r m o g e n i c o ' ,  
-                 ' s u p e r a v i t E n t r e n o ' ,  
-                 ' s u p e r a v i t D e s c a n s o '  
-         ] ;  
-  
-         t r i g g e r F i e l d s . f o r E a c h ( i d   = >   {  
-                 c o n s t   e l e m e n t   =   d o c u m e n t . g e t E l e m e n t B y I d ( i d ) ;  
-                 i f   ( e l e m e n t )   {  
-                         / /   U s e   ' i n p u t '   f o r   t e x t / n u m b e r   f i e l d s   t o   c a t c h   t y p i n g ,   ' c h a n g e '   f o r   s e l e c t s  
-                         c o n s t   e v e n t T y p e   =   ( e l e m e n t . t a g N a m e   = = =   ' S E L E C T '   | |   e l e m e n t . t y p e   = = =   ' c h e c k b o x '   | |   e l e m e n t . t y p e   = = =   ' r a d i o ' )   ?   ' c h a n g e '   :   ' i n p u t ' ;  
-  
-                         e l e m e n t . a d d E v e n t L i s t e n e r ( e v e n t T y p e ,   f u n c t i o n   ( )   {  
-                                 / /   O n l y   c a l c u l a t e   i f   e s s e n t i a l   f i e l d s   a r e   f i l l e d  
-                                 c o n s t   r e q u i r e d I d s   =   [ ' e d a d ' ,   ' p e s o ' ,   ' a l t u r a ' ,   ' s e x o ' ] ;  
-                                 c o n s t   a l l F i l l e d   =   r e q u i r e d I d s . e v e r y ( r e q I d   = >   {  
-                                         c o n s t   e l   =   d o c u m e n t . g e t E l e m e n t B y I d ( r e q I d ) ;  
-                                         r e t u r n   e l   & &   e l . v a l u e   ! = =   ' ' ;  
-                                 } ) ;  
-  
-                                 i f   ( a l l F i l l e d )   {  
-                                         c o n s o l e . l o g ( ` � �� �   R e c a l c u l a t i n g   m a c r o s   d u e   t o   c h a n g e   i n   $ { i d } ` ) ;  
-                                         t r y   {  
-                                                 c a l c u l a r M a c r o n u t r i e n t e s ( ) ;  
-  
-                                                 / /   A l s o   u p d a t e   T M B   v i s u a l   i f   f u n c t i o n   e x i s t s  
-                                                 i f   ( t y p e o f   m o s t r a r I n f o U s u a r i o   = = =   ' f u n c t i o n '   & &   w i n d o w . d a t o s U s u a r i o   & &   w i n d o w . d a t o s U s u a r i o . t m b )   {  
-                                                         m o s t r a r I n f o U s u a r i o ( ) ;  
-                                                 }  
-                                         }   c a t c h   ( e )   {  
-                                                 c o n s o l e . e r r o r ( " E r r o r   a u t o - c a l c u l a t i n g : " ,   e ) ;  
-                                         }  
-                                 }  
-                         } ) ;  
-                 }  
-         } ) ;  
- }  
-  
- / /   I n i t i a l i z e   o n   l o a d  
- i f   ( d o c u m e n t . r e a d y S t a t e   = = =   ' l o a d i n g ' )   {  
-         d o c u m e n t . a d d E v e n t L i s t e n e r ( ' D O M C o n t e n t L o a d e d ' ,   s e t u p A u t o C a l c u l a t i o n ) ;  
- }   e l s e   {  
-         s e t u p A u t o C a l c u l a t i o n ( ) ;  
- }  
- 
+}); // End DOMContentLoaded

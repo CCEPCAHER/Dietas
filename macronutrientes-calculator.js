@@ -18,11 +18,11 @@ const MacronutrientesCalculator = {
         const peso = parseFloat(formulario.peso?.value) || datosUsuario.peso;
         const objetivo = formulario.objetivo?.value || datosUsuario.objetivo;
         const tipoPersona = formulario.tipoPersona?.value || datosUsuario.tipoPersona;
-        
+
         // Obtener valores del formulario (pueden no estar en datosUsuario aún)
-        const actividadFisicaDeporte = formulario.actividadFisicaDeporte?.value || 
-                                       datosUsuario.actividadFisicaDeporte || 'moderada';
-        
+        const actividadFisicaDeporte = formulario.actividadFisicaDeporte?.value ||
+            datosUsuario.actividadFisicaDeporte || 'moderada';
+
         // Mapear tipoPersona a tipoTermogenico si no está definido
         let tipoTermogenico = formulario.tipoTermogenico?.value || datosUsuario.tipoTermogenico;
         if (!tipoTermogenico) {
@@ -36,46 +36,67 @@ const MacronutrientesCalculator = {
                 tipoTermogenico = 'no-sedentaria';
             }
         }
-        
-        const superavitEntrenoRaw = parseFloat(formulario.superavitEntreno?.value || 
-                                            datosUsuario.superavitEntreno || 5);
-        const superavitDescansoRaw = parseFloat(formulario.superavitDescanso?.value || 
-                                             datosUsuario.superavitDescanso || 5);
-        
+
         // Determinar si es déficit o superávit según el objetivo
-        // Si el objetivo es "perder peso" o "adelgazar", los valores positivos se interpretan como déficit (negativos)
         const objetivoNormalizado = (objetivo || '').toString().toLowerCase();
-        const esDeficit = objetivoNormalizado === 'adelgazar' || objetivoNormalizado === 'perder peso' || objetivoNormalizado === 'perder grasa';
-        
+        const esDeficit = objetivoNormalizado.includes('adelgazar') ||
+            objetivoNormalizado.includes('perder');
+        const esMantener = objetivoNormalizado.includes('mantener');
+
+        // DEBUG LOGS
+        console.log('--- CALC DEBUG ---');
+        console.log('Objetivo Raw:', objetivo);
+        console.log('Objetivo Norm:', objetivoNormalizado);
+        console.log('Es Deficit:', esDeficit, 'Es Mantener:', esMantener);
+
+        // Definir valores base por defecto según objetivo
+        let defaultSurplus = 5;
+        if (esDeficit) defaultSurplus = 15; // 15% déficit por defecto
+        if (objetivoNormalizado.includes('aumentar')) defaultSurplus = 15; // 15% superávit
+        if (esMantener) defaultSurplus = 0; // 0% para mantenimiento
+
+        console.log('Default Surplus:', defaultSurplus);
+
+        // Usar valor del formulario si existe, o el default calculado. 
+        // NO usar datosUsuario.superavitEntreno para evitar persistencia de valores de otros objetivos.
+        const superavitEntrenoRaw = formulario.superavitEntreno?.value ?
+            parseFloat(formulario.superavitEntreno.value) : defaultSurplus;
+
+        const superavitDescansoRaw = formulario.superavitDescanso?.value ?
+            parseFloat(formulario.superavitDescanso.value) : defaultSurplus;
+
         // Convertir valores a negativos si es déficit
         const superavitEntreno = esDeficit ? -superavitEntrenoRaw : superavitEntrenoRaw;
         const superavitDescanso = esDeficit ? -superavitDescansoRaw : superavitDescansoRaw;
-        
+
+        console.log('Superavit Entreno:', superavitEntreno);
+        console.log('------------------');
+
         // Obtener días de entrenamiento
         const diasEntrenoCheckboxes = document.querySelectorAll('input[name="diaEntreno"]:checked');
         const diasEntreno = Array.from(diasEntrenoCheckboxes).map(cb => cb.value);
-        
+
         // Calcular TMB base usando fórmula de Mifflin-St Jeor
         const tmbBaseExacta = this._calcularTMBBase(sexo, peso, altura, edad);
         const tmbBase = Math.round(tmbBaseExacta);
-        
+
         const sexoNormalizado = this._normalizarSexo(sexo);
         const tipoPersonaNormalizado = (tipoPersona || '').toString().toLowerCase();
-        
+
         // Calcular TMB ajustado
         const factorTipoPersona = this._obtenerFactorTipoPersona(
-            sexoNormalizado, 
-            tipoPersonaNormalizado, 
+            sexoNormalizado,
+            tipoPersonaNormalizado,
             datosUsuario.factorTipoPersonaPersonalizado
         );
         const tmbAjustadoExacta = tmbBaseExacta * factorTipoPersona;
         const tmb = Math.round(tmbAjustadoExacta);
-        
+
         // Calcular TEF
         const porcentajeTEF = this._obtenerPorcentajeTEF(tipoTermogenico);
         const tefExacta = tmbAjustadoExacta * porcentajeTEF;
         const tef = Math.round(tefExacta);
-        
+
         // Calcular actividad física
         const factorActividad = this._obtenerFactorActividad(
             sexoNormalizado,
@@ -84,37 +105,37 @@ const MacronutrientesCalculator = {
         );
         const actividadFisicaDeporteKcalExacta = tmbBaseExacta * factorActividad;
         const actividadFisicaDeporteKcal = Math.round(actividadFisicaDeporteKcalExacta);
-        
+
         // Calcular gasto calórico base
         const gastoBaseEntrenoExacta = tmbAjustadoExacta + tefExacta + actividadFisicaDeporteKcalExacta;
         const gastoBaseDescansoExacta = tmbAjustadoExacta + tefExacta;
         const gastoBaseEntreno = Math.round(gastoBaseEntrenoExacta);
         const gastoBaseDescanso = Math.round(gastoBaseDescansoExacta);
-        
+
         // Calcular superávit/déficit (puede ser negativo si es déficit)
         const superavitEntrenoKcalExacta = gastoBaseEntrenoExacta * (superavitEntreno / 100);
         const superavitDescansoKcalExacta = gastoBaseDescansoExacta * (superavitDescanso / 100);
         const superavitEntrenoKcal = Math.round(superavitEntrenoKcalExacta);
         const superavitDescansoKcal = Math.round(superavitDescansoKcalExacta);
-        
+
         // Calcular ingesta calórica total (suma, puede ser menor si es déficit)
         const caloriasEntrenoExacta = gastoBaseEntrenoExacta + superavitEntrenoKcalExacta;
         const caloriasDescansoExacta = gastoBaseDescansoExacta + superavitDescansoKcalExacta;
         const caloriasEntreno = Math.round(caloriasEntrenoExacta);
         const caloriasDescanso = Math.round(caloriasDescansoExacta);
-        
+
         // Guardar también los valores raw (positivos) para mostrar en la UI
         datosUsuario.superavitEntrenoRaw = superavitEntrenoRaw;
         datosUsuario.superavitDescansoRaw = superavitDescansoRaw;
-        
+
         // Calcular promedio de calorías
         const numDiasEntreno = diasEntreno.length || 5;
         const numDiasDescanso = 7 - numDiasEntreno;
         const caloriasPromedio = Math.round((caloriasEntreno * numDiasEntreno + caloriasDescanso * numDiasDescanso) / 7);
-        
+
         // Obtener porcentajes de macronutrientes (si no están definidos, usar 50/30/20)
         const porcentajes = this._obtenerPorcentajesMacros(datosUsuario);
-        
+
         // Asegurar que los porcentajes estén guardados en datosUsuario si no estaban definidos
         if (datosUsuario.porcentajeCarbs === undefined) {
             datosUsuario.porcentajeCarbs = porcentajes.carbs * 100;
@@ -125,22 +146,22 @@ const MacronutrientesCalculator = {
         if (datosUsuario.porcentajeProteinas === undefined) {
             datosUsuario.porcentajeProteinas = porcentajes.proteinas * 100;
         }
-        
+
         // Calcular macronutrientes promedio usando los porcentajes (no el método antiguo)
         const macrosPromedio = this._calcularMacrosDesdePorcentajes(caloriasPromedio, porcentajes);
-        
+
         // Calcular macronutrientes diferenciados
         const macrosEntreno = this._calcularMacrosDiferenciados(
-            caloriasEntreno, 
-            porcentajes, 
+            caloriasEntreno,
+            porcentajes,
             peso
         );
         const macrosDescanso = this._calcularMacrosDiferenciados(
-            caloriasDescanso, 
-            porcentajes, 
+            caloriasDescanso,
+            porcentajes,
             peso
         );
-        
+
         // Actualizar datosUsuario con todos los cálculos
         return {
             ...datosUsuario,
@@ -191,7 +212,7 @@ const MacronutrientesCalculator = {
             imc: (peso / Math.pow(altura / 100, 2)).toFixed(1)
         };
     },
-    
+
     /**
      * Calcula TMB base usando fórmula de Mifflin-St Jeor
      */
@@ -201,14 +222,14 @@ const MacronutrientesCalculator = {
         }
         return 10 * peso + 6.25 * altura - 5 * edad - 161;
     },
-    
+
     /**
      * Normaliza el sexo a formato estándar
      */
     _normalizarSexo(sexo) {
         return (sexo || '').toString().toLowerCase().includes('mujer') ? 'femenino' : 'masculino';
     },
-    
+
     /**
      * Obtiene el factor según tipo de persona
      */
@@ -216,7 +237,7 @@ const MacronutrientesCalculator = {
         if (typeof factorPersonalizado === 'number') {
             return factorPersonalizado;
         }
-        
+
         const FACTORES_TIPO_PERSONA = {
             masculino: {
                 sedentaria: 1.0,
@@ -231,12 +252,12 @@ const MacronutrientesCalculator = {
                 'muy-activa': 1.48
             }
         };
-        
-        return FACTORES_TIPO_PERSONA[sexoNormalizado]?.[tipoPersonaNormalizado] 
-            ?? FACTORES_TIPO_PERSONA[sexoNormalizado]?.['no-sedentaria'] 
+
+        return FACTORES_TIPO_PERSONA[sexoNormalizado]?.[tipoPersonaNormalizado]
+            ?? FACTORES_TIPO_PERSONA[sexoNormalizado]?.['no-sedentaria']
             ?? 1.15;
     },
-    
+
     /**
      * Obtiene el porcentaje de TEF según tipo termogénico
      */
@@ -248,7 +269,7 @@ const MacronutrientesCalculator = {
         };
         return porcentajes[tipoTermogenico] || 0.15;
     },
-    
+
     /**
      * Obtiene el factor de actividad física
      */
@@ -256,7 +277,7 @@ const MacronutrientesCalculator = {
         if (typeof factorPersonalizado === 'number') {
             return factorPersonalizado;
         }
-        
+
         const FACTORES_ACTIVIDAD = {
             masculino: {
                 sedentario: 0,
@@ -273,19 +294,19 @@ const MacronutrientesCalculator = {
                 'muy-intensa': 1.10
             }
         };
-        
+
         const actividad = (actividadNormalizada || '').toString().toLowerCase();
-        return FACTORES_ACTIVIDAD[sexoNormalizado]?.[actividad] 
-            ?? FACTORES_ACTIVIDAD[sexoNormalizado]?.moderada 
+        return FACTORES_ACTIVIDAD[sexoNormalizado]?.[actividad]
+            ?? FACTORES_ACTIVIDAD[sexoNormalizado]?.moderada
             ?? 0.65;
     },
-    
+
     /**
      * Calcula macronutrientes promedio según objetivo (método antiguo, mantenido para compatibilidad)
      */
     _calcularMacrosPromedio(objetivo, peso, calorias) {
         let proteinas, grasas, carbohidratos;
-        
+
         if (objetivo === 'aumentar') {
             proteinas = Math.round(peso * 2);
             grasas = Math.round((calorias * 0.25) / 9);
@@ -299,10 +320,10 @@ const MacronutrientesCalculator = {
             grasas = Math.round((calorias * 0.30) / 9);
             carbohidratos = Math.round((calorias - (proteinas * 4) - (grasas * 9)) / 4);
         }
-        
+
         return { proteinas, grasas, carbohidratos };
     },
-    
+
     /**
      * Calcula macronutrientes promedio desde porcentajes (para modo manual)
      */
@@ -310,10 +331,10 @@ const MacronutrientesCalculator = {
         const carbohidratos = Math.round((calorias * porcentajes.carbs) / 4);
         const grasas = Math.round((calorias * porcentajes.grasas) / 9);
         const proteinas = Math.round((calorias * porcentajes.proteinas) / 4);
-        
+
         return { proteinas, grasas, carbohidratos };
     },
-    
+
     /**
      * Obtiene porcentajes de macronutrientes
      */
@@ -324,7 +345,7 @@ const MacronutrientesCalculator = {
             proteinas: datosUsuario.porcentajeProteinas !== undefined ? datosUsuario.porcentajeProteinas / 100 : 0.20
         };
     },
-    
+
     /**
      * Calcula macronutrientes diferenciados para entreno/descanso
      */
@@ -332,7 +353,7 @@ const MacronutrientesCalculator = {
         const carbs = Math.round((calorias * porcentajes.carbs) / 4);
         const grasas = Math.round((calorias * porcentajes.grasas) / 9);
         const proteinas = Math.round((calorias * porcentajes.proteinas) / 4);
-        
+
         return {
             carbs,
             grasas,

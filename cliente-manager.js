@@ -42,7 +42,7 @@ class ClienteManager {
             </div>
             <div id="clientesList" class="clientes-list"></div>
         `;
-        
+
         // Insertar después del título principal
         const mainHeader = mainContainer.querySelector('.main-header');
         const titulo = mainContainer.querySelector('h1');
@@ -128,14 +128,14 @@ class ClienteManager {
 
         // Botón en menú principal para mostrar clientes
         this.agregarBotonMenu();
-        
+
         // Event listener para cuando el usuario inicia sesión
         window.addEventListener('userLoggedIn', () => {
             setTimeout(() => {
                 this.mostrarBotonFlotante();
             }, 200);
         });
-        
+
         // Verificar si ya está logueado
         setTimeout(() => {
             if (window.authManager && window.authManager.isAuthenticated()) {
@@ -143,7 +143,7 @@ class ClienteManager {
             }
         }, 500);
     }
-    
+
     mostrarBotonFlotante() {
         const botonFlotante = document.getElementById('botonCrearClienteFlotante');
         if (botonFlotante) {
@@ -154,7 +154,7 @@ class ClienteManager {
     agregarBotonMenu() {
         const crearBoton = () => {
             if (document.getElementById('btnClientes')) return;
-            
+
             const btn = document.createElement('button');
             btn.id = 'btnClientes';
             btn.className = 'btn-clientes';
@@ -162,16 +162,16 @@ class ClienteManager {
             btn.addEventListener('click', () => {
                 this.mostrarSeccionClientes();
             });
-            
+
             const userMenu = document.querySelector('.user-menu');
             if (userMenu) {
                 userMenu.insertBefore(btn, userMenu.firstChild);
             }
         };
-        
+
         // Intentar agregar inmediatamente
         crearBoton();
-        
+
         // También agregar cuando se actualice el UI
         setTimeout(() => {
             const userMenu = document.querySelector('.user-menu');
@@ -186,7 +186,7 @@ class ClienteManager {
                 userMenu.insertBefore(btn, userMenu.firstChild);
             }
         }, 500);
-        
+
         // También agregar al evento de login
         window.addEventListener('userLoggedIn', () => {
             setTimeout(() => {
@@ -210,9 +210,9 @@ class ClienteManager {
         const seccion = document.getElementById('clientesSection');
         const formContainer = document.querySelector('.form-container');
         const resultados = document.getElementById('resultados');
-        
+
         console.log('Sección encontrada:', seccion);
-        
+
         if (!seccion) {
             console.error('No se encontró la sección de clientes. Recreando...');
             this.crearInterfazClientes();
@@ -220,11 +220,11 @@ class ClienteManager {
             await this.mostrarSeccionClientes();
             return;
         }
-        
+
         seccion.classList.remove('oculto');
         if (formContainer) formContainer.style.display = 'none';
         if (resultados) resultados.classList.add('oculto');
-        
+
         // Asegurar que el botón de buscar está disponible
         setTimeout(() => {
             const buscarInput = document.getElementById('buscarCliente');
@@ -233,7 +233,7 @@ class ClienteManager {
                     this.buscarClientes(e.target.value);
                 });
             }
-            
+
             const btnNuevo = document.getElementById('btnNuevoCliente');
             if (btnNuevo) {
                 btnNuevo.addEventListener('click', () => {
@@ -241,7 +241,7 @@ class ClienteManager {
                 });
             }
         }, 100);
-        
+
         try {
             await this.cargarClientes();
         } catch (error) {
@@ -251,7 +251,7 @@ class ClienteManager {
                 lista.innerHTML = `<p class="error">Error al cargar clientes: ${error.message}</p>`;
             }
         }
-        
+
         // Scroll a la sección
         setTimeout(() => {
             seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -262,14 +262,14 @@ class ClienteManager {
         const seccion = document.getElementById('clientesSection');
         const formContainer = document.querySelector('.form-container');
         const resultados = document.getElementById('resultados');
-        
+
         if (seccion) {
             seccion.classList.add('oculto');
         }
         if (formContainer) {
             formContainer.style.display = '';
         }
-        
+
         // Scroll a la parte superior
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -277,24 +277,24 @@ class ClienteManager {
     async cargarClientes() {
         const resultado = await window.clienteService.obtenerClientes();
         const lista = document.getElementById('clientesList');
-        
+
         if (!resultado.success) {
             lista.innerHTML = `<p class="error">Error al cargar clientes: ${resultado.error}</p>`;
             return;
         }
 
         const clientes = resultado.clientes.filter(c => c.activo !== false);
-        
+
         if (clientes.length === 0) {
             lista.innerHTML = '<p class="no-clientes">No tienes clientes registrados aún. Haz clic en "Nuevo Cliente" para agregar uno.</p>';
             return;
         }
 
         lista.innerHTML = clientes.map(cliente => {
-            const fechaCreacion = cliente.fechaCreacion?.toDate ? 
-                cliente.fechaCreacion.toDate().toLocaleDateString('es-ES') : 
+            const fechaCreacion = cliente.fechaCreacion?.toDate ?
+                cliente.fechaCreacion.toDate().toLocaleDateString('es-ES') :
                 'Fecha no disponible';
-            
+
             return `
                 <div class="cliente-card" data-id="${cliente.id}">
                     <div class="cliente-info">
@@ -348,24 +348,24 @@ class ClienteManager {
 
         const resultado = await window.clienteService.buscarCliente(termino);
         const lista = document.getElementById('clientesList');
-        
+
         if (!resultado.success) {
             lista.innerHTML = `<p class="error">Error en búsqueda: ${resultado.error}</p>`;
             return;
         }
 
         const clientes = resultado.clientes.filter(c => c.activo !== false);
-        
+
         if (clientes.length === 0) {
             lista.innerHTML = '<p class="no-clientes">No se encontraron clientes con ese criterio.</p>';
             return;
         }
 
         lista.innerHTML = clientes.map(cliente => {
-            const fechaCreacion = cliente.fechaCreacion?.toDate ? 
-                cliente.fechaCreacion.toDate().toLocaleDateString('es-ES') : 
+            const fechaCreacion = cliente.fechaCreacion?.toDate ?
+                cliente.fechaCreacion.toDate().toLocaleDateString('es-ES') :
                 'Fecha no disponible';
-            
+
             return `
                 <div class="cliente-card" data-id="${cliente.id}">
                     <div class="cliente-info">
@@ -411,7 +411,7 @@ class ClienteManager {
 
     async mostrarFichaCliente(clienteId) {
         const resultado = await window.clienteService.obtenerClientePorId(clienteId);
-        
+
         if (!resultado.success) {
             alert('Error al cargar cliente: ' + resultado.error);
             return;
@@ -423,8 +423,8 @@ class ClienteManager {
         const modal = document.getElementById('clienteModal');
         const content = document.getElementById('clienteModalContent');
 
-        const fechaCreacion = cliente.fechaCreacion?.toDate ? 
-            cliente.fechaCreacion.toDate().toLocaleDateString('es-ES') : 
+        const fechaCreacion = cliente.fechaCreacion?.toDate ?
+            cliente.fechaCreacion.toDate().toLocaleDateString('es-ES') :
             'Fecha no disponible';
 
         content.innerHTML = `
@@ -550,7 +550,7 @@ class ClienteManager {
         `;
 
         modal.style.display = 'block';
-        
+
         // Renderizar gráficas después de mostrar el modal
         setTimeout(() => {
             this.renderizarGraficas(cliente);
@@ -559,7 +559,7 @@ class ClienteManager {
 
     generarHTMLMedidas(medidasIniciales, historialMedidas) {
         let html = '';
-        
+
         if (!medidasIniciales || Object.keys(medidasIniciales).length === 0) {
             html += '<p style="color: #666; font-style: italic;">No hay medidas corporales registradas.</p>';
             return html;
@@ -571,7 +571,7 @@ class ClienteManager {
             'Brazos': ['brazoDer', 'brazoIzq', 'bicepsDer', 'bicepsIzq', 'antebrazoDer', 'antebrazoIzq'],
             'Piernas': ['cuadricepsDer', 'cuadricepsIzq', 'gemeloDer', 'gemeloIzq']
         };
-        
+
         const labels = {
             cintura: 'Cintura',
             cadera: 'Cadera',
@@ -596,16 +596,16 @@ class ClienteManager {
         };
 
         html += '<div style="margin-bottom: 20px;"><h4 style="color: #667eea; margin-bottom: 15px; font-size: 1.1em; font-weight: 600;">Medidas Iniciales</h4>';
-        
+
         // Crear tarjetas por categoría
         for (const [categoria, medidas] of Object.entries(categorias)) {
             const medidasEnCategoria = medidas.filter(key => medidasIniciales[key] !== null && medidasIniciales[key] !== undefined);
-            
+
             if (medidasEnCategoria.length > 0) {
                 html += `<div style="margin-bottom: 20px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 15px; border-radius: 10px; border-left: 4px solid #2196f3;">
                     <h5 style="color: #1976d2; margin-bottom: 12px; font-size: 1em; font-weight: 700;">${iconosCategoria[categoria]} ${categoria}</h5>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">`;
-                
+
                 medidasEnCategoria.forEach(key => {
                     const value = medidasIniciales[key];
                     html += `<div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid #2196f3; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(33, 150, 243, 0.1);">
@@ -613,7 +613,7 @@ class ClienteManager {
                         <div style="font-size: 1.3em; font-weight: 700; color: #333;">${value} cm</div>
                     </div>`;
                 });
-                
+
                 html += '</div></div>';
             }
         }
@@ -622,27 +622,27 @@ class ClienteManager {
         // Mostrar historial de medidas
         if (historialMedidas && historialMedidas.length > 0) {
             html += '<div style="margin-top: 30px;"><h4 style="color: #667eea; margin-bottom: 15px; font-size: 1.1em; font-weight: 600;">📊 Historial de Medidas</h4>';
-            
+
             historialMedidas.slice(-3).reverse().forEach((medida, index) => {
-                const fecha = medida.fecha?.toDate ? 
-                    medida.fecha.toDate().toLocaleDateString('es-ES') : 
+                const fecha = medida.fecha?.toDate ?
+                    medida.fecha.toDate().toLocaleDateString('es-ES') :
                     'Fecha no disponible';
-                
+
                 html += `<div style="background: linear-gradient(135deg, #f0fff4 0%, #d4f4dd 100%); padding: 20px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #10b981; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);">
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #10b981;">
                         <span style="font-size: 1.2em;">📅</span>
                         <strong style="color: #059669; font-size: 1.1em;">${fecha}</strong>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">`;
-                
+
                 for (const [key, value] of Object.entries(medida)) {
                     if (key !== 'fecha' && key !== 'notas' && value !== null && value !== undefined && labels[key]) {
-                        const cambio = medidasIniciales[key] ? 
+                        const cambio = medidasIniciales[key] ?
                             (value - medidasIniciales[key]).toFixed(1) : '0';
                         const colorCambio = parseFloat(cambio) > 0 ? '#28a745' : parseFloat(cambio) < 0 ? '#dc3545' : '#666';
                         const icono = parseFloat(cambio) > 0 ? '📈' : parseFloat(cambio) < 0 ? '📉' : '➡️';
                         const signo = parseFloat(cambio) > 0 ? '+' : '';
-                        
+
                         html += `<div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid #10b981;">
                             <div style="font-weight: 600; color: #059669; font-size: 0.85em; margin-bottom: 3px;">${labels[key]}</div>
                             <div style="display: flex; align-items: center; gap: 8px;">
@@ -652,14 +652,14 @@ class ClienteManager {
                         </div>`;
                     }
                 }
-                
+
                 if (medida.notas) {
                     html += `<div style="grid-column: 1 / -1; background: white; padding: 12px; border-radius: 8px; border: 1px solid #10b981; margin-top: 10px;">
                         <div style="font-weight: 600; color: #059669; font-size: 0.85em; margin-bottom: 5px;">📝 Notas:</div>
                         <div style="color: #333; font-size: 0.95em;">${medida.notas}</div>
                     </div>`;
                 }
-                
+
                 html += '</div></div>';
             });
             html += '</div>';
@@ -670,28 +670,28 @@ class ClienteManager {
 
     generarHTMLProgreso(progreso) {
         let html = '';
-        
+
         // Si hay historial de peso, crear gráfica
         if (progreso && progreso.peso && progreso.peso.length > 0) {
             html += '<div style="margin-bottom: 30px;"><h4 style="color: #667eea; margin-bottom: 10px;">📈 Evolución del Peso</h4>';
             html += '<div class="chart-wrapper"><canvas id="chart-peso" style="max-height: 300px; width: 100%;"></canvas></div></div>';
         }
-        
+
         if (!progreso || Object.keys(progreso).length === 0) {
             html += '<p style="color: #666; font-style: italic;">No hay registros de progreso aún.</p>';
         }
-        
+
         return html;
     }
-    
+
     generarHTMLProgresoMedidas(medidasIniciales, historialMedidas) {
         if (!historialMedidas || historialMedidas.length === 0) {
             return '';
         }
-        
+
         let html = '<div style="margin-top: 20px;"><h4 style="color: #667eea; margin-bottom: 10px;">📊 Gráfica de Medidas</h4>';
         html += '<div class="charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">';
-        
+
         // Crear gráficas para medidas más comunes
         const medidasClave = ['cintura', 'cadera', 'brazoDer', 'bicepsDer', 'cuadricepsDer', 'gemeloDer'];
         const nomMedidas = {
@@ -703,17 +703,17 @@ class ClienteManager {
             cuadricepsDer: 'Cuádriceps Derecho',
             gemeloDer: 'Gemelo Derecho'
         };
-        
+
         medidasClave.forEach(medida => {
             if (medidasIniciales && medidasIniciales[medida] !== null && medidasIniciales[medida] !== undefined) {
                 html += `<div class="chart-wrapper"><canvas id="chart-${medida}" style="max-height: 200px; width: 100%;"></canvas></div>`;
             }
         });
-        
+
         html += '</div></div>';
         return html;
     }
-    
+
     renderizarGraficas(cliente) {
         // Graficar peso si existe historial
         if (cliente.progreso && cliente.progreso.peso && cliente.progreso.peso.length > 0) {
@@ -726,7 +726,7 @@ class ClienteManager {
                     }
                     return 'Fecha no disponible';
                 });
-                
+
                 new Chart(ctxPeso, {
                     type: 'line',
                     data: {
@@ -754,7 +754,7 @@ class ClienteManager {
                 });
             }
         }
-        
+
         // Graficar medidas
         if (cliente.historialMedidas && cliente.historialMedidas.length > 0) {
             const medidasClave = ['cintura', 'cadera', 'brazoDer', 'bicepsDer', 'cuadricepsDer', 'gemeloDer'];
@@ -767,13 +767,13 @@ class ClienteManager {
                 cuadricepsDer: 'Cuádriceps Derecho',
                 gemeloDer: 'Gemelo Derecho'
             };
-            
+
             medidasClave.forEach(medida => {
                 const ctx = document.getElementById(`chart-${medida}`);
                 if (ctx && cliente.medidasIniciales && cliente.medidasIniciales[medida] !== null) {
                     const valores = [cliente.medidasIniciales[medida]];
                     const fechas = ['Inicial'];
-                    
+
                     cliente.historialMedidas.forEach(hm => {
                         if (hm[medida] !== null && hm[medida] !== undefined) {
                             valores.push(hm[medida]);
@@ -781,7 +781,7 @@ class ClienteManager {
                             fechas.push(fecha);
                         }
                     });
-                    
+
                     new Chart(ctx, {
                         type: 'line',
                         data: {
@@ -800,9 +800,9 @@ class ClienteManager {
                             maintainAspectRatio: false,
                             plugins: {
                                 legend: { display: false },
-                                title: { 
-                                    display: true, 
-                                    text: nomMedidas[medida] || medida, 
+                                title: {
+                                    display: true,
+                                    text: nomMedidas[medida] || medida,
                                     position: 'top',
                                     font: { size: 12, weight: 'bold' }
                                 }
@@ -823,8 +823,8 @@ class ClienteManager {
         }
 
         return consultas.slice(-5).reverse().map(consulta => {
-            const fecha = consulta.fecha?.toDate ? 
-                consulta.fecha.toDate().toLocaleDateString('es-ES') : 
+            const fecha = consulta.fecha?.toDate ?
+                consulta.fecha.toDate().toLocaleDateString('es-ES') :
                 'Fecha no disponible';
             return `
                 <div style="background: white; padding: 20px; margin-bottom: 15px; border-radius: 10px; border-left: 4px solid #667eea; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s ease;">
@@ -854,8 +854,8 @@ class ClienteManager {
         };
 
         return dietas.slice(-5).reverse().map(dieta => {
-            const fecha = dieta.fecha?.toDate ? 
-                dieta.fecha.toDate().toLocaleDateString('es-ES') : 
+            const fecha = dieta.fecha?.toDate ?
+                dieta.fecha.toDate().toLocaleDateString('es-ES') :
                 'Fecha no disponible';
             const objetivoLabel = objetivoLabels[dieta.objetivo] || dieta.objetivo || 'No especificado';
             return `
@@ -1103,14 +1103,14 @@ class ClienteManager {
 
     async generarDietaParaCliente(clienteId) {
         const resultado = await window.clienteService.obtenerClientePorId(clienteId);
-        
+
         if (!resultado.success) {
             alert('Error al cargar cliente: ' + resultado.error);
             return;
         }
 
         const cliente = resultado.cliente;
-        
+
         // Cargar datos del cliente en el formulario
         document.getElementById('nombre').value = cliente.nombre || '';
         document.getElementById('fechaRegistro').value = new Date().toISOString().split('T')[0];
@@ -1123,13 +1123,13 @@ class ClienteManager {
             return '';
         };
         document.getElementById('sexo').value = mapSexo(cliente.sexo);
-        document.getElementById('edad').value = cliente.fechaNacimiento ? 
+        document.getElementById('edad').value = cliente.fechaNacimiento ?
             Math.floor((new Date() - new Date(cliente.fechaNacimiento)) / (365.25 * 24 * 60 * 60 * 1000)) : '';
         document.getElementById('altura').value = cliente.altura || '';
         document.getElementById('peso').value = cliente.pesoActual || cliente.pesoInicial || '';
         // Establecer nivel de actividad en el selector tipoPersona
         const tipoActividad = (cliente.tipoPersona || '').toLowerCase();
-        const tp = ['sedentaria','activa','muy-activa'].includes(tipoActividad) ? tipoActividad : '';
+        const tp = ['sedentaria', 'activa', 'muy-activa'].includes(tipoActividad) ? tipoActividad : '';
         document.getElementById('tipoPersona').value = tp;
         // Mapear objetivo del cliente al formato del generador
         const mapObjetivo = (obj) => {
@@ -1150,9 +1150,16 @@ class ClienteManager {
         // Mostrar formulario de dieta
         document.querySelector('.form-container').style.display = 'block';
         document.getElementById('clientesSection')?.classList.add('oculto');
-        
+
         // Scroll al formulario
         document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
+
+        // Trigger auto-calculation if available
+        if (window.triggerManualRecalculation) {
+            setTimeout(() => {
+                window.triggerManualRecalculation();
+            }, 500); // Wait for scroll and display update
+        }
     }
 
     async verDietaDetalle(dietaId) {
@@ -1368,27 +1375,27 @@ class ClienteManager {
                 </form>
             </div>
         `;
-        
+
         document.body.appendChild(modal);
         document.getElementById('progresoFecha').valueAsDate = new Date();
-        
+
         // Cerrar al hacer clic fuera
         modal.addEventListener('click', (e) => {
             if (e.target === modal) modal.remove();
         });
-        
+
         // Guardar progreso
         document.getElementById('formAgregarProgreso').addEventListener('submit', async (e) => {
             e.preventDefault();
             await this.guardarProgreso(clienteId);
         });
-        
+
         // Calcular IMC automáticamente si hay peso y altura
         document.getElementById('progresoPeso').addEventListener('input', () => {
             this.calcularIMCAuto(clienteId);
         });
     }
-    
+
     async calcularIMCAuto(clienteId) {
         try {
             const resultado = await window.clienteService.obtenerClientePorId(clienteId);
@@ -1410,21 +1417,21 @@ class ClienteManager {
         const peso = parseFloat(document.getElementById('progresoPeso').value);
         const imc = parseFloat(document.getElementById('progresoIMC').value);
         const notas = document.getElementById('progresoNotas').value;
-        
+
         if (!fecha) {
             window.mostrarNotificacion?.('⚠️ La fecha es obligatoria', 'warning');
             return;
         }
-        
+
         const progreso = {
             fecha: new Date(fecha),
             valor: peso,
             imc: isNaN(imc) ? null : imc,
             notas: notas
         };
-        
+
         const resultado = await window.clienteService.agregarProgresoCliente(clienteId, progreso, peso);
-        
+
         if (resultado.success) {
             window.mostrarNotificacion?.('✅ Progreso registrado correctamente', 'success');
             document.getElementById('modalAgregarProgreso').remove();
@@ -1466,33 +1473,33 @@ class ClienteManager {
                 </form>
             </div>
         `;
-        
+
         document.body.appendChild(modal);
         document.getElementById('consultaFecha').valueAsDate = new Date();
-        
+
         modal.addEventListener('click', (e) => {
             if (e.target === modal) modal.remove();
         });
-        
+
         document.getElementById('formAgregarConsulta').addEventListener('submit', async (e) => {
             e.preventDefault();
             await this.guardarConsulta(clienteId);
         });
     }
-    
+
     async guardarConsulta(clienteId) {
         const fecha = document.getElementById('consultaFecha').value;
         const motivo = document.getElementById('consultaMotivo').value;
         const notas = document.getElementById('consultaNotas').value;
-        
+
         const consulta = {
             fecha: new Date(fecha),
             motivo: motivo,
             notas: notas
         };
-        
+
         const resultado = await window.clienteService.agregarConsultaCliente(clienteId, consulta);
-        
+
         if (resultado.success) {
             window.mostrarNotificacion?.('✅ Consulta registrada correctamente', 'success');
             document.getElementById('modalAgregarConsulta').remove();
@@ -1505,7 +1512,7 @@ class ClienteManager {
     async editarCliente(clienteId) {
         // Obtener datos actuales del cliente
         const resultado = await window.clienteService.obtenerClientePorId(clienteId);
-        
+
         if (!resultado.success) {
             window.mostrarNotificacion('❌ Error al cargar cliente: ' + resultado.error, 'error');
             return;
@@ -1672,13 +1679,13 @@ class ClienteManager {
 
                 if (resultado.success) {
                     window.mostrarNotificacion('✅ Cliente actualizado correctamente', 'success');
-                    
+
                     // Cerrar modal de edición
                     modal.remove();
-                    
+
                     // Recargar ficha del cliente
                     await this.mostrarFichaCliente(clienteId);
-                    
+
                     // Recargar lista de clientes
                     await this.cargarClientes();
                 } else {
@@ -1761,7 +1768,7 @@ class ClienteManager {
             }
         } catch (error) {
             console.error('Error al eliminar cliente:', error);
-            
+
             // Mostrar error
             if (typeof window.mostrarNotificacion === 'function') {
                 window.mostrarNotificacion(
@@ -1780,7 +1787,7 @@ class ClienteManager {
             }
         }
     }
-    
+
     // Función para generar PDF desde el modal de dieta editable
     generarPDFDesdeModal() {
         // Verificar que la función unificada esté disponible
