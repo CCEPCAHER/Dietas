@@ -295,7 +295,7 @@ window.mostrarResultados = function () {
 
         setTimeout(() => {
             try {
-                window.inicializarBotones();
+                inicializarBotones();
             } catch (error) {
                 console.error('Error en inicializarBotones:', error);
             }
@@ -1823,18 +1823,7 @@ function mostrarPlanAlimentacion() {
             throw new Error('Elemento plan-alimentacion no encontrado');
         }
 
-        const { duracion, modoGeneracion } = datosUsuario;
-        let { objetivo } = datosUsuario;
-
-        // Fallback: intentar obtener objetivo del DOM si no está en datosUsuario
-        if (!objetivo) {
-            const objetivoSelect = document.getElementById('objetivo');
-            if (objetivoSelect && objetivoSelect.value) {
-                objetivo = objetivoSelect.value;
-                datosUsuario.objetivo = objetivo;
-                console.log('⚠️ Objetivo recuperado del DOM:', objetivo);
-            }
-        }
+        const { objetivo, duracion, modoGeneracion } = datosUsuario;
 
         // Verificar si el modo es manual
         if (modoGeneracion === 'manual') {
@@ -2422,20 +2411,11 @@ function actualizarOpcionesSuperavit(selectElement, objetivo) {
     });
 
     // Si el valor actual existe en las nuevas opciones, mantenerlo
-    // PERO solo si NO hemos cambiado de "grupo" de objetivo (ej: de adelgazar a aumentar)
-    // Para simplificar, si el objetivo cambió (lo cual es probable si llamamos a esta función),
-    // forzamos el valor por defecto para asegurar que el cambio se note.
-    
-    // EXCEPCIÓN: Si el valor actual es 0, intentamos mantenerlo si es 'mantener', 
-    // pero si cambiamos a 'adelgazar' o 'aumentar', sugerimos el valor por defecto.
-    
-    if (opciones.includes(valorActual) && valorActual !== '0') {
-        // selectElement.value = valorActual; 
-        // return valorActual;
-        // COMENTADO: Forzar cambio para que el usuario vea el efecto del nuevo objetivo
+    if (opciones.includes(valorActual)) {
+        selectElement.value = valorActual;
+        return valorActual;
     }
 
-    selectElement.value = valorPorDefecto;
     return valorPorDefecto;
 }
 
@@ -3168,9 +3148,9 @@ document.addEventListener('DOMContentLoaded', function () {
     cards.forEach((card, index) => {
         card.style.animationDelay = `${index * 0.1}s`;
     });
-    // }); // Removed premature close
+});
 
-window.inicializarBotones = function() {
+function inicializarBotones() {
     // Botón guardar dieta
     const btnGuardar = document.getElementById('btnGuardar');
     if (btnGuardar) {
@@ -5458,5 +5438,3 @@ if (document.readyState === 'loading') {
     // DOM already loaded
     setupAutoCalculation();
 }
-
-} }); // End DOMContentLoaded

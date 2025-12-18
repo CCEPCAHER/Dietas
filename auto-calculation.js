@@ -108,7 +108,8 @@ function setupAutoCalculation() {
 
     const fieldsToWatch = [
         'peso', 'objetivo', 'tipoPersona', 'actividadFisicaDeporte',
-        'edad', 'altura', 'sexo'
+        'edad', 'altura', 'sexo',
+        'tipoTermogenico', 'superavitEntreno', 'superavitDescanso'
     ];
 
     const runCalculation = (sourceId) => {

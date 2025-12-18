@@ -295,7 +295,7 @@ window.mostrarResultados = function () {
 
         setTimeout(() => {
             try {
-                window.inicializarBotones();
+                inicializarBotones();
             } catch (error) {
                 console.error('Error en inicializarBotones:', error);
             }
@@ -1823,18 +1823,7 @@ function mostrarPlanAlimentacion() {
             throw new Error('Elemento plan-alimentacion no encontrado');
         }
 
-        const { duracion, modoGeneracion } = datosUsuario;
-        let { objetivo } = datosUsuario;
-
-        // Fallback: intentar obtener objetivo del DOM si no está en datosUsuario
-        if (!objetivo) {
-            const objetivoSelect = document.getElementById('objetivo');
-            if (objetivoSelect && objetivoSelect.value) {
-                objetivo = objetivoSelect.value;
-                datosUsuario.objetivo = objetivo;
-                console.log('⚠️ Objetivo recuperado del DOM:', objetivo);
-            }
-        }
+        const { objetivo, duracion, modoGeneracion } = datosUsuario;
 
         // Verificar si el modo es manual
         if (modoGeneracion === 'manual') {
@@ -2422,20 +2411,11 @@ function actualizarOpcionesSuperavit(selectElement, objetivo) {
     });
 
     // Si el valor actual existe en las nuevas opciones, mantenerlo
-    // PERO solo si NO hemos cambiado de "grupo" de objetivo (ej: de adelgazar a aumentar)
-    // Para simplificar, si el objetivo cambió (lo cual es probable si llamamos a esta función),
-    // forzamos el valor por defecto para asegurar que el cambio se note.
-    
-    // EXCEPCIÓN: Si el valor actual es 0, intentamos mantenerlo si es 'mantener', 
-    // pero si cambiamos a 'adelgazar' o 'aumentar', sugerimos el valor por defecto.
-    
-    if (opciones.includes(valorActual) && valorActual !== '0') {
-        // selectElement.value = valorActual; 
-        // return valorActual;
-        // COMENTADO: Forzar cambio para que el usuario vea el efecto del nuevo objetivo
+    if (opciones.includes(valorActual)) {
+        selectElement.value = valorActual;
+        return valorActual;
     }
 
-    selectElement.value = valorPorDefecto;
     return valorPorDefecto;
 }
 
@@ -3168,9 +3148,9 @@ document.addEventListener('DOMContentLoaded', function () {
     cards.forEach((card, index) => {
         card.style.animationDelay = `${index * 0.1}s`;
     });
-    // }); // Removed premature close
+});
 
-window.inicializarBotones = function() {
+function inicializarBotones() {
     // Botón guardar dieta
     const btnGuardar = document.getElementById('btnGuardar');
     if (btnGuardar) {
@@ -5156,307 +5136,17 @@ ${lineas.join('\n')}`;
         });
     }
 
-    const btnDescargarExcel = document.getElementById('btnDescargarExcel');
-    if (btnDescargarExcel) {
-        btnDescargarExcel.replaceWith(btnDescargarExcel.cloneNode(true));
-        const nuevoBtnExcel = document.getElementById('btnDescargarExcel');
-        nuevoBtnExcel.addEventListener('click', function () {
+    
+const btnDescargarExcel = document.getElementById('btnDescargarExcel');
+if (btnDescargarExcel) {
+    btnDescargarExcel.replaceWith(btnDescargarExcel.cloneNode(true));
+    const nuevoBtnExcel = document.getElementById('btnDescargarExcel');
+    nuevoBtnExcel.addEventListener('click', function () {
+        if (typeof exportarExcelProfesional === 'function') {
             exportarExcelProfesional();
-        });
-    }
-}
-
-// Hacer función global
-window.mostrarNotificacion = function (mensaje, tipo = 'info') {
-    const notificacion = document.createElement('div');
-    notificacion.className = `notificacion notificacion-${tipo}`;
-    notificacion.textContent = mensaje;
-
-    notificacion.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 25px;
-        background: ${tipo === 'success' ? '#28a745' : tipo === 'error' ? '#dc3545' : '#17a2b8'};
-        color: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        z-index: 10000;
-        animation: slideIn 0.3s ease;
-        font-weight: 600;
-        max-width: 300px;
-    `;
-
-    document.body.appendChild(notificacion);
-
-    setTimeout(() => {
-        notificacion.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => {
-            document.body.removeChild(notificacion);
-        }, 300);
-    }, 3000);
-};
-
-// Función para mostrar vista previa del PDF con opciones de descarga/compartir
-window.mostrarPreviewPDF = function (pdfUrl, pdfBlob, filename) {
-    // Crear modal de previsualización
-    const modal = document.createElement('div');
-    modal.id = 'pdfPreviewModal';
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.85);
-        z-index: 99999;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        animation: fadeIn 0.3s ease;
-    `;
-
-    // Contenedor del modal
-    const modalContent = document.createElement('div');
-    modalContent.style.cssText = `
-        background: white;
-        border-radius: 12px;
-        width: 90%;
-        max-width: 1000px;
-        height: 90%;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        overflow: hidden;
-    `;
-
-    // Header del modal
-    const header = document.createElement('div');
-    header.style.cssText = `
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-radius: 12px 12px 0 0;
-    `;
-
-    const title = document.createElement('h3');
-    title.textContent = '📄 Vista Previa del PDF';
-    title.style.cssText = `
-        margin: 0;
-        font-size: 1.5em;
-        font-weight: 600;
-    `;
-
-    const closeBtn = document.createElement('button');
-    closeBtn.innerHTML = '✕';
-    closeBtn.style.cssText = `
-        background: rgba(255, 255, 255, 0.95);
-        border: none;
-        color: #dc3545;
-        font-size: 36px;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: bold;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        line-height: 1;
-    `;
-    closeBtn.onmouseover = () => {
-        closeBtn.style.background = 'rgba(255, 255, 255, 1)';
-        closeBtn.style.color = '#c82333';
-        closeBtn.style.transform = 'scale(1.1)';
-        closeBtn.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
-    };
-    closeBtn.onmouseout = () => {
-        closeBtn.style.background = 'rgba(255, 255, 255, 0.95)';
-        closeBtn.style.color = '#dc3545';
-        closeBtn.style.transform = 'scale(1)';
-        closeBtn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
-    };
-    closeBtn.onclick = () => {
-        URL.revokeObjectURL(pdfUrl);
-        document.body.removeChild(modal);
-    };
-
-    header.appendChild(title);
-    header.appendChild(closeBtn);
-
-    // Visor de PDF
-    const pdfViewer = document.createElement('iframe');
-    pdfViewer.src = pdfUrl;
-    pdfViewer.style.cssText = `
-        flex: 1;
-        border: none;
-        width: 100%;
-        background: #f5f5f5;
-    `;
-
-    // Footer con botones de acción
-    const footer = document.createElement('div');
-    footer.style.cssText = `
-        padding: 20px;
-        background: #f8f9fa;
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        flex-wrap: wrap;
-        border-radius: 0 0 12px 12px;
-        border-top: 2px solid #e9ecef;
-    `;
-
-    // Botón Descargar
-    const btnDescargar = document.createElement('button');
-    btnDescargar.innerHTML = '💾 Descargar PDF';
-    btnDescargar.style.cssText = `
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    `;
-    btnDescargar.onmouseover = () => {
-        btnDescargar.style.transform = 'translateY(-2px)';
-        btnDescargar.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
-    };
-    btnDescargar.onmouseout = () => {
-        btnDescargar.style.transform = 'translateY(0)';
-        btnDescargar.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
-    };
-    btnDescargar.onclick = () => {
-        const a = document.createElement('a');
-        a.href = pdfUrl;
-        a.download = filename;
-        a.click();
-        mostrarNotificacion('✅ PDF descargado correctamente', 'success');
-    };
-
-    // Botón Abrir en Nueva Ventana
-    const btnNuevaVentana = document.createElement('button');
-    btnNuevaVentana.innerHTML = '🔗 Abrir en Nueva Ventana';
-    btnNuevaVentana.style.cssText = `
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
-    `;
-    btnNuevaVentana.onmouseover = () => {
-        btnNuevaVentana.style.transform = 'translateY(-2px)';
-        btnNuevaVentana.style.boxShadow = '0 6px 20px rgba(240, 147, 251, 0.5)';
-    };
-    btnNuevaVentana.onmouseout = () => {
-        btnNuevaVentana.style.transform = 'translateY(0)';
-        btnNuevaVentana.style.boxShadow = '0 4px 15px rgba(240, 147, 251, 0.4)';
-    };
-    btnNuevaVentana.onclick = () => {
-        window.open(pdfUrl, '_blank');
-        mostrarNotificacion('✅ PDF abierto en nueva ventana', 'info');
-    };
-
-    // Botón WhatsApp
-    const btnWhatsApp = document.createElement('button');
-    btnWhatsApp.innerHTML = '📱 Compartir por WhatsApp';
-    btnWhatsApp.style.cssText = `
-        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
-    `;
-    btnWhatsApp.onmouseover = () => {
-        btnWhatsApp.style.transform = 'translateY(-2px)';
-        btnWhatsApp.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.5)';
-    };
-    btnWhatsApp.onmouseout = () => {
-        btnWhatsApp.style.transform = 'translateY(0)';
-        btnWhatsApp.style.boxShadow = '0 4px 15px rgba(37, 211, 102, 0.4)';
-    };
-    btnWhatsApp.onclick = () => {
-        // Primero descargar el archivo
-        const a = document.createElement('a');
-        a.href = pdfUrl;
-        a.download = filename;
-        a.click();
-
-        // Mostrar instrucciones
-        const mensaje = 'El PDF se ha descargado. Para compartirlo por WhatsApp:\n\n' +
-            '1. Abre WhatsApp\n' +
-            '2. Selecciona el contacto\n' +
-            '3. Toca el ícono de adjuntar (📎)\n' +
-            '4. Selecciona "Documento"\n' +
-            '5. Busca y selecciona el PDF descargado';
-
-        alert(mensaje);
-        mostrarNotificacion('💡 Sigue las instrucciones para compartir', 'info');
-    };
-
-// ========================================
-// AUTOMATIC CALORIE RECALCULATION
-// Auto-recalculates calories when weight, objective, or activity level changes
-// ========================================
-
-/**
- * Sets up automatic calorie recalculation when key form fields change.
- * Triggered on changes to: peso, objetivo, tipoPersona, actividadFisicaDeporte
- */
-function setupAutoCalculation() {
-    console.log('📊 Configurando recálculo automático de calorías...');
-    
-    // Fields that should trigger recalculation
-    const fieldsToWatch = [
-        'peso',                    // Weight
-        'objetivo',                // Objective (lose, maintain, gain)
-        'tipoPersona',             // Activity level
-        'actividadFisicaDeporte'   // Physical activity/sport level
-    ];
-    
-    fieldsToWatch.forEach(fieldId => {
-        const element = document.getElementById(fieldId);
-        if (element) {
-            element.addEventListener('change', () => {
-                console.log(`🔄 Campo "${fieldId}" cambió, recalculando macronutrientes...`);
-                calcularMacronutrientes();
-            });
-            console.log(`✅ Listener agregado a: ${fieldId}`);
         } else {
-            console.warn(`⚠️ No se encontró el elemento: ${fieldId}`);
+            console.error('exportarExcelProfesional no definido');
         }
     });
-    
-    console.log('✅ Recálculo automático configurado correctamente');
 }
-
-// Initialize auto-calculation when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupAutoCalculation);
-} else {
-    // DOM already loaded
-    setupAutoCalculation();
-}
-
-} }); // End DOMContentLoaded
+} });
