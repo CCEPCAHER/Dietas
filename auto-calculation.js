@@ -88,11 +88,17 @@ window.calcularMacronutrientes = function () {
             try { window.actualizarGraficosMacronutrientes(); } catch (e) { }
         }
 
-        if (typeof window.mostrarResultados === 'function') {
-            try { window.mostrarResultados(); } catch (e) { console.warn('Error en mostrarResultados:', e); }
+        // Solo mostrar resultados si ya hay un objetivo definido
+        const objetivoActual = window.datosUsuario?.objetivo || formularioData.objetivo;
+        if (objetivoActual) {
+            if (typeof window.mostrarResultados === 'function') {
+                try { window.mostrarResultados(); } catch (e) { console.warn('Error en mostrarResultados:', e); }
+            } else {
+                const resultadosDiv = document.getElementById('resultados');
+                if (resultadosDiv) resultadosDiv.classList.remove('oculto');
+            }
         } else {
-            const resultadosDiv = document.getElementById('resultados');
-            if (resultadosDiv) resultadosDiv.classList.remove('oculto');
+            console.log('ℹ️ Objetivo vacío, se omite mostrarResultados hasta que el usuario seleccione uno.');
         }
 
     } catch (error) {

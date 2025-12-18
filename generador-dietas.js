@@ -22,19 +22,22 @@
 })();
 
 // Helper para obtener información nutricional de manera segura (fallback)
-function obtenerInfoNutricional(nombreAlimento, cantidad = 100) {
-    if (window.obtenerInfoNutricional) {
+// IMPORTANTE: usamos un nombre distinto (obtenerInfoNutricionalSeguro) para no
+// entrar en recursión con la función global window.obtenerInfoNutricional
+function obtenerInfoNutricionalSeguro(nombreAlimento, cantidad = 100) {
+    // Si existe la función global (definida en base-datos-alimentos.js), usarla
+    if (window.obtenerInfoNutricional && window.obtenerInfoNutricional !== obtenerInfoNutricionalSeguro) {
         return window.obtenerInfoNutricional(nombreAlimento, cantidad);
     }
-    
-    // Si la función global no está disponible, intentar buscar manualmente en window.baseDatosAlimentos
+
+    // Si no existe la global, intentar buscar manualmente en window.baseDatosAlimentos
     if (window.baseDatosAlimentos && Array.isArray(window.baseDatosAlimentos)) {
         const nombreBuscado = nombreAlimento.toLowerCase().trim();
-        const alimento = window.baseDatosAlimentos.find(item => 
-            (item.ALIMENTO && item.ALIMENTO.toLowerCase() === nombreBuscado) || 
+        const alimento = window.baseDatosAlimentos.find(item =>
+            (item.ALIMENTO && item.ALIMENTO.toLowerCase() === nombreBuscado) ||
             (item.nombre && item.nombre.toLowerCase() === nombreBuscado)
         );
-        
+
         if (alimento) {
             const factor = cantidad / 100;
             return {
@@ -45,7 +48,7 @@ function obtenerInfoNutricional(nombreAlimento, cantidad = 100) {
             };
         }
     }
-    
+
     console.warn(`⚠️ No se pudo obtener información nutricional para: ${nombreAlimento}`);
     return { proteinas: 0, grasas: 0, carbohidratos: 0, calorias: 0 };
 }
@@ -296,7 +299,7 @@ function generarComida(objetivo, tipoComida, variacion, esDescanso = false) {
     
     // Calcular macros totales
     alimentos.forEach(alimento => {
-        const info = obtenerInfoNutricional(alimento.nombre, alimento.cantidad);
+        const info = obtenerInfoNutricionalSeguro(alimento.nombre, alimento.cantidad);
         if (info) {
             calorias += info.calorias;
             proteinas += info.proteinas;
@@ -1006,7 +1009,7 @@ function verificarRestricciones(alimento, restricciones) {
 
 // Función para calcular cantidad óptima de un alimento según distribución objetivo
 function calcularCantidadOptima(alimento, distribucion, tipoAlimento, porcentajeObjetivo = 0.3) {
-    const info = obtenerInfoNutricional(alimento, 100);
+    const info = obtenerInfoNutricionalSeguro(alimento, 100);
     if (!info) return 100;
     
     // Calcular cuántos gramos necesitamos para alcanzar el porcentaje objetivo de la distribución
@@ -1044,7 +1047,7 @@ function calcularCantidadOptima(alimento, distribucion, tipoAlimento, porcentaje
 
 // Función para calcular cantidad basada en distribución objetivo considerando múltiples macros
 function calcularCantidadPorDistribucion(nombreAlimento, distribucion, prioridad = 'carbohidratos') {
-    const info = obtenerInfoNutricional(nombreAlimento, 100);
+    const info = obtenerInfoNutricionalSeguro(nombreAlimento, 100);
     if (!info) return 100;
     
     // Calcular ratios de macronutrientes
@@ -1099,7 +1102,7 @@ function balancearMacrosComida(alimentos, distribucionObjetivo, objetivo) {
     
     // Calcular macros actuales con información nutricional por alimento
     const alimentosConInfo = alimentos.map(alimento => {
-        const info = obtenerInfoNutricional(alimento.nombre, alimento.cantidad);
+        const info = obtenerInfoNutricionalSeguro(alimento.nombre, alimento.cantidad);
         if (info) {
             totalMacros.calorias += info.calorias;
             totalMacros.proteinas += info.proteinas;
@@ -1247,7 +1250,7 @@ function balancearMacrosComida(alimentos, distribucionObjetivo, objetivo) {
     };
     
     alimentosAjustados.forEach(alimento => {
-        const info = obtenerInfoNutricional(alimento.nombre, alimento.cantidad);
+        const info = obtenerInfoNutricionalSeguro(alimento.nombre, alimento.cantidad);
         if (info) {
             nuevosMacros.calorias += info.calorias;
             nuevosMacros.proteinas += info.proteinas;
@@ -1270,7 +1273,7 @@ function balancearMacrosComida(alimentos, distribucionObjetivo, objetivo) {
         };
         
         alimentosFinales.forEach(alimento => {
-            const info = obtenerInfoNutricional(alimento.nombre, alimento.cantidad);
+            const info = obtenerInfoNutricionalSeguro(alimento.nombre, alimento.cantidad);
             if (info) {
                 macrosActuales.calorias += info.calorias;
                 macrosActuales.proteinas += info.proteinas;
@@ -1312,7 +1315,7 @@ function balancearMacrosComida(alimentos, distribucionObjetivo, objetivo) {
         
         // Aplicar ajuste selectivo más preciso
         alimentosFinales = alimentosFinales.map(alimento => {
-            const info = obtenerInfoNutricional(alimento.nombre, alimento.cantidad);
+            const info = obtenerInfoNutricionalSeguro(alimento.nombre, alimento.cantidad);
             if (!info) return alimento;
             
             const ratioGrasas = info.grasas / info.calorias || 0;
@@ -1361,7 +1364,7 @@ function balancearMacrosComida(alimentos, distribucionObjetivo, objetivo) {
     };
     
     alimentosFinales.forEach(alimento => {
-        const info = obtenerInfoNutricional(alimento.nombre, alimento.cantidad);
+        const info = obtenerInfoNutricionalSeguro(alimento.nombre, alimento.cantidad);
         if (info) {
             macrosFinales.calorias += info.calorias;
             macrosFinales.proteinas += info.proteinas;
@@ -1380,7 +1383,7 @@ function balancearMacrosComida(alimentos, distribucionObjetivo, objetivo) {
         
         if (alimentosFiltrados.length > 0) {
             const alimentoCarb = alimentosFiltrados[0];
-            const infoCarb = obtenerInfoNutricional(alimentoCarb, 100);
+            const infoCarb = obtenerInfoNutricionalSeguro(alimentoCarb, 100);
             if (infoCarb && infoCarb.carbohidratos > 0) {
                 const cantidadNecesaria = Math.round((deficitCarbos / infoCarb.carbohidratos) * 100);
                 const cantidadFinal = Math.max(30, Math.min(cantidadNecesaria, 200));
@@ -1404,7 +1407,7 @@ function balancearMacrosComida(alimentos, distribucionObjetivo, objetivo) {
         
         if (alimentosProtFiltrados.length > 0) {
             const alimentoProt = alimentosProtFiltrados[0];
-            const infoProt = obtenerInfoNutricional(alimentoProt, 100);
+            const infoProt = obtenerInfoNutricionalSeguro(alimentoProt, 100);
             if (infoProt && infoProt.proteinas > 0) {
                 const cantidadNecesaria = Math.round((deficitProt / infoProt.proteinas) * 100);
                 const cantidadFinal = Math.max(30, Math.min(cantidadNecesaria, 300));

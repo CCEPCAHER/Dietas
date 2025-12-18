@@ -2055,8 +2055,10 @@ async function inicializarTablaEditable() {
 
 // Intentar inicializar cuando el DOM esté listo
 function intentarInicializar() {
-    // Esperar a que la base de datos esté disponible
-    if (typeof window.obtenerTodosLosAlimentos === 'function') {
+    // Esperar a que la base de datos de alimentos esté disponible.
+    // Desde la refactorización, la fuente principal es AlimentoService (Firebase),
+    // pero mantenemos compatibilidad con la función antigua obtenerTodosLosAlimentos.
+    if (window.alimentoService || typeof window.obtenerTodosLosAlimentos === 'function') {
         inicializarTablaEditable();
     } else {
         console.log('⏳ Esperando base de datos de alimentos...');
