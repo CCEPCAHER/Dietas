@@ -301,14 +301,6 @@ window.mostrarResultados = function () {
             }
         }, 100);
 
-        setTimeout(() => {
-            try {
-                resultadosDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } catch (error) {
-                console.error('Error al hacer scroll:', error);
-            }
-        }, 200);
-
         if (window.toastManager) {
             window.toastManager.success('Plan de alimentación generado correctamente', '¡Listo!');
         } else if (window.mostrarNotificacion) {
@@ -3133,26 +3125,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     */
 
-    // Smooth scroll to results when they appear
-    const observer = new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                const resultados = document.getElementById('resultados');
-                if (resultados && !resultados.classList.contains('oculto')) {
-                    setTimeout(() => {
-                        resultados.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 300);
-                }
-            }
-        });
-    });
-
-    const resultados = document.getElementById('resultados');
-    if (resultados) {
-        observer.observe(resultados, { attributes: true });
-    }
-
-    // Enhanced tooltip initialization
+    // Inicialización de tooltips
     const tooltipIcons = document.querySelectorAll('.tooltip-icon');
     tooltipIcons.forEach(icon => {
         icon.addEventListener('mouseenter', function () {

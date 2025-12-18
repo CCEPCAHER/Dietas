@@ -251,11 +251,6 @@ class ClienteManager {
                 lista.innerHTML = `<p class="error">Error al cargar clientes: ${error.message}</p>`;
             }
         }
-
-        // Scroll a la sección
-        setTimeout(() => {
-            seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 200);
     }
 
     volverAFormulario() {
