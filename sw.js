@@ -1,6 +1,6 @@
 // Service Worker para MAIKA PORCUNA - PWA
 // Versión actualizada para auto-actualización automática
-const CACHE_NAME = 'maika-porcuna-v5.0.36';
+const CACHE_NAME = 'maika-porcuna-v5.0.38';
 const BASE_PATH = self.location.pathname.replace(/sw\.js$/, '');
 const urlsToCache = [
   './',

@@ -21,6 +21,35 @@
     }
 })();
 
+// Helper para obtener información nutricional de manera segura (fallback)
+function obtenerInfoNutricional(nombreAlimento, cantidad = 100) {
+    if (window.obtenerInfoNutricional) {
+        return window.obtenerInfoNutricional(nombreAlimento, cantidad);
+    }
+    
+    // Si la función global no está disponible, intentar buscar manualmente en window.baseDatosAlimentos
+    if (window.baseDatosAlimentos && Array.isArray(window.baseDatosAlimentos)) {
+        const nombreBuscado = nombreAlimento.toLowerCase().trim();
+        const alimento = window.baseDatosAlimentos.find(item => 
+            (item.ALIMENTO && item.ALIMENTO.toLowerCase() === nombreBuscado) || 
+            (item.nombre && item.nombre.toLowerCase() === nombreBuscado)
+        );
+        
+        if (alimento) {
+            const factor = cantidad / 100;
+            return {
+                proteinas: (parseFloat(alimento.PROTEÍNAS) || 0) * factor,
+                grasas: (parseFloat(alimento.GRASAS) || 0) * factor,
+                carbohidratos: (parseFloat(alimento.HIDRATOS) || 0) * factor,
+                calorias: (parseFloat(alimento.KCALS) || 0) * factor
+            };
+        }
+    }
+    
+    console.warn(`⚠️ No se pudo obtener información nutricional para: ${nombreAlimento}`);
+    return { proteinas: 0, grasas: 0, carbohidratos: 0, calorias: 0 };
+}
+
 // Variables globales para tracking de diversidad
 let alimentosUsadosSemana = [];
 let alimentosUsadosHistorial = [];
