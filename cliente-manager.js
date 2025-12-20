@@ -1136,6 +1136,22 @@ class ClienteManager {
             return obj; // Si no coincide, devolver original
         };
         document.getElementById('objetivo').value = mapObjetivo(cliente.objetivo);
+
+        // Actualizar opciones del select de superávit según el objetivo
+        if (typeof window.actualizarSuperavitPorObjetivo === 'function') {
+            window.actualizarSuperavitPorObjetivo();
+
+            // REQUISITO: Forzar siempre a 0 al cargar, independientemente del objetivo
+            console.log('Forzando superávit a 0 por defecto al cargar cliente');
+            const superavitEntreno = document.getElementById('superavitEntreno');
+            const superavitDescanso = document.getElementById('superavitDescanso');
+
+            if (superavitEntreno) superavitEntreno.value = '0';
+            if (superavitDescanso) superavitDescanso.value = '0';
+
+            // Marcar manualmente como cambiados para que el cálculo inicial use estos valores
+            if (superavitEntreno) superavitEntreno.setAttribute('data-manual-set', 'true');
+        }
         document.getElementById('prohibiciones').value = cliente.alergias || '';
 
         // Guardar referencia al cliente
@@ -1737,6 +1753,7 @@ class ClienteManager {
             const resultado = await window.clienteService.eliminarCliente(clienteId);
 
             if (resultado.success) {
+
                 // Mostrar notificación de éxito
                 if (typeof window.mostrarNotificacion === 'function') {
                     window.mostrarNotificacion(
