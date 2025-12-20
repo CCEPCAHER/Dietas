@@ -50,10 +50,10 @@ const MacronutrientesCalculator = {
         console.log('Es Deficit:', esDeficit, 'Es Mantener:', esMantener);
 
         // Definir valores base por defecto según objetivo
-        let defaultSurplus = 5;
-        if (esDeficit) defaultSurplus = 15; // 15% déficit por defecto
-        if (objetivoNormalizado.includes('aumentar')) defaultSurplus = 15; // 15% superávit
-        if (esMantener) defaultSurplus = 0; // 0% para mantenimiento
+        // El usuario solicitó explícitamente que el selector empiece en 0%, 
+        // pero que las calorías cambien automáticamente.
+        // Para lograr esto, aplicamos un "Factor de Objetivo" interno.
+        let defaultSurplus = 0;
 
         console.log('Default Surplus:', defaultSurplus);
 
@@ -106,9 +106,16 @@ const MacronutrientesCalculator = {
         const actividadFisicaDeporteKcalExacta = tmbBaseExacta * factorActividad;
         const actividadFisicaDeporteKcal = Math.round(actividadFisicaDeporteKcalExacta);
 
-        // Calcular gasto calórico base
-        const gastoBaseEntrenoExacta = tmbAjustadoExacta + tefExacta + actividadFisicaDeporteKcalExacta;
-        const gastoBaseDescansoExacta = tmbAjustadoExacta + tefExacta;
+        // Factor de Objetivo Base (Oculto/Implícito)
+        // Esto permite que al seleccionar "Perder Peso" con "0%" en el selector,
+        // las calorías bajen respecto al mantenimiento (simulando un déficit base).
+        let factorObjetivo = 1.0;
+        if (esDeficit) factorObjetivo = 0.85; // 15% de déficit base implícito
+        if (objetivoNormalizado.includes('aumentar')) factorObjetivo = 1.10; // 10% de superávit base implícito
+
+        // Calcular gasto calórico base CON el factor de objetivo
+        const gastoBaseEntrenoExacta = (tmbAjustadoExacta + tefExacta + actividadFisicaDeporteKcalExacta) * factorObjetivo;
+        const gastoBaseDescansoExacta = (tmbAjustadoExacta + tefExacta) * factorObjetivo;
         const gastoBaseEntreno = Math.round(gastoBaseEntrenoExacta);
         const gastoBaseDescanso = Math.round(gastoBaseDescansoExacta);
 

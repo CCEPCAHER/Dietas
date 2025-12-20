@@ -1420,15 +1420,15 @@
         function actualizarEstadisticas() {
             document.getElementById('totalAlimentos').textContent = baseDatosCompleta.length;
 
-            const categorias = new Set(baseDatosCompleta.map(a => a.categoria_principal || a['CATEGORÍA PRINCIPAL']));
+            const categorias = new Set(baseDatosCompleta.map(a => a.categoria_principal || a['CATEGORÍA PRINCIPAL'] || a.MACRONUTRIENTE_PRINCIPAL || a['MACRONUTRIENTE PRINCIPAL']));
             document.getElementById('totalCategorias').textContent = categorias.size;
 
-            const subcategorias = new Set(baseDatosCompleta.map(a => a.subcategoria || a.CLASIFICACIÓN));
+            const subcategorias = new Set(baseDatosCompleta.map(a => a.subcategoria || a.CLASIFICACIÓN || a.CLASIFICACION));
             document.getElementById('totalSubcategorias').textContent = subcategorias.size;
         }
 
         function poblarFiltros() {
-            const categorias = [...new Set(baseDatosCompleta.map(a => a.categoria_principal || a['CATEGORÍA PRINCIPAL']))].sort();
+            const categorias = [...new Set(baseDatosCompleta.map(a => a.categoria_principal || a['CATEGORÍA PRINCIPAL'] || a.MACRONUTRIENTE_PRINCIPAL || a['MACRONUTRIENTE PRINCIPAL']))].sort();
             const selectCategoria = document.getElementById('filterCategoria');
 
             categorias.forEach(cat => {
@@ -1457,17 +1457,17 @@
             }
 
             baseDatosFiltrada.forEach((alimento, index) => {
-                const nombre = alimento.nombre || alimento.ALIMENTO;
-                const marca = alimento.marca || alimento['MARCA REGISTRADA'] || '-';
-                const categoria = alimento.categoria_principal || alimento['CATEGORÍA PRINCIPAL'] || '';
-                const subcategoria = alimento.subcategoria || alimento.CLASIFICACIÓN || '';
-                const peso = alimento.peso || alimento['PESO POR UNIDAD'] || '';
+                const nombre = alimento.nombre || alimento.ALIMENTO || '';
+                const marca = alimento.marca || alimento['MARCA REGISTRADA'] || alimento.MARCA_REGISTRADA || '-';
+                const categoria = alimento.categoria_principal || alimento['CATEGORÍA PRINCIPAL'] || alimento.MACRONUTRIENTE_PRINCIPAL || alimento['MACRONUTRIENTE PRINCIPAL'] || '';
+                const subcategoria = alimento.subcategoria || alimento.CLASIFICACIÓN || alimento.CLASIFICACION || '';
+                const peso = alimento.peso || alimento['PESO POR UNIDAD'] || alimento.PESO_POR_UNIDAD || '';
                 const proteinas = parseFloat(alimento.proteínas || alimento.PROTEÍNAS || 0);
-                const grasasSaturadas = alimento.grasas_saturadas || alimento['GRASAS SATURADAS'] || '-';
-                const carbohidratos = parseFloat(alimento.carbohidratos || alimento.HIDRATOS || 0);
+                const grasasSaturadas = alimento.grasas_saturadas || alimento['GRASAS SATURADAS'] || alimento.GRASAS_SATURADAS || '-';
+                const carbohidratos = parseFloat(alimento.carbohidratos || alimento.HIDRATOS || alimento.hidratos || 0);
                 const grasas = parseFloat(alimento.grasas || alimento.GRASAS || 0);
-                const azucares = alimento.azucar || alimento.AZÚCARES || '-';
-                const calorias = parseFloat(alimento.calorias || alimento.CALORÍAS || 0) ||
+                const azucares = alimento.azucar || alimento.AZÚCARES || alimento.AZUCARES || '-';
+                const calorias = parseFloat(alimento.calorias || alimento.CALORÍAS || alimento.CALORIAS || 0) ||
                     Math.round((proteinas * 4) + (carbohidratos * 4) + (grasas * 9));
 
                 const tr = document.createElement('tr');
@@ -1498,9 +1498,9 @@
 
             baseDatosFiltrada = baseDatosCompleta.filter(alimento => {
                 const nombre = (alimento.nombre || alimento.ALIMENTO || '').toLowerCase();
-                const cat = alimento.categoria_principal || alimento['CATEGORÍA PRINCIPAL'] || '';
-                const marca = (alimento.marca || alimento['MARCA REGISTRADA'] || '').toLowerCase();
-                const producto = (alimento.producto || alimento['NOMBRE DEL PRODUCTO'] || '').toLowerCase();
+                const cat = alimento.categoria_principal || alimento['CATEGORÍA PRINCIPAL'] || alimento.MACRONUTRIENTE_PRINCIPAL || alimento['MACRONUTRIENTE PRINCIPAL'] || '';
+                const marca = (alimento.marca || alimento['MARCA REGISTRADA'] || alimento.MARCA_REGISTRADA || '').toLowerCase();
+                const producto = (alimento.producto || alimento['NOMBRE DEL PRODUCTO'] || alimento.NOMBRE_DEL_PRODUCTO || '').toLowerCase();
 
                 const coincideBusqueda = !busqueda ||
                     nombre.includes(busqueda) ||
@@ -1546,18 +1546,18 @@
             modalTitle.style.paddingBottom = '15px';
 
             document.getElementById('nombre').value = alimento.nombre || alimento.ALIMENTO || '';
-            document.getElementById('categoria_principal').value = alimento.categoria_principal || alimento['CATEGORÍA PRINCIPAL'] || '';
-            document.getElementById('subcategoria').value = alimento.subcategoria || alimento.CLASIFICACIÓN || '';
+            document.getElementById('categoria_principal').value = alimento.categoria_principal || alimento['CATEGORÍA PRINCIPAL'] || alimento.MACRONUTRIENTE_PRINCIPAL || alimento['MACRONUTRIENTE PRINCIPAL'] || '';
+            document.getElementById('subcategoria').value = alimento.subcategoria || alimento.CLASIFICACIÓN || alimento.CLASIFICACION || '';
             document.getElementById('presentacion').value = alimento.presentacion || alimento.UNIDAD || '';
-            document.getElementById('peso').value = alimento.peso || alimento['PESO POR UNIDAD'] || '';
-            document.getElementById('marca').value = alimento.marca || alimento['MARCA REGISTRADA'] || '';
-            document.getElementById('producto').value = alimento.producto || alimento['NOMBRE DEL PRODUCTO'] || '';
-            document.getElementById('notas').value = alimento.notas || alimento['OTRAS NOTAS'] || '';
-            document.getElementById('proteínas').value = alimento.proteínas || alimento.PROTEÍNAS || 0;
-            document.getElementById('carbohidratos').value = alimento.carbohidratos || alimento.HIDRATOS || 0;
+            document.getElementById('peso').value = alimento.peso || alimento['PESO POR UNIDAD'] || alimento.PESO_POR_UNIDAD || '';
+            document.getElementById('marca').value = alimento.marca || alimento['MARCA REGISTRADA'] || alimento.MARCA_REGISTRADA || '';
+            document.getElementById('producto').value = alimento.producto || alimento['NOMBRE DEL PRODUCTO'] || alimento.NOMBRE_DEL_PRODUCTO || '';
+            document.getElementById('notas').value = alimento.notas || alimento['OTRAS NOTAS'] || alimento.OTRAS_NOTAS || '';
+            document.getElementById('proteínas').value = alimento.proteínas || alimento.PROTEÍNAS || alimento.PROTEINAS || 0;
+            document.getElementById('carbohidratos').value = alimento.carbohidratos || alimento.HIDRATOS || alimento.hidratos || 0;
             document.getElementById('grasas').value = alimento.grasas || alimento.GRASAS || 0;
             document.getElementById('fibra').value = alimento.fibra || alimento.FIBRA || '';
-            document.getElementById('azucar').value = alimento.azucar || alimento.AZÚCARES || '';
+            document.getElementById('azucar').value = alimento.azucar || alimento.AZÚCARES || alimento.AZUCARES || '';
 
             actualizarCalorias();
             indiceEdicion = indiceOriginal;

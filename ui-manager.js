@@ -446,39 +446,29 @@ class UIManager {
                     // Primero actualizar las opciones y etiquetas según el objetivo
                     window.actualizarSuperavitPorObjetivo();
 
-                    // Luego, si hay valores guardados, restaurarlos (después de que las opciones estén actualizadas)
-                    if (superavitEntrenoGuardado !== undefined) {
+                    // Restaurar valores guardados, PERO forzar a 0 como solicitó el usuario "cargar con cero"
+                    // El usuario pidió explícitamente: "siempre tiene que estar el déficit y el superávit en cero" al cargar
+                    if (true) { // Forzamos siempre
                         const superavitEntrenoElem = document.getElementById('superavitEntreno');
                         if (superavitEntrenoElem) {
-                            const valor = String(superavitEntrenoGuardado);
-                            if (superavitEntrenoElem.querySelector(`option[value="${valor}"]`)) {
-                                superavitEntrenoElem.value = valor;
+                            // Intentar seleccionar 0 explícitamente
+                            if (superavitEntrenoElem.querySelector('option[value="0"]')) {
+                                superavitEntrenoElem.value = '0';
                             } else {
-                                // Buscar el valor más cercano si el valor exacto no está disponible
-                                const opciones = Array.from(superavitEntrenoElem.options).map(opt => parseFloat(opt.value));
-                                const valorNum = parseFloat(valor);
-                                const masCercano = opciones.reduce((prev, curr) =>
-                                    Math.abs(curr - valorNum) < Math.abs(prev - valorNum) ? curr : prev
-                                );
-                                superavitEntrenoElem.value = String(masCercano);
+                                // Si no existe 0 (raro), forzar el primer valor o mantener default
+                                // Pero con la lógica actual, 0 siempre debería existir en las opciones generadas
+                                superavitEntrenoElem.value = '0';
                             }
                         }
                     }
 
-                    if (superavitDescansoGuardado !== undefined) {
+                    if (true) {
                         const superavitDescansoElem = document.getElementById('superavitDescanso');
                         if (superavitDescansoElem) {
-                            const valor = String(superavitDescansoGuardado);
-                            if (superavitDescansoElem.querySelector(`option[value="${valor}"]`)) {
-                                superavitDescansoElem.value = valor;
+                            if (superavitDescansoElem.querySelector('option[value="0"]')) {
+                                superavitDescansoElem.value = '0';
                             } else {
-                                // Buscar el valor más cercano si el valor exacto no está disponible
-                                const opciones = Array.from(superavitDescansoElem.options).map(opt => parseFloat(opt.value));
-                                const valorNum = parseFloat(valor);
-                                const masCercano = opciones.reduce((prev, curr) =>
-                                    Math.abs(curr - valorNum) < Math.abs(prev - valorNum) ? curr : prev
-                                );
-                                superavitDescansoElem.value = String(masCercano);
+                                superavitDescansoElem.value = '0';
                             }
                         }
                     }

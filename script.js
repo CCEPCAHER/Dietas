@@ -2387,12 +2387,12 @@ function actualizarOpcionesSuperavit(selectElement, objetivo) {
         case 'aumentar':
             // Para aumentar: superávit positivo (5% a 30% típicamente)
             opciones = ['0', '5', '10', '15', '20', '25', '30', '35', '40'];
-            valorPorDefecto = '10'; // Superávit moderado por defecto
+            valorPorDefecto = '0'; // Superávit 0 por defecto (pero aplicará factor base interno)
             break;
         case 'adelgazar':
             // Para adelgazar: déficit (0% a 30% típicamente)
             opciones = ['0', '5', '10', '15', '20', '25', '30'];
-            valorPorDefecto = '15'; // Déficit moderado por defecto
+            valorPorDefecto = '0'; // Déficit 0 por defecto (pero aplicará factor base interno)
             break;
         case 'mantener':
         default:
