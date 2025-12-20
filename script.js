@@ -322,7 +322,7 @@ const mostrarResultados = window.mostrarResultados;
 // Funciones de visualización de tablas refactorizadas al módulo UIRenderer
 function mostrarTablaMacros() {
     if (window.UIRenderer) {
-        window.UIRenderer.mostrarTablaMacros(datosUsuario);
+        window.UIRenderer.mostrarTablaMacros(window.datosUsuario || datosUsuario);
     } else {
         console.error('UIRenderer no está disponible');
     }
@@ -2324,10 +2324,11 @@ function recalcularIngestasPorSuperavit() {
         };
 
         // Recalcular macronutrientes con los nuevos valores
-        window.datosUsuario = window.MacronutrientesCalculator.calcularMacronutrientes(
-            window.datosUsuario,
+        datosUsuario = window.MacronutrientesCalculator.calcularMacronutrientes(
+            window.datosUsuario || datosUsuario,
             formulario
         );
+        window.datosUsuario = datosUsuario;
 
         // Actualizar la tabla de cálculos detallados
         if (typeof mostrarCalculosDetallados === 'function') {
@@ -2341,7 +2342,7 @@ function recalcularIngestasPorSuperavit() {
 
         // Actualizar la tabla de macros principal
         if (typeof mostrarTablaMacros === 'function') {
-            mostrarTablaMacros();
+            mostrarTablaMacros(window.datosUsuario);
         }
 
         // Si hay tabla editable (modo manual), actualizar los objetivos calóricos y totales
