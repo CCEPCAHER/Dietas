@@ -156,7 +156,8 @@ class UIManager {
                             window.clienteManager.mostrarSeccionClientes();
                         } else {
                             console.error('clienteManager no está disponible');
-                            alert('Error: Sistema de clientes no está cargado. Por favor, recarga la página.');
+                            console.error('Sistema de clientes no cargado');
+                            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: El sistema de clientes no está listo.', 'error');
                         }
                     });
 

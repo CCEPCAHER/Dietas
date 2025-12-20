@@ -408,7 +408,7 @@ class ClienteManager {
         const resultado = await window.clienteService.obtenerClientePorId(clienteId);
 
         if (!resultado.success) {
-            alert('Error al cargar cliente: ' + resultado.error);
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Error al cargar cliente: ' + resultado.error, 'error');
             return;
         }
 
@@ -1100,7 +1100,7 @@ class ClienteManager {
         const resultado = await window.clienteService.obtenerClientePorId(clienteId);
 
         if (!resultado.success) {
-            alert('Error al cargar cliente: ' + resultado.error);
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Error al cargar cliente: ' + resultado.error, 'error');
             return;
         }
 
@@ -1175,7 +1175,7 @@ class ClienteManager {
 
     async verDietaDetalle(dietaId) {
         // Implementar visualización de dieta detallada
-        alert('Función de visualización de dieta en desarrollo');
+        if (window.mostrarNotificacion) window.mostrarNotificacion('Función de visualización de dieta en desarrollo', 'info');
     }
 
     async agregarMedidas(clienteId) {
@@ -1761,7 +1761,7 @@ class ClienteManager {
                         'success'
                     );
                 } else {
-                    alert(`✅ Cliente "${clienteNombre}" eliminado correctamente`);
+                    if (window.mostrarNotificacion) window.mostrarNotificacion(`✅ Cliente "${clienteNombre}" eliminado correctamente`, 'success');
                 }
 
                 // Recargar la lista de clientes
@@ -1788,7 +1788,7 @@ class ClienteManager {
                     'error'
                 );
             } else {
-                alert(`❌ Error al eliminar cliente: ${error.message}`);
+                if (window.mostrarNotificacion) window.mostrarNotificacion(`❌ Error al eliminar cliente: ${error.message}`, 'error');
             }
 
             // Restaurar botón
@@ -1818,7 +1818,7 @@ class ClienteManager {
                 window.generarPDFProfesional('principal');
             }
         } else {
-            alert('Error: Sistema de generación de PDF no disponible. Recarga la página.');
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: Sistema de generación de PDF no disponible. Recarga la página.', 'error');
         }
     }
 }
