@@ -12,16 +12,28 @@ const MacronutrientesCalculator = {
      */
     calcularMacronutrientes(datosUsuario = {}, formulario = {}) {
         // Obtener valores del formulario o datosUsuario (prioridad al formulario)
-        const edad = parseInt(formulario.edad?.value) || datosUsuario.edad;
-        const sexo = formulario.sexo?.value || datosUsuario.sexo;
-        const altura = parseFloat(formulario.altura?.value) || datosUsuario.altura;
-        const peso = parseFloat(formulario.peso?.value) || datosUsuario.peso;
-        const objetivo = formulario.objetivo?.value || datosUsuario.objetivo;
-        const tipoPersona = formulario.tipoPersona?.value || datosUsuario.tipoPersona;
+        const valEdad = parseInt(formulario.edad?.value);
+        const edad = !isNaN(valEdad) ? valEdad : datosUsuario.edad;
+
+        const valSex = formulario.sexo?.value;
+        const sexo = (valSex && valSex !== "") ? valSex : datosUsuario.sexo;
+
+        const valAltura = parseFloat(formulario.altura?.value);
+        const altura = !isNaN(valAltura) ? valAltura : datosUsuario.altura;
+
+        const valPeso = parseFloat(formulario.peso?.value);
+        const peso = !isNaN(valPeso) ? valPeso : datosUsuario.peso;
+
+        const valObjetivo = formulario.objetivo?.value;
+        const objetivo = (valObjetivo && valObjetivo !== "") ? valObjetivo : datosUsuario.objetivo;
+
+        const valTipo = formulario.tipoPersona?.value;
+        const tipoPersona = (valTipo && valTipo !== "") ? valTipo : datosUsuario.tipoPersona;
 
         // Obtener valores del formulario (pueden no estar en datosUsuario aún)
-        const actividadFisicaDeporte = formulario.actividadFisicaDeporte?.value ||
-            datosUsuario.actividadFisicaDeporte || 'moderada';
+        const valAct = formulario.actividadFisicaDeporte?.value;
+        const actividadFisicaDeporte = (valAct && valAct !== "") ? valAct :
+            (datosUsuario.actividadFisicaDeporte || 'moderada');
 
         // Mapear tipoPersona a tipoTermogenico si no está definido
         let tipoTermogenico = formulario.tipoTermogenico?.value || datosUsuario.tipoTermogenico;

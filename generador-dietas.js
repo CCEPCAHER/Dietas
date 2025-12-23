@@ -297,8 +297,8 @@ function generarComida(objetivo, tipoComida, variacion, esDescanso = false) {
     // Balancear macros si es necesario
     alimentos = balancearMacrosComida(alimentos, distribucion, objetivo);
     
-    // Calcular macros totales
-    alimentos.forEach(alimento => {
+    // Calcular macros totales y crear objetos de alimentos con info nutricional
+    const alimentosConInfo = alimentos.map(alimento => {
         const info = obtenerInfoNutricionalSeguro(alimento.nombre, alimento.cantidad);
         if (info) {
             calorias += info.calorias;
@@ -306,10 +306,21 @@ function generarComida(objetivo, tipoComida, variacion, esDescanso = false) {
             carbohidratos += info.carbohidratos;
             grasas += info.grasas;
         }
+        
+        // Retornar objeto con toda la información
+        return {
+            nombre: alimento.nombre,
+            cantidad: alimento.cantidad,
+            textoFormateado: formatearAlimento(alimento),
+            calorias: info ? info.calorias : 0,
+            proteinas: info ? info.proteinas : 0,
+            carbohidratos: info ? info.carbohidratos : 0,
+            grasas: info ? info.grasas : 0
+        };
     });
     
     return {
-        alimentos: alimentos.map(a => formatearAlimento(a)),
+        alimentos: alimentosConInfo,
         calorias: Math.round(calorias),
         proteinas: Math.round(proteinas),
         carbohidratos: Math.round(carbohidratos),

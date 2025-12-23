@@ -68,7 +68,11 @@ window.calcularMacronutrientes = function () {
         const nuevosDatos = window.MacronutrientesCalculator.calcularMacronutrientes(window.datosUsuario, formularioRefs);
 
         // Update global object
-        window.datosUsuario = { ...window.datosUsuario, ...nuevosDatos };
+        if (typeof window.actualizarDatosUsuarioGlobal === 'function') {
+            window.actualizarDatosUsuarioGlobal({ ...window.datosUsuario, ...nuevosDatos });
+        } else {
+            window.datosUsuario = { ...window.datosUsuario, ...nuevosDatos };
+        }
 
         // Update UI
         const setVal = (id, val) => {

@@ -322,7 +322,7 @@ const mostrarResultados = window.mostrarResultados;
 // Funciones de visualización de tablas refactorizadas al módulo UIRenderer
 function mostrarTablaMacros() {
     if (window.UIRenderer) {
-        window.UIRenderer.mostrarTablaMacros(window.datosUsuario || datosUsuario);
+        window.UIRenderer.mostrarTablaMacros(window.datosUsuario);
     } else {
         console.error('UIRenderer no está disponible');
     }
@@ -1968,15 +1968,74 @@ function mostrarPlanAlimentacion() {
             datosUsuario.planSemana = planSemanaEditable;
             window.datosUsuario = datosUsuario;
 
+            // (Previous auto-populate code removed to fix TypeError. 
+            // The logic is now handled after DOM rendering below)
+
             // Actualizar estructura para exportación si la función está disponible
             if (typeof window.actualizarEstructuraPlanExport === 'function') {
                 window.actualizarEstructuraPlanExport();
             } else if (typeof actualizarEstructuraPlanExport === 'function') {
                 actualizarEstructuraPlanExport();
-            } else {
                 console.warn('⚠️ actualizarEstructuraPlanExport no está definida, saltando paso de exportación');
             }
         }
+
+        // --- FIX DOM ACCESS ERROR ---
+        // Render the "Tracking Table" HTML invisibly if it's not already there.
+        // This is required because 'actualizarTotalesDiarios' tries to read these DOM elements
+        // to calculate the "CONSUMIDO" values in the main summary table.
+        // We create a container, render the table into it, and hide it (or append it).
+        // If we want the user to USE the tracking table, we should append it visibly.
+        // Assuming the user wants to see the automatic plan primarily, but needs the tracking data valid.
+
+        // Let's append the tracking table at the bottom of the plan, visible, so they can track!
+        let trackingContainer = document.getElementById('tracking-table-container');
+        if (!trackingContainer) {
+            trackingContainer = document.createElement('div');
+            trackingContainer.id = 'tracking-table-container';
+            trackingContainer.className = 'mt-8'; // Margin top
+            // Add a header
+            trackingContainer.innerHTML = `
+                <div class="separator" style="margin: 40px 0; border-top: 1px solid #ddd;"></div>
+                <h3 style="text-align: center; color: #4a5568;">📝 Seguimiento Diario (Editable)</h3>
+                <p style="text-align: center; font-size: 0.9em; color: #718096; margin-bottom: 20px;">
+                    Aquí puedes registrar lo que realmente comes. Se ha pre-cargado con tu plan.
+                </p>
+                <div id="tabla-editable-root"></div>
+            `;
+            // Append after the plan
+            planDiv.appendChild(trackingContainer);
+        } else {
+            // Ensure it's clear
+            const root = trackingContainer.querySelector('#tabla-editable-root');
+            if (root) root.innerHTML = '';
+        }
+
+        if (window.tablaEditable) {
+            const root = document.getElementById('tabla-editable-root');
+            if (root) {
+                // Generate the HTML for the editable table
+                if (typeof window.tablaEditable.generarTablaHTML === 'function') {
+                    root.innerHTML = window.tablaEditable.generarTablaHTML();
+
+                    // Initialize events/styles
+                    if (window.tablaEditable.actualizarSelectoresDia) window.tablaEditable.actualizarSelectoresDia();
+                    if (window.tablaEditable.actualizarEstilosDia) window.tablaEditable.actualizarEstilosDia();
+
+                    // Now populate it with the saved data
+                    const diaActual = window.tablaEditable.diaActual || 'Lunes';
+                    if (datosUsuario.planSemana && datosUsuario.planSemana[diaActual]) {
+                        console.log('🔄 Loading generated plan into tracking table...');
+                        window.tablaEditable.cargarDatos(datosUsuario.planSemana[diaActual], true);
+                    }
+
+                    console.log('✅ Tracking table rendered and populated.');
+                } else {
+                    console.error('❌ generarTablaHTML not found in tablaEditable');
+                }
+            }
+        }
+        // -----------------------------
 
         console.log('✅ Plan de alimentación mostrado correctamente');
     } catch (error) {
@@ -2059,7 +2118,7 @@ function convertirComida(comida) {
         let nombre, gramos, calorias, proteinas, grasas, hidratos;
 
         if (typeof alimento === 'string') {
-            // Es un string formateado, necesitamos parsearlo
+            // Es un string formateado (para compatibilidad con versiones anteriores)
             const parsed = parsearAlimentoFormateado(alimento);
             nombre = parsed.nombre;
             gramos = parsed.gramos;
@@ -2073,15 +2132,17 @@ function convertirComida(comida) {
                     grasas = info.grasas || 0;
                     hidratos = info.carbohidratos || info.hidratos || 0;
                 } else {
+                    console.warn(`⚠️ No se encontró info nutricional para: "${nombre}" (${gramos}g)`);
                     calorias = proteinas = grasas = hidratos = 0;
                 }
             } else {
                 calorias = proteinas = grasas = hidratos = 0;
             }
         } else {
-            // Es un objeto
+            // Es un objeto - ahora con información nutricional incluida
             nombre = alimento.nombre || alimento.alimento || '';
             gramos = alimento.gramos || alimento.cantidad || 0;
+            // Primero intentar usar los valores que vienen en el objeto
             calorias = alimento.calorias || 0;
             proteinas = alimento.proteinas || alimento.proteínas || 0;
             grasas = alimento.grasas || 0;
@@ -2153,11 +2214,21 @@ function generarDiaHTML(dia, editable = false) {
     }
     theadThs += '<th>MACROS</th>';
 
+    // Función helper para extraer texto del alimento (string u objeto)
+    const obtenerTextoAlimento = (alimento) => {
+        if (typeof alimento === 'string') {
+            return alimento;
+        } else if (typeof alimento === 'object') {
+            return alimento.textoFormateado || `${alimento.nombre} (${alimento.cantidad}g)`;
+        }
+        return '';
+    };
+
     // Generar filas para cada tipo de comida
     const filasComidas = `
         <tr>
             <td class="nombre-comida">🍳 DESAYUNO</td>
-            ${comidas.desayuno.alimentos.map(alimento => `<td>${alimento}</td>`).join('')}
+            ${comidas.desayuno.alimentos.map(alimento => `<td>${obtenerTextoAlimento(alimento)}</td>`).join('')}
             ${Array(maxAlimentos - comidas.desayuno.alimentos.length).fill('<td></td>').join('')}
             <td class="macros-celda">
                 <div class="macros-comida">
@@ -2168,7 +2239,7 @@ function generarDiaHTML(dia, editable = false) {
         </tr>
         <tr>
             <td class="nombre-comida">🥤 MEDIA<br/>MAÑANA</td>
-            ${comidas.medioDia.alimentos.map(alimento => `<td>${alimento}</td>`).join('')}
+            ${comidas.medioDia.alimentos.map(alimento => `<td>${obtenerTextoAlimento(alimento)}</td>`).join('')}
             ${Array(maxAlimentos - comidas.medioDia.alimentos.length).fill('<td></td>').join('')}
             <td class="macros-celda">
                 <div class="macros-comida">
@@ -2179,7 +2250,7 @@ function generarDiaHTML(dia, editable = false) {
         </tr>
         <tr>
             <td class="nombre-comida">🍽️ COMIDA</td>
-            ${comidas.almuerzo.alimentos.map(alimento => `<td>${alimento}</td>`).join('')}
+            ${comidas.almuerzo.alimentos.map(alimento => `<td>${obtenerTextoAlimento(alimento)}</td>`).join('')}
             ${Array(maxAlimentos - comidas.almuerzo.alimentos.length).fill('<td></td>').join('')}
             <td class="macros-celda">
                 <div class="macros-comida">
@@ -2190,7 +2261,7 @@ function generarDiaHTML(dia, editable = false) {
         </tr>
         <tr>
             <td class="nombre-comida">🥙 MERIENDA</td>
-            ${comidas.merienda.alimentos.map(alimento => `<td>${alimento}</td>`).join('')}
+            ${comidas.merienda.alimentos.map(alimento => `<td>${obtenerTextoAlimento(alimento)}</td>`).join('')}
             ${Array(maxAlimentos - comidas.merienda.alimentos.length).fill('<td></td>').join('')}
             <td class="macros-celda">
                 <div class="macros-comida">
@@ -2201,7 +2272,7 @@ function generarDiaHTML(dia, editable = false) {
         </tr>
         <tr>
             <td class="nombre-comida">🌙 CENA</td>
-            ${comidas.cena.alimentos.map(alimento => `<td>${alimento}</td>`).join('')}
+            ${comidas.cena.alimentos.map(alimento => `<td>${obtenerTextoAlimento(alimento)}</td>`).join('')}
             ${Array(maxAlimentos - comidas.cena.alimentos.length).fill('<td></td>').join('')}
             <td class="macros-celda">
                 <div class="macros-comida">
@@ -2834,9 +2905,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     superavitDescanso: superavitDescansoElem ? parseFloat(superavitDescansoElem.value || 5) : 5
                 };
 
+                // Actualizar referencia global ANTES de calcular
+                window.datosUsuario = datosUsuario;
+
                 // Calcular macronutrientes con manejo de errores
                 try {
                     calcularMacronutrientes();
+                    // Sincronizar datosUsuario local con el actualizado por calcularMacronutrientes
+                    datosUsuario = window.datosUsuario;
                 } catch (error) {
                     console.error('❌ Error al calcular macronutrientes:', error);
                     // Asegurar que el loading overlay esté oculto
@@ -2851,9 +2927,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     mostrarNotificacion('❌ Error al calcular macronutrientes: ' + error.message, 'error');
                     return;
                 }
-
-                // Actualizar referencia global
-                window.datosUsuario = datosUsuario;
 
                 // Marcar operación crítica para prevenir reload del Service Worker
                 if (window.marcarOperacionCritica) {
@@ -2890,6 +2963,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         try {
                             window.mostrarPlanAlimentacion();
                             console.log('✅ Plan generado correctamente');
+
+                            // Actualizar la tabla de macronutrientes después de generar el plan
+                            if (typeof window.mostrarTablaMacros === 'function') {
+                                window.mostrarTablaMacros();
+                                console.log('✅ Tabla de macronutrientes actualizada');
+                            }
                         } catch (planError) {
                             console.error('❌ Error al generar el plan:', planError);
                             clearTimeout(timeoutId);
@@ -5118,6 +5197,12 @@ ${lineas.join('\n')}`;
                     document.getElementById('grasas').value = '';
                     document.getElementById('carbohidratos').value = '';
 
+                    // Resetear datosUsuario global para evitar mezclar datos
+                    window.datosUsuario = {};
+                    if (window.UIRenderer) {
+                        // Limpiar tablas si es necesario o manejar estado inicial
+                    }
+
                     const hoy = new Date();
                     const fechaInput = document.getElementById('fechaRegistro');
                     if (fechaInput) {
@@ -5389,49 +5474,54 @@ ${lineas.join('\n')}`;
             mostrarNotificacion('💡 Sigue las instrucciones para compartir', 'info');
         };
 
-        // ========================================
-        // AUTOMATIC CALORIE RECALCULATION
-        // Auto-recalculates calories when weight, objective, or activity level changes
-        // ========================================
 
-        /**
-         * Sets up automatic calorie recalculation when key form fields change.
-         * Triggered on changes to: peso, objetivo, tipoPersona, actividadFisicaDeporte
-         */
-        function setupAutoCalculation() {
-            console.log('📊 Configurando recálculo automático de calorías...');
-
-            // Fields that should trigger recalculation
-            const fieldsToWatch = [
-                'peso',                    // Weight
-                'objetivo',                // Objective (lose, maintain, gain)
-                'tipoPersona',             // Activity level
-                'actividadFisicaDeporte'   // Physical activity/sport level
-            ];
-
-            fieldsToWatch.forEach(fieldId => {
-                const element = document.getElementById(fieldId);
-                if (element) {
-                    element.addEventListener('change', () => {
-                        console.log(`🔄 Campo "${fieldId}" cambió, recalculando macronutrientes...`);
-                        calcularMacronutrientes();
-                    });
-                    console.log(`✅ Listener agregado a: ${fieldId}`);
-                } else {
-                    console.warn(`⚠️ No se encontró el elemento: ${fieldId}`);
-                }
-            });
-
-            console.log('✅ Recálculo automático configurado correctamente');
-        }
-
-        // Initialize auto-calculation when DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', setupAutoCalculation);
-        } else {
-            // DOM already loaded
-            setupAutoCalculation();
-        }
 
     }
 }); // End DOMContentLoaded
+
+// ========================================
+// AUTOMATIC CALORIE RECALCULATION
+// Auto-recalculates calories when weight, objective, or activity level changes
+// ========================================
+
+/**
+ * Sets up automatic calorie recalculation when key form fields change.
+ * Triggered on changes to: peso, objetivo, tipoPersona, actividadFisicaDeporte
+ */
+function setupAutoCalculation() {
+    console.log('📊 Configurando recálculo automático de calorías...');
+
+    // Fields that should trigger recalculation
+    const fieldsToWatch = [
+        'edad',                    // Age
+        'altura',                  // Height
+        'peso',                    // Weight
+        'sexo',                    // Sex
+        'objetivo',                // Objective
+        'tipoPersona',             // Activity level
+        'actividadFisicaDeporte'   // Physical activity/sport level
+    ];
+
+    fieldsToWatch.forEach(fieldId => {
+        const element = document.getElementById(fieldId);
+        if (element) {
+            element.addEventListener('change', () => {
+                console.log(`🔄 Campo "${fieldId}" cambió, recalculando macronutrientes...`);
+                calcularMacronutrientes();
+            });
+            console.log(`✅ Listener agregado a: ${fieldId}`);
+        } else {
+            console.warn(`⚠️ No se encontró el elemento: ${fieldId}`);
+        }
+    });
+
+    console.log('✅ Recálculo automático configurado correctamente');
+}
+
+// Initialize auto-calculation when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupAutoCalculation);
+} else {
+    // DOM already loaded
+    setupAutoCalculation();
+}
