@@ -4528,6 +4528,27 @@ ${lineas.join('\n')}`;
                     return;
                 }
 
+                // Verificar si está en assets precargados (Fix para CORS local)
+                if (window.APP_ASSETS) {
+                    // Obtener nombre de archivo limpio (sin path ni query params)
+                    const filename = src.split('/').pop().split('?')[0].split('#')[0];
+                    // Decodificar por si tiene espacios (%20) u otros caracteres
+                    const decodedFilename = decodeURIComponent(filename);
+
+                    if (window.APP_ASSETS[decodedFilename]) {
+                        console.log('📦 Usando asset precargado para:', decodedFilename);
+                        resolve(window.APP_ASSETS[decodedFilename]);
+                        return;
+                    }
+
+                    // Intento directo con el nombre por si acaso
+                    if (window.APP_ASSETS['iconofit.png'] && decodedFilename.includes('iconofit')) {
+                        console.log('📦 Usando asset precargado (match parcial) para:', decodedFilename);
+                        resolve(window.APP_ASSETS['iconofit.png']);
+                        return;
+                    }
+                }
+
                 // Primero intentar buscar la imagen en el DOM si ya está cargada
                 const imagenesEnDOM = document.querySelectorAll('img[src*="' + src + '"], img[src*="iconofit"]');
                 for (const imgDOM of imagenesEnDOM) {
