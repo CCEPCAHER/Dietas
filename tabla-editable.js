@@ -135,6 +135,7 @@ class TablaEditable {
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <button type="button" class="btn-clientes" onclick="tablaEditable.replicarDiaActualPorTipo('entreno')" title="Copiar este día a todos los días marcados como entreno">💪 Replicar días de entreno</button>
                     <button type="button" class="btn-clientes" onclick="tablaEditable.replicarDiaActualPorTipo('descanso')" title="Copiar este día a todos los días de descanso">😴 Replicar días de descanso</button>
+                    <button type="button" class="btn-clientes" onclick="tablaEditable.mostrarModalReplicar()" title="Seleccionar días específicos para copiar este plan">📋 Replicar a días...</button>
                     <button type="button" class="btn-clientes" onclick="tablaEditable.replicarDiaActualATodaLaSemana()" title="Copiar este día a toda la semana">↔️ Replicar a toda la semana</button>
                     <button type="button" class="btn-clientes" onclick="tablaEditable.exportarPDFMinimalista()" title="Exportar plan semanal en PDF">🧾 Exportar PDF</button>
                 </div>
@@ -1941,6 +1942,94 @@ class TablaEditable {
             this.planSemana[d] = JSON.parse(JSON.stringify(datosActual));
         });
         window.mostrarNotificacion?.('✅ Día replicado a toda la semana', 'success');
+    }
+
+    /**
+     * Muestra un modal para seleccionar a qué días replicar el plan actual
+     */
+    mostrarModalReplicar() {
+        const modalId = 'modal-replicar-dias';
+        let modal = document.getElementById(modalId);
+        if (modal) modal.remove();
+
+        const diasSemana = this.dias;
+        const diaActual = this.diaActual;
+
+        let optionsHtml = '';
+        diasSemana.forEach(dia => {
+            if (dia === diaActual) return; // No replicar sobre sí mismo en el selector
+
+            const esDescanso = this.esDiaDescanso(dia);
+            const badge = esDescanso ? '😴' : '💪';
+            
+            optionsHtml += `
+                <label class="checkbox-label-modern">
+                    <input type="checkbox" name="dia-replicar" value="${dia}">
+                    <div class="dia-card-mini">
+                        <span class="dia-nombre">${dia}</span>
+                        <span class="dia-badge">${badge}</span>
+                    </div>
+                </label>
+            `;
+        });
+
+        const modalHTML = `
+            <div id="${modalId}" class="modal-modern-container">
+                <div class="modal-modern-content fade-in">
+                    <div class="modal-modern-header">
+                        <h3>📋 Replicar Plan de ${diaActual}</h3>
+                        <span class="modal-modern-close" onclick="document.getElementById('${modalId}').remove()">&times;</span>
+                    </div>
+                    <div class="modal-modern-body">
+                        <p>Selecciona los días a los que quieres copiar la dieta de hoy:</p>
+                        <div class="dias-selection-grid">
+                            ${optionsHtml}
+                        </div>
+                    </div>
+                    <div class="modal-modern-footer">
+                        <button class="btn-modern-secondary" onclick="document.getElementById('${modalId}').remove()">Cancelar</button>
+                        <button class="btn-modern-primary" onclick="window.tablaEditable.confirmarReplicacion()">Replicar Ahora</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const div = document.createElement('div');
+        div.innerHTML = modalHTML;
+        document.body.appendChild(div.firstElementChild);
+    }
+
+    /**
+     * Confirma la replicación a los días seleccionados
+     */
+    confirmarReplicacion() {
+        const checkboxes = document.querySelectorAll('input[name="dia-replicar"]:checked');
+        if (checkboxes.length === 0) {
+            window.mostrarNotificacion?.('Selecciona al menos un día', 'warning');
+            return;
+        }
+
+        const datosActual = this.obtenerDatos();
+        const diasSeleccionados = [];
+
+        checkboxes.forEach(cb => {
+            const día = cb.value;
+            this.planSemana[día] = JSON.parse(JSON.stringify(datosActual));
+            diasSeleccionados.push(día);
+        });
+
+        document.getElementById('modal-replicar-dias').remove();
+        
+        const mensaje = diasSeleccionados.length === 1 
+            ? `✅ Plan replicado al ${diasSeleccionados[0]}`
+            : `✅ Plan replicado a ${diasSeleccionados.length} días`;
+            
+        window.mostrarNotificacion?.(mensaje, 'success');
+        
+        // Sincronizar con el estado global
+        if (typeof window.sincronizarPlanManualConDatosUsuario === 'function') {
+            window.sincronizarPlanManualConDatosUsuario();
+        }
     }
 
     // Exportación PDF minimalista con marca MAIKA PORCUNA
