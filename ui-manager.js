@@ -345,7 +345,15 @@ class UIManager {
             }
 
             const dieta = result.dieta || {};
+            await this.cargarDietaDesdeObjeto(dieta);
+        } catch (error) {
+            console.error('❌ Error crítico al cargar dieta:', error);
+            this.showNotification('❌ Error crítico al cargar la dieta: ' + error.message, 'error');
+        }
+    }
 
+    async cargarDietaDesdeObjeto(dieta, clienteId = null) {
+        try {
             // Guardar el ID de la dieta cargada para poder actualizarla después
             const dietaIdCargada = dieta.id || null;
             if (dietaIdCargada) {
@@ -353,6 +361,15 @@ class UIManager {
                 console.log(`💾 ID de dieta cargada guardado: ${dietaIdCargada}`);
             } else {
                 window.dietaIdCargada = null;
+            }
+
+            // Sincronizar ID de cliente asociado si se provee o si la dieta lo tiene
+            if (clienteId) {
+                window.clienteIdDieta = clienteId;
+            } else if (dieta.clienteId) {
+                window.clienteIdDieta = dieta.clienteId;
+            } else {
+                window.clienteIdDieta = null;
             }
 
             // Normalizar campos que pueden venir como Timestamp u otros formatos
@@ -391,13 +408,11 @@ class UIManager {
                 // Asegurar que ambos IDs coinciden
                 if (window.datosUsuario.id !== window.dietaIdCargada) {
                     console.warn(`⚠️ ADVERTENCIA: IDs no coinciden! datosUsuario.id=${window.datosUsuario.id}, dietaIdCargada=${window.dietaIdCargada}`);
-                    // Sincronizar: usar el ID de dietaIdCargada como fuente de verdad
                     window.datosUsuario.id = window.dietaIdCargada;
                     console.log(`💾 IDs sincronizados: usando ${window.dietaIdCargada}`);
                 }
             } else {
                 console.warn(`⚠️ ADVERTENCIA: ID no encontrado en datosUsuario después de cargar`);
-                // Intentar restaurar desde dietaIdCargada
                 if (window.dietaIdCargada && window.datosUsuario) {
                     window.datosUsuario.id = window.dietaIdCargada;
                     console.log(`💾 ID restaurado en datosUsuario: ${window.dietaIdCargada}`);
@@ -441,36 +456,18 @@ class UIManager {
 
             // Actualizar opciones y etiquetas según el objetivo (siempre, para asegurar que las etiquetas sean correctas)
             if (dietaNormalizada.objetivo && typeof window.actualizarSuperavitPorObjetivo === 'function') {
-                // Esperar un momento para que los elementos estén listos
                 setTimeout(() => {
-                    // Primero actualizar las opciones y etiquetas según el objetivo
                     window.actualizarSuperavitPorObjetivo();
 
-                    // Restaurar valores guardados, PERO forzar a 0 como solicitó el usuario "cargar con cero"
-                    // El usuario pidió explícitamente: "siempre tiene que estar el déficit y el superávit en cero" al cargar
-                    if (true) { // Forzamos siempre
-                        const superavitEntrenoElem = document.getElementById('superavitEntreno');
-                        if (superavitEntrenoElem) {
-                            // Intentar seleccionar 0 explícitamente
-                            if (superavitEntrenoElem.querySelector('option[value="0"]')) {
-                                superavitEntrenoElem.value = '0';
-                            } else {
-                                // Si no existe 0 (raro), forzar el primer valor o mantener default
-                                // Pero con la lógica actual, 0 siempre debería existir en las opciones generadas
-                                superavitEntrenoElem.value = '0';
-                            }
-                        }
+                    // Forzar a 0 como solicitó el usuario
+                    const superavitEntrenoElem = document.getElementById('superavitEntreno');
+                    if (superavitEntrenoElem) {
+                        superavitEntrenoElem.value = '0';
                     }
 
-                    if (true) {
-                        const superavitDescansoElem = document.getElementById('superavitDescanso');
-                        if (superavitDescansoElem) {
-                            if (superavitDescansoElem.querySelector('option[value="0"]')) {
-                                superavitDescansoElem.value = '0';
-                            } else {
-                                superavitDescansoElem.value = '0';
-                            }
-                        }
+                    const superavitDescansoElem = document.getElementById('superavitDescanso');
+                    if (superavitDescansoElem) {
+                        superavitDescansoElem.value = '0';
                     }
 
                     // Recalcular después de restaurar valores
@@ -537,7 +534,6 @@ class UIManager {
                 console.error('❌ Error al mostrar resultados:', error);
                 this.showNotification('⚠️ Dieta cargada pero hubo un error al mostrar los resultados', 'error');
             } finally {
-                // Desmarcar operación crítica después de un delay
                 setTimeout(() => {
                     if (window.marcarOperacionCritica) {
                         window.marcarOperacionCritica(false);
@@ -545,13 +541,23 @@ class UIManager {
                 }, 2000);
             }
 
+            // Ocultar sección de clientes y mostrar formulario principal de dietas
+            const clientesSection = document.getElementById('clientesSection');
+            if (clientesSection) {
+                clientesSection.classList.add('oculto');
+            }
+            const formContainer = document.querySelector('.form-container');
+            if (formContainer) {
+                formContainer.style.display = 'block';
+            }
+
             this.showNotification('✅ Dieta cargada correctamente', 'success');
 
             // Scroll al inicio
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
-            console.error('❌ Error crítico al cargar dieta:', error);
-            this.showNotification('❌ Error crítico al cargar la dieta: ' + error.message, 'error');
+            console.error('❌ Error en cargarDietaDesdeObjeto:', error);
+            this.showNotification('❌ Error al procesar la dieta cargada: ' + error.message, 'error');
         }
     }
 

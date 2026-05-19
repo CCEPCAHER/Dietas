@@ -229,8 +229,6 @@
             background: white;
             padding: 8px;
             border: 1px solid rgba(102, 126, 234, 0.1);
-            /* Smooth scrolling implementation */
-            -webkit-overflow-scrolling: touch;
         }
 
         .table-container::-webkit-scrollbar {
@@ -479,6 +477,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.6);
+            -webkit-backdrop-filter: blur(4px);
             backdrop-filter: blur(4px);
             overflow-y: auto;
         }
@@ -493,6 +492,38 @@
             box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
             animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        #modalTitle {
+            color: #4c51bf;
+            margin-bottom: 30px;
+            font-size: 1.9em;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 2px solid #e8e8e8;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+            padding: 14px 28px;
+            font-weight: 700;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.5);
+            transform: translateY(-3px);
         }
 
         @keyframes modalSlideIn {
@@ -909,8 +940,6 @@
                 border: none;
                 box-shadow: none;
                 background: transparent;
-                /* Permitir scroll suave en touch */
-                -webkit-overflow-scrolling: touch;
                 overflow-x: auto;
                 /* Asegurar scroll horizontal */
             }
@@ -1198,10 +1227,10 @@
             </div>
 
             <div class="filters">
-                <select class="filter-select" id="filterCategoria" onchange="filtrarAlimentos()">
+                <select class="filter-select" id="filterCategoria" onchange="filtrarAlimentos()" aria-label="Filtrar por categoría" title="Filtrar por categoría">
                     <option value="">Todas las categorías</option>
                 </select>
-                <select class="filter-select" id="filterSubcategoria" onchange="filtrarAlimentos()">
+                <select class="filter-select" id="filterSubcategoria" onchange="filtrarAlimentos()" aria-label="Filtrar por subcategoría" title="Filtrar por subcategoría">
                     <option value="">Todas las subcategorías</option>
                 </select>
             </div>
@@ -1235,9 +1264,7 @@
     <div id="modalAlimento" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="cerrarModal()">&times;</span>
-            <h2 id="modalTitle"
-                style="color: #4c51bf; margin-bottom: 30px; font-size: 1.9em; font-weight: 800; letter-spacing: 0.5px; border-bottom: 3px solid #667eea; padding-bottom: 15px;">
-                Agregar Nuevo Alimento</h2>
+            <h2 id="modalTitle">Agregar Nuevo Alimento</h2>
 
             <form id="formAlimento" onsubmit="guardarAlimento(event)">
                 <div class="form-group">
@@ -1341,11 +1368,10 @@
                     </div>
                 </div>
 
-                <div
-                    style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 35px; padding-top: 25px; border-top: 2px solid #e8e8e8;">
-                    <button type="button" class="btn" onclick="cerrarModal()"
-                        style="background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); color: white; box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3); padding: 14px 28px; font-weight: 700;">Cancelar</button>
-                    <button type="submit" class="btn btn-success" style="padding: 14px 28px;">💾 Guardar</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-success">💾 Guardar</button>
+                </div>
             </form>
         </div>
     </div>
@@ -1518,13 +1544,6 @@
         function abrirModalAgregar() {
             const modalTitle = document.getElementById('modalTitle');
             modalTitle.innerHTML = 'Agregar Nuevo Alimento';
-            modalTitle.style.color = '#4c51bf';
-            modalTitle.style.marginBottom = '30px';
-            modalTitle.style.fontSize = '1.9em';
-            modalTitle.style.fontWeight = '800';
-            modalTitle.style.letterSpacing = '0.5px';
-            modalTitle.style.borderBottom = '3px solid #667eea';
-            modalTitle.style.paddingBottom = '15px';
             document.getElementById('formAlimento').reset();
             document.getElementById('calorias').value = 0;
             indiceEdicion = -1;
@@ -1537,13 +1556,6 @@
 
             const modalTitle = document.getElementById('modalTitle');
             modalTitle.innerHTML = '✏️ Editar Alimento';
-            modalTitle.style.color = '#4c51bf';
-            modalTitle.style.marginBottom = '30px';
-            modalTitle.style.fontSize = '1.9em';
-            modalTitle.style.fontWeight = '800';
-            modalTitle.style.letterSpacing = '0.5px';
-            modalTitle.style.borderBottom = '3px solid #667eea';
-            modalTitle.style.paddingBottom = '15px';
 
             document.getElementById('nombre').value = alimento.nombre || alimento.ALIMENTO || '';
             document.getElementById('categoria_principal').value = alimento.categoria_principal || alimento['CATEGORÍA PRINCIPAL'] || alimento.MACRONUTRIENTE_PRINCIPAL || alimento['MACRONUTRIENTE PRINCIPAL'] || '';

@@ -3,8 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Maika Porcuna - Plan de Alimentación Personalizada</title>
 
     <!-- PWA Meta Tags -->
@@ -24,7 +23,6 @@
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png?v=4">
     <link rel="icon" type="image/png" sizes="512x512" href="icon-512x512.png?v=4">
     <link rel="apple-touch-icon" href="icon-180x180.png?v=4">
-    <link rel="apple-touch-icon" sizes="180x180" href="icon-180x180.png?v=4">
     <link rel="apple-touch-icon" sizes="167x167" href="icon-167x167.png?v=4">
     <link rel="apple-touch-icon" sizes="152x152" href="icon-152x152.png?v=4">
     <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png?v=4">
@@ -61,7 +59,7 @@
 
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
-        <div style="text-align: center;">
+        <div class="text-center">
             <div class="loading-spinner-large"></div>
             <div class="loading-message" id="loadingMessage">Generando plan de alimentación...</div>
         </div>
@@ -138,7 +136,7 @@
                     </div>
                 </div>
 
-                <div class="card-modern fade-in" style="animation-delay: 0.1s;">
+                <div class="card-modern fade-in delay-100">
                     <h2>Perfil y Objetivo</h2>
                     <div class="form-group">
                         <label for="tipoPersona">Tipo de persona:</label>
@@ -179,7 +177,7 @@
                     </div>
                 </div>
 
-                <div class="card-modern fade-in" style="animation-delay: 0.2s;">
+                <div class="card-modern fade-in delay-200">
                     <h2>Macronutrientes (Auto-calculados)</h2>
 
                     <div class="macro-info">
@@ -210,7 +208,7 @@
                     </div>
                 </div>
 
-                <div class="card-modern fade-in" style="animation-delay: 0.3s;">
+                <div class="card-modern fade-in delay-300">
                     <h2>Entrenamiento y Actividad Física</h2>
 
                     <div class="form-group">
@@ -364,7 +362,7 @@
                     </div>
                 </div>
 
-                <div class="card-modern fade-in" style="animation-delay: 0.4s;">
+                <div class="card-modern fade-in delay-400">
                     <h2>Prohibiciones y Alergias</h2>
 
                     <div class="form-group">
@@ -489,7 +487,7 @@
                     </div>
                 </div>
 
-                <div class="card-modern fade-in" style="animation-delay: 0.5s;">
+                <div class="card-modern fade-in delay-500">
                     <h2>Hidratación y Finalizar</h2>
 
                     <div class="form-group">
@@ -516,9 +514,8 @@
                         title="Editar la dieta antes de descargar">
                         ✏️ Editar Dieta
                     </button>
-                    <button type="button" id="btnActualizarDieta" class="btn-edit"
-                        title="Actualizar dieta con nuevos valores de objetivo o superávit/déficit"
-                        style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    <button type="button" id="btnActualizarDieta" class="btn-edit btn-update"
+                        title="Actualizar dieta con nuevos valores de objetivo o superávit/déficit">
                         🔄 Actualizar Dieta
                     </button>
                     <button type="button" id="btnDescargar" class="btn-download" title="Descargar plan en formato PDF">
@@ -532,8 +529,8 @@
                         title="Generar lista de la compra" onclick="window.shoppingListManager.generarLista()">
                         🛒 Lista de Compra
                     </button>
-                    <button type="button" id="btnCompartirWhatsApp" class="btn-whatsapp"
-                        title="Compartir por WhatsApp (solo móvil)" style="display: none;">
+                    <button type="button" id="btnCompartirWhatsApp" class="btn-whatsapp oculto"
+                        title="Compartir por WhatsApp (solo móvil)">
                         💬 Compartir por WhatsApp
                     </button>
                     <button type="button" id="btnNuevo" class="btn-new" title="Crear una nueva dieta">
@@ -546,25 +543,17 @@
             <div id="pdf-content">
                 <div class="pdf-header">
                     <div class="nutricionista-contacto-header">
-                        <span class="nombre-nutricionista-header"
-                            style="display: inline-block; color: white; font-size: 1.1em; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0;">MAIKA
-                            PORCUNA</span>
-                        <span class="contacto-item-header"
-                            style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 1.1em; margin: 0; color: white;">
+                        <span class="nombre-nutricionista-header">MAIKA PORCUNA</span>
+                        <span class="contacto-item-header">
                             <span class="contacto-icon-header">📧</span>
-                            <a href="mailto:Maikafit1977@gmail.com"
-                                style="color: inherit; text-decoration: none;">Maikafit1977@gmail.com</a>
+                            <a href="mailto:Maikafit1977@gmail.com">Maikafit1977@gmail.com</a>
                         </span>
-                        <span class="contacto-item-header"
-                            style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 1.1em; margin: 0; color: white;">
+                        <span class="contacto-item-header">
                             <span class="contacto-icon-header">📞</span>
-                            <a href="tel:+34650229987" style="color: inherit; text-decoration: none;">+34 650 229
-                                987</a>
+                            <a href="tel:+34650229987">+34 650 229 987</a>
                         </span>
                     </div>
-                    <div class="separador-header"
-                        style="width: 100%; height: 2px; background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent); margin: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.3);">
-                    </div>
+                    <div class="separador-header"></div>
                     <h2 class="subtitle">NUTRICIÓN/DIETÉTICA/SUPLEMENTACIÓN/NUTRICIÓN DEPORTIVA</h2>
                     <h3 class="plan-subtitle">PLAN DE ALIMENTACIÓN PERSONALIZADA</h3>
                 </div>
@@ -629,7 +618,7 @@
                     </div>
 
                     <!-- Distribución de Entrenamientos -->
-                    <div id="distribucion-entrenos" class="distribucion-entrenos-section" style="margin-top: 25px;">
+                    <div id="distribucion-entrenos" class="distribucion-entrenos-section">
                         <h3>📅 Distribución Semanal de Entrenamientos</h3>
                         <table class="tabla-entrenos">
                             <thead>
@@ -645,7 +634,7 @@
                     </div>
 
                     <!-- Cálculos Detallados -->
-                    <div id="calculos-detallados" class="calculos-detallados-section" style="margin-top: 25px;">
+                    <div id="calculos-detallados" class="calculos-detallados-section">
                         <h3>📊 Cálculos Nutricionales Detallados</h3>
                         <table class="tabla-calculos">
                             <thead>
@@ -661,7 +650,7 @@
                     </div>
 
                     <!-- Distribución de Macronutrientes -->
-                    <div id="macronutrientes-distribucion" class="macronutrientes-section" style="margin-top: 25px;">
+                    <div id="macronutrientes-distribucion" class="macronutrientes-section">
                         <h3>🥗 Distribución de Macronutrientes</h3>
                         <table class="tabla-macros-distribucion">
                             <thead>
@@ -684,10 +673,9 @@
                     </div>
 
                     <!-- Nota sobre agua (solo una vez) -->
-                    <div id="nota-agua" class="notas-agua-section"
-                        style="margin-top: 30px; padding: 15px; background: #d1ecf1; border-radius: 8px; border-left: 4px solid #17a2b8;">
-                        <h4 style="color: #0c5460; margin-bottom: 10px;">📝 NOTA IMPORTANTE</h4>
-                        <p style="margin: 0; color: #0c5460;">Recuerda beber al menos 2-3 litros de agua al día. Ajusta
+                    <div id="nota-agua" class="notas-agua-section">
+                        <h4>📝 NOTA IMPORTANTE</h4>
+                        <p>Recuerda beber al menos 2-3 litros de agua al día. Ajusta
                             las porciones según tu nivel de saciedad y energía.</p>
                     </div>
                 </div>
@@ -767,17 +755,15 @@
                 <div class="pdf-footer">
                     <p>© 2025 Maika Porcuna - Nutrición/Dietética/Suplementación Plan generado el <span
                             id="fecha-generacion"></span></p>
-                    <p style="margin: 10px 0;">Este plan es personalizado y confidencial</p>
+                    <p>Este plan es personalizado y confidencial</p>
                     <div class="pdf-footer-contacto">
                         <p class="contacto-item">
                             <span class="contacto-icon">📞</span>
-                            <a href="tel:+34650229987" style="color: inherit; text-decoration: none;">+34 650 229
-                                987</a>
+                            <a href="tel:+34650229987">+34 650 229 987</a>
                         </p>
                         <p class="contacto-item">
                             <span class="contacto-icon">📧</span>
-                            <a href="mailto:Maikafit1977@gmail.com"
-                                style="color: inherit; text-decoration: none;">Maikafit1977@gmail.com</a>
+                            <a href="mailto:Maikafit1977@gmail.com">Maikafit1977@gmail.com</a>
                         </p>
                     </div>
                 </div>

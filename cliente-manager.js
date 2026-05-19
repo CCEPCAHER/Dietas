@@ -849,9 +849,18 @@ class ClienteManager {
         };
 
         return dietas.slice(-5).reverse().map(dieta => {
-            const fecha = dieta.fecha?.toDate ?
-                dieta.fecha.toDate().toLocaleDateString('es-ES') :
-                'Fecha no disponible';
+            let fecha = 'Fecha no disponible';
+            if (dieta.fecha) {
+                if (typeof dieta.fecha.toDate === 'function') {
+                    fecha = dieta.fecha.toDate().toLocaleDateString('es-ES');
+                } else if (dieta.fecha instanceof Date) {
+                    fecha = dieta.fecha.toLocaleDateString('es-ES');
+                } else if (dieta.fecha.seconds) {
+                    fecha = new Date(dieta.fecha.seconds * 1000).toLocaleDateString('es-ES');
+                } else if (typeof dieta.fecha === 'string' || typeof dieta.fecha === 'number') {
+                    fecha = new Date(dieta.fecha).toLocaleDateString('es-ES');
+                }
+            }
             const objetivoLabel = objetivoLabels[dieta.objetivo] || dieta.objetivo || 'No especificado';
             return `
                 <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); padding: 20px; margin-bottom: 15px; border-radius: 10px; border-left: 4px solid #f39c12; box-shadow: 0 2px 8px rgba(243, 156, 18, 0.15); transition: all 0.3s ease;">
@@ -869,7 +878,10 @@ class ClienteManager {
                             <div style="color: #333; font-size: 1.2em; font-weight: 700;">${dieta.calorias || 'N/A'} kcal</div>
                         </div>
                     </div>
-                    <button class="btn-ver-dieta" onclick="clienteManager.verDietaDetalle('${dieta.id}')" style="width: 100%; padding: 10px; background: #f39c12; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📄 Ver Detalle Completo</button>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn-ver-dieta" onclick="clienteManager.verDietaDetalle('${dieta.id}')" style="flex: 1; padding: 10px; background: #f39c12; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📄 Ver Detalle</button>
+                        <button class="btn-eliminar-dieta-cliente" onclick="clienteManager.eliminarDietaCliente('${dieta.id}')" style="padding: 10px 15px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;" title="Eliminar dieta del historial">🗑️</button>
+                    </div>
                 </div>
             `;
         }).join('');
@@ -1174,8 +1186,60 @@ class ClienteManager {
     }
 
     async verDietaDetalle(dietaId) {
-        // Implementar visualización de dieta detallada
-        if (window.mostrarNotificacion) window.mostrarNotificacion('Función de visualización de dieta en desarrollo', 'info');
+        if (!this.clienteActual || !this.clienteActual.historialDietas) {
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: No se encontró la información del cliente', 'error');
+            return;
+        }
+
+        const dieta = this.clienteActual.historialDietas.find(d => d.id === dietaId);
+        if (!dieta) {
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: Dieta no encontrada en el historial', 'error');
+            return;
+        }
+
+        // Cerrar modal de ficha de cliente
+        const modal = document.getElementById('clienteModal');
+        if (modal) modal.style.display = 'none';
+
+        // Cargar la dieta usando el UIManager
+        if (window.uiManager && typeof window.uiManager.cargarDietaDesdeObjeto === 'function') {
+            await window.uiManager.cargarDietaDesdeObjeto(dieta, this.clienteActual.id);
+        } else {
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: El cargador de dietas no está disponible', 'error');
+        }
+    }
+
+    async eliminarDietaCliente(dietaId) {
+        if (!this.clienteActual || !this.clienteActual.id) {
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: No se encontró la información del cliente', 'error');
+            return;
+        }
+
+        if (!confirm('¿Estás seguro de eliminar esta dieta del historial del cliente?')) {
+            return;
+        }
+
+        try {
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Eliminando dieta...', 'info');
+            const result = await window.clienteService.eliminarDietaCliente(this.clienteActual.id, dietaId);
+
+            if (result.success) {
+                if (window.mostrarNotificacion) window.mostrarNotificacion('✅ Dieta eliminada del historial', 'success');
+                
+                // Actualizar la ficha del cliente en memoria
+                if (this.clienteActual.historialDietas) {
+                    this.clienteActual.historialDietas = this.clienteActual.historialDietas.filter(d => d.id !== dietaId);
+                }
+
+                // Refrescar el modal de la ficha del cliente
+                await this.mostrarFichaCliente(this.clienteActual.id);
+            } else {
+                if (window.mostrarNotificacion) window.mostrarNotificacion('❌ Error: ' + result.error, 'error');
+            }
+        } catch (error) {
+            console.error('Error al eliminar dieta de cliente:', error);
+            if (window.mostrarNotificacion) window.mostrarNotificacion('❌ Error al eliminar dieta: ' + error.message, 'error');
+        }
     }
 
     async agregarMedidas(clienteId) {

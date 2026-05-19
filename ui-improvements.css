@@ -225,8 +225,8 @@ body.dark-mode .card-modern {
 
 /* 7. Glassmorphism for Modal */
 .modal-content {
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
@@ -484,7 +484,6 @@ body.dark-mode input[type="range"]::-webkit-slider-runnable-track {
   margin-bottom: 20px;
   padding: 5px 10px 15px 10px;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   /* Firefox */
 }
@@ -589,8 +588,8 @@ body.dark-mode .tab.active {
   width: 0;
   margin: 0;
   padding: 0;
-  appearance: none;
   -webkit-appearance: none;
+  appearance: none;
   pointer-events: none;
   /* Let the label handle the click */
 }
@@ -603,6 +602,7 @@ body.dark-mode .tab.active {
   border-radius: 20px;
   font-size: 0.9rem;
   transition: all 0.2s ease;
+  -webkit-user-select: none;
   user-select: none;
   color: var(--text-secondary);
 }
@@ -754,7 +754,6 @@ body.dark-mode .checkbox-label:hover span {
     display: block;
     width: 100%;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
   }
 
   /* Ensure text doesn't wrap awkwardly in tables */
@@ -1065,6 +1064,7 @@ body.dark-mode .progress-step.active .progress-step-label {
   right: 0;
   bottom: 0;
   background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -1250,9 +1250,9 @@ select {
   background-position: right 12px center;
   background-size: 12px;
   padding-right: 36px;
-  appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
+  appearance: none;
   cursor: pointer;
 }
 
@@ -1875,8 +1875,8 @@ body.dark-mode .dashboard-container {
 /* 40. Glassmorphism Effect */
 .glass-effect {
   background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
@@ -2166,3 +2166,77 @@ body.dark-mode .glass-effect {
 body.dark-mode .btn-modern-secondary:hover {
   background: rgba(255, 255, 255, 0.05);
 }
+
+/* Staggered animation delays for fade-in cards */
+.delay-100 {
+  animation-delay: 0.1s;
+}
+.delay-200 {
+  animation-delay: 0.2s;
+}
+.delay-300 {
+  animation-delay: 0.3s;
+}
+.delay-400 {
+  animation-delay: 0.4s;
+}
+.delay-500 {
+  animation-delay: 0.5s;
+}
+
+/* Text alignment utilities */
+.text-center {
+  text-align: center !important;
+}
+
+/* Custom button states */
+.btn-update {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+}
+
+/* Header & Contact items */
+.contacto-item-header {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px !important;
+  font-weight: 600;
+  font-size: 1.1em;
+  margin: 0;
+  color: white !important;
+}
+
+.contacto-item-header a,
+.contacto-item a {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+/* Layout section spacing */
+.distribucion-entrenos-section,
+.calculos-detallados-section,
+.macronutrientes-section {
+  margin-top: 25px !important;
+}
+
+/* Water intake / notes section */
+.notas-agua-section {
+  margin-top: 30px !important;
+  padding: 15px !important;
+  background: #d1ecf1 !important;
+  border-radius: 8px !important;
+  border-left: 4px solid #17a2b8 !important;
+}
+.notas-agua-section h4 {
+  color: #0c5460 !important;
+  margin-bottom: 10px !important;
+}
+.notas-agua-section p {
+  margin: 0 !important;
+  color: #0c5460 !important;
+}
+
+/* PDF Footer paragraph margin override */
+.pdf-footer p {
+  margin: 10px 0 !important;
+}
+

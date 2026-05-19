@@ -249,6 +249,29 @@ class ClienteService {
         }
     }
 
+    async eliminarDietaCliente(clienteId, dietaId) {
+        try {
+            const clienteDoc = await this.db.collection('clientes').doc(clienteId).get();
+            if (!clienteDoc.exists) {
+                throw new Error('Cliente no encontrado');
+            }
+
+            const cliente = clienteDoc.data();
+            const historialDietas = cliente.historialDietas || [];
+            const historialActualizado = historialDietas.filter(d => d.id !== dietaId);
+
+            await this.db.collection('clientes').doc(clienteId).update({
+                historialDietas: historialActualizado,
+                fechaModificacion: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error al eliminar dieta del cliente:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
     async agregarProgreso(clienteId, tipoProgreso, datos) {
         try {
             const clienteDoc = await this.db.collection('clientes').doc(clienteId).get();
