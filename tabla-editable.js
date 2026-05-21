@@ -1780,6 +1780,56 @@ class TablaEditable {
         }
     }
 
+    cargarPlanSemana(planSemana) {
+        if (!planSemana || typeof planSemana !== 'object') {
+            console.warn('⚠️ cargarPlanSemana recibió datos inválidos:', planSemana);
+            return false;
+        }
+
+        // Aceptar tanto object como array de días
+        let plan = planSemana;
+        if (Array.isArray(planSemana)) {
+            plan = planSemana.reduce((acumulado, dia) => {
+                if (dia && dia.nombre) {
+                    acumulado[dia.nombre] = dia.datos || {};
+                }
+                return acumulado;
+            }, {});
+        } else {
+            plan = JSON.parse(JSON.stringify(planSemana));
+        }
+
+        this.planSemana = plan;
+        const diasGuardados = Object.keys(plan);
+        const primerDia = diasGuardados.length > 0 ? diasGuardados[0] : this.diaActual;
+        this.diaActual = primerDia || 'Lunes';
+
+        if (typeof this.actualizarSelectoresDia === 'function') {
+            this.actualizarSelectoresDia();
+        }
+
+        if (typeof this.cargarDatos === 'function') {
+            this.cargarDatos(this.planSemana[this.diaActual] || null, false);
+        }
+
+        if (typeof this.actualizarEstilosDia === 'function') {
+            this.actualizarEstilosDia();
+        }
+
+        if (typeof this.actualizarTotalesDiarios === 'function') {
+            this.actualizarTotalesDiarios();
+        }
+
+        // Asegurar que todos los días tienen una estructura inicial
+        this.dias.forEach(dia => {
+            if (!this.planSemana[dia]) {
+                this.planSemana[dia] = {};
+            }
+        });
+
+        return true;
+    }
+
     // Cambiar de día guardando el actual
     cambiarDia(nuevoDia) {
         console.log(`🔄 Cambiando de día: ${this.diaActual} → ${nuevoDia}`);

@@ -510,13 +510,37 @@ class UIManager {
             // Esperar un momento antes de mostrar resultados para asegurar que todo esté listo
             await new Promise(resolve => setTimeout(resolve, 300));
 
-            // Cargar planSemana en tablaEditable si existe y está en modo manual
-            if (planSemanaGuardado && dietaNormalizada.modoGeneracion === 'manual' && window.tablaEditable) {
+            // Cargar planSemana guardada en la tabla editable si existe
+            if (planSemanaGuardado && window.tablaEditable) {
                 try {
                     if (typeof window.tablaEditable.cargarPlanSemana === 'function') {
                         window.tablaEditable.cargarPlanSemana(planSemanaGuardado);
-                    } else if (window.tablaEditable.planSemana) {
-                        window.tablaEditable.planSemana = planSemanaGuardado;
+                    } else {
+                        window.tablaEditable.planSemana = JSON.parse(JSON.stringify(planSemanaGuardado));
+                        const diasGuardados = Object.keys(window.tablaEditable.planSemana);
+                        const primerDia = diasGuardados.length > 0 ? diasGuardados[0] : window.tablaEditable.diaActual;
+                        window.tablaEditable.diaActual = primerDia;
+                        if (typeof window.tablaEditable.cargarDatos === 'function') {
+                            window.tablaEditable.cargarDatos(window.tablaEditable.planSemana[primerDia] || null, false);
+                        }
+                        if (typeof window.tablaEditable.actualizarSelectoresDia === 'function') {
+                            window.tablaEditable.actualizarSelectoresDia();
+                        }
+                        if (typeof window.tablaEditable.actualizarEstilosDia === 'function') {
+                            window.tablaEditable.actualizarEstilosDia();
+                        }
+                        if (typeof window.tablaEditable.actualizarTotalesDiarios === 'function') {
+                            window.tablaEditable.actualizarTotalesDiarios();
+                        }
+                    }
+
+                    // Forzar modo manual cuando hay un plan semanal cargado
+                    dietaNormalizada.modoGeneracion = 'manual';
+                    window.datosUsuario = dietaNormalizada;
+
+                    // Mostrar la tabla editable si está disponible para ver la semana completa
+                    if (typeof window.mostrarTablaEditable === 'function') {
+                        window.mostrarTablaEditable();
                     }
                 } catch (error) {
                     console.error('Error al cargar planSemana:', error);
