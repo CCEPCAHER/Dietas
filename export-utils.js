@@ -15,8 +15,17 @@
         const planEditable = window.tablaEditable?.planSemana;
         const planDatosUsuario = datosUsuario?.planSemana;
 
-        const tieneDatos = (obj) => obj && typeof obj === 'object' && Object.keys(obj).length > 0;
-        const plan = tieneDatos(planEditable) ? planEditable : (tieneDatos(planDatosUsuario) ? planDatosUsuario : {});
+        const tieneContenidoPlan = (obj) => {
+            if (!obj || typeof obj !== 'object') return false;
+            return Object.values(obj).some(dia => {
+                if (!dia || typeof dia !== 'object') return false;
+                return Object.values(dia).some(comida => Array.isArray(comida) && comida.length > 0);
+            });
+        };
+
+        const plan = tieneContenidoPlan(planEditable) ? planEditable
+            : tieneContenidoPlan(planDatosUsuario) ? planDatosUsuario
+            : {};
 
         const normalizar = (texto = '') => texto
             .toString()

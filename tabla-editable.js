@@ -106,12 +106,18 @@ class TablaEditable {
 
     // Inicializar tablas vacías con filas para empezar
     inicializarTablasVacias(filasIniciales = 3) {
+        // Crear la estructura de la semana completa con días vacíos
+        this.dias.forEach(dia => {
+            this.planSemana[dia] = {};
+        });
+
         this.comidas.forEach(comida => {
             for (let i = 0; i < filasIniciales; i++) {
                 this.agregarFila(comida);
             }
         });
-        // Inicializar estructura del día actual en blanco
+
+        // Guardar el día actual con datos vacíos (filas recién creadas)
         this.planSemana[this.diaActual] = this.obtenerDatos();
     }
 
@@ -1780,6 +1786,39 @@ class TablaEditable {
         }
     }
 
+    normalizarNombreDia(nombreDia) {
+        if (!nombreDia || typeof nombreDia !== 'string') return null;
+
+        const nombre = nombreDia
+            .toString()
+            .trim()
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '');
+
+        const mapa = {
+            'lunes': 'Lunes',
+            'martes': 'Martes',
+            'miercoles': 'Miércoles',
+            'miércoles': 'Miércoles',
+            'jueves': 'Jueves',
+            'viernes': 'Viernes',
+            'sabado': 'Sábado',
+            'sábado': 'Sábado',
+            'domingo': 'Domingo',
+            'lun': 'Lunes',
+            'mar': 'Martes',
+            'mie': 'Miércoles',
+            'jue': 'Jueves',
+            'vie': 'Viernes',
+            'sab': 'Sábado',
+            'dom': 'Domingo'
+        };
+
+        return mapa[nombre] ||
+            (nombre.length > 0 ? nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase() : null);
+    }
+
     cargarPlanSemana(planSemana) {
         if (!planSemana || typeof planSemana !== 'object') {
             console.warn('⚠️ cargarPlanSemana recibió datos inválidos:', planSemana);
@@ -1787,20 +1826,33 @@ class TablaEditable {
         }
 
         // Aceptar tanto object como array de días
-        let plan = planSemana;
+        let plan = {};
         if (Array.isArray(planSemana)) {
             plan = planSemana.reduce((acumulado, dia) => {
-                if (dia && dia.nombre) {
-                    acumulado[dia.nombre] = dia.datos || {};
+                if (dia) {
+                    const claveDia = this.normalizarNombreDia(dia.nombre || dia.dia || dia.diaSemana || dia.day || dia.name) || null;
+                    if (claveDia) {
+                        acumulado[claveDia] = dia.datos || dia.comidas || dia.plan || {};
+                    }
                 }
                 return acumulado;
             }, {});
         } else {
-            plan = JSON.parse(JSON.stringify(planSemana));
+            Object.entries(planSemana).forEach(([clave, valor]) => {
+                const nombreDia = this.normalizarNombreDia(clave) || clave;
+                plan[nombreDia] = JSON.parse(JSON.stringify(valor || {}));
+            });
         }
 
+        // Completar días faltantes con estructura vacía
+        this.dias.forEach(dia => {
+            if (!plan[dia] || typeof plan[dia] !== 'object') {
+                plan[dia] = {};
+            }
+        });
+
         this.planSemana = plan;
-        const diasGuardados = Object.keys(plan);
+        const diasGuardados = Object.keys(plan).filter(dia => plan[dia] && Object.keys(plan[dia]).length > 0);
         const primerDia = diasGuardados.length > 0 ? diasGuardados[0] : this.diaActual;
         this.diaActual = primerDia || 'Lunes';
 
@@ -1831,11 +1883,25 @@ class TablaEditable {
     }
 
     // Cambiar de día guardando el actual
+    tieneDatosDia(planDia) {
+        if (!planDia || typeof planDia !== 'object') return false;
+        return this.comidas.some(comida => Array.isArray(planDia[comida]) && planDia[comida].length > 0);
+    }
+
     cambiarDia(nuevoDia) {
         console.log(`🔄 Cambiando de día: ${this.diaActual} → ${nuevoDia}`);
         
         // Guardar lo que hay en pantalla en el día actual
-        this.planSemana[this.diaActual] = this.obtenerDatos();
+        const datosActuales = this.obtenerDatos();
+        const tieneDatosActuales = this.tieneDatosDia(datosActuales);
+        const tieneDatosGuardados = this.tieneDatosDia(this.planSemana[this.diaActual]);
+
+        if (tieneDatosActuales || !tieneDatosGuardados) {
+            this.planSemana[this.diaActual] = datosActuales;
+        } else {
+            console.log(`✅ Conservando datos guardados para ${this.diaActual} al cambiar de día`);
+        }
+
         this.diaActual = nuevoDia;
         this.actualizarSelectoresDia();
         const datos = this.planSemana[this.diaActual] || null;
@@ -1849,7 +1915,7 @@ class TablaEditable {
         setTimeout(() => {
             // Actualizar estilos visuales y objetivos según el tipo de día
             // IMPORTANTE: actualizarEstilosDia() debe llamarse antes de actualizarTotalesDiarios()
-            // para que los objetivos se actualicen correctamente antes de calcular el progreso
+            // para que los objetivos se calculen correctamente antes de actualizar el progreso
             this.actualizarEstilosDia();
             
             // Actualizar totales diarios después de actualizar los objetivos
@@ -2086,6 +2152,14 @@ class TablaEditable {
     exportarPDFMinimalista() {
         // Guardar día actual antes de exportar
         this.planSemana[this.diaActual] = this.obtenerDatos();
+
+        // Sincronizar el plan manual con los datos globales antes de generar el PDF
+        if (typeof window.sincronizarPlanManualConDatosUsuario === 'function') {
+            window.sincronizarPlanManualConDatosUsuario();
+        }
+        if (typeof window.actualizarEstructuraPlanExport === 'function') {
+            window.actualizarEstructuraPlanExport();
+        }
         
         // Usar función unificada
         if (typeof window.generarPDFProfesional === 'function') {

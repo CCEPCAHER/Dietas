@@ -37,6 +37,15 @@ function sincronizarPlanManualConDatosUsuario() {
             window.tablaEditable.planSemana[window.tablaEditable.diaActual] = window.tablaEditable.obtenerDatos();
         }
 
+        // Asegurar que exista la estructura de toda la semana
+        if (window.tablaEditable && Array.isArray(window.tablaEditable.dias)) {
+            window.tablaEditable.dias.forEach(dia => {
+                if (!window.tablaEditable.planSemana[dia]) {
+                    window.tablaEditable.planSemana[dia] = {};
+                }
+            });
+        }
+
         // Clonar en profundidad para evitar referencias compartidas
         const planClonado = JSON.parse(JSON.stringify(window.tablaEditable.planSemana));
         datosUsuario.planSemana = planClonado;
@@ -1124,11 +1133,18 @@ function mostrarTablaEditable() {
                     // Marcar que este plan fue generado automáticamente y puede necesitar resetear estadísticas
                     window.tablaEditable.planGeneradoAutomatico = true;
 
-                    // Cargar planSemana en tablaEditable
-                    window.tablaEditable.planSemana = datosUsuario.planSemana;
+                    // Cargar planSemana en tablaEditable usando el método especializado
+                    const cargado = typeof window.tablaEditable.cargarPlanSemana === 'function'
+                        ? window.tablaEditable.cargarPlanSemana(datosUsuario.planSemana)
+                        : false;
+
+                    if (!cargado) {
+                        console.warn('⚠️ cargarPlanSemana no está disponible o falló, asignando planSemana directamente');
+                        window.tablaEditable.planSemana = datosUsuario.planSemana;
+                    }
 
                     // Cargar el primer día disponible
-                    const dias = Object.keys(datosUsuario.planSemana);
+                    const dias = Object.keys(window.tablaEditable.planSemana || {});
                     if (dias.length > 0) {
                         const primerDia = dias[0];
                         window.tablaEditable.diaActual = primerDia;
@@ -3442,9 +3458,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!datosUsuario || !datosUsuario.nombre) {
                     return { datos: null, contenidoOriginal: null, error: 'Error: No hay datos de dieta para generar el PDF.' };
                 }
+                const contenidoOriginal = document.getElementById('pdf-content');
                 return {
                     datos: datosUsuario,
-                    contenidoOriginal: document.getElementById('pdf-content'),
+                    contenidoOriginal,
                     error: null
                 };
             } else if (fuente === 'tabla-editable') {
@@ -4024,8 +4041,17 @@ document.addEventListener('DOMContentLoaded', function () {
             const planEditable = window.tablaEditable?.planSemana;
             const planDatosUsuario = datosUsuario?.planSemana;
 
-            const tieneDatos = (obj) => obj && typeof obj === 'object' && Object.keys(obj).length > 0;
-            const plan = tieneDatos(planEditable) ? planEditable : (tieneDatos(planDatosUsuario) ? planDatosUsuario : {});
+            const tieneContenidoPlan = (obj) => {
+                if (!obj || typeof obj !== 'object') return false;
+                return Object.values(obj).some(dia => {
+                    if (!dia || typeof dia !== 'object') return false;
+                    return Object.values(dia).some(comida => Array.isArray(comida) && comida.length > 0);
+                });
+            };
+
+            const plan = tieneContenidoPlan(planEditable) ? planEditable
+                : tieneContenidoPlan(planDatosUsuario) ? planDatosUsuario
+                : {};
 
             const normalizar = (texto = '') => texto
                 .toString()
@@ -4902,8 +4928,26 @@ ${lineas.join('\n')}`;
             // Mostrar notificación de generación
             mostrarNotificacion('⏳ Generando PDF...', 'info');
 
+            // Si el plan principal no contiene contenido y hay datos manuales cargados, usar tabla editable
+            let fuenteFinal = fuente;
+            if (fuente === 'principal') {
+                const planDiv = document.getElementById('plan-alimentacion');
+                const planVacio = !planDiv || !planDiv.innerText.trim();
+                const tienePlanManual = window.tablaEditable && window.tablaEditable.planSemana && Object.keys(window.tablaEditable.planSemana).length > 0;
+                const modoManual = datosUsuario && datosUsuario.modoGeneracion === 'manual';
+                if ((planVacio || modoManual) && tienePlanManual) {
+                    console.log('📄 Plan manual detectado. Usando tabla editable para generar el PDF.');
+                    fuenteFinal = 'tabla-editable';
+                }
+            }
+
+            // Si estamos exportando el plan manual, sincronizar el día actual con los datos guardados
+            if (fuenteFinal === 'tabla-editable' && typeof sincronizarPlanManualConDatosUsuario === 'function') {
+                sincronizarPlanManualConDatosUsuario();
+            }
+
             // Obtener datos según la fuente
-            const { datos, contenidoOriginal, error } = obtenerDatosPDF(fuente);
+            const { datos, contenidoOriginal, error } = obtenerDatosPDF(fuenteFinal);
             if (error) {
                 alert(error);
                 return;
@@ -4916,7 +4960,7 @@ ${lineas.join('\n')}`;
 
             // Si es tabla editable, calcular tamaños dinámicos ANTES de generar CSS
             let tamanosFuente = null;
-            if (fuente === 'tabla-editable') {
+            if (fuenteFinal === 'tabla-editable') {
                 const estructura = construirPlanSemanalEstructurado();
                 if (estructura) {
                     tamanosFuente = calcularTamanosFuenteDinamicos(estructura);
@@ -4956,7 +5000,7 @@ ${lineas.join('\n')}`;
         `;
 
             // Agregar contenido según la fuente
-            if (fuente === 'principal' && contenidoOriginal) {
+            if (fuenteFinal === 'principal' && contenidoOriginal) {
                 // 1. CAPTURAR GRÁFICOS (CANVAS) ANTES DE CLONAR
                 // Los canvas se pierden al clonar o usar innerHTML, así que los convertimos a imágenes
                 const canvasReales = contenidoOriginal.querySelectorAll('canvas');
@@ -5073,7 +5117,7 @@ ${lineas.join('\n')}`;
                 procesarContenidoParaPDF(clone);
                 htmlPDF += clone.innerHTML;
                 // Sin línea final, solo el margen inferior
-            } else if (fuente === 'tabla-editable') {
+            } else if (fuenteFinal === 'tabla-editable') {
                 htmlPDF += generarHTMLDesdeTablaEditable();
             }
 
