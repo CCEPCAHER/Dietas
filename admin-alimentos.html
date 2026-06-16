@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Gestión de Alimentos</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
         * {
             margin: 0;
@@ -1221,7 +1222,6 @@
             <div class="controls">
                 <button class="btn btn-success" onclick="abrirModalAgregar()">➕ Agregar Alimento</button>
                 <button class="btn btn-primary" onclick="recuperarAlimentosDesdeFirebase()">☁️ Recuperar desde Firebase</button>
-                <button class="btn btn-secondary" onclick="restablecerBaseOriginal()">🔄 Restaurar original</button>
                 <div class="search-box">
                     <input type="text" id="searchInput" placeholder="🔍 Buscar alimentos..."
                         oninput="filtrarAlimentos()">
@@ -1604,7 +1604,7 @@
             document.getElementById('modalAlimento').style.display = 'none';
         }
 
-        function guardarAlimento(event) {
+        async function guardarAlimento(event) {
             event.preventDefault();
 
             const nuevoAlimento = {
@@ -1632,6 +1632,14 @@
 
             // Guardar en localStorage para persistencia
             guardarEnLocalStorage();
+
+            // Guardar en Firebase si el servicio está disponible
+            if (window.alimentoService && typeof window.alimentoService.guardarEnFirestore === 'function') {
+                const guardado = await window.alimentoService.guardarEnFirestore(baseDatosCompleta);
+                if (!guardado) {
+                    mostrarNotificacion('⚠️ Guardado local, pero no se pudo sincronizar con Firebase.', 'error');
+                }
+            }
 
             // Actualizar variable global para uso inmediato en dietas
             window.baseDatosAlimentos = baseDatosCompleta;
@@ -1734,7 +1742,7 @@
             }, 3000);
         }
 
-        function eliminarAlimento(index) {
+        async function eliminarAlimento(index) {
             if (!confirm('¿Estás seguro de eliminar este alimento?')) return;
 
             const alimento = baseDatosFiltrada[index];
@@ -1744,6 +1752,14 @@
 
             // Guardar en localStorage
             guardarEnLocalStorage();
+
+            // Guardar cambios en Firebase si el servicio está disponible
+            if (window.alimentoService && typeof window.alimentoService.guardarEnFirestore === 'function') {
+                const guardado = await window.alimentoService.guardarEnFirestore(baseDatosCompleta);
+                if (!guardado) {
+                    mostrarNotificacion('⚠️ Eliminación local, pero no se pudo sincronizar con Firebase.', 'error');
+                }
+            }
 
             // Actualizar variable global
             window.baseDatosAlimentos = baseDatosCompleta;
