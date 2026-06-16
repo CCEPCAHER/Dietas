@@ -1220,6 +1220,7 @@
 
             <div class="controls">
                 <button class="btn btn-success" onclick="abrirModalAgregar()">➕ Agregar Alimento</button>
+                <button class="btn btn-secondary" onclick="restablecerBaseOriginal()">🔄 Restaurar original</button>
                 <div class="search-box">
                     <input type="text" id="searchInput" placeholder="🔍 Buscar alimentos..."
                         oninput="filtrarAlimentos()">
@@ -1376,6 +1377,11 @@
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="alimentoService.js"></script>
     <script src="base-datos-alimentos.js"></script>
     <script>
         let baseDatosCompleta = [];
@@ -1454,14 +1460,27 @@
         }
 
         function poblarFiltros() {
-            const categorias = [...new Set(baseDatosCompleta.map(a => a.categoria_principal || a['CATEGORÍA PRINCIPAL'] || a.MACRONUTRIENTE_PRINCIPAL || a['MACRONUTRIENTE PRINCIPAL']))].sort();
             const selectCategoria = document.getElementById('filterCategoria');
+            const selectSubcategoria = document.getElementById('filterSubcategoria');
+
+            selectCategoria.innerHTML = '<option value="">Todas las categorías</option>';
+            selectSubcategoria.innerHTML = '<option value="">Todas las subcategorías</option>';
+
+            const categorias = [...new Set(baseDatosCompleta.map(a => a.categoria_principal || a['CATEGORÍA PRINCIPAL'] || a.MACRONUTRIENTE_PRINCIPAL || a['MACRONUTRIENTE PRINCIPAL']))].sort();
+            const subcategorias = [...new Set(baseDatosCompleta.map(a => a.subcategoria || a.CLASIFICACIÓN || a.CLASIFICACION || ''))].filter(Boolean).sort();
 
             categorias.forEach(cat => {
                 const option = document.createElement('option');
                 option.value = cat;
                 option.textContent = cat;
                 selectCategoria.appendChild(option);
+            });
+
+            subcategorias.forEach(subcat => {
+                const option = document.createElement('option');
+                option.value = subcat;
+                option.textContent = subcat;
+                selectSubcategoria.appendChild(option);
             });
         }
 
@@ -1521,10 +1540,12 @@
         function filtrarAlimentos() {
             const busqueda = document.getElementById('searchInput').value.toLowerCase();
             const categoria = document.getElementById('filterCategoria').value;
+            const subcategoriaSeleccionada = document.getElementById('filterSubcategoria').value;
 
             baseDatosFiltrada = baseDatosCompleta.filter(alimento => {
                 const nombre = (alimento.nombre || alimento.ALIMENTO || '').toLowerCase();
                 const cat = alimento.categoria_principal || alimento['CATEGORÍA PRINCIPAL'] || alimento.MACRONUTRIENTE_PRINCIPAL || alimento['MACRONUTRIENTE PRINCIPAL'] || '';
+                const subcat = alimento.subcategoria || alimento.CLASIFICACIÓN || alimento.CLASIFICACION || '';
                 const marca = (alimento.marca || alimento['MARCA REGISTRADA'] || alimento.MARCA_REGISTRADA || '').toLowerCase();
                 const producto = (alimento.producto || alimento['NOMBRE DEL PRODUCTO'] || alimento.NOMBRE_DEL_PRODUCTO || '').toLowerCase();
 
@@ -1534,8 +1555,9 @@
                     producto.includes(busqueda);
 
                 const coincideCategoria = !categoria || cat === categoria;
+                const coincideSubcategoria = !subcategoriaSeleccionada || subcat === subcategoriaSeleccionada;
 
-                return coincideBusqueda && coincideCategoria;
+                return coincideBusqueda && coincideCategoria && coincideSubcategoria;
             });
 
             renderizarTabla();
@@ -1627,6 +1649,44 @@
             } catch (e) {
                 console.error('❌ Error al guardar en localStorage:', e);
                 alert('Error al guardar los cambios. Por favor, verifica el espacio disponible.');
+            }
+        }
+
+        function restablecerBaseOriginal() {
+            if (!confirm('¿Deseas restaurar la base original? Esto eliminará los cambios guardados localmente.')) return;
+
+            localStorage.removeItem('baseDatosAlimentosPersonalizada');
+            baseDatosCompleta = JSON.parse(JSON.stringify(baseDatosAlimentos));
+            window.baseDatosAlimentos = baseDatosCompleta;
+            cargarBaseDatos();
+            mostrarNotificacion('✅ Base de datos restaurada al original', 'success');
+        }
+
+        async function recuperarAlimentosDesdeFirebase() {
+            if (!window.alimentoService || typeof window.alimentoService.obtenerAlimentos !== 'function') {
+                mostrarNotificacion('⚠️ No se puede acceder a Firebase en esta página', 'error');
+                return;
+            }
+
+            mostrarNotificacion('☁️ Recuperando alimentos desde Firebase...', 'success');
+            try {
+                const alimentos = await window.alimentoService.obtenerAlimentos(true);
+                if (!alimentos || alimentos.length === 0) {
+                    mostrarNotificacion('⚠️ No se encontraron alimentos guardados en Firebase', 'error');
+                    return;
+                }
+
+                baseDatosCompleta = alimentos;
+                baseDatosFiltrada = baseDatosCompleta;
+                window.baseDatosAlimentos = baseDatosCompleta;
+                guardarEnLocalStorage();
+                actualizarEstadisticas();
+                poblarFiltros();
+                renderizarTabla();
+                mostrarNotificacion(`✅ ${alimentos.length} alimentos recuperados desde Firebase`, 'success');
+            } catch (error) {
+                console.error('Error al recuperar alimentos desde Firebase:', error);
+                mostrarNotificacion('❌ Error al recuperar desde Firebase. Revisa la consola.', 'error');
             }
         }
 
