@@ -3515,9 +3515,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 line-height: 1.6;
                 color: #000;
                 background: #fff;
-                padding: 2mm 8mm 3mm 8mm;
+                padding: 1.5mm 5mm 1.5mm 5mm;
                 margin-bottom: 0;
-                padding-bottom: 3mm;
+                padding-bottom: 1.5mm;
                 display: flex;
                 flex-direction: column;
                 min-height: 100vh;
@@ -3528,10 +3528,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 -moz-osx-font-smoothing: grayscale;
             }
             body.layout-landscape {
-                padding: 0.5mm 5mm 3mm 5mm;
+                padding: 0.5mm 4mm 1.5mm 4mm;
                 max-height: 210mm;
                 margin-bottom: 0;
-                padding-bottom: 3mm;
+                padding-bottom: 1.5mm;
                 overflow: hidden;
                 display: flex;
                 flex-direction: column;
@@ -3584,7 +3584,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
             .header {
-                margin-bottom: 0.5mm;
+                margin-bottom: 0.2mm;
                 position: relative;
                 margin-top: 0;
                 width: 100%;
@@ -3595,8 +3595,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 justify-content: space-between;
                 align-items: flex-start;
                 width: 100%;
-                gap: 4mm;
-                padding: 0 2mm;
+                gap: 1.5mm;
+                padding: 0 1mm;
             }
             .contacto-left {
                 font-size: 6.8pt;
@@ -3606,8 +3606,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 flex-direction: column;
                 align-items: flex-start;
                 text-align: left;
-                gap: 0.4mm;
-                line-height: 1.2;
+                gap: 0.2mm;
+                line-height: 1.15;
                 padding-left: 0;
             }
             .contacto-left span { white-space: nowrap; }
@@ -3618,7 +3618,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                gap: 0.4mm;
+                gap: 0.2mm;
             }
             .logo-header-right {
                 display: flex;
@@ -3637,7 +3637,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 font-weight: 800;
                 letter-spacing: 0.5px;
                 text-transform: uppercase;
-                margin: 1mm 0 0 0;
+                margin: 0 0 0 0;
                 padding: 0;
                 color: #000;
                 text-align: center;
@@ -3652,7 +3652,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .nombre-profesional {
                 font-size: 11pt;
                 font-weight: 700;
-                margin: 0.5mm 0 0 0;
+                margin: 0 0 0 0;
                 padding: 0;
                 color: #000;
                 line-height: 0.95;
@@ -3662,19 +3662,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 color: #000;
                 font-weight: 600;
                 text-transform: uppercase;
-                margin: 1.2mm 0 4mm 0;
+                margin: 0.5mm 0 1.5mm 0;
                 padding: 0;
                 line-height: 1;
             }
             .cliente-info {
-                margin-bottom: 0.5mm;
-                padding-bottom: 0.3mm;
+                margin-bottom: 0.3mm;
+                padding-bottom: 0.2mm;
                 border-bottom: 1px solid #000;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                gap: 1mm;
+                gap: 0.3mm;
                 text-align: center;
                 width: 100%;
             }
@@ -3682,17 +3682,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 font-weight: 700;
                 font-size: 10pt;
                 color: #000;
-                line-height: 1.2;
+                line-height: 1;
                 white-space: nowrap;
                 width: 100%;
+                margin: 0;
             }
             .cliente-datos {
                 font-size: 7.2pt;
                 color: #000;
                 font-weight: 500;
-                line-height: 1.3;
+                line-height: 1.2;
                 width: 100%;
                 text-align: center;
+                margin: 0;
             }
             .recordatorio-agua {
                 color: #4FC3F7;
@@ -3701,12 +3703,12 @@ document.addEventListener('DOMContentLoaded', function () {
             table {
                 width: 100%;
                 border-collapse: collapse;
-                margin: 4px 0;
+                margin: 0 0;
                 font-size: 7.6pt;
             }
             th {
                 border: 1px solid #000;
-                padding: 4px;
+                padding: 2px;
                 text-align: left;
                 font-weight: 700;
                 background: #fff;
@@ -3715,7 +3717,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             td {
                 border: 1px solid #666;
-                padding: 3px;
+                padding: 2px;
                 text-align: left;
                 background: #fff;
                 color: #000;
@@ -3724,7 +3726,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             .plan-tabla-editable { 
                 width: 100%; 
-                margin-top: 4px;
+                margin-top: 0;
                 flex: 1;
                 display: flex;
                 flex-direction: column;
@@ -3732,7 +3734,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 min-height: 0;
             }
             .pdf-semana {
-                margin-bottom: 10px;
+                margin-bottom: 0;
                 page-break-after: always;
                 page-break-inside: avoid;
                 flex: 1;
@@ -3749,7 +3751,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 font-weight: 700;
                 text-transform: uppercase;
                 letter-spacing: 1px;
-                margin-bottom: 4px;
+                margin-bottom: 1px;
                 flex-shrink: 0;
             }
             .tabla-plan-semanal {
@@ -3787,7 +3789,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .tabla-plan-semanal th,
             .tabla-plan-semanal td {
                 border: 1px solid #666;
-                padding: ${Math.max(1, tamanos.tamanoItemAlimento * 0.1)}px ${Math.max(1, tamanos.tamanoItemAlimento * 0.08)}px;
+                padding: ${Math.max(0, tamanos.tamanoItemAlimento * 0.08)}px ${Math.max(0, tamanos.tamanoItemAlimento * 0.06)}px;
                 font-size: ${tamanos.tamanoItemAlimento}pt;
                 vertical-align: top;
                 word-wrap: break-word;
@@ -3806,7 +3808,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 background: #fff;
                 font-weight: 700;
                 text-align: center;
-                padding: ${Math.max(2, tamanos.tamanoHeader * 0.15)}px ${Math.max(1, tamanos.tamanoHeader * 0.1)}px;
+                padding: ${Math.max(1, tamanos.tamanoHeader * 0.12)}px ${Math.max(0, tamanos.tamanoHeader * 0.08)}px;
                 font-size: ${tamanos.tamanoHeader}pt;
                 line-height: ${Math.max(1.1, Math.min(1.2, 1.0 + (tamanos.tamanoHeader - 6) * 0.015))};
                 white-space: nowrap;
@@ -3828,13 +3830,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 height: auto;
                 word-break: break-word;
                 vertical-align: top;
-                padding: ${Math.max(1, tamanos.tamanoItemAlimento * 0.1)}px ${Math.max(1, tamanos.tamanoItemAlimento * 0.08)}px;
+                padding: ${Math.max(0, tamanos.tamanoItemAlimento * 0.08)}px ${Math.max(0, tamanos.tamanoItemAlimento * 0.06)}px;
                 overflow: hidden;
             }
             .celda-dia .item-alimento {
                 display: block;
-                margin-left: 6px;
-                margin-bottom: 1px;
+                margin-left: 4px;
+                margin-bottom: 0;
                 position: relative;
                 font-size: ${tamanos.tamanoItemAlimento}pt;
                 line-height: ${Math.max(1.1, Math.min(1.3, 1.0 + (tamanos.tamanoItemAlimento - 6) * 0.02))};
@@ -3856,7 +3858,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .titulo-comida {
                 display: block;
                 font-weight: 700;
-                margin-bottom: ${Math.max(1, Math.min(2, tamanos.tamanoTituloComida * 0.12))}px;
+                margin-bottom: ${Math.max(0, Math.min(1, tamanos.tamanoTituloComida * 0.12))}px;
                 font-size: ${tamanos.tamanoTituloComida}pt;
                 line-height: ${Math.max(1.1, Math.min(1.25, 1.0 + (tamanos.tamanoTituloComida - 6) * 0.02))};
                 white-space: nowrap;
@@ -3865,10 +3867,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             /* Estilos anteriores mantenidos para compatibilidad */
             .dia-plan {
-                margin: 8px 0;
+                margin: 2px 0;
                 page-break-inside: avoid;
                 border: 1px solid #000;
-                padding: 8px;
+                padding: 4px;
                 display: block;
                 width: 100%;
             }
@@ -3877,30 +3879,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 font-weight: 700;
                 font-size: 11pt;
                 text-transform: uppercase;
-                margin-bottom: 6px;
+                margin-bottom: 2px;
                 border-bottom: 1px solid #000;
-                padding-bottom: 4px;
+                padding-bottom: 2px;
                 line-height: 1.2;
                 display: block;
             }
-            .comida-row { margin: 8px 0; line-height: 1.5; }
+            .comida-row { margin: 2px 0; line-height: 1.4; }
             .comida-nombre {
                 font-weight: 600;
                 font-size: 10.5pt;
             }
             .comida-row .comida-nombre + * {
                 font-size: 10pt;
-                line-height: 1.5;
+                line-height: 1.4;
             }
             h2, h3 {
                 color: #000;
                 font-weight: 700;
-                margin: 12px 0 8px 0;
+                margin: 4px 0 2px 0;
                 font-size: 13pt;
-                line-height: 1.3;
+                line-height: 1.2;
             }
             .section {
-                margin: 20px 0;
+                margin: 4px 0;
                 page-break-inside: avoid;
             }
             @media print {
@@ -3915,8 +3917,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
             .hidratacion-section {
-                margin-top: 40px;
-                margin-bottom: 20px;
+                margin-top: 10px;
+                margin-bottom: 0;
                 page-break-inside: avoid;
                 clear: both;
             }
