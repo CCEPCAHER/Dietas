@@ -26,8 +26,6 @@ class PDFService {
         // A4 = 210mm, con márgenes aproximados de 10mm a cada lado = 190mm de contenido
         // 190mm a 96 DPI = 190 * 3.779527559 = ~718px. Dejamos un poco más (760px) sin cortar bordes.
         const contenidoAnchoPx = isLandscape ? 990 : 780;
-        const windowWidthPx = isLandscape ? 1123 : 794; // Ancho total de la hoja A4 a 96 DPI
-        const html2canvasWindowWidth = Math.max(windowWidthPx, contenidoAnchoPx + 120);
 
         const defaultOptions = {
             margin: isLandscape ? [4, 10, 10, 10] : [4, 10, 10, 10], // Márgenes en mm (arriba, izquierda, abajo, derecha)
@@ -38,8 +36,9 @@ class PDFService {
                 useCORS: true,
                 logging: false,
                 letterRendering: true,
+                scrollX: 0,
                 scrollY: 0,
-                windowWidth: html2canvasWindowWidth
+                windowWidth: contenidoAnchoPx
             },
             jsPDF: {
                 unit: 'mm',
@@ -61,7 +60,7 @@ class PDFService {
             // A4 = 210mm o 297mm según orientación. Ajustamos el ancho del contenido restando márgenes.
             elementToPrint.style.width = `${contenidoAnchoPx}px`;
             elementToPrint.style.maxWidth = `${contenidoAnchoPx}px`;
-            elementToPrint.style.margin = '0 auto';
+            elementToPrint.style.margin = '0';
             elementToPrint.style.background = 'white';
             elementToPrint.style.padding = '0';
             elementToPrint.style.textAlign = 'center';
@@ -80,11 +79,10 @@ class PDFService {
             container.style.position = 'absolute';
             container.style.left = '-9999px';
             container.style.top = '0';
-            container.style.width = `${html2canvasWindowWidth}px`; // Asegurar que hay espacio para centrar
+            container.style.width = `${contenidoAnchoPx}px`;
             container.style.padding = '0';
-            container.style.display = 'flex';
-            container.style.justifyContent = 'center';
-            container.style.alignItems = 'flex-start';
+            container.style.margin = '0';
+            container.style.display = 'block';
             container.appendChild(elementToPrint);
             document.body.appendChild(container);
 

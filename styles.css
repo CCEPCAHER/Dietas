@@ -6581,3 +6581,47 @@ body.dark-mode .banner-modo-manual p:last-child {
     opacity: 0.8;
     text-decoration: underline;
 }
+
+/* Botón de feedback flotante */
+.feedback-floating-btn {
+    position: fixed;
+    top: 80px; /* Justo debajo del botón de modo oscuro (top: 20px, height: 50px) */
+    right: 20px;
+    z-index: 10000;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 22px;
+    color: white;
+    max-width: calc(100vw - 40px);
+    box-sizing: border-box;
+}
+
+.feedback-floating-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+}
+
+.feedback-floating-btn:active {
+    transform: translateY(1px);
+}
+
+body.dark-mode .feedback-floating-btn {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+}
+
+@media (max-width: 480px) {
+    .feedback-floating-btn {
+        top: 70px; /* Debajo de top: 10px, height: 50px */
+        right: 10px;
+    }
+}

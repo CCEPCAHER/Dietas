@@ -5695,7 +5695,12 @@ ${lineas.join('\n')}`;
                             margin: [0, 0, margenInferiorPulgadas, 0], // [top, right, bottom, left] - solo margen inferior
                             filename: `Plan_Alimentacion_${datosUsuario.nombre || 'Cliente'}.pdf`,
                             image: { type: 'jpeg', quality: 0.98 },
-                            html2canvas: { scale: 2, useCORS: true },
+                            html2canvas: { 
+                                scale: 2, 
+                                useCORS: true,
+                                scrollX: 0,
+                                scrollY: 0
+                            },
                             jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
                         };
 
