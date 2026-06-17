@@ -4914,12 +4914,14 @@ ${lineas.join('\n')}`;
                     iframe.onload = () => {
                         loadingDiv.style.display = 'none';
                         ajustarZoomAlIframe();
+                        setTimeout(ajustarZoomAlIframe, 350); // Recalcular tras completar animación de apertura del modal
                         resolve();
                     };
                     // Fallback timeout por si onload no se dispara
                     setTimeout(() => {
                         loadingDiv.style.display = 'none';
                         ajustarZoomAlIframe();
+                        setTimeout(ajustarZoomAlIframe, 350); // Recalcular tras completar animación de apertura del modal
                         resolve();
                     }, 3000);
                 });
