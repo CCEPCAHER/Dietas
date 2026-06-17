@@ -353,6 +353,14 @@ class UIManager {
     }
 
     async cargarDietaDesdeObjeto(dieta, clienteId = null) {
+        // Advertir si hay cambios sin guardar antes de sobreescribir la dieta actual
+        if (window.cambiosSinGuardar) {
+            const confirmar = confirm("Tienes cambios sin guardar en la dieta actual. Si cargas otra dieta, perderás los cambios. ¿Deseas continuar?");
+            if (!confirmar) {
+                return;
+            }
+        }
+
         try {
             // Guardar el ID de la dieta cargada para poder actualizarla después
             const dietaIdCargada = dieta.id || null;
@@ -576,6 +584,9 @@ class UIManager {
             }
 
             this.showNotification('✅ Dieta cargada correctamente', 'success');
+
+            // Resetear cambios sin guardar al cargar una nueva dieta
+            window.cambiosSinGuardar = false;
 
             // Scroll al inicio
             window.scrollTo({ top: 0, behavior: 'smooth' });

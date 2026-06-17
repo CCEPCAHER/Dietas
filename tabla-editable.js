@@ -359,6 +359,9 @@ class TablaEditable {
 
     // Agregar una nueva fila vacía a una comida
     agregarFila(comida) {
+        // Marcar cambios sin guardar
+        window.cambiosSinGuardar = true;
+
         const comidaId = comida.toLowerCase().replace(/\s+/g, '-');
         const tbody = document.getElementById(`tbody-${comidaId}`);
         // ID de fila robusto: incluye comida, timestamp y contador incremental
@@ -1315,10 +1318,12 @@ class TablaEditable {
         }
     }
 
-    // Calcular macros basado en gramos (valores de base-datos-alimentos.js)
     calcularMacros(rowId, comida) {
         // Si se está editando un plan automático, resetear estadísticas primero
         this.resetearEstadisticasPlanAutomatico();
+        
+        // Marcar cambios sin guardar
+        window.cambiosSinGuardar = true;
         
         const row = document.getElementById(rowId);
         if (!row) {
@@ -1643,6 +1648,9 @@ class TablaEditable {
     eliminarFila(rowId, comida) {
         // Si se está editando un plan automático, resetear estadísticas primero
         this.resetearEstadisticasPlanAutomatico();
+        
+        // Marcar cambios sin guardar
+        window.cambiosSinGuardar = true;
         
         const row = document.getElementById(rowId);
         if (row) {
@@ -2112,6 +2120,9 @@ class TablaEditable {
     }
 
     replicarDiaActualPorTipo(tipo) {
+        // Marcar cambios sin guardar
+        window.cambiosSinGuardar = true;
+
         const datosActual = this.obtenerDatos();
         const diasObjetivo = tipo === 'entreno' ? this.obtenerDiasEntreno() : this.obtenerDiasDescanso();
 
@@ -2143,6 +2154,9 @@ class TablaEditable {
 
     // Replicar día actual a toda la semana
     replicarDiaActualATodaLaSemana() {
+        // Marcar cambios sin guardar
+        window.cambiosSinGuardar = true;
+
         const datosActual = this.obtenerDatos();
         this.dias.forEach(d => {
             this.planSemana[d] = JSON.parse(JSON.stringify(datosActual));
@@ -2217,6 +2231,9 @@ class TablaEditable {
      * Confirma la replicación a los días seleccionados
      */
     confirmarReplicacion() {
+        // Marcar cambios sin guardar
+        window.cambiosSinGuardar = true;
+
         const checkboxes = document.querySelectorAll('input[name="dia-replicar"]:checked');
         if (checkboxes.length === 0) {
             window.mostrarNotificacion?.('Selecciona al menos un día', 'warning');
@@ -2286,6 +2303,9 @@ class TablaEditable {
         if (!confirm('¿Estás seguro de que quieres borrar los menús de toda la semana? Esta acción no se puede deshacer.')) {
             return;
         }
+
+        // Marcar cambios sin guardar
+        window.cambiosSinGuardar = true;
 
         // Vaciar planSemana para todos los días
         this.dias.forEach(dia => {

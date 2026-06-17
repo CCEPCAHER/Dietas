@@ -2697,6 +2697,18 @@ function actualizarTodoAutomaticamente(skipObjetivoCheck = false) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    // Inicializar estado de cambios sin guardar
+    window.cambiosSinGuardar = false;
+
+    // Escuchar antes de recargar o cerrar la pestaña
+    window.addEventListener('beforeunload', function (e) {
+        if (window.cambiosSinGuardar) {
+            e.preventDefault();
+            e.returnValue = 'Tienes cambios sin guardar en la dieta actual. ¿Seguro que deseas salir?';
+            return e.returnValue;
+        }
+    });
+
     // Event listener para el selector de objetivo
     const objetivoSelect = document.getElementById('objetivo');
     if (objetivoSelect) {
@@ -2773,6 +2785,14 @@ document.addEventListener('DOMContentLoaded', function () {
     if (dietForm) {
         dietForm.addEventListener('submit', async function (e) {
             e.preventDefault();
+
+            // Advertir si hay cambios sin guardar antes de generar una nueva dieta
+            if (window.cambiosSinGuardar) {
+                const confirmar = confirm("Tienes cambios sin guardar en la dieta actual. Si continúas y calculas una nueva, perderás los cambios. ¿Deseas continuar?");
+                if (!confirmar) {
+                    return;
+                }
+            }
 
             // Obtener referencia al botón de submit
             const submitButton = document.querySelector('#dietForm button[type="submit"]');
@@ -3023,6 +3043,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (window.mostrarResultados) {
                         try {
                             window.mostrarResultados();
+                            // Marcar cambios sin guardar para la nueva dieta
+                            window.cambiosSinGuardar = true;
                             // Cancelar timeout si todo salió bien
                             clearTimeout(timeoutId);
                             // Hide loading after results are shown
@@ -3342,6 +3364,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             ? '✅ Dieta actualizada correctamente'
                             : '✅ Dieta guardada correctamente';
                         mostrarNotificacion(mensaje, 'success');
+                        
+                        // Restablecer cambios sin guardar ya que se guardó correctamente
+                        window.cambiosSinGuardar = false;
+                        
                         boton.innerHTML = '✅ Guardado';
                         setTimeout(() => {
                             boton.innerHTML = textoOriginal;
