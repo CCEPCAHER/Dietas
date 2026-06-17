@@ -6545,3 +6545,12 @@ body.dark-mode .banner-modo-manual p:last-child {
     align-items: center;
     gap: 1px;
 }
+
+/* ===== Danger Action Buttons ===== */
+.btn-clientes.btn-danger-action {
+    background: linear-gradient(135deg, #e53e3e 0%, #b83280 100%) !important;
+}
+
+.btn-clientes.btn-danger-action:hover {
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4) !important;
+}

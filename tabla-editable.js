@@ -132,6 +132,8 @@ class TablaEditable {
                         <button type="button" class="btn-clientes" onclick="tablaEditable.mostrarModalReplicar()" title="Seleccionar días específicos para copiar este plan">📋 Replicar a días...</button>
                         <button type="button" class="btn-clientes" onclick="tablaEditable.replicarDiaActualATodaLaSemana()" title="Copiar este día a toda la semana">↔️ Replicar a toda la semana</button>
                         <button type="button" class="btn-clientes" onclick="tablaEditable.exportarPDFMinimalista()" title="Exportar plan semanal en PDF">🧾 Exportar PDF</button>
+                        <button type="button" class="btn-clientes btn-danger-action" onclick="tablaEditable.limpiarDiaActual()" title="Borrar todos los alimentos del día de hoy">🗑️ Limpiar día</button>
+                        <button type="button" class="btn-clientes btn-danger-action" onclick="tablaEditable.limpiarSemanaCompleta()" title="Borrar la dieta de toda la semana para empezar de cero">⚠️ Limpiar semana</button>
                     </div>
                 </div>
             `;
@@ -149,6 +151,8 @@ class TablaEditable {
                     <button type="button" class="btn-clientes" onclick="tablaEditable.mostrarModalReplicar()" title="Seleccionar días específicos para copiar este plan">📋 Replicar a días...</button>
                     <button type="button" class="btn-clientes" onclick="tablaEditable.replicarDiaActualATodaLaSemana()" title="Copiar este día a toda la semana">↔️ Replicar a toda la semana</button>
                     <button type="button" class="btn-clientes" onclick="tablaEditable.exportarPDFMinimalista()" title="Exportar plan semanal en PDF">🧾 Exportar PDF</button>
+                    <button type="button" class="btn-clientes btn-danger-action" onclick="tablaEditable.limpiarDiaActual()" title="Borrar todos los alimentos del día de hoy">🗑️ Limpiar día</button>
+                    <button type="button" class="btn-clientes btn-danger-action" onclick="tablaEditable.limpiarSemanaCompleta()" title="Borrar la dieta de toda la semana para empezar de cero">⚠️ Limpiar semana</button>
                 </div>
             </div>
         `;
@@ -2243,6 +2247,60 @@ class TablaEditable {
 
         // Refrescar selector de días
         this.actualizarSelectoresDia();
+    }
+
+    limpiarDiaActual() {
+        if (!confirm(`¿Estás seguro de que quieres borrar todos los alimentos del día ${this.diaActual}?`)) {
+            return;
+        }
+
+        // Limpiar tbodys en la pantalla
+        this.comidas.forEach(comida => {
+            const comidaId = comida.toLowerCase().replace(/\s+/g, '-');
+            const tbody = document.getElementById(`tbody-${comidaId}`);
+            if (tbody) {
+                tbody.innerHTML = '';
+            }
+            // Agregar 3 filas vacías por defecto
+            for (let i = 0; i < 3; i++) {
+                this.agregarFila(comida);
+            }
+            this.actualizarTotales(comida);
+        });
+
+        // Guardar el estado vacío
+        this.planSemana[this.diaActual] = this.obtenerDatos();
+
+        // Actualizar totales generales y actualizar selector
+        this.actualizarTotalesDiarios();
+
+        // Sincronizar con el estado global
+        if (typeof window.sincronizarPlanManualConDatosUsuario === 'function') {
+            window.sincronizarPlanManualConDatosUsuario();
+        }
+
+        window.mostrarNotificacion?.(`🗑️ Menú de ${this.diaActual} borrado`, 'info');
+    }
+
+    limpiarSemanaCompleta() {
+        if (!confirm('¿Estás seguro de que quieres borrar los menús de toda la semana? Esta acción no se puede deshacer.')) {
+            return;
+        }
+
+        // Vaciar planSemana para todos los días
+        this.dias.forEach(dia => {
+            this.planSemana[dia] = {};
+        });
+
+        // Cargar el día actual vacío (esto limpiará la pantalla y creará filas vacías)
+        this.cargarDatos(null, true);
+
+        // Sincronizar con el estado global
+        if (typeof window.sincronizarPlanManualConDatosUsuario === 'function') {
+            window.sincronizarPlanManualConDatosUsuario();
+        }
+
+        window.mostrarNotificacion?.('🗑️ Plan semanal completo borrado', 'info');
     }
 
     // Exportación PDF minimalista con marca MAIKA PORCUNA
