@@ -4873,7 +4873,6 @@ ${lineas.join('\n')}`;
             const iframe = document.getElementById('pdfPreviewIframe');
             const loadingDiv = modal.querySelector('.pdf-preview-loading');
             const refreshBtn = document.getElementById('pdfPreviewRefresh');
-            const downloadBtn = document.getElementById('pdfPreviewDownload');
             const printBtn = document.getElementById('pdfPreviewPrint');
             const cancelBtn = document.getElementById('pdfPreviewCancel');
             const closeBtn = modal.querySelector('.pdf-preview-close');
@@ -5083,11 +5082,6 @@ ${lineas.join('\n')}`;
                 };
 
                 // --- Botones de acción ---
-                downloadBtn.onclick = () => {
-                    const htmlFinal = obtenerHTMLDesdeIframe(iframe, modal.dataset.htmlPDFOriginal);
-                    descargarPDFDesdePreview(htmlFinal, nombreCliente, orientationSelect.value);
-                };
-
                 printBtn.onclick = () => {
                     const htmlFinal = obtenerHTMLDesdeIframe(iframe, modal.dataset.htmlPDFOriginal);
                     imprimirPDFDesdePreview(htmlFinal, orientationSelect.value);
