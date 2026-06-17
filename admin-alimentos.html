@@ -1408,6 +1408,18 @@
             }
         });
 
+        // Registrar escuchador de autenticación de Firebase para sincronizar automáticamente
+        if (typeof firebase !== 'undefined') {
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (user) {
+                    console.log('☁️ Usuario autenticado, iniciando sincronización de alimentos con Firebase...');
+                    await sincronizarAlimentosDesdeFirebase();
+                } else {
+                    console.warn('⚠️ Usuario no autenticado en admin-alimentos.html');
+                }
+            });
+        }
+
         function setupEventListeners() {
             // Auto-cálculo de calorías
             document.getElementById('proteínas').addEventListener('input', actualizarCalorias);
@@ -1696,6 +1708,44 @@
             } catch (error) {
                 console.error('Error al recuperar alimentos desde Firebase:', error);
                 mostrarNotificacion('❌ Error al recuperar desde Firebase. Revisa la consola.', 'error');
+            }
+        }
+
+        async function sincronizarAlimentosDesdeFirebase() {
+            if (!window.alimentoService || typeof window.alimentoService.obtenerAlimentos !== 'function') {
+                console.warn('⚠️ AlimentoService no está disponible para sincronización');
+                return;
+            }
+
+            mostrarNotificacion('☁️ Sincronizando con Firebase...', 'success');
+            try {
+                // Obtener alimentos de Firebase (forzando recarga para tener el estado fresco)
+                const alimentos = await window.alimentoService.obtenerAlimentos(true);
+                
+                if (alimentos && alimentos.length > 0) {
+                    // Si Firebase tiene alimentos, actualizamos localmente
+                    baseDatosCompleta = alimentos;
+                    baseDatosFiltrada = baseDatosCompleta;
+                    window.baseDatosAlimentos = baseDatosCompleta;
+                    guardarEnLocalStorage();
+                    actualizarEstadisticas();
+                    poblarFiltros();
+                    renderizarTabla();
+                    mostrarNotificacion(`✅ Base de datos sincronizada: ${alimentos.length} alimentos.`, 'success');
+                } else {
+                    // Si Firebase no tiene alimentos pero localmente hay alimentos creados
+                    // subimos nuestra base de datos local para inicializar los datos en la nube
+                    console.log('📤 Inicializando base de datos de alimentos en Firebase...');
+                    const guardado = await window.alimentoService.guardarEnFirestore(baseDatosCompleta);
+                    if (guardado) {
+                        mostrarNotificacion('✅ Base de datos local sincronizada con Firebase', 'success');
+                    } else {
+                        console.warn('⚠️ No se pudo inicializar la base de datos en Firebase');
+                    }
+                }
+            } catch (error) {
+                console.error('Error durante la sincronización con Firebase:', error);
+                mostrarNotificacion('⚠️ Error al sincronizar con Firebase. Usando copia local.', 'error');
             }
         }
 

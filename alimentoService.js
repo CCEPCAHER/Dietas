@@ -71,6 +71,9 @@ class AlimentoService {
     async cargarDesdeFirestore() {
         try {
             if (!this.db) {
+                this.db = window.firebaseDb || (typeof firebase !== 'undefined' && firebase.firestore());
+            }
+            if (!this.db) {
                 console.warn('⚠️ Firestore no está inicializado');
                 return null;
             }
@@ -114,7 +117,7 @@ class AlimentoService {
         try {
             // Asegurar que this.db esté disponible, si no, intentar obtenerlo
             if (!this.db) {
-                this.db = window.firebaseDb;
+                this.db = window.firebaseDb || (typeof firebase !== 'undefined' && firebase.firestore());
                 console.log('🔄 Actualizando referencia de Firestore en AlimentoService');
             }
             
@@ -128,7 +131,18 @@ class AlimentoService {
                 return false;
             }
 
-            const user = window.authManager?.getCurrentUser();
+            // Obtener usuario de forma robusta (soporta fallback en páginas que no cargan auth.js)
+            let user = null;
+            if (window.authManager && typeof window.authManager.getCurrentUser === 'function') {
+                user = window.authManager.getCurrentUser();
+            }
+            if (!user && window.firebaseAuth) {
+                user = window.firebaseAuth.currentUser;
+            }
+            if (!user && typeof firebase !== 'undefined' && firebase.auth) {
+                user = firebase.auth().currentUser;
+            }
+
             if (!user) {
                 console.warn('⚠️ Usuario no autenticado, saltando guardado en Firestore');
                 return false;
