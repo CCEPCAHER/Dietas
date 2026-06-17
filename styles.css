@@ -6430,3 +6430,118 @@ body.dark-mode .banner-modo-manual p:last-child {
         overflow-x: auto !important;
     }
 }
+
+/* ===== Weekly Navigation Bar Styles ===== */
+.weekly-nav-container {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+@media (max-width: 900px) {
+    .weekly-nav-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+@media (max-width: 600px) {
+    .weekly-nav-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.dia-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    position: relative;
+}
+
+.dia-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-color);
+    border-color: var(--primary-color);
+}
+
+.dia-card.active {
+    border-color: #667eea !important;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%) !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+}
+
+.dia-card.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 20px;
+    right: 20px;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 2px 2px 0 0;
+}
+
+.dia-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.dia-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 12px;
+    margin-bottom: 6px;
+}
+
+.dia-card.entreno .dia-badge {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.dia-card.descanso .dia-badge {
+    background: rgba(33, 150, 243, 0.1);
+    color: #2196f3;
+}
+
+.dia-status {
+    font-size: 10.5px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.dia-status.vacio {
+    color: #94a3b8;
+}
+
+.dia-status.completo {
+    color: #10b981;
+    font-weight: 600;
+}
+
+.dia-replicated-icon {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 9px;
+    background: #f59e0b;
+    color: white;
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 1px;
+}

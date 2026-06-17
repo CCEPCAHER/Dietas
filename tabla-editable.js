@@ -122,22 +122,27 @@ class TablaEditable {
     }
 
     generarBarraAcciones(sufijo = '') {
-        const idSelector = `selector-dia${sufijo}`;
-        const idBadge = `badge-dia-actual${sufijo}`;
-        
-        return `
-            <div class="comida-header" style="margin-bottom:20px; gap:10px; flex-wrap:wrap">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <label for="${idSelector}" style="font-weight:600;color:#667eea">Día:</label>
-                    <select id="${idSelector}" onchange="tablaEditable.cambiarDia(this.value)" title="Selecciona el día a editar" style="padding: 8px; border-radius: 6px; border: 2px solid #667eea; font-weight: 600;">
-                        ${this.dias.map(d => {
-                            const esDescanso = this.esDiaDescanso(d);
-                            const badge = esDescanso ? '😴 DESCANSO' : '💪 ENTRENO';
-                            return `<option value="${d}" ${d === this.diaActual ? 'selected' : ''}>${d} - ${badge}</option>`;
-                        }).join('')}
-                    </select>
-                    <span id="${idBadge}" class="badge-dia-selector"></span>
+        // En la barra inferior, solo mostramos los botones
+        if (sufijo === '-bottom') {
+            return `
+                <div class="comida-header" style="margin-top:20px; margin-bottom:20px; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button type="button" class="btn-clientes" onclick="tablaEditable.replicarDiaActualPorTipo('entreno')" title="Copiar este día a todos los días marcados como entreno">💪 Replicar días de entreno</button>
+                        <button type="button" class="btn-clientes" onclick="tablaEditable.replicarDiaActualPorTipo('descanso')" title="Copiar este día a todos los días de descanso">😴 Replicar días de descanso</button>
+                        <button type="button" class="btn-clientes" onclick="tablaEditable.mostrarModalReplicar()" title="Seleccionar días específicos para copiar este plan">📋 Replicar a días...</button>
+                        <button type="button" class="btn-clientes" onclick="tablaEditable.replicarDiaActualATodaLaSemana()" title="Copiar este día a toda la semana">↔️ Replicar a toda la semana</button>
+                        <button type="button" class="btn-clientes" onclick="tablaEditable.exportarPDFMinimalista()" title="Exportar plan semanal en PDF">🧾 Exportar PDF</button>
+                    </div>
                 </div>
+            `;
+        }
+        
+        // En la barra superior, incluimos el contenedor para las tarjetas semanales y los botones
+        return `
+            <div id="weekly-nav-container" class="weekly-nav-container">
+                <!-- Se generará dinámicamente con las tarjetas de día -->
+            </div>
+            <div class="comida-header" style="margin-bottom:20px; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <button type="button" class="btn-clientes" onclick="tablaEditable.replicarDiaActualPorTipo('entreno')" title="Copiar este día a todos los días marcados como entreno">💪 Replicar días de entreno</button>
                     <button type="button" class="btn-clientes" onclick="tablaEditable.replicarDiaActualPorTipo('descanso')" title="Copiar este día a todos los días de descanso">😴 Replicar días de descanso</button>
@@ -1522,6 +1527,14 @@ class TablaEditable {
         if (typeof window.actualizarConsumidoEnTabla === 'function') {
             window.actualizarConsumidoEnTabla();
         }
+
+        // Guardar el día actual con datos en tiempo real
+        if (this.diaActual) {
+            this.planSemana[this.diaActual] = this.obtenerDatos();
+        }
+
+        // Refrescar selector de días para mostrar status actualizados en tiempo real
+        this.actualizarSelectoresDia();
     }
 
     actualizarProgresoMacros(calorias, proteinas, grasas, carbohidratos) {
@@ -1931,16 +1944,81 @@ class TablaEditable {
         }, 50);
     }
 
-    actualizarSelectoresDia() {
-        const selectorSuperior = document.getElementById('selector-dia');
-        const selectorInferior = document.getElementById('selector-dia-bottom');
+    // Serializar día simplificando alimentos y cantidades para comparar duplicados
+    serializarDia(planDia) {
+        if (!planDia || typeof planDia !== 'object') return '';
+        const simple = {};
+        this.comidas.forEach(comida => {
+            const list = planDia[comida] || [];
+            simple[comida] = list.map(item => ({
+                alimento: (item.alimento || '').trim().toLowerCase(),
+                gramos: Number(item.gramos) || 0
+            })).sort((a, b) => a.alimento.localeCompare(b.alimento) || a.gramos - b.gramos);
+        });
+        return JSON.stringify(simple);
+    }
+
+    // Obtener qué días están duplicados
+    obtenerGruposReplicados() {
+        const serializados = {};
+        const conteos = {};
         
-        if (selectorSuperior && selectorSuperior.value !== this.diaActual) {
-            selectorSuperior.value = this.diaActual;
-        }
-        if (selectorInferior && selectorInferior.value !== this.diaActual) {
-            selectorInferior.value = this.diaActual;
-        }
+        this.dias.forEach(d => {
+            const plan = this.planSemana[d];
+            if (this.tieneDatosDia(plan)) {
+                const s = this.serializarDia(plan);
+                serializados[d] = s;
+                conteos[s] = (conteos[s] || 0) + 1;
+            } else {
+                serializados[d] = null;
+            }
+        });
+        
+        const diasReplicados = {};
+        this.dias.forEach(d => {
+            const s = serializados[d];
+            diasReplicados[d] = (s && conteos[s] > 1);
+        });
+        return diasReplicados;
+    }
+
+    actualizarSelectoresDia() {
+        const container = document.getElementById('weekly-nav-container');
+        if (!container) return;
+
+        // Calcular días replicados
+        const diasReplicados = this.obtenerGruposReplicados();
+
+        // Generar el HTML de las tarjetas
+        const html = this.dias.map(d => {
+            const esDescanso = this.esDiaDescanso(d);
+            const claseTipo = esDescanso ? 'descanso' : 'entreno';
+            const claseActivo = (d === this.diaActual) ? ' active' : '';
+            const badgeTipo = esDescanso ? '😴 DESCANSO' : '💪 ENTRENO';
+            
+            // Comprobar si el día tiene datos
+            const plan = this.planSemana[d];
+            const tieneDatos = this.tieneDatosDia(plan);
+            
+            const statusHtml = tieneDatos 
+                ? '<span class="dia-status completo">✅ Completado</span>' 
+                : '<span class="dia-status vacio">⚠️ Vacío</span>';
+                
+            const replicatedHtml = diasReplicados[d]
+                ? '<span class="dia-replicated-icon" title="Este menú está duplicado en otro día">🔗 Replicado</span>'
+                : '';
+
+            return `
+                <div class="dia-card ${claseTipo}${claseActivo}" onclick="tablaEditable.cambiarDia('${d}')">
+                    ${replicatedHtml}
+                    <span class="dia-name">${d}</span>
+                    <span class="dia-badge">${badgeTipo}</span>
+                    ${statusHtml}
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = html;
     }
     
     // Actualizar estilos visuales del contenedor según tipo de día
@@ -2049,6 +2127,14 @@ class TablaEditable {
             ? `✅ Día replicado en ${diasObjetivo.length} día(s) de entreno`
             : `✅ Día replicado en ${diasObjetivo.length} día(s) de descanso`;
         window.mostrarNotificacion?.(mensajeExito, 'success');
+
+        // Sincronizar con el estado global
+        if (typeof window.sincronizarPlanManualConDatosUsuario === 'function') {
+            window.sincronizarPlanManualConDatosUsuario();
+        }
+
+        // Refrescar selector de días
+        this.actualizarSelectoresDia();
     }
 
     // Replicar día actual a toda la semana
@@ -2058,6 +2144,14 @@ class TablaEditable {
             this.planSemana[d] = JSON.parse(JSON.stringify(datosActual));
         });
         window.mostrarNotificacion?.('✅ Día replicado a toda la semana', 'success');
+
+        // Sincronizar con el estado global
+        if (typeof window.sincronizarPlanManualConDatosUsuario === 'function') {
+            window.sincronizarPlanManualConDatosUsuario();
+        }
+
+        // Refrescar selector de días
+        this.actualizarSelectoresDia();
     }
 
     /**
@@ -2146,6 +2240,9 @@ class TablaEditable {
         if (typeof window.sincronizarPlanManualConDatosUsuario === 'function') {
             window.sincronizarPlanManualConDatosUsuario();
         }
+
+        // Refrescar selector de días
+        this.actualizarSelectoresDia();
     }
 
     // Exportación PDF minimalista con marca MAIKA PORCUNA
