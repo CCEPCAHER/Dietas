@@ -1,4 +1,4 @@
-﻿
+
 // Variables globales
 let datosUsuario = {};
 window.datosUsuario = datosUsuario; // Exportar para uso en otros módulos
@@ -4868,6 +4868,430 @@ ${lineas.join('\n')}`;
         }
 
         /**
+         * Muestra el modal de previsualización del PDF usando un iframe con el HTML real
+         * Permite editar el contenido antes de descargar
+         */
+        window.mostrarPreviewPDF = async function (htmlPDF, nombreCliente) {
+            const modal = document.getElementById('pdfPreviewModal');
+            const iframe = document.getElementById('pdfPreviewIframe');
+            const loadingDiv = modal.querySelector('.pdf-preview-loading');
+            const refreshBtn = document.getElementById('pdfPreviewRefresh');
+            const downloadBtn = document.getElementById('pdfPreviewDownload');
+            const printBtn = document.getElementById('pdfPreviewPrint');
+            const cancelBtn = document.getElementById('pdfPreviewCancel');
+            const closeBtn = modal.querySelector('.pdf-preview-close');
+            const orientationSelect = document.getElementById('pdfOrientationSelect');
+            const editToggle = document.getElementById('pdfEditToggle');
+            const editBanner = document.getElementById('pdfEditBanner');
+            const zoomInBtn = document.getElementById('pdfZoomIn');
+            const zoomOutBtn = document.getElementById('pdfZoomOut');
+            const zoomResetBtn = document.getElementById('pdfZoomReset');
+            const zoomLevelSpan = document.getElementById('pdfZoomLevel');
+
+            // Estado del preview
+            let currentZoom = 100;
+            let editMode = false;
+
+            // Guardar HTML original para poder regenerar
+            modal.dataset.htmlPDFOriginal = htmlPDF;
+            modal.dataset.nombreCliente = nombreCliente;
+
+            // Mostrar modal
+            modal.classList.add('active');
+
+            // Reset edit mode UI
+            editToggle.classList.remove('active');
+            editBanner.style.display = 'none';
+
+            try {
+                loadingDiv.style.display = 'flex';
+
+                // Cargar HTML en el iframe
+                renderizarEnIframe(iframe, htmlPDF, orientationSelect.value);
+
+                // Esperar a que el iframe cargue
+                await new Promise((resolve) => {
+                    iframe.onload = () => {
+                        loadingDiv.style.display = 'none';
+                        resolve();
+                    };
+                    // Fallback timeout por si onload no se dispara
+                    setTimeout(() => {
+                        loadingDiv.style.display = 'none';
+                        resolve();
+                    }, 3000);
+                });
+
+                // --- Zoom ---
+                function actualizarZoom(nuevoZoom) {
+                    currentZoom = Math.max(25, Math.min(200, nuevoZoom));
+                    zoomLevelSpan.textContent = `${currentZoom}%`;
+                    try {
+                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        const body = iframeDoc.body;
+                        if (body) {
+                            body.style.transform = `scale(${currentZoom / 100})`;
+                            body.style.transformOrigin = 'top left';
+                            body.style.width = `${100 / (currentZoom / 100)}%`;
+                        }
+                    } catch (e) {
+                        console.warn('No se pudo aplicar zoom:', e);
+                    }
+                }
+
+                zoomInBtn.onclick = () => actualizarZoom(currentZoom + 15);
+                zoomOutBtn.onclick = () => actualizarZoom(currentZoom - 15);
+                zoomResetBtn.onclick = () => actualizarZoom(100);
+                currentZoom = 100;
+                zoomLevelSpan.textContent = '100%';
+
+                // --- Modo edición ---
+                function toggleEdicion() {
+                    editMode = !editMode;
+                    editToggle.classList.toggle('active', editMode);
+                    editBanner.style.display = editMode ? 'flex' : 'none';
+
+                    try {
+                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        if (!iframeDoc || !iframeDoc.body) return;
+
+                        // Hacer editables las celdas de tabla, títulos de comida, items de alimento
+                        const editables = iframeDoc.querySelectorAll('td, th, .item-alimento, .titulo-comida, h1, h2, h3, p, span');
+                        editables.forEach(el => {
+                            el.contentEditable = editMode ? 'true' : 'false';
+                        });
+
+                        // Inyectar/remover estilos de edición en el iframe
+                        let editStyle = iframeDoc.getElementById('pdf-edit-styles');
+                        if (editMode) {
+                            if (!editStyle) {
+                                editStyle = iframeDoc.createElement('style');
+                                editStyle.id = 'pdf-edit-styles';
+                                editStyle.textContent = `
+                                    td[contenteditable="true"],
+                                    th[contenteditable="true"] {
+                                        outline: 2px dashed rgba(245, 158, 11, 0.5) !important;
+                                        outline-offset: -1px;
+                                        cursor: text !important;
+                                        transition: outline-color 0.2s, background-color 0.2s;
+                                    }
+                                    td[contenteditable="true"]:hover,
+                                    th[contenteditable="true"]:hover {
+                                        outline-color: rgba(245, 158, 11, 0.8) !important;
+                                        background-color: rgba(245, 158, 11, 0.05) !important;
+                                    }
+                                    td[contenteditable="true"]:focus,
+                                    th[contenteditable="true"]:focus {
+                                        outline: 2px solid #f59e0b !important;
+                                        background-color: rgba(245, 158, 11, 0.1) !important;
+                                    }
+                                    .item-alimento[contenteditable="true"]:focus,
+                                    .titulo-comida[contenteditable="true"]:focus {
+                                        outline: 2px solid #f59e0b !important;
+                                        background-color: rgba(245, 158, 11, 0.1) !important;
+                                        border-radius: 2px;
+                                    }
+                                    h1[contenteditable="true"]:hover,
+                                    h2[contenteditable="true"]:hover,
+                                    h3[contenteditable="true"]:hover,
+                                    p[contenteditable="true"]:hover {
+                                        outline: 1px dashed rgba(245, 158, 11, 0.4) !important;
+                                    }
+                                    h1[contenteditable="true"]:focus,
+                                    h2[contenteditable="true"]:focus,
+                                    h3[contenteditable="true"]:focus,
+                                    p[contenteditable="true"]:focus {
+                                        outline: 2px solid #f59e0b !important;
+                                        border-radius: 2px;
+                                    }
+                                `;
+                                iframeDoc.head.appendChild(editStyle);
+                            }
+                        } else {
+                            if (editStyle) {
+                                editStyle.remove();
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('No se pudo activar modo edición:', e);
+                    }
+                }
+
+                editToggle.onclick = toggleEdicion;
+
+                // --- Cambio de orientación ---
+                orientationSelect.onchange = async () => {
+                    loadingDiv.style.display = 'flex';
+                    editMode = false;
+                    editToggle.classList.remove('active');
+                    editBanner.style.display = 'none';
+
+                    // Regenerar desde el HTML original
+                    const htmlOriginal = modal.dataset.htmlPDFOriginal;
+                    renderizarEnIframe(iframe, htmlOriginal, orientationSelect.value);
+
+                    await new Promise((resolve) => {
+                        iframe.onload = () => {
+                            loadingDiv.style.display = 'none';
+                            actualizarZoom(currentZoom);
+                            resolve();
+                        };
+                        setTimeout(() => {
+                            loadingDiv.style.display = 'none';
+                            resolve();
+                        }, 3000);
+                    });
+                };
+
+                // --- Botones de acción ---
+                downloadBtn.onclick = () => {
+                    const htmlFinal = obtenerHTMLDesdeIframe(iframe, modal.dataset.htmlPDFOriginal);
+                    descargarPDFDesdePreview(htmlFinal, nombreCliente, orientationSelect.value);
+                };
+
+                printBtn.onclick = () => {
+                    const htmlFinal = obtenerHTMLDesdeIframe(iframe, modal.dataset.htmlPDFOriginal);
+                    imprimirPDFDesdePreview(htmlFinal, orientationSelect.value);
+                };
+
+                cancelBtn.onclick = () => cerrarPreviewModal(modal);
+                closeBtn.onclick = () => cerrarPreviewModal(modal);
+
+                refreshBtn.onclick = async () => {
+                    loadingDiv.style.display = 'flex';
+                    editMode = false;
+                    editToggle.classList.remove('active');
+                    editBanner.style.display = 'none';
+
+                    // Regenerar completamente el PDF desde los datos actuales
+                    // Esto vuelve a llamar a generarPDFProfesional que recargará el modal
+                    cerrarPreviewModal(modal);
+                    const fuenteActual = window._ultimaFuentePDF || 'principal';
+                    if (typeof window.generarPDFProfesional === 'function') {
+                        await window.generarPDFProfesional(fuenteActual);
+                    }
+                };
+
+            } catch (error) {
+                console.error('Error generando previsualización:', error);
+                mostrarNotificacion('❌ Error al generar previsualización: ' + error.message, 'error');
+                cerrarPreviewModal(modal);
+            }
+        };
+
+        /**
+         * Renderiza el HTML del PDF dentro de un iframe
+         * Aplica estilos de "hoja de papel" para simular la apariencia impresa
+         */
+        function renderizarEnIframe(iframe, htmlPDF, orientation) {
+            try {
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                
+                // Inyectar HTML. Necesitamos envolver con estilos de fondo gris + hoja blanca
+                const wrapperCSS = `
+                    html {
+                        background: #e5e7eb;
+                        margin: 0;
+                        padding: 0;
+                    }
+                `;
+
+                // Extraer el contenido del body del HTML del PDF
+                let bodyContent = htmlPDF;
+                let styleContent = '';
+                let bodyClass = '';
+
+                // Intentar extraer <style> y <body> del HTML completo
+                const styleMatch = htmlPDF.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+                if (styleMatch) {
+                    styleContent = styleMatch[1];
+                }
+
+                const bodyMatch = htmlPDF.match(/<body[^>]*class="([^"]*)"[^>]*>([\s\S]*?)<\/body>/i);
+                if (bodyMatch) {
+                    bodyClass = bodyMatch[1];
+                    bodyContent = bodyMatch[2];
+                } else {
+                    // Si no hay body tag, usar todo el contenido
+                    const bodyMatch2 = htmlPDF.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+                    if (bodyMatch2) {
+                        bodyContent = bodyMatch2[1];
+                    }
+                }
+
+                const fullHTML = `<!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>${wrapperCSS}</style>
+                    <style>${styleContent}</style>
+                    <style>
+                        body {
+                            background: #e5e7eb;
+                            margin: 0;
+                            padding: 20px;
+                            display: flex;
+                            justify-content: center;
+                        }
+                        .pdf-paper {
+                            background: white;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
+                            border-radius: 2px;
+                            padding: 15mm;
+                            width: ${orientation === 'portrait' ? '210mm' : '297mm'};
+                            min-height: ${orientation === 'portrait' ? '297mm' : '210mm'};
+                            box-sizing: border-box;
+                        }
+                    </style>
+                </head>
+                <body class="${bodyClass}">
+                    <div class="pdf-paper">
+                        ${bodyContent}
+                    </div>
+                </body>
+                </html>`;
+
+                iframeDoc.open();
+                iframeDoc.write(fullHTML);
+                iframeDoc.close();
+            } catch (e) {
+                console.error('Error renderizando en iframe:', e);
+            }
+        }
+
+        /**
+         * Extrae el HTML actual del iframe (incluyendo ediciones del usuario)
+         * y reconstruye el HTML completo del PDF para descarga
+         */
+        function obtenerHTMLDesdeIframe(iframe, htmlOriginal) {
+            try {
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                if (!iframeDoc || !iframeDoc.body) return htmlOriginal;
+
+                // Obtener el contenido editado de la "hoja de papel"
+                const paper = iframeDoc.querySelector('.pdf-paper');
+                if (!paper) return htmlOriginal;
+
+                const contenidoEditado = paper.innerHTML;
+
+                // Remover atributos contenteditable antes de exportar
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = contenidoEditado;
+                const editables = tempDiv.querySelectorAll('[contenteditable]');
+                editables.forEach(el => el.removeAttribute('contenteditable'));
+
+                // Remover estilos de edición inyectados
+                const editStyle = tempDiv.querySelector('#pdf-edit-styles');
+                if (editStyle) editStyle.remove();
+
+                // Reconstruir el HTML completo del PDF con el contenido editado
+                // Extraer head (style, meta) del original
+                const headMatch = htmlOriginal.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
+                const headContent = headMatch ? headMatch[1] : '';
+                const bodyClassMatch = htmlOriginal.match(/<body[^>]*class="([^"]*)"[^>]*>/i);
+                const bodyClass = bodyClassMatch ? bodyClassMatch[1] : '';
+
+                return `<!DOCTYPE html>
+                <html>
+                <head>${headContent}</head>
+                <body class="${bodyClass}">
+                    ${tempDiv.innerHTML}
+                </body>
+                </html>`;
+            } catch (e) {
+                console.warn('No se pudo extraer HTML del iframe, usando original:', e);
+                return htmlOriginal;
+            }
+        }
+
+        /**
+         * Cierra el modal de previsualización
+         */
+        window.cerrarPreviewModal = function (modal) {
+            modal.classList.remove('active');
+            modal.dataset.htmlPDFOriginal = '';
+            modal.dataset.nombreCliente = '';
+
+            // Reset edit mode
+            const editToggle = document.getElementById('pdfEditToggle');
+            const editBanner = document.getElementById('pdfEditBanner');
+            if (editToggle) editToggle.classList.remove('active');
+            if (editBanner) editBanner.style.display = 'none';
+
+            // Limpiar iframe
+            const iframe = document.getElementById('pdfPreviewIframe');
+            if (iframe) {
+                try {
+                    const doc = iframe.contentDocument || iframe.contentWindow.document;
+                    doc.open();
+                    doc.write('');
+                    doc.close();
+                } catch (e) { /* ignorar */ }
+            }
+        };
+
+        /**
+         * Descarga el PDF desde la previsualización
+         */
+        window.descargarPDFDesdePreview = async function (htmlPDF, nombreCliente, orientation = 'landscape') {
+            try {
+                mostrarNotificacion('⏳ Preparando descarga...', 'info');
+
+                await generarArchivoPDF(htmlPDF, nombreCliente, { 
+                    orientacion: orientation === 'portrait' ? 'p' : 'l'
+                });
+
+                cerrarPreviewModal(document.getElementById('pdfPreviewModal'));
+            } catch (error) {
+                console.error('Error descargando PDF:', error);
+                mostrarNotificacion('❌ Error al descargar PDF: ' + error.message, 'error');
+            }
+        };
+
+        /**
+         * Imprime el PDF desde la previsualización
+         */
+        window.imprimirPDFDesdePreview = async function (htmlPDF, orientation = 'landscape') {
+            try {
+                mostrarNotificacion('⏳ Preparando impresión...', 'info');
+
+                // Crear ventana para impresión
+                const ventanaImpresion = window.open('', '', 'width=900,height=700');
+                
+                if (!ventanaImpresion) {
+                    throw new Error('No se pudo abrir la ventana de impresión. Verifica que no esté bloqueada.');
+                }
+
+                // Ajustar HTML para impresión
+                let htmlParaImprimir = htmlPDF;
+                if (orientation === 'portrait') {
+                    htmlParaImprimir = htmlParaImprimir.replace(
+                        /class="layout-landscape"/g,
+                        'class="layout-portrait"'
+                    );
+                }
+
+                ventanaImpresion.document.write(htmlParaImprimir);
+                ventanaImpresion.document.close();
+
+                // Esperar a que cargue
+                ventanaImpresion.onload = () => {
+                    ventanaImpresion.print();
+                };
+
+                setTimeout(() => {
+                    ventanaImpresion.print();
+                }, 1000);
+
+                mostrarNotificacion('🖨️ Diálogo de impresión abierto', 'success');
+
+            } catch (error) {
+                console.error('Error imprimiendo PDF:', error);
+                mostrarNotificacion('❌ Error al imprimir: ' + error.message, 'error');
+            }
+        };
+
+        /**
          * Función unificada para generar PDF profesional (blanco y negro, minimalista)
          * @param {string} fuente - 'principal' o 'tabla-editable'
          */
@@ -5128,9 +5552,11 @@ ${lineas.join('\n')}`;
             </html>
         `;
 
-            // Generar y descargar PDF (ahora es async)
-            // orientacionPDF ya está declarada arriba, solo usar su valor
-            await generarArchivoPDF(htmlPDF, nombreCliente, { orientacion: orientacionPDF });
+            // Guardar la fuente usada para poder regenerar desde el modal
+            window._ultimaFuentePDF = fuenteFinal;
+
+            // Mostrar previsualización del PDF en lugar de descargar directamente
+            await window.mostrarPreviewPDF(htmlPDF, nombreCliente);
         };
 
         // Botón descargar PDF
@@ -5323,227 +5749,6 @@ ${lineas.join('\n')}`;
         }, 3000);
     };
 
-    // Función para mostrar vista previa del PDF con opciones de descarga/compartir
-    window.mostrarPreviewPDF = function (pdfUrl, pdfBlob, filename) {
-        // Crear modal de previsualización
-        const modal = document.createElement('div');
-        modal.id = 'pdfPreviewModal';
-        modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.85);
-        z-index: 99999;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        animation: fadeIn 0.3s ease;
-    `;
-
-        // Contenedor del modal
-        const modalContent = document.createElement('div');
-        modalContent.style.cssText = `
-        background: white;
-        border-radius: 12px;
-        width: 90%;
-        max-width: 1000px;
-        height: 90%;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        overflow: hidden;
-    `;
-
-        // Header del modal
-        const header = document.createElement('div');
-        header.style.cssText = `
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-radius: 12px 12px 0 0;
-    `;
-
-        const title = document.createElement('h3');
-        title.textContent = '📄 Vista Previa del PDF';
-        title.style.cssText = `
-        margin: 0;
-        font-size: 1.5em;
-        font-weight: 600;
-    `;
-
-        const closeBtn = document.createElement('button');
-        closeBtn.innerHTML = '✕';
-        closeBtn.style.cssText = `
-        background: rgba(255, 255, 255, 0.95);
-        border: none;
-        color: #dc3545;
-        font-size: 36px;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: bold;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        line-height: 1;
-    `;
-        closeBtn.onmouseover = () => {
-            closeBtn.style.background = 'rgba(255, 255, 255, 1)';
-            closeBtn.style.color = '#c82333';
-            closeBtn.style.transform = 'scale(1.1)';
-            closeBtn.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
-        };
-        closeBtn.onmouseout = () => {
-            closeBtn.style.background = 'rgba(255, 255, 255, 0.95)';
-            closeBtn.style.color = '#dc3545';
-            closeBtn.style.transform = 'scale(1)';
-            closeBtn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
-        };
-        closeBtn.onclick = () => {
-            URL.revokeObjectURL(pdfUrl);
-            document.body.removeChild(modal);
-        };
-
-        header.appendChild(title);
-        header.appendChild(closeBtn);
-
-        // Visor de PDF
-        const pdfViewer = document.createElement('iframe');
-        pdfViewer.src = pdfUrl;
-        pdfViewer.style.cssText = `
-        flex: 1;
-        border: none;
-        width: 100%;
-        background: #f5f5f5;
-    `;
-
-        // Footer con botones de acción
-        const footer = document.createElement('div');
-        footer.style.cssText = `
-        padding: 20px;
-        background: #f8f9fa;
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        flex-wrap: wrap;
-        border-radius: 0 0 12px 12px;
-        border-top: 2px solid #e9ecef;
-    `;
-
-        // Botón Descargar
-        const btnDescargar = document.createElement('button');
-        btnDescargar.innerHTML = '💾 Descargar PDF';
-        btnDescargar.style.cssText = `
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    `;
-        btnDescargar.onmouseover = () => {
-            btnDescargar.style.transform = 'translateY(-2px)';
-            btnDescargar.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
-        };
-        btnDescargar.onmouseout = () => {
-            btnDescargar.style.transform = 'translateY(0)';
-            btnDescargar.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
-        };
-        btnDescargar.onclick = () => {
-            const a = document.createElement('a');
-            a.href = pdfUrl;
-            a.download = filename;
-            a.click();
-            mostrarNotificacion('✅ PDF descargado correctamente', 'success');
-        };
-
-        // Botón Abrir en Nueva Ventana
-        const btnNuevaVentana = document.createElement('button');
-        btnNuevaVentana.innerHTML = '🔗 Abrir en Nueva Ventana';
-        btnNuevaVentana.style.cssText = `
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
-    `;
-        btnNuevaVentana.onmouseover = () => {
-            btnNuevaVentana.style.transform = 'translateY(-2px)';
-            btnNuevaVentana.style.boxShadow = '0 6px 20px rgba(240, 147, 251, 0.5)';
-        };
-        btnNuevaVentana.onmouseout = () => {
-            btnNuevaVentana.style.transform = 'translateY(0)';
-            btnNuevaVentana.style.boxShadow = '0 4px 15px rgba(240, 147, 251, 0.4)';
-        };
-        btnNuevaVentana.onclick = () => {
-            window.open(pdfUrl, '_blank');
-            mostrarNotificacion('✅ PDF abierto en nueva ventana', 'info');
-        };
-
-        // Botón WhatsApp
-        const btnWhatsApp = document.createElement('button');
-        btnWhatsApp.innerHTML = '📱 Compartir por WhatsApp';
-        btnWhatsApp.style.cssText = `
-        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
-    `;
-        btnWhatsApp.onmouseover = () => {
-            btnWhatsApp.style.transform = 'translateY(-2px)';
-            btnWhatsApp.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.5)';
-        };
-        btnWhatsApp.onmouseout = () => {
-            btnWhatsApp.style.transform = 'translateY(0)';
-            btnWhatsApp.style.boxShadow = '0 4px 15px rgba(37, 211, 102, 0.4)';
-        };
-        btnWhatsApp.onclick = () => {
-            // Primero descargar el archivo
-            const a = document.createElement('a');
-            a.href = pdfUrl;
-            a.download = filename;
-            a.click();
-
-            // Mostrar instrucciones
-            const mensaje = 'El PDF se ha descargado. Para compartirlo por WhatsApp:\n\n' +
-                '1. Abre WhatsApp\n' +
-                '2. Selecciona el contacto\n' +
-                '3. Toca el ícono de adjuntar (📎)\n' +
-                '4. Selecciona "Documento"\n' +
-                '5. Busca y selecciona el PDF descargado';
-
-            mostrarNotificacion(mensaje, 'info');
-            mostrarNotificacion('💡 Sigue las instrucciones para compartir', 'info');
-        };
-
-
-
-    }
 }); // End DOMContentLoaded
 
 // ========================================

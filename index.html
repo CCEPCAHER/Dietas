@@ -959,6 +959,71 @@
             }
         });
     </script>
+
+    <!-- Modal de Previsualización del PDF -->
+    <div id="pdfPreviewModal" class="pdf-preview-modal-overlay">
+        <div class="pdf-preview-modal">
+            <div class="pdf-preview-header">
+                <h3>📄 Previsualización del PDF</h3>
+                <button type="button" class="pdf-preview-close" title="Cerrar previsualización">&times;</button>
+            </div>
+
+            <!-- Barra de herramientas -->
+            <div class="pdf-preview-toolbar">
+                <div class="pdf-toolbar-group">
+                    <label class="pdf-preview-label">
+                        <span>Orientación:</span>
+                        <select id="pdfOrientationSelect" class="pdf-preview-select">
+                            <option value="landscape">Horizontal</option>
+                            <option value="portrait">Vertical</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="pdf-toolbar-group pdf-zoom-controls">
+                    <button type="button" id="pdfZoomOut" class="pdf-toolbar-btn" title="Reducir zoom">−</button>
+                    <span id="pdfZoomLevel" class="pdf-zoom-level">100%</span>
+                    <button type="button" id="pdfZoomIn" class="pdf-toolbar-btn" title="Aumentar zoom">+</button>
+                    <button type="button" id="pdfZoomReset" class="pdf-toolbar-btn pdf-toolbar-btn-text" title="Restablecer zoom">Ajustar</button>
+                </div>
+                <div class="pdf-toolbar-group">
+                    <button type="button" id="pdfEditToggle" class="pdf-toolbar-btn pdf-toolbar-btn-edit" title="Activar modo edición para corregir contenido">
+                        ✏️ Editar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Indicador modo edición -->
+            <div id="pdfEditBanner" class="pdf-edit-banner" style="display: none;">
+                <span>✏️ <strong>Modo Edición activo</strong> — Haz clic en cualquier texto de la tabla para corregirlo. Los cambios se aplicarán al descargar el PDF.</span>
+            </div>
+            
+            <div class="pdf-preview-content">
+                <div class="pdf-preview-iframe-container">
+                    <iframe id="pdfPreviewIframe" class="pdf-preview-iframe" sandbox="allow-same-origin"></iframe>
+                    <div class="pdf-preview-loading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Generando previsualización...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pdf-preview-actions">
+                <button type="button" id="pdfPreviewRefresh" class="pdf-preview-btn pdf-preview-btn-refresh" title="Regenerar previsualización desde los datos originales">
+                    🔄 Regenerar
+                </button>
+                <button type="button" id="pdfPreviewPrint" class="pdf-preview-btn pdf-preview-btn-print" title="Imprimir PDF">
+                    🖨️ Imprimir
+                </button>
+                <button type="button" id="pdfPreviewDownload" class="pdf-preview-btn pdf-preview-btn-success" title="Descargar PDF con los cambios aplicados">
+                    ⬇️ Descargar PDF
+                </button>
+                <button type="button" id="pdfPreviewCancel" class="pdf-preview-btn pdf-preview-btn-cancel" title="Cancelar">
+                    ✕ Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
