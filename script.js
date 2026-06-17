@@ -3817,7 +3817,16 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             .tabla-plan-semanal th,
             .tabla-plan-semanal td {
-                width: ${Math.round((100 / 7) * 100) / 100}%;
+                width: 12.85%;
+            }
+            .tabla-plan-semanal th.col-comida,
+            .tabla-plan-semanal td.celda-comida {
+                width: 10% !important;
+                font-weight: 700;
+                text-align: center;
+                background: #f8fafc;
+                vertical-align: middle;
+                font-size: ${tamanos.tamanoTituloComida || 7.8}pt;
             }
             .tabla-plan-semanal .subtitulo-dia {
                 display: block;
@@ -4307,6 +4316,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 html += '<table class="tabla-plan-semanal"><thead><tr>';
 
+                // Columna para las comidas
+                html += '<th class="col-comida">Comida</th>';
+
                 semana.columnas.forEach(col => {
                     const icono = col.esDescanso ? '😴' : '💪';
                     // Asegurar que el día se muestre correctamente
@@ -4319,6 +4331,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 comidas.forEach(comida => {
                     html += '<tr>';
+
+                    const iconoComida = comida === 'Desayuno' ? '🍳' :
+                        comida === 'Media Mañana' ? '🥤' :
+                        comida === 'Comida' ? '🍽️' :
+                        comida === 'Merienda' ? '🥙' :
+                        comida === 'Cena' ? '🌙' : '🍽️';
+
+                    html += `<td class="celda-comida">${iconoComida}<br><small style="font-size: 85%; font-weight: bold; text-transform: uppercase;">${escapeHTML(comida)}</small></td>`;
+
                     semana.columnas.forEach(col => {
                         const items = col.alimentosPorComida[comida] || [];
                         if (!items.length) {
@@ -4327,7 +4348,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             const contenido = items
                                 .map(item => `<span class="item-alimento">${escapeHTML(formatoAlimento(item))}</span>`)
                                 .join(' ');
-                            html += `<td class="celda-dia"><span class="titulo-comida">${escapeHTML(comida)}</span>${contenido}</td>`;
+                            html += `<td class="celda-dia">${contenido}</td>`;
                         }
                     });
                     html += '</tr>';
