@@ -5876,3 +5876,51 @@ if (document.readyState === 'loading') {
     // DOM already loaded
     setupAutoCalculation();
 }
+
+// ===== Funciones para el Modal de Feedback al Programador =====
+window.mostrarModalFeedback = function() {
+    const modal = document.getElementById('feedbackModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        // Limpiar campo
+        const textarea = document.getElementById('feedbackText');
+        if (textarea) textarea.value = '';
+    }
+};
+
+window.cerrarModalFeedback = function() {
+    const modal = document.getElementById('feedbackModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+};
+
+window.enviarFeedback = function() {
+    const textarea = document.getElementById('feedbackText');
+    if (!textarea || !textarea.value.trim()) {
+        if (typeof mostrarNotificacion === 'function') {
+            mostrarNotificacion('Por favor, escribe tu sugerencia antes de enviar.', 'warning');
+        } else {
+            alert('Por favor, escribe tu sugerencia antes de enviar.');
+        }
+        return;
+    }
+
+    const sugerencia = textarea.value.trim();
+    
+    // Correo ofuscado en Base64 para evitar spam: franklinomundo@hotmail.com
+    const emailDecoded = atob('ZnJhbmtsaW5vbXVuZG9AaG90bWFpbC5jb20='); 
+    
+    const subject = encodeURIComponent('Sugerencia de cambios - Dietas App');
+    const body = encodeURIComponent(sugerencia);
+    
+    // Redirección con mailto: abre el cliente de correo del usuario
+    window.location.href = `mailto:${emailDecoded}?subject=${subject}&body=${body}`;
+    
+    // Cerrar modal
+    window.cerrarModalFeedback();
+    
+    if (typeof mostrarNotificacion === 'function') {
+        mostrarNotificacion('📧 Abriendo cliente de correo para enviar feedback...', 'success');
+    }
+};

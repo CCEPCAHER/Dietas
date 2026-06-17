@@ -769,6 +769,12 @@
                 </div>
             </div>
         </div>
+        
+        <!-- App Footer showing version and feedback link -->
+        <div class="app-footer">
+            <span>Versión 2.1.0</span>
+            <a href="javascript:void(0)" class="app-footer-link" onclick="mostrarModalFeedback()">📩 Feedback al programador</a>
+        </div>
     </div>
 
     <!-- Librerías externas -->
@@ -959,6 +965,26 @@
             }
         });
     </script>
+
+    <!-- Modal de Feedback al Programador -->
+    <div id="feedbackModal" class="modal-modern-container" style="display: none;">
+        <div class="modal-modern-content fade-in" style="max-width: 500px;">
+            <div class="modal-modern-header">
+                <h3>📩 Feedback al Programador</h3>
+                <span class="modal-modern-close" onclick="cerrarModalFeedback()">&times;</span>
+            </div>
+            <div class="modal-modern-body">
+                <p>Envía tus sugerencias, reporte de errores o comentarios de mejora:</p>
+                <div class="form-group" style="margin-top: 15px;">
+                    <textarea id="feedbackText" placeholder="Escribe tu sugerencia aquí..." rows="6" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-family: inherit; resize: vertical; box-sizing: border-box; background: var(--bg-card); color: var(--text-primary);"></textarea>
+                </div>
+            </div>
+            <div class="modal-modern-footer">
+                <button class="btn-modern-secondary" onclick="cerrarModalFeedback()">Cancelar</button>
+                <button class="btn-modern-primary" onclick="enviarFeedback()">Enviar sugerencia</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal de Previsualización del PDF -->
     <div id="pdfPreviewModal" class="pdf-preview-modal-overlay">
