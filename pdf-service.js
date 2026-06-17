@@ -30,7 +30,7 @@ class PDFService {
         const html2canvasWindowWidth = Math.max(windowWidthPx, contenidoAnchoPx + 120);
 
         const defaultOptions = {
-            margin: isLandscape ? [10, 4, 10, 10] : [10, 4, 10, 10], // Márgenes en mm (izquierda, arriba, derecha, abajo)
+            margin: isLandscape ? [4, 10, 10, 10] : [4, 10, 10, 10], // Márgenes en mm (arriba, izquierda, abajo, derecha)
             filename: filename,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: {
