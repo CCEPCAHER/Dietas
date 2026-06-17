@@ -4913,11 +4913,13 @@ ${lineas.join('\n')}`;
                 await new Promise((resolve) => {
                     iframe.onload = () => {
                         loadingDiv.style.display = 'none';
+                        ajustarZoomAlIframe();
                         resolve();
                     };
                     // Fallback timeout por si onload no se dispara
                     setTimeout(() => {
                         loadingDiv.style.display = 'none';
+                        ajustarZoomAlIframe();
                         resolve();
                     }, 3000);
                 });
@@ -4939,11 +4941,49 @@ ${lineas.join('\n')}`;
                     }
                 }
 
+                function ajustarZoomAlIframe() {
+                    try {
+                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        const body = iframeDoc.body;
+                        if (!body) return;
+
+                        const containerWidth = iframe.clientWidth;
+                        const containerHeight = iframe.clientHeight;
+                        
+                        if (containerWidth <= 0 || containerHeight <= 0) return;
+
+                        // Dimensiones de la hoja más padding en píxeles (A4 horizontal vs vertical)
+                        const esHorizontal = orientationSelect.value === 'landscape';
+                        const paperWidth = esHorizontal ? 1162.5 : 833.7;
+                        const paperHeight = esHorizontal ? 833.7 : 1162.5;
+
+                        // Calcular el factor de escala necesario para encajar
+                        const scaleX = containerWidth / paperWidth;
+                        const scaleY = containerHeight / paperHeight;
+                        
+                        // Queremos que quepa tanto a lo ancho como a lo alto, así que tomamos el mínimo
+                        let scale = Math.min(scaleX, scaleY);
+                        
+                        // Limitar el zoom entre 25% y 200%
+                        const zoomPercent = Math.max(25, Math.min(200, Math.floor(scale * 100)));
+                        actualizarZoom(zoomPercent);
+                    } catch (e) {
+                        console.warn('Error al ajustar zoom automáticamente:', e);
+                    }
+                }
+
                 zoomInBtn.onclick = () => actualizarZoom(currentZoom + 15);
                 zoomOutBtn.onclick = () => actualizarZoom(currentZoom - 15);
-                zoomResetBtn.onclick = () => actualizarZoom(100);
-                currentZoom = 100;
-                zoomLevelSpan.textContent = '100%';
+                zoomResetBtn.onclick = () => ajustarZoomAlIframe();
+
+                // Configurar ResizeObserver para auto-ajustar al tamaño del iframe
+                if (window.pdfPreviewResizeObserver) {
+                    window.pdfPreviewResizeObserver.disconnect();
+                }
+                window.pdfPreviewResizeObserver = new ResizeObserver(() => {
+                    ajustarZoomAlIframe();
+                });
+                window.pdfPreviewResizeObserver.observe(iframe);
 
                 // --- Modo edición ---
                 function toggleEdicion() {
@@ -5221,6 +5261,12 @@ ${lineas.join('\n')}`;
             modal.classList.remove('active');
             modal.dataset.htmlPDFOriginal = '';
             modal.dataset.nombreCliente = '';
+
+            // Desconectar ResizeObserver
+            if (window.pdfPreviewResizeObserver) {
+                window.pdfPreviewResizeObserver.disconnect();
+                window.pdfPreviewResizeObserver = null;
+            }
 
             // Reset edit mode
             const editToggle = document.getElementById('pdfEditToggle');
