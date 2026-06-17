@@ -3789,14 +3789,14 @@ document.addEventListener('DOMContentLoaded', function () {
             .tabla-plan-semanal th,
             .tabla-plan-semanal td {
                 border: 1px solid #666;
-                padding: ${Math.max(0, tamanos.tamanoItemAlimento * 0.08)}px ${Math.max(0, tamanos.tamanoItemAlimento * 0.06)}px;
+                padding: ${Math.max(1.2, Math.min(3.0, tamanos.tamanoItemAlimento * 0.28))}px ${Math.max(1.2, Math.min(3.0, tamanos.tamanoItemAlimento * 0.18))}px;
                 font-size: ${tamanos.tamanoItemAlimento}pt;
                 vertical-align: top;
                 word-wrap: break-word;
                 overflow-wrap: break-word;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                line-height: ${Math.max(1.1, Math.min(1.3, 1.0 + (tamanos.tamanoItemAlimento - 6) * 0.02))};
+                line-height: 1.15;
             }
             .tabla-plan-semanal tbody tr:last-child td {
                 border-bottom: 2px solid #000 !important;
@@ -4182,97 +4182,73 @@ document.addEventListener('DOMContentLoaded', function () {
          * @returns {Object} - Tamaños de fuente calculados
          */
         function calcularTamanosFuenteDinamicos(estructura) {
-            const { diasBase, comidas, semanas } = estructura;
+            const { diasBase, comidas, semanas, formatoAlimento } = estructura;
 
-            // Contar total de alimentos en todas las celdas
-            let totalAlimentos = 0;
-            let maxAlimentosPorCelda = 0;
+            // Calcular total de líneas estimadas de alimentos para toda la semana
+            let totalLineasEstimadas = 0;
+            let maxLineasPorCelda = 0;
+            const totalCeldas = semanas.length * diasBase.length * comidas.length;
 
             semanas.forEach(semana => {
                 semana.columnas.forEach(col => {
                     comidas.forEach(comida => {
                         const items = col.alimentosPorComida[comida] || [];
-                        totalAlimentos += items.length;
-                        if (items.length > maxAlimentosPorCelda) {
-                            maxAlimentosPorCelda = items.length;
+                        let lineasCelda = 0;
+                        items.forEach(item => {
+                            const texto = formatoAlimento(item);
+                            // Estimar cuántas líneas ocupará el texto
+                            // Aprox 28 caracteres por línea en el PDF en A4 landscape
+                            const lineasItem = Math.max(1, Math.ceil(texto.length / 28));
+                            lineasCelda += lineasItem;
+                        });
+                        totalLineasEstimadas += lineasCelda;
+                        if (lineasCelda > maxLineasPorCelda) {
+                            maxLineasPorCelda = lineasCelda;
                         }
                     });
                 });
             });
 
-            // Calcular densidad: alimentos por celda promedio
-            const totalCeldas = semanas.length * diasBase.length * comidas.length;
-            const densidadAlimentos = totalCeldas > 0 ? totalAlimentos / totalCeldas : 0;
+            const promedioLineasPorCelda = totalCeldas > 0 ? totalLineasEstimadas / totalCeldas : 0;
 
-            // Tamaños base para A4 horizontal (297mm x 210mm)
-            // Altura disponible aproximada: ~195mm (descontando header y márgenes mínimos)
-            // Ancho disponible: ~287mm
+            // Calcular tamaño base a partir del promedio de líneas por celda y el caso más desfavorable
+            let tamanoBase = 10.0;
 
-            // Calcular tamaño de fuente basado en densidad y distribución
-            // Objetivo: ajustar dinámicamente para mejor legibilidad y uso del espacio
-
-            // Calcular altura promedio de contenido por celda (estimación)
-            const alturaEstimadaPorCelda = (totalAlimentos / totalCeldas) * 4; // ~4mm por alimento
-
-            // Tamaño base inicial - ajustado para que quepa en una sola hoja
-            // Altura disponible: ~182mm (descontando header ~25mm y margen inferior 3mm)
-            // Ancho disponible: ~287mm / 7 días = ~41mm por columna
-            const alturaDisponiblePorCelda = 182 / 5; // ~36.4mm por fila de comida
-            const anchoDisponiblePorCelda = 287 / 7; // ~41mm por columna
-
-            // Calcular espacio disponible estimado por celda (en mm)
-            const espacioDisponible = alturaDisponiblePorCelda * anchoDisponiblePorCelda; // mm²
-
-            // Calcular espacio ocupado estimado
-            const espacioOcupado = alturaEstimadaPorCelda * anchoDisponiblePorCelda;
-            const porcentajeUso = espacioOcupado > 0 ? (espacioOcupado / espacioDisponible) * 100 : 0;
-
-            // Calcular tamaño base - 10.0pt como tamaño base
-            let tamanoBase = 10.0; // Tamaño base fijado en 10.0pt
-
-            // Ajuste según densidad de alimentos
-            if (densidadAlimentos < 1.0) {
-                tamanoBase = Math.min(12.0, 11.0 + (1.0 - densidadAlimentos) * 1.0);
-            } else if (densidadAlimentos < 2.0) {
-                tamanoBase = Math.min(11.5, 11.0 + (2.0 - densidadAlimentos) * 0.5);
-            } else if (densidadAlimentos < 3.0) {
-                tamanoBase = 10.0;
-            } else if (densidadAlimentos < 4.0) {
-                tamanoBase = Math.max(9.0, 10.0 - (densidadAlimentos - 3.0) * 0.5);
+            if (promedioLineasPorCelda < 1.5) {
+                tamanoBase = 11.5;
+            } else if (promedioLineasPorCelda < 2.5) {
+                tamanoBase = 10.5;
+            } else if (promedioLineasPorCelda < 3.5) {
+                tamanoBase = 9.5;
+            } else if (promedioLineasPorCelda < 4.5) {
+                tamanoBase = 8.5;
+            } else if (promedioLineasPorCelda < 6.0) {
+                tamanoBase = 7.5;
             } else {
-                tamanoBase = Math.max(8.5, 9.0 - (densidadAlimentos - 4.0) * 0.3);
+                tamanoBase = 6.8;
             }
 
-            // Ajuste según máximo de alimentos por celda
-            if (maxAlimentosPorCelda > 8) {
-                tamanoBase = Math.max(8.5, tamanoBase - 0.8);
-            } else if (maxAlimentosPorCelda > 6) {
-                tamanoBase = Math.max(9.0, tamanoBase - 0.5);
-            } else if (maxAlimentosPorCelda <= 2 && densidadAlimentos < 2.0) {
-                tamanoBase = Math.min(12.0, tamanoBase + 1.0);
-            } else if (maxAlimentosPorCelda <= 3 && densidadAlimentos < 2.5) {
-                tamanoBase = Math.min(11.5, tamanoBase + 0.8);
+            // Ajuste restrictivo según el día más lleno (caso más desfavorable) para evitar recortes
+            if (maxLineasPorCelda > 12) {
+                tamanoBase = Math.min(tamanoBase, 6.5);
+            } else if (maxLineasPorCelda > 10) {
+                tamanoBase = Math.min(tamanoBase, 7.0);
+            } else if (maxLineasPorCelda > 8) {
+                tamanoBase = Math.min(tamanoBase, 7.8);
+            } else if (maxLineasPorCelda > 6) {
+                tamanoBase = Math.min(tamanoBase, 8.5);
             }
 
-            // Ajuste según altura estimada (para evitar desbordamiento)
-            if (alturaEstimadaPorCelda > 35) {
-                tamanoBase = Math.max(8.5, tamanoBase - 0.8);
-            } else if (alturaEstimadaPorCelda > 30) {
-                tamanoBase = Math.max(9.0, tamanoBase - 0.5);
-            } else if (alturaEstimadaPorCelda < 15 && densidadAlimentos < 2.5) {
-                tamanoBase = Math.min(11.5, tamanoBase + 0.8);
-            }
-
-            console.log(`📊 Cálculo dinámico: densidad=${densidadAlimentos.toFixed(2)}, maxPorCelda=${maxAlimentosPorCelda}, alturaEst=${alturaEstimadaPorCelda.toFixed(1)}mm, usoEspacio=${porcentajeUso.toFixed(1)}%, tamañoBase=${tamanoBase.toFixed(1)}pt`);
+            console.log(`📊 Cálculo dinámico basado en líneas: promedioLineas=${promedioLineasPorCelda.toFixed(2)}, maxLineasPorCelda=${maxLineasPorCelda}, tamañoBase=${tamanoBase.toFixed(1)}pt`);
 
             // Redondear a 1 decimal
             tamanoBase = Math.round(tamanoBase * 10) / 10;
 
             // Calcular tamaños relativos con mejor proporción
             const tamanoItem = tamanoBase;
-            const tamanoTitulo = Math.min(tamanoBase + 1.0, tamanoBase * 1.15); // Máximo 15% más grande
-            const tamanoHeader = Math.min(tamanoBase + 1.5, tamanoBase * 1.25); // Máximo 25% más grande
-            const tamanoSubtitulo = Math.min(tamanoBase + 0.5, tamanoBase * 1.1); // Máximo 10% más grande
+            const tamanoTitulo = Math.min(tamanoBase + 0.8, tamanoBase * 1.12);
+            const tamanoHeader = Math.min(tamanoBase + 1.2, tamanoBase * 1.2);
+            const tamanoSubtitulo = Math.min(tamanoBase + 0.4, tamanoBase * 1.08);
 
             return {
                 tamanoItemAlimento: tamanoItem,
@@ -5203,7 +5179,7 @@ ${lineas.join('\n')}`;
                             background: white !important;
                             box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
                             border-radius: 4px !important;
-                            padding: 15mm !important;
+                            padding: 5mm 10mm 5mm 10mm !important;
                             width: ${orientation === 'portrait' ? '210mm' : '297mm'} !important;
                             height: ${orientation === 'portrait' ? '297mm' : '210mm'} !important;
                             overflow: hidden !important;

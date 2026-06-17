@@ -28,7 +28,7 @@ class PDFService {
         const contenidoAnchoPx = isLandscape ? 990 : 780;
 
         const defaultOptions = {
-            margin: isLandscape ? [4, 10, 10, 10] : [4, 10, 10, 10], // Márgenes en mm (arriba, izquierda, abajo, derecha)
+            margin: isLandscape ? [4, 10, 4, 10] : [4, 10, 4, 10], // Margen arriba 4mm, izquierda 10mm, abajo 4mm, derecha 10mm
             filename: filename,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: {
@@ -77,8 +77,9 @@ class PDFService {
             // Contenedor temporal fuera de pantalla pero visible para html2canvas
             const container = document.createElement('div');
             container.style.position = 'absolute';
-            container.style.left = '-9999px';
+            container.style.left = '0';
             container.style.top = '0';
+            container.style.zIndex = '-9999';
             container.style.width = `${contenidoAnchoPx}px`;
             container.style.padding = '0';
             container.style.margin = '0';
