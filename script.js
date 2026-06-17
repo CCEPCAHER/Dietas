@@ -4931,7 +4931,7 @@ ${lineas.join('\n')}`;
                         const body = iframeDoc.body;
                         if (body) {
                             body.style.transform = `scale(${currentZoom / 100})`;
-                            body.style.transformOrigin = 'top left';
+                            body.style.transformOrigin = 'top center';
                             body.style.width = `${100 / (currentZoom / 100)}%`;
                         }
                     } catch (e) {
@@ -5123,24 +5123,33 @@ ${lineas.join('\n')}`;
                 <html>
                 <head>
                     <meta charset="UTF-8">
+                    <link rel="stylesheet" href="styles.css">
                     <style>${wrapperCSS}</style>
                     <style>${styleContent}</style>
                     <style>
                         body {
-                            background: #e5e7eb;
-                            margin: 0;
-                            padding: 20px;
-                            display: flex;
-                            justify-content: center;
+                            background: #e5e7eb !important;
+                            margin: 0 !important;
+                            padding: 20px !important;
+                            display: block !important;
+                            max-height: none !important;
+                            overflow: auto !important;
+                            height: auto !important;
                         }
                         .pdf-paper {
-                            background: white;
-                            box-shadow: 0 2px 8px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
-                            border-radius: 2px;
-                            padding: 15mm;
-                            width: ${orientation === 'portrait' ? '210mm' : '297mm'};
-                            min-height: ${orientation === 'portrait' ? '297mm' : '210mm'};
-                            box-sizing: border-box;
+                            background: white !important;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+                            border-radius: 4px !important;
+                            padding: 15mm !important;
+                            width: ${orientation === 'portrait' ? '210mm' : '297mm'} !important;
+                            min-height: ${orientation === 'portrait' ? '297mm' : '210mm'} !important;
+                            box-sizing: border-box !important;
+                            margin: 0 auto 20px auto !important;
+                            display: block !important;
+                            position: relative !important;
+                        }
+                        .pdf-paper * {
+                            box-sizing: border-box !important;
                         }
                     </style>
                 </head>
