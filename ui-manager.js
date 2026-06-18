@@ -302,6 +302,7 @@ class UIManager {
                     if (dieta) {
                         if (typeof window.generarPDFDesdeDietaObjeto === 'function') {
                             await window.generarPDFDesdeDietaObjeto(dieta, 'preview');
+                            modal.style.display = 'none';
                         } else {
                             this.showNotification('❌ Función de previsualización no disponible', 'error');
                         }
@@ -317,6 +318,7 @@ class UIManager {
                     if (dieta) {
                         if (typeof window.generarPDFDesdeDietaObjeto === 'function') {
                             await window.generarPDFDesdeDietaObjeto(dieta, 'print');
+                            modal.style.display = 'none';
                         } else {
                             this.showNotification('❌ Función de impresión no disponible', 'error');
                         }
@@ -337,6 +339,7 @@ class UIManager {
 
                     if (confirm('¿Estás seguro de eliminar esta dieta?')) {
                         await this.eliminarDieta(dietaId);
+                        modal.style.display = 'none';
                     }
                 });
             });
