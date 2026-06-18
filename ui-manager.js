@@ -300,11 +300,22 @@ class UIManager {
                     const dietaId = e.target.getAttribute('data-id');
                     const dieta = dietas.find(d => d.id === dietaId);
                     if (dieta) {
+                        if (typeof window.generarPDFDesdeDietaObjeto !== 'function') {
+                            this.showNotification('⏳ Cargando previsualizador PDF, espera un momento...', 'info');
+                            // Reintentar cada 200ms hasta por 5 segundos
+                            for (let i = 0; i < 25; i++) {
+                                await new Promise(resolve => setTimeout(resolve, 200));
+                                if (typeof window.generarPDFDesdeDietaObjeto === 'function') {
+                                    break;
+                                }
+                            }
+                        }
+
                         if (typeof window.generarPDFDesdeDietaObjeto === 'function') {
                             await window.generarPDFDesdeDietaObjeto(dieta, 'preview');
                             modal.style.display = 'none';
                         } else {
-                            this.showNotification('❌ Función de previsualización no disponible', 'error');
+                            this.showNotification('❌ Función de previsualización no disponible o cargando lento. Inténtalo de nuevo.', 'error');
                         }
                     }
                 });
@@ -316,11 +327,22 @@ class UIManager {
                     const dietaId = e.target.getAttribute('data-id');
                     const dieta = dietas.find(d => d.id === dietaId);
                     if (dieta) {
+                        if (typeof window.generarPDFDesdeDietaObjeto !== 'function') {
+                            this.showNotification('⏳ Cargando impresor PDF, espera un momento...', 'info');
+                            // Reintentar cada 200ms hasta por 5 segundos
+                            for (let i = 0; i < 25; i++) {
+                                await new Promise(resolve => setTimeout(resolve, 200));
+                                if (typeof window.generarPDFDesdeDietaObjeto === 'function') {
+                                    break;
+                                }
+                            }
+                        }
+
                         if (typeof window.generarPDFDesdeDietaObjeto === 'function') {
                             await window.generarPDFDesdeDietaObjeto(dieta, 'print');
                             modal.style.display = 'none';
                         } else {
-                            this.showNotification('❌ Función de impresión no disponible', 'error');
+                            this.showNotification('❌ Función de impresión no disponible o cargando lento. Inténtalo de nuevo.', 'error');
                         }
                     }
                 });

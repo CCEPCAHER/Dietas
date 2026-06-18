@@ -1223,10 +1223,21 @@ class ClienteManager {
             return;
         }
  
+        if (typeof window.generarPDFDesdeDietaObjeto !== 'function') {
+            if (window.mostrarNotificacion) window.mostrarNotificacion('⏳ Cargando previsualizador PDF, espera un momento...', 'info');
+            // Reintentar cada 200ms hasta por 5 segundos
+            for (let i = 0; i < 25; i++) {
+                await new Promise(resolve => setTimeout(resolve, 200));
+                if (typeof window.generarPDFDesdeDietaObjeto === 'function') {
+                    break;
+                }
+            }
+        }
+ 
         if (typeof window.generarPDFDesdeDietaObjeto === 'function') {
             await window.generarPDFDesdeDietaObjeto(dieta, 'preview');
         } else {
-            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: El visualizador de PDFs no está disponible', 'error');
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: El visualizador de PDFs no está disponible o sigue cargando. Inténtalo de nuevo.', 'error');
         }
     }
  
@@ -1242,10 +1253,21 @@ class ClienteManager {
             return;
         }
  
+        if (typeof window.generarPDFDesdeDietaObjeto !== 'function') {
+            if (window.mostrarNotificacion) window.mostrarNotificacion('⏳ Cargando impresor PDF, espera un momento...', 'info');
+            // Reintentar cada 200ms hasta por 5 segundos
+            for (let i = 0; i < 25; i++) {
+                await new Promise(resolve => setTimeout(resolve, 200));
+                if (typeof window.generarPDFDesdeDietaObjeto === 'function') {
+                    break;
+                }
+            }
+        }
+ 
         if (typeof window.generarPDFDesdeDietaObjeto === 'function') {
             await window.generarPDFDesdeDietaObjeto(dieta, 'print');
         } else {
-            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: El impresor de PDFs no está disponible', 'error');
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: El impresor de PDFs no está disponible o sigue cargando. Inténtalo de nuevo.', 'error');
         }
     }
  
