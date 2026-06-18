@@ -2696,7 +2696,7 @@ function actualizarTodoAutomaticamente(skipObjetivoCheck = false) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+function iniciarScriptPrincipal() {
     // Inicializar estado de cambios sin guardar
     window.cambiosSinGuardar = false;
 
@@ -5984,7 +5984,13 @@ ${lineas.join('\n')}`;
         }, 3000);
     };
 
-}); // End DOMContentLoaded
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', iniciarScriptPrincipal);
+} else {
+    iniciarScriptPrincipal();
+}
 
 // ========================================
 // AUTOMATIC CALORIE RECALCULATION
