@@ -4227,9 +4227,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 semanas.push({ indice: semana + 1, columnas });
             }
 
-            if (!hayContenido) {
-                return null;
-            }
+            // if (!hayContenido) {
+            //     return null;
+            // }
 
             return { diasBase, comidas, semanas, formatoAlimento, esDiaDescanso };
         }
@@ -5714,7 +5714,8 @@ ${lineas.join('\n')}`;
                 return;
             }
 
-            const estructura = construirPlanSemanalEstructurado(dieta.planSemana, dieta);
+            const planAUsar = dieta.planSemana || {};
+            const estructura = construirPlanSemanalEstructurado(planAUsar, dieta);
             if (!estructura) {
                 mostrarNotificacion('❌ Dieta sin plan semanal estructurado', 'error');
                 return;
@@ -5750,7 +5751,7 @@ ${lineas.join('\n')}`;
             };
 
             const headerHTML = await generarHeaderPDF(datosHeader, fecha);
-            const tablaHTML = generarHTMLDesdeTablaEditable(dieta.planSemana, dieta);
+            const tablaHTML = generarHTMLDesdeTablaEditable(planAUsar, dieta);
 
             let htmlPDF = `
             <!DOCTYPE html>
