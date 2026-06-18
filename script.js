@@ -5714,8 +5714,21 @@ ${lineas.join('\n')}`;
                 return;
             }
 
-            const planAUsar = dieta.planSemana || {};
-            const estructura = construirPlanSemanalEstructurado(planAUsar, dieta);
+            // Normalizar el objeto dieta de la misma manera que en UIManager.cargarDietaDesdeObjeto
+            const dietaNormalizada = { ...dieta };
+            if (dietaNormalizada.fechaRegistro && typeof dietaNormalizada.fechaRegistro.toDate === 'function') {
+                const fechaObj = dietaNormalizada.fechaRegistro.toDate();
+                dietaNormalizada.fechaRegistro = fechaObj.toISOString().split('T')[0];
+            }
+            if (dietaNormalizada.fechaCreacion && typeof dietaNormalizada.fechaCreacion.toDate === 'function') {
+                dietaNormalizada.fechaCreacion = dietaNormalizada.fechaCreacion.toDate();
+            }
+            if (dietaNormalizada.fechaModificacion && typeof dietaNormalizada.fechaModificacion.toDate === 'function') {
+                dietaNormalizada.fechaModificacion = dietaNormalizada.fechaModificacion.toDate();
+            }
+
+            const planAUsar = dietaNormalizada.planSemana || {};
+            const estructura = construirPlanSemanalEstructurado(planAUsar, dietaNormalizada);
             if (!estructura) {
                 mostrarNotificacion('❌ Dieta sin plan semanal estructurado', 'error');
                 return;
@@ -5735,23 +5748,34 @@ ${lineas.join('\n')}`;
             const mmToPxPDF = 3.779527559;
             const viewportWidth = esMovilPDF ? Math.round(pageWidthPDF * mmToPxPDF) : 'device-width';
 
-            const fecha = dieta.fechaCreacion ? 
-                (dieta.fechaCreacion.toDate ? dieta.fechaCreacion.toDate().toLocaleDateString('es-ES') : new Date(dieta.fechaCreacion).toLocaleDateString('es-ES')) : 
-                new Date().toLocaleDateString('es-ES');
+            // Conversión de fecha ultra-segura para evitar RangeError: Invalid time value
+            let fecha = new Date().toLocaleDateString('es-ES');
+            if (dietaNormalizada.fechaCreacion) {
+                if (dietaNormalizada.fechaCreacion instanceof Date) {
+                    fecha = dietaNormalizada.fechaCreacion.toLocaleDateString('es-ES');
+                } else if (dietaNormalizada.fechaCreacion.seconds) {
+                    fecha = new Date(dietaNormalizada.fechaCreacion.seconds * 1000).toLocaleDateString('es-ES');
+                } else {
+                    const parsedDate = new Date(dietaNormalizada.fechaCreacion);
+                    if (!isNaN(parsedDate.getTime())) {
+                        fecha = parsedDate.toLocaleDateString('es-ES');
+                    }
+                }
+            }
 
             const datosHeader = {
-                nombre: dieta.nombre || 'Cliente',
-                edad: dieta.edad,
-                altura: dieta.altura,
-                peso: dieta.peso,
-                imc: dieta.imc,
-                sexo: dieta.sexo,
-                tipoPersona: dieta.tipoPersona,
-                objetivo: dieta.objetivo
+                nombre: dietaNormalizada.nombre || 'Cliente',
+                edad: dietaNormalizada.edad,
+                altura: dietaNormalizada.altura,
+                peso: dietaNormalizada.peso,
+                imc: dietaNormalizada.imc,
+                sexo: dietaNormalizada.sexo,
+                tipoPersona: dietaNormalizada.tipoPersona,
+                objetivo: dietaNormalizada.objetivo
             };
 
             const headerHTML = await generarHeaderPDF(datosHeader, fecha);
-            const tablaHTML = generarHTMLDesdeTablaEditable(planAUsar, dieta);
+            const tablaHTML = generarHTMLDesdeTablaEditable(planAUsar, dietaNormalizada);
 
             let htmlPDF = `
             <!DOCTYPE html>
@@ -5770,7 +5794,7 @@ ${lineas.join('\n')}`;
             `;
 
             window._ultimaFuentePDF = 'objeto-dieta';
-            window._ultimaDietaPDFObjeto = dieta;
+            window._ultimaDietaPDFObjeto = dietaNormalizada;
 
             await window.mostrarPreviewPDF(htmlPDF, datosHeader.nombre);
 
@@ -5779,7 +5803,7 @@ ${lineas.join('\n')}`;
                     const modal = document.getElementById('pdfPreviewModal');
                     const iframe = document.getElementById('pdfPreviewIframe');
                     if (modal && iframe) {
-                        const orientationSelect = document.getElementById('pdfPreviewOrientation');
+                        const orientationSelect = document.getElementById('pdfOrientationSelect') || document.getElementById('pdfPreviewOrientation');
                         const orientation = orientationSelect ? orientationSelect.value : 'landscape';
                         const htmlOriginal = modal.dataset.htmlPDFOriginal || htmlPDF;
                         const htmlFinal = obtenerHTMLDesdeIframe(iframe, htmlOriginal);
@@ -5952,6 +5976,9 @@ ${lineas.join('\n')}`;
             });
         }
     }
+
+    // Inicializar botones y funciones PDF/Excel inmediatamente al cargar la página
+    window.inicializarBotones();
 
     // Hacer función global
     window.mostrarNotificacion = function (mensaje, tipo = 'info') {

@@ -574,103 +574,113 @@
                 </div>
 
                 <div id="tab-dieta" class="tab-content active">
-                    <!-- Tabla de Macronutrientes -->
-                    <div class="macro-table">
-                        <h3>Macronutrientes</h3>
-                        <table class="tabla-macros">
-                            <thead>
-                                <tr>
-                                    <th>NUTRIENTE</th>
-                                    <th>AUTOMÁTICO</th>
-                                    <th>AJUSTE MANUAL</th>
-                                    <th>SELECCIONADO</th>
-                                    <th>% CALORÍAS</th>
-                                    <th>CONSUMIDO</th>
-                                    <th>ESTADO</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-macros-body">
-                                <!-- Se llenará con JS -->
-                            </tbody>
-                        </table>
+                    <!-- Panel Colapsable de Cálculos -->
+                    <div id="toggleCalculosContainer" class="toggle-calculos-container">
+                        <button type="button" id="btnToggleCalculosInline" class="btn-toggle-calculos-inline">
+                            📊 Mostrar/Ocultar Cálculos y Macronutrientes Detallados
+                        </button>
+                    </div>
+                    
+                    <div id="seccion-calculos-nutricionales" class="calculos-nutricionales-panel collapsed">
+                        <!-- Tabla de Macronutrientes -->
+                        <div class="macro-table">
+                            <h3>Macronutrientes</h3>
+                            <table class="tabla-macros">
+                                <thead>
+                                    <tr>
+                                        <th>NUTRIENTE</th>
+                                        <th>AUTOMÁTICO</th>
+                                        <th>AJUSTE MANUAL</th>
+                                        <th>SELECCIONADO</th>
+                                        <th>% CALORÍAS</th>
+                                        <th>CONSUMIDO</th>
+                                        <th>ESTADO</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-macros-body">
+                                    <!-- Se llenará con JS -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Calculadora TMB -->
+                        <div id="tmb-calculator"></div>
+
+                        <!-- Información del Usuario -->
+                        <div class="info-usuario-table">
+                            <h3>Información del Usuario</h3>
+                            <table class="tabla-info">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Fecha registro</th>
+                                        <th>Sexo</th>
+                                        <th>Edad</th>
+                                        <th>Peso corporal</th>
+                                        <th>Altura</th>
+                                        <th>Tipo persona</th>
+                                        <th>Actividad física del deporte</th>
+                                        <th>Efecto termogénico de los alimentos</th>
+                                        <th>Objetivo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-info-body">
+                                    <!-- Se llenará con JS -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Distribución de Entrenamientos -->
+                        <div id="distribucion-entrenos" class="distribucion-entrenos-section">
+                            <h3>📅 Distribución Semanal de Entrenamientos</h3>
+                            <table class="tabla-entrenos">
+                                <thead>
+                                    <tr>
+                                        <th>Día</th>
+                                        <th>Actividad</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-entrenos-body">
+                                    <!-- Se llenará con JS -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Cálculos Detallados -->
+                        <div id="calculos-detallados" class="calculos-detallados-section">
+                            <h3>📊 Cálculos Nutricionales Detallados</h3>
+                            <table class="tabla-calculos">
+                                <thead>
+                                    <tr>
+                                        <th>Concepto</th>
+                                        <th>Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-calculos-body">
+                                    <!-- Se llenará con JS -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Distribución de Macronutrientes -->
+                        <div id="macronutrientes-distribucion" class="macronutrientes-section">
+                            <h3>🥗 Distribución de Macronutrientes</h3>
+                            <table class="tabla-macros-distribucion">
+                                <thead>
+                                    <tr>
+                                        <th>Macronutriente</th>
+                                        <th>MODO MANUAL</th>
+                                        <th>G/KG CORPORAL (Entreno)</th>
+                                        <th>G/KG CORPORAL (Descanso)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-macros-distribucion-body">
+                                    <!-- Se llenará con JS -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <!-- Calculadora TMB -->
-                    <div id="tmb-calculator"></div>
-
-                    <!-- Información del Usuario -->
-                    <div class="info-usuario-table">
-                        <h3>Información del Usuario</h3>
-                        <table class="tabla-info">
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Fecha registro</th>
-                                    <th>Sexo</th>
-                                    <th>Edad</th>
-                                    <th>Peso corporal</th>
-                                    <th>Altura</th>
-                                    <th>Tipo persona</th>
-                                    <th>Actividad física del deporte</th>
-                                    <th>Efecto termogénico de los alimentos</th>
-                                    <th>Objetivo</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-info-body">
-                                <!-- Se llenará con JS -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Distribución de Entrenamientos -->
-                    <div id="distribucion-entrenos" class="distribucion-entrenos-section">
-                        <h3>📅 Distribución Semanal de Entrenamientos</h3>
-                        <table class="tabla-entrenos">
-                            <thead>
-                                <tr>
-                                    <th>Día</th>
-                                    <th>Actividad</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-entrenos-body">
-                                <!-- Se llenará con JS -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Cálculos Detallados -->
-                    <div id="calculos-detallados" class="calculos-detallados-section">
-                        <h3>📊 Cálculos Nutricionales Detallados</h3>
-                        <table class="tabla-calculos">
-                            <thead>
-                                <tr>
-                                    <th>Concepto</th>
-                                    <th>Valor</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-calculos-body">
-                                <!-- Se llenará con JS -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Distribución de Macronutrientes -->
-                    <div id="macronutrientes-distribucion" class="macronutrientes-section">
-                        <h3>🥗 Distribución de Macronutrientes</h3>
-                        <table class="tabla-macros-distribucion">
-                            <thead>
-                                <tr>
-                                    <th>Macronutriente</th>
-                                    <th>MODO MANUAL</th>
-                                    <th>G/KG CORPORAL (Entreno)</th>
-                                    <th>G/KG CORPORAL (Descanso)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-macros-distribucion-body">
-                                <!-- Se llenará con JS -->
-                            </tbody>
-                        </table>
-                    </div>
 
                     <!-- Plan de Alimentación Semanal -->
                     <div id="plan-alimentacion" class="plan-alimentacion">

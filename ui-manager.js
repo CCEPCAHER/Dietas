@@ -73,6 +73,25 @@ class UIManager {
         window.addEventListener('userLoggedOut', () => {
             this.updateUIForLoggedOutUser();
         });
+
+        // Toggle inline calculations
+        const btnToggleCalculosInline = document.getElementById('btnToggleCalculosInline');
+        if (btnToggleCalculosInline) {
+            btnToggleCalculosInline.addEventListener('click', () => {
+                const calculosPanel = document.getElementById('seccion-calculos-nutricionales');
+                if (calculosPanel) {
+                    const isCollapsed = calculosPanel.classList.contains('collapsed');
+                    if (isCollapsed) {
+                        calculosPanel.classList.remove('collapsed');
+                    } else {
+                        calculosPanel.classList.add('collapsed');
+                    }
+                    if (window.mostrarNotificacion) {
+                        window.mostrarNotificacion(isCollapsed ? '📊 Detalles nutricionales visibles' : '📊 Detalles nutricionales ocultados', 'info');
+                    }
+                }
+            });
+        }
     }
 
     async handleLogin() {
@@ -123,54 +142,113 @@ class UIManager {
         const userInfoDiv = document.getElementById('userInfo');
         if (userInfoDiv) {
             userInfoDiv.innerHTML = `
-                <div class="user-menu">
+                <div class="user-menu-container">
                     <span class="user-name">👤 ${user.email}</span>
-                    <button id="btnClientes" class="btn-clientes">👥 Mis Clientes</button>
-                    <button id="btnGestorAlimentos" class="btn-gestor-alimentos">🍎 Gestor Alimentos</button>
-                    <button id="misDietasBtn" class="btn-dietas">Mis Dietas</button>
-                    <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
+                    <div class="hamburger-menu">
+                        <button id="menuToggleBtn" class="menu-toggle-btn" title="Menú de opciones">
+                            <span class="hamburger-icon">☰</span> Menú
+                        </button>
+                        <div id="menuDropdown" class="menu-dropdown-content">
+                            <button id="btnClientes" class="menu-item">👥 Mis Clientes</button>
+                            <button id="btnGestorAlimentos" class="menu-item">🍎 Gestor Alimentos</button>
+                            <button id="misDietasBtn" class="menu-item">📂 Mis Dietas-Plantillas</button>
+                            <hr class="menu-divider">
+                            <button id="btnToggleForm" class="menu-item">📋 Mostrar/Ocultar Formulario</button>
+                            <button id="btnToggleCalculos" class="menu-item">📊 Mostrar/Ocultar Detalles</button>
+                            <hr class="menu-divider">
+                            <button id="logoutBtn" class="menu-item logout-item">🚪 Cerrar Sesión</button>
+                        </div>
+                    </div>
                 </div>
             `;
+
+            const menuToggleBtn = document.getElementById('menuToggleBtn');
+            const menuDropdown = document.getElementById('menuDropdown');
+            if (menuToggleBtn && menuDropdown) {
+                menuToggleBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    menuDropdown.classList.toggle('show');
+                });
+
+                document.addEventListener('click', () => {
+                    menuDropdown.classList.remove('show');
+                });
+
+                menuDropdown.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+            }
+
             document.getElementById('logoutBtn').addEventListener('click', this.handleLogout.bind(this));
-            document.getElementById('misDietasBtn').addEventListener('click', this.showMisDietas.bind(this));
+            
+            document.getElementById('misDietasBtn').addEventListener('click', (e) => {
+                if (menuDropdown) menuDropdown.classList.remove('show');
+                this.showMisDietas(e);
+            });
 
             document.getElementById('btnGestorAlimentos').addEventListener('click', () => {
+                if (menuDropdown) menuDropdown.classList.remove('show');
                 window.location.href = 'admin-alimentos.html';
             });
 
-            // Agregar event listener para botón de clientes - con múltiples intentos
+            const btnToggleForm = document.getElementById('btnToggleForm');
+            if (btnToggleForm) {
+                btnToggleForm.addEventListener('click', () => {
+                    if (menuDropdown) menuDropdown.classList.remove('show');
+                    const formContainer = document.querySelector('.form-container');
+                    if (formContainer) {
+                        const isHidden = formContainer.style.display === 'none';
+                        formContainer.style.display = isHidden ? 'block' : 'none';
+                        if (window.mostrarNotificacion) {
+                            window.mostrarNotificacion(isHidden ? '📋 Formulario visible' : '📋 Formulario ocultado', 'info');
+                        }
+                    }
+                });
+            }
+
+            const btnToggleCalculos = document.getElementById('btnToggleCalculos');
+            if (btnToggleCalculos) {
+                btnToggleCalculos.addEventListener('click', () => {
+                    if (menuDropdown) menuDropdown.classList.remove('show');
+                    const calculosPanel = document.getElementById('seccion-calculos-nutricionales');
+                    if (calculosPanel) {
+                        const isCollapsed = calculosPanel.classList.contains('collapsed');
+                        if (isCollapsed) {
+                            calculosPanel.classList.remove('collapsed');
+                        } else {
+                            calculosPanel.classList.add('collapsed');
+                        }
+                        if (window.mostrarNotificacion) {
+                            window.mostrarNotificacion(isCollapsed ? '📊 Detalles nutricionales visibles' : '📊 Detalles nutricionales ocultados', 'info');
+                        }
+                    }
+                });
+            }
+
             const agregarListenerCliente = () => {
                 const btnClientes = document.getElementById('btnClientes');
                 if (btnClientes) {
-                    // Remover listeners anteriores para evitar duplicados
                     const nuevoBtn = btnClientes.cloneNode(true);
                     btnClientes.parentNode.replaceChild(nuevoBtn, btnClientes);
 
                     nuevoBtn.addEventListener('click', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
+                        if (menuDropdown) menuDropdown.classList.remove('show');
                         console.log('Botón Mis Clientes clicked');
 
                         if (window.clienteManager) {
-                            console.log('Llamando a mostrarSeccionClientes');
                             window.clienteManager.mostrarSeccionClientes();
                         } else {
-                            console.error('clienteManager no está disponible');
-                            console.error('Sistema de clientes no cargado');
                             if (window.mostrarNotificacion) window.mostrarNotificacion('Error: El sistema de clientes no está listo.', 'error');
                         }
                     });
-
-                    console.log('Event listener agregado al botón de clientes');
                 } else {
-                    console.warn('Botón btnClientes no encontrado aún, reintentando...');
                     setTimeout(agregarListenerCliente, 200);
                 }
             };
 
-            // Intentar inmediatamente y también después de un delay
             agregarListenerCliente();
-            setTimeout(agregarListenerCliente, 300);
         }
     }
 
@@ -637,7 +715,12 @@ class UIManager {
             }
             const formContainer = document.querySelector('.form-container');
             if (formContainer) {
-                formContainer.style.display = 'block';
+                formContainer.style.display = 'none';
+            }
+
+            const calculosPanel = document.getElementById('seccion-calculos-nutricionales');
+            if (calculosPanel) {
+                calculosPanel.classList.add('collapsed');
             }
 
             this.showNotification('✅ Dieta cargada correctamente', 'success');

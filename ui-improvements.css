@@ -2379,3 +2379,189 @@ body.dark-mode .card-modern.expanded {
   background: #6b46c1 !important;
 }
 
+/* Hamburger Menu and Collapsed Layout Styles */
+.user-menu-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  width: 100%;
+}
+
+.hamburger-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.menu-toggle-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+}
+
+.menu-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+}
+
+.hamburger-icon {
+  font-size: 1.1rem;
+}
+
+.menu-dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background-color: white;
+  min-width: 250px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  z-index: 1000;
+  overflow: hidden;
+  border: 1px solid #edf2f7;
+  animation: slideInDown 0.2s ease;
+}
+
+body.dark-mode .menu-dropdown-content {
+  background-color: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.menu-dropdown-content.show {
+  display: block;
+}
+
+.menu-item {
+  width: 100%;
+  text-align: left;
+  padding: 12px 20px;
+  border: none;
+  background: none;
+  color: #4a5568;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .menu-item {
+  color: #e2e8f0;
+}
+
+.menu-item:hover {
+  background-color: #f7fafc;
+  color: #667eea;
+  padding-left: 24px;
+}
+
+body.dark-mode .menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #818cf8;
+}
+
+.menu-divider {
+  border: 0;
+  border-top: 1px solid #edf2f7;
+  margin: 4px 0;
+}
+
+body.dark-mode .menu-divider {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.logout-item {
+  color: #e53e3e;
+}
+
+.logout-item:hover {
+  background-color: #fff5f5;
+  color: #e53e3e;
+}
+
+body.dark-mode .logout-item:hover {
+  background-color: rgba(229, 62, 98, 0.1);
+}
+
+/* Collapsible Nutritional Details Panel */
+.calculos-nutricionales-panel {
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  opacity: 1;
+  max-height: 5000px;
+  overflow: visible;
+}
+
+.calculos-nutricionales-panel.collapsed {
+  display: none !important;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.toggle-calculos-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+  width: 100%;
+}
+
+.btn-toggle-calculos-inline {
+  background: white;
+  color: #4a5568;
+  border: 2px solid #e2e8f0;
+  padding: 10px 24px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .btn-toggle-calculos-inline {
+  background: var(--bg-card);
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.btn-toggle-calculos-inline:hover {
+  border-color: #667eea;
+  color: #667eea;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(102, 126, 234, 0.15);
+}
+
+body.dark-mode .btn-toggle-calculos-inline:hover {
+  border-color: #818cf8;
+  color: #818cf8;
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
