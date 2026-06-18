@@ -2240,3 +2240,142 @@ body.dark-mode .btn-modern-secondary:hover {
   margin: 10px 0 !important;
 }
 
+
+/* Collapsible Cards (Dashboard Questionnaire) */
+.collapsible-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-left-color 0.3s ease !important;
+}
+
+.card-header-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  padding-bottom: 4px;
+}
+
+.card-header-toggle h2 {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.card-header-toggle h2::after {
+  display: none !important; /* Quitar línea estática de h2 en modo colapsable */
+}
+
+.card-toggle-icon {
+  font-size: 1.1rem;
+  color: #667eea;
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(102, 126, 234, 0.1);
+}
+
+body.dark-mode .card-toggle-icon {
+  color: #818cf8;
+  background: rgba(129, 140, 248, 0.15);
+}
+
+.card-modern.expanded .card-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.card-modern .card-body {
+  max-height: 2000px;
+  opacity: 1;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, margin-top 0.4s ease;
+  margin-top: 20px;
+}
+
+.card-modern.collapsed .card-body {
+  max-height: 0 !important;
+  opacity: 0 !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  pointer-events: none;
+}
+
+.card-modern.collapsed {
+  background: #fdfdfd;
+  border-left: 4px solid rgba(102, 126, 234, 0.3) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+body.dark-mode .card-modern.collapsed {
+  background: rgba(255, 255, 255, 0.01);
+  border-left: 4px solid rgba(129, 140, 248, 0.3) !important;
+}
+
+.card-modern.expanded {
+  border-left: 4px solid #667eea !important;
+}
+
+body.dark-mode .card-modern.expanded {
+  border-left: 4px solid #818cf8 !important;
+}
+
+/* Estilos de botones de previsualización e impresión directa */
+.btn-visualizar-directo,
+.btn-imprimir-directo {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 0.9em;
+}
+
+.btn-visualizar-directo {
+  background: #3182ce;
+  color: white;
+}
+
+.btn-visualizar-directo:hover {
+  background: #2b6cb0;
+}
+
+.btn-imprimir-directo {
+  background: #805ad5;
+  color: white;
+}
+
+.btn-imprimir-directo:hover {
+  background: #6b46c1;
+}
+
+/* Ajustes Responsive para botones de acciones en tarjetas de dietas */
+@media (max-width: 768px) {
+  .dieta-actions {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  
+  .dieta-actions button,
+  .dieta-actions .btn-visualizar-directo,
+  .dieta-actions .btn-imprimir-directo {
+    flex: 1 1 calc(50% - 8px) !important;
+    min-width: 110px !important;
+    text-align: center;
+    padding: 10px 5px !important;
+  }
+}
+
+/* Hover effects for direct buttons in client history card */
+.btn-visualizar-dieta-directo:hover {
+  background: #2b6cb0 !important;
+}
+
+.btn-imprimir-dieta-directo:hover {
+  background: #6b46c1 !important;
+}
+

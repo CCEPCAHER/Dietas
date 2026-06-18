@@ -3259,7 +3259,69 @@ document.addEventListener('DOMContentLoaded', function () {
     cards.forEach((card, index) => {
         card.style.animationDelay = `${index * 0.1}s`;
     });
-    // }); // Removed premature close
+    
+    // Inicializar tarjetas colapsables del formulario
+    inicializarTarjetasColapsables();
+
+    function inicializarTarjetasColapsables() {
+        const formCards = document.querySelectorAll('.form-container .card-modern');
+        formCards.forEach((card, index) => {
+            const h2 = card.querySelector('h2');
+            if (!h2) return;
+
+            card.classList.add('collapsible-card');
+
+            // 1. Crear cabecera de la tarjeta
+            const header = document.createElement('div');
+            header.className = 'card-header-toggle';
+
+            // Crear icono de expansión
+            const icon = document.createElement('span');
+            icon.className = 'card-toggle-icon';
+            icon.innerHTML = '▼';
+
+            // 2. Envolver el h2 y el icono
+            h2.parentNode.insertBefore(header, h2);
+            header.appendChild(h2);
+            header.appendChild(icon);
+
+            // 3. Crear el cuerpo de la tarjeta y mover todos los hermanos dentro de él
+            const body = document.createElement('div');
+            body.className = 'card-body';
+
+            while (header.nextSibling) {
+                body.appendChild(header.nextSibling);
+            }
+            card.appendChild(body);
+
+            // 4. Establecer estado inicial (primera expandida, resto colapsadas)
+            if (index > 0) {
+                card.classList.add('collapsed');
+            } else {
+                card.classList.add('expanded');
+            }
+
+            // 5. Manejador para alternar colapso al hacer clic
+            header.addEventListener('click', () => {
+                const isCollapsed = card.classList.contains('collapsed');
+                if (isCollapsed) {
+                    card.classList.remove('collapsed');
+                    card.classList.add('expanded');
+                } else {
+                    card.classList.add('collapsed');
+                    card.classList.remove('expanded');
+                }
+            });
+
+            // 6. Expandir automáticamente si tiene campos inválidos
+            card.addEventListener('invalid', () => {
+                if (card.classList.contains('collapsed')) {
+                    card.classList.remove('collapsed');
+                    card.classList.add('expanded');
+                }
+            }, true); // Usar fase de captura
+        });
+    }
 
     window.inicializarBotones = function () {
         // Botón guardar dieta
@@ -4072,23 +4134,29 @@ document.addEventListener('DOMContentLoaded', function () {
          * Construye una estructura normalizada del plan semanal para reutilizar en PDF/Excel
          * @returns {{diasBase: string[], comidas: string[], semanas: Array, formatoAlimento: Function, esDiaDescanso: Function}|null}
          */
-        function construirPlanSemanalEstructurado() {
+        function construirPlanSemanalEstructurado(customPlan = null, customDatosUsuario = null) {
             const diasBase = window.tablaEditable?.dias || ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
             const comidas = window.tablaEditable?.comidas || ['Desayuno', 'Media Mañana', 'Comida', 'Merienda', 'Cena'];
-            const planEditable = window.tablaEditable?.planSemana;
-            const planDatosUsuario = datosUsuario?.planSemana;
+            
+            const activeDatosUsuario = customDatosUsuario || datosUsuario;
+            const planDatosUsuario = activeDatosUsuario?.planSemana;
 
-            const tieneContenidoPlan = (obj) => {
-                if (!obj || typeof obj !== 'object') return false;
-                return Object.values(obj).some(dia => {
-                    if (!dia || typeof dia !== 'object') return false;
-                    return Object.values(dia).some(comida => Array.isArray(comida) && comida.length > 0);
-                });
-            };
-
-            const plan = tieneContenidoPlan(planEditable) ? planEditable
-                : tieneContenidoPlan(planDatosUsuario) ? planDatosUsuario
-                : {};
+            let plan;
+            if (customPlan) {
+                plan = customPlan;
+            } else {
+                const planEditable = window.tablaEditable?.planSemana;
+                const tieneContenidoPlan = (obj) => {
+                    if (!obj || typeof obj !== 'object') return false;
+                    return Object.values(obj).some(dia => {
+                        if (!dia || typeof dia !== 'object') return false;
+                        return Object.values(dia).some(comida => Array.isArray(comida) && comida.length > 0);
+                    });
+                };
+                plan = tieneContenidoPlan(planEditable) ? planEditable
+                    : tieneContenidoPlan(planDatosUsuario) ? planDatosUsuario
+                    : {};
+            }
 
             const normalizar = (texto = '') => texto
                 .toString()
@@ -4099,11 +4167,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 .trim();
 
             const esDiaDescanso = (nombreDia) => {
-                if (!window.datosUsuario || !Array.isArray(window.datosUsuario.diasEntreno) || window.datosUsuario.diasEntreno.length === 0) {
-                    return false; // Si no hay días seleccionados, todos son de entreno por defecto (consistente con esDiaDescanso global)
+                if (!activeDatosUsuario || !Array.isArray(activeDatosUsuario.diasEntreno) || activeDatosUsuario.diasEntreno.length === 0) {
+                    return false; // Si no hay días seleccionados, todos son de entreno por defecto
                 }
                 const valorDia = normalizar(nombreDia);
-                const diasEntrenoNormalizados = window.datosUsuario.diasEntreno.map(d => normalizar(d));
+                const diasEntrenoNormalizados = activeDatosUsuario.diasEntreno.map(d => normalizar(d));
                 return !diasEntrenoNormalizados.includes(valorDia);
             };
 
@@ -4288,8 +4356,8 @@ document.addEventListener('DOMContentLoaded', function () {
          * Genera el HTML del plan desde tabla editable
          * @returns {string}
          */
-        function generarHTMLDesdeTablaEditable() {
-            const estructura = construirPlanSemanalEstructurado();
+        function generarHTMLDesdeTablaEditable(customPlan = null, customDatosUsuario = null) {
+            const estructura = construirPlanSemanalEstructurado(customPlan, customDatosUsuario);
             if (!estructura) {
                 return '<div class="plan-tabla-editable"><p style="padding:8px;font-size:9pt;">No hay datos disponibles para generar el plan semanal.</p></div>';
             }
@@ -5123,10 +5191,13 @@ ${lineas.join('\n')}`;
                     editBanner.style.display = 'none';
 
                     // Regenerar completamente el PDF desde los datos actuales
-                    // Esto vuelve a llamar a generarPDFProfesional que recargará el modal
                     cerrarPreviewModal(modal);
                     const fuenteActual = window._ultimaFuentePDF || 'principal';
-                    if (typeof window.generarPDFProfesional === 'function') {
+                    if (fuenteActual === 'objeto-dieta' && window._ultimaDietaPDFObjeto) {
+                        if (typeof window.generarPDFDesdeDietaObjeto === 'function') {
+                            await window.generarPDFDesdeDietaObjeto(window._ultimaDietaPDFObjeto);
+                        }
+                    } else if (typeof window.generarPDFProfesional === 'function') {
                         await window.generarPDFProfesional(fuenteActual);
                     }
                 };
@@ -5632,6 +5703,89 @@ ${lineas.join('\n')}`;
 
             // Mostrar previsualización del PDF en lugar de descargar directamente
             await window.mostrarPreviewPDF(htmlPDF, nombreCliente);
+        };
+
+        window.generarPDFDesdeDietaObjeto = async function (dieta, accion = 'preview') {
+            mostrarNotificacion('⏳ Generando PDF...', 'info');
+
+            const libreriasListas = await window.esperarLibreriasPDF();
+            if (!libreriasListas) {
+                mostrarNotificacion('❌ Error: Librerías PDF no disponibles', 'error');
+                return;
+            }
+
+            const estructura = construirPlanSemanalEstructurado(dieta.planSemana, dieta);
+            if (!estructura) {
+                mostrarNotificacion('❌ Dieta sin plan semanal estructurado', 'error');
+                return;
+            }
+
+            const tamanosFuente = calcularTamanosFuenteDinamicos(estructura);
+            window.tamanosFuentePDF = tamanosFuente;
+
+            const cssHTML = generarCSSPDF(tamanosFuente);
+            const bodyClass = 'layout-landscape';
+
+            const esMovilPDF = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|mobile|CriOS/i.test(navigator.userAgent) ||
+                (window.innerWidth <= 768) ||
+                ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
+            const pageWidthPDF = 297;
+            const mmToPxPDF = 3.779527559;
+            const viewportWidth = esMovilPDF ? Math.round(pageWidthPDF * mmToPxPDF) : 'device-width';
+
+            const fecha = dieta.fechaCreacion ? 
+                (dieta.fechaCreacion.toDate ? dieta.fechaCreacion.toDate().toLocaleDateString('es-ES') : new Date(dieta.fechaCreacion).toLocaleDateString('es-ES')) : 
+                new Date().toLocaleDateString('es-ES');
+
+            const datosHeader = {
+                nombre: dieta.nombre || 'Cliente',
+                edad: dieta.edad,
+                altura: dieta.altura,
+                peso: dieta.peso,
+                imc: dieta.imc,
+                sexo: dieta.sexo,
+                tipoPersona: dieta.tipoPersona,
+                objetivo: dieta.objetivo
+            };
+
+            const headerHTML = await generarHeaderPDF(datosHeader, fecha);
+            const tablaHTML = generarHTMLDesdeTablaEditable(dieta.planSemana, dieta);
+
+            let htmlPDF = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=${viewportWidth}, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+                <title>Plan de Alimentación - ${datosHeader.nombre}</title>
+                <style>${cssHTML}</style>
+            </head>
+            <body class="${bodyClass}">
+                ${headerHTML}
+                ${tablaHTML}
+            </body>
+            </html>
+            `;
+
+            window._ultimaFuentePDF = 'objeto-dieta';
+            window._ultimaDietaPDFObjeto = dieta;
+
+            await window.mostrarPreviewPDF(htmlPDF, datosHeader.nombre);
+
+            if (accion === 'print') {
+                setTimeout(() => {
+                    const modal = document.getElementById('pdfPreviewModal');
+                    const iframe = document.getElementById('pdfPreviewIframe');
+                    if (modal && iframe) {
+                        const orientationSelect = document.getElementById('pdfPreviewOrientation');
+                        const orientation = orientationSelect ? orientationSelect.value : 'landscape';
+                        const htmlOriginal = modal.dataset.htmlPDFOriginal || htmlPDF;
+                        const htmlFinal = obtenerHTMLDesdeIframe(iframe, htmlOriginal);
+                        window.imprimirPDFDesdePreview(htmlFinal, orientation);
+                    }
+                }, 1200);
+            }
         };
 
         // Botón descargar PDF

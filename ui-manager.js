@@ -258,6 +258,8 @@ class UIManager {
                         </div>
                         <div class="dieta-actions">
                             <button class="btn-cargar" data-id="${dieta.id}">Cargar</button>
+                            <button class="btn-visualizar-directo" data-id="${dieta.id}" title="Previsualizar PDF sin cargar">👁️ Preview</button>
+                            <button class="btn-imprimir-directo" data-id="${dieta.id}" title="Imprimir PDF sin cargar">🖨️ Imprimir</button>
                             <button class="btn-eliminar" data-id="${dieta.id}">Eliminar</button>
                         </div>
                     </div>
@@ -289,6 +291,36 @@ class UIManager {
                         await this.cargarDieta(dietaId);
                     }
                     modal.style.display = 'none';
+                });
+            });
+
+            // Event listeners para visualizar directo
+            dietasList.querySelectorAll('.btn-visualizar-directo').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const dietaId = e.target.getAttribute('data-id');
+                    const dieta = dietas.find(d => d.id === dietaId);
+                    if (dieta) {
+                        if (typeof window.generarPDFDesdeDietaObjeto === 'function') {
+                            await window.generarPDFDesdeDietaObjeto(dieta, 'preview');
+                        } else {
+                            this.showNotification('❌ Función de previsualización no disponible', 'error');
+                        }
+                    }
+                });
+            });
+
+            // Event listeners para imprimir directo
+            dietasList.querySelectorAll('.btn-imprimir-directo').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const dietaId = e.target.getAttribute('data-id');
+                    const dieta = dietas.find(d => d.id === dietaId);
+                    if (dieta) {
+                        if (typeof window.generarPDFDesdeDietaObjeto === 'function') {
+                            await window.generarPDFDesdeDietaObjeto(dieta, 'print');
+                        } else {
+                            this.showNotification('❌ Función de impresión no disponible', 'error');
+                        }
+                    }
                 });
             });
 

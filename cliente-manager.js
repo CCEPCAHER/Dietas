@@ -878,8 +878,10 @@ class ClienteManager {
                             <div style="color: #333; font-size: 1.2em; font-weight: 700;">${dieta.calorias || 'N/A'} kcal</div>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 10px; margin-top: 15px;">
-                        <button class="btn-ver-dieta" onclick="clienteManager.verDietaDetalle('${dieta.id}')" style="flex: 1; padding: 10px; background: #f39c12; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📄 Ver Detalle</button>
+                    <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                        <button class="btn-ver-dieta" onclick="clienteManager.verDietaDetalle('${dieta.id}')" style="flex: 1; min-width: 110px; padding: 10px; background: #f39c12; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📄 Ver Detalle</button>
+                        <button class="btn-visualizar-dieta-directo" onclick="clienteManager.visualizarDietaDirecto('${dieta.id}')" style="padding: 10px 15px; background: #3182ce; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;" title="Previsualizar PDF">👁️ Preview</button>
+                        <button class="btn-imprimir-dieta-directo" onclick="clienteManager.imprimirDietaDirecto('${dieta.id}')" style="padding: 10px 15px; background: #805ad5; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;" title="Imprimir PDF">🖨️ Imprimir</button>
                         <button class="btn-eliminar-dieta-cliente" onclick="clienteManager.eliminarDietaCliente('${dieta.id}')" style="padding: 10px 15px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;" title="Eliminar dieta del historial">🗑️</button>
                     </div>
                 </div>
@@ -1208,7 +1210,45 @@ class ClienteManager {
             if (window.mostrarNotificacion) window.mostrarNotificacion('Error: El cargador de dietas no está disponible', 'error');
         }
     }
-
+ 
+    async visualizarDietaDirecto(dietaId) {
+        if (!this.clienteActual || !this.clienteActual.historialDietas) {
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: No se encontró la información del cliente', 'error');
+            return;
+        }
+ 
+        const dieta = this.clienteActual.historialDietas.find(d => d.id === dietaId);
+        if (!dieta) {
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: Dieta no encontrada en el historial', 'error');
+            return;
+        }
+ 
+        if (typeof window.generarPDFDesdeDietaObjeto === 'function') {
+            await window.generarPDFDesdeDietaObjeto(dieta, 'preview');
+        } else {
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: El visualizador de PDFs no está disponible', 'error');
+        }
+    }
+ 
+    async imprimirDietaDirecto(dietaId) {
+        if (!this.clienteActual || !this.clienteActual.historialDietas) {
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: No se encontró la información del cliente', 'error');
+            return;
+        }
+ 
+        const dieta = this.clienteActual.historialDietas.find(d => d.id === dietaId);
+        if (!dieta) {
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: Dieta no encontrada en el historial', 'error');
+            return;
+        }
+ 
+        if (typeof window.generarPDFDesdeDietaObjeto === 'function') {
+            await window.generarPDFDesdeDietaObjeto(dieta, 'print');
+        } else {
+            if (window.mostrarNotificacion) window.mostrarNotificacion('Error: El impresor de PDFs no está disponible', 'error');
+        }
+    }
+ 
     async eliminarDietaCliente(dietaId) {
         if (!this.clienteActual || !this.clienteActual.id) {
             if (window.mostrarNotificacion) window.mostrarNotificacion('Error: No se encontró la información del cliente', 'error');
